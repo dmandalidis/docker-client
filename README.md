@@ -1,21 +1,13 @@
 # Docker Client
 
-[![Build Status](https://travis-ci.com/spotify/docker-client.svg?branch=master)](https://travis-ci.com/spotify/docker-client)
-[![codecov](https://codecov.io/github/spotify/docker-client/coverage.svg?branch=master)](https://codecov.io/github/spotify/docker-client?branch=master)
-[![Maven Central](https://img.shields.io/maven-central/v/com.spotify/docker-client.svg)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.spotify%22%20docker-client)
-[![License](https://img.shields.io/github/license/spotify/docker-client.svg)](LICENSE)
-
-## Status: mature
-
-**Spotify no longer uses recent versions of this project internally. The
-version of docker-client we're using is whatever helios has in its
-[pom.xml][helios-pom]. At this point, we're not developing or accepting new
-features or even fixing non-critical bugs. Feel free to fork this repo though.**
-
-[helios-pom]: https://github.com/spotify/helios/blob/master/pom.xml
+[![Build Status](https://travis-ci.com/dmandalidis/docker-client.svg?branch=master)](https://travis-ci.com/dmandalidis/docker-client)
+[![codecov](https://codecov.io/github/dmandalidis/docker-client/coverage.svg?branch=master)](https://codecov.io/github/dmandalidis/docker-client?branch=master)
+[![Maven Central](https://img.shields.io/maven-central/v/org.mandas/docker-client.svg)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.mandas%22%20docker-client)
+[![License](https://img.shields.io/github/license/dmandalidis/docker-client.svg)](LICENSE)
 
 This is a [Docker](https://github.com/docker/docker) client written in Java.
-It is used in many critical production systems at Spotify.
+It was used in many critical production systems at Spotify until its 
+[fork](https://github.com/dmandalidis/docker-client/FORK.md) on September 2019.
 
 * [Version compatibility](#version-compatibility)
 * [Download](#download)
@@ -26,7 +18,7 @@ It is used in many critical production systems at Spotify.
 * [Releasing](#releasing)
 * [A Note on Shading](#a-note-on-shading)
 * [Code of Conduct](#code-of-conduct)
-* [User Manual](https://github.com/spotify/docker-client/blob/master/docs/user_manual.md)
+* [User Manual](https://github.com/dmandalidis/docker-client/blob/master/docs/user_manual.md)
 
 ## Version compatibility
 docker-client is built and tested against the six most recent minor releases of Docker.
@@ -40,7 +32,7 @@ Download the latest JAR or grab [via Maven][maven-search].
 
 ```xml
 <dependency>
-  <groupId>com.spotify</groupId>
+  <groupId>org.mandas</groupId>
   <artifactId>docker-client</artifactId>
   <version>LATEST-VERSION</version>
 </dependency>
@@ -148,17 +140,15 @@ mvn clean [-DskipTests -Darguments=-DskipTests] -Dgpg.keyname=<key ID used for s
 
 ## A note on shading
 
-Please note that in releases 2.7.6 and earlier, the default artifact was the shaded version.
-When upgrading to version 2.7.7, you will need to include the shaded classifier if you relied on
-the shaded dependencies in the docker-client jar.
+Please note that there is also a shaded variant.
 
 Standard:
 
 ```xml
 <dependency>
-  <groupId>com.spotify</groupId>
+  <groupId>org.mandas</groupId>
   <artifactId>docker-client</artifactId>
-  <version>3.5.12</version>
+  <version>1.0.0</version>
 </dependency>
 ```
 
@@ -166,10 +156,10 @@ Shaded:
 
 ```xml
 <dependency>
-  <groupId>com.spotify</groupId>
+  <groupId>org.mandas</groupId>
   <artifactId>docker-client</artifactId>
   <classifier>shaded</classifier>
-  <version>3.5.12</version>
+  <version>1.0.0</version>
 </dependency>
 ```
 
@@ -177,15 +167,9 @@ Shaded:
 docker-client and Jersey 2.x, you will need to explicitly specify the shaded version above.**
 
 
-  [1]: https://travis-ci.org/spotify/docker-client
+  [1]: https://travis-ci.org/dmandalidis/docker-client
   [2]: docs/user_manual.md
   [3]: https://docs.docker.com/engine/api/v1.27/#section/Versioning
 
 
-## Code of conduct
-
-This project adheres to the [Open Code of Conduct][code-of-conduct]. By participating, you are
-expected to honor this code.
-
-  [code-of-conduct]: https://github.com/spotify/code-of-conduct/blob/master/code-of-conduct.md
-  [maven-search]: https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.spotify%22%20docker-client
+[maven-search]: https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.mandas%22%20docker-client

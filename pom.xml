@@ -1,18 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>com.spotify</groupId>
-    <artifactId>foss-root</artifactId>
-    <version>5</version>
-  </parent>
-
+  <groupId>org.mandas</groupId>
   <artifactId>docker-client</artifactId>
-  <version>8.16.1-SNAPSHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>docker-client</name>
   <description>A docker client</description>
-  <url>https://github.com/spotify/docker-client</url>
+  <url>https://github.com/dmandalidis/docker-client</url>
 
   <licenses>
     <license>
@@ -23,47 +18,17 @@
   </licenses>
 
   <scm>
-    <connection>scm:git:https://github.com/spotify/docker-client</connection>
-    <developerConnection>scm:git:git@github.com:spotify/docker-client</developerConnection>
-    <url>https://github.com/spotify/docker-client</url>
+    <connection>scm:git:https://github.com/dmandalidis/docker-client</connection>
+    <developerConnection>scm:git:git@github.com:dmandalidis/docker-client</developerConnection>
+    <url>https://github.com/dmandalidis/docker-client</url>
     <tag>HEAD</tag>
   </scm>
 
   <developers>
     <developer>
-      <id>dano</id>
-      <name>Daniel Norberg</name>
-      <email>dano@spotify.com</email>
-    </developer>
-    <developer>
-      <id>ryan</id>
-      <name>Ryan Culbertson</name>
-      <email>ryan@spotify.com</email>
-    </developer>
-    <developer>
-      <id>drewc</id>
-      <name>Drew Csillag</name>
-      <email>drewc@spotify.com</email>
-    </developer>
-    <developer>
-      <id>philipcristiano</id>
-      <name>Philip Cristiano</name>
-      <email>philipcristiano@spotify.com</email>
-    </developer>
-    <developer>
-      <id>rohan</id>
-      <name>Rohan Singh</name>
-      <email>rohan@spotify.com</email>
-    </developer>
-    <developer>
-      <id>dxia</id>
-      <name>David Xia</name>
-      <email>dxia@spotify.com</email>
-    </developer>
-    <developer>
-      <id>mattbrown</id>
-      <name>Matt Brown</name>
-      <email>mattbrown@spotify.com</email>
+      <id>dmandalidis</id>
+      <name>Dimitris Mandalidis</name>
+      <email>dimitris.mandalidis@gmail.com</email>
     </developer>
   </developers>
 
@@ -268,6 +233,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>3.1.0</version>
         <configuration>
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
           <violationSeverity>warning</violationSeverity>
@@ -276,6 +242,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-enforcer-plugin</artifactId>
+        <version>3.0.0-M2</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -433,6 +400,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
+        <version>3.0.0-M3</version>
       </plugin>
       <plugin>
         <groupId>org.jacoco</groupId>
@@ -457,6 +425,48 @@
     </plugins>
   </build>
 
+  <profiles>
+		<profile>
+			<id>deploy-artifacts</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>nexus-staging-maven-plugin</artifactId>
+						<version>1.6.8</version>
+						<extensions>true</extensions>
+						<configuration>
+							<serverId>ossrh</serverId>
+							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+							<autoReleaseAfterClose>true</autoReleaseAfterClose>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.6</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+								<configuration>
+									<executable>gpg2</executable>
+									<gpgArguments>
+										<arg>--pinentry-mode</arg>
+										<arg>loopback</arg>
+									</gpgArguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+  
   <reporting>
     <plugins>
       <plugin>

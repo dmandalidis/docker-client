@@ -1,22 +1,18 @@
 # Contributing
 
-
 ## Response Times
 
-This project is developed and maintained by an infrastructure team at Spotify. Lots of teams at
-Spotify use relatively recent versions of this project in production for mission-critical systems.
+This project is developed and maintained by Dimitris Mandalidis. It was originally
+developed by an infrastructure team at Spotify, but it was forked after being declared
+mature and further development was frozen. It is being used in a single production-critical 
+system where Docker version upgrades are frequent and changes to the API need to
+be adapted.
 
-That being said, this is our day job where our primary users are our colleagues.
-So we might be slow in getting back to you because we're busy working on Spotify-specific things
-or because your issues are being prioritized behind those of our colleagues.
-
-Please poke us if you feel you're being neglected, and we'll do our best to get back to you.
-
-## Related Tools You May Find Useful
-
-If you like this project, you might also like [dockerfile-maven][2], [helios][3], [docker-gc][4],
-[helios-skydns][5], and [helios-consul][6].
-
+Apart from API adaptations and security fixes (which are a must-have), this is
+maintained mostly in my (limited) free time, so I might be slow responding to bugs
+and reviewing pull requests. However, if you feel that your bug or pull-request
+requires immediate attention and/or an urgent patch please poke me and I 'll do
+my best.
 
 ## Reporting Bugs
 
@@ -50,12 +46,7 @@ than a simple unit test that captures/asserts HTTP requests and responses, and
 they end up testing both how docker-client behaves and how the docker daemon
 itself behaves.
 
-  [1]: https://github.com/spotify/docker-client#testing
-  [2]: https://github.com/spotify/dockerfile-maven
-  [3]: https://github.com/spotify/helios
-  [4]: https://github.com/spotify/docker-gc
-  [5]: https://github.com/spotify/helios-skydns
-  [6]: https://github.com/spotify/helios-consul
+  [1]: https://github.com/dmandalidis/docker-client#testing
   [DefaultDockerClientTest]: src/test/java/com/spotify/docker/client/DefaultDockerClientTest.java
   [DefaultDockerClientUnitTest]: src/test/java/com/spotify/docker/client/DefaultDockerClientUnitTest.java
   [MockWebServer]: https://github.com/square/okhttp/tree/master/mockwebserver
