@@ -7,7 +7,7 @@
 
 This is a [Docker](https://github.com/docker/docker) client written in Java.
 It was used in many critical production systems at Spotify until its 
-[fork](https://github.com/dmandalidis/docker-client/FORK.md) on September 2019.
+[fork](https://github.com/dmandalidis/docker-client/blob/master/FORK.md) on September 2019.
 
 * [Version compatibility](#version-compatibility)
 * [Download](#download)
@@ -17,7 +17,6 @@ It was used in many critical production systems at Spotify until its
 * [Testing](#testing)
 * [Releasing](#releasing)
 * [A Note on Shading](#a-note-on-shading)
-* [Code of Conduct](#code-of-conduct)
 * [User Manual](https://github.com/dmandalidis/docker-client/blob/master/docs/user_manual.md)
 
 ## Version compatibility
