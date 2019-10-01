@@ -431,6 +431,7 @@
 				</executions>
 				<configuration>
             <source>1.8</source>
+            <doclint>syntax,reference,html,missing</doclint>
         </configuration>
 			</plugin>
       <plugin>
