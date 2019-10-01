@@ -476,7 +476,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       config.property(ClientProperties.REQUEST_ENTITY_PROCESSING, builder.requestEntityProcessing);
     }
 
-    this.client = ClientBuilder.newBuilder()
+	this.client = ClientBuilder.newBuilder()
         .withConfig(config)
         .build();
 

@@ -58,7 +58,6 @@ import static com.spotify.docker.client.messages.Network.Type.BUILTIN;
 import static com.spotify.docker.client.messages.RemovedImage.Type.UNTAGGED;
 import static com.spotify.docker.client.messages.swarm.PortConfig.PROTOCOL_TCP;
 import static com.spotify.docker.client.messages.swarm.RestartPolicy.RESTART_POLICY_ANY;
-import static java.lang.Long.toHexString;
 import static java.lang.String.format;
 import static java.lang.System.getenv;
 import static java.util.Collections.singletonList;
@@ -134,6 +133,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
@@ -159,6 +159,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -302,7 +303,6 @@ public class DefaultDockerClientTest {
   private static final String CIRROS_PRIVATE = "dxia/cirros-private";
   private static final String CIRROS_PRIVATE_LATEST = CIRROS_PRIVATE + ":latest";
 
-  private static final boolean CIRCLECI = !isNullOrEmpty(getenv("CIRCLECI"));
   private static final boolean TRAVIS = "true".equals(getenv("TRAVIS"));
 
   private static final String AUTH_USERNAME = "dxia2";
@@ -316,13 +316,13 @@ public class DefaultDockerClientTest {
   @Rule
   public final TestName testName = new TestName();
 
+  private final Random r = new Random(System.currentTimeMillis());
+  
   private final RegistryAuth registryAuth = RegistryAuth.builder()
       .username(AUTH_USERNAME)
       .password(AUTH_PASSWORD)
       .email("1234@example.com")
       .build();
-
-  private final String nameTag = toHexString(ThreadLocalRandom.current().nextLong());
 
   private URI dockerEndpoint;
 
@@ -356,20 +356,27 @@ public class DefaultDockerClientTest {
       try {
         final List<Service> services = sut.listServices();
         for (final Service service : services) {
-          if (service.spec().name().startsWith(nameTag)) {
-            sut.removeService(service.id());
-          }
+          sut.removeService(service.id());
         }
       } catch (DockerException e) {
         log.warn("Ignoring DockerException in teardown", e);
       }
+    }
+    if (dockerApiVersionAtLeast("1.25")) {
+    	try {
+	    	for (final Secret secret : sut.listSecrets()) {
+	    		sut.deleteSecret(secret.id());
+	    	}
+    	} catch (DockerException e) {
+            log.warn("Ignoring DockerException in teardown", e);
+        }
     }
 
     // Remove containers
     final List<Container> containers = sut.listContainers();
     for (final Container container : containers) {
       final ContainerInfo info = sut.inspectContainer(container.id());
-      if (info != null && info.name().startsWith(nameTag)) {
+      if (info != null) {
         try {
           sut.killContainer(info.id());
         } catch (DockerRequestException e) {
@@ -488,10 +495,8 @@ public class DefaultDockerClientTest {
     assertThat(interrupted.get(), is(true));
   }
 
-  @Test(expected = ImageNotFoundException.class)
+  @Test(expected = ImageNotFoundException.class) @Ignore // TODO: Docker < 17.12 returns 200 for this (!) 
   public void testPullBadImage() throws Exception {
-    // The Docker daemon on CircleCI won't throw ImageNotFoundException for some reason...
-    assumeFalse(CIRCLECI);
     sut.pull(randomName());
   }
 
@@ -565,9 +570,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testPullByDigest() throws Exception {
-    // The current Docker client on CircleCI does allow you to pull images by digest.
-    assumeFalse(CIRCLECI);
-
     // note: this digest may change over time, the value here may disappear from hub.docker.com
     sut.pull(BUSYBOX + "@sha256:4a887a2326ec9e0fa90cce7b4764b0e627b5d6afcb81a3f73c85dc29cea00048");
   }
@@ -721,9 +723,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testAuth() throws Exception {
-    // The Docker Hub password is stored encrypted in Travis. So only run on Travis.
-    assumeTrue(TRAVIS);
-
     final int statusCode = sut.auth(registryAuth);
     assertThat(statusCode, equalTo(200));
   }
@@ -824,11 +823,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testRemoveImage() throws Exception {
-    // Don't remove images on CircleCI. Their version of Docker causes failures when pulling an
-    // image that shares layers with an image that has been removed. This causes tests after this
-    // one to fail.
-    assumeFalse(CIRCLECI);
-
     sut.pull("dxia/cirros:latest");
     sut.pull("dxia/cirros:0.3.0");
     final String imageLatest = "dxia/cirros:latest";
@@ -968,9 +962,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testBuildImageIdWithAuth() throws Exception {
-    // The Docker Hub password is stored encrypted in Travis. So only run on Travis.
-    assumeTrue(TRAVIS);
-
     final Path dockerDirectory = getResource("dockerDirectory");
     final AtomicReference<String> imageIdFromMessage = new AtomicReference<>();
 
@@ -1614,12 +1605,9 @@ public class DefaultDockerClientTest {
       // Remove the container
       sut.removeContainer(id);
     } catch (DockerRequestException e) {
-      // CircleCI doesn't let you remove a container :(
-      if (!CIRCLECI) {
-        // Verify that the container is gone
-        exception.expect(ContainerNotFoundException.class);
-        sut.inspectContainer(id);
-      }
+      // Verify that the container is gone
+      exception.expect(ContainerNotFoundException.class);
+      sut.inspectContainer(id);
     }
   }
 
@@ -2011,8 +1999,8 @@ public class DefaultDockerClientTest {
     sut.pull(BUSYBOX_LATEST);
 
     final HostConfig.Builder hostConfigBuilder = HostConfig.builder()
-        .memory(4194304L)
-        .memorySwap(5000000L)
+        .memory(16777216L) // Do not set this lower: https://github.com/moby/moby/issues/38921
+        .memorySwap(33554432L)
         .kernelMemory(5000000L);
 
     if (dockerApiVersionAtLeast("1.20")) {
@@ -2103,8 +2091,6 @@ public class DefaultDockerClientTest {
   @Test
   public void testContainerWithCpuQuota() throws Exception {
     requireDockerApiVersionAtLeast("1.19", "Container Creation with HostConfig");
-
-    assumeFalse(CIRCLECI);
 
     sut.pull(BUSYBOX_LATEST);
 
@@ -3445,11 +3431,9 @@ public class DefaultDockerClientTest {
     sut.removeImage(randomName());
   }
 
-  @Test
+  @Test @Ignore // TODO: https://github.com/moby/moby/issues/31421
   public void testExec() throws Exception {
     requireDockerApiVersionAtLeast("1.15", "Exec");
-    // CircleCI uses lxc, doesn't support exec - https://circleci.com/docs/docker/#docker-exec
-    assumeFalse(CIRCLECI);
 
     sut.pull(BUSYBOX_LATEST);
 
@@ -3483,11 +3467,6 @@ public class DefaultDockerClientTest {
   @Test
   public void testExecCreateOnNonRunningContainer() throws Exception {
     requireDockerApiVersionAtLeast("1.15", "Exec");
-    // Execution driver is removed in Docker API >= 1.24
-    if (dockerApiVersionLessThan("1.24")) {
-      // CircleCI uses lxc, doesn't support exec - https://circleci.com/docs/docker/#docker-exec
-      assumeFalse(CIRCLECI);
-    }
 
     sut.pull(BUSYBOX_LATEST);
 
@@ -3510,8 +3489,6 @@ public class DefaultDockerClientTest {
   @Test
   public void testExecInspect() throws Exception {
     requireDockerApiVersionAtLeast("1.16", "Exec Inspect");
-    // CircleCI uses lxc, doesn't support exec - https://circleci.com/docs/docker/#docker-exec
-    assumeFalse(CIRCLECI);
 
     sut.pull(BUSYBOX_LATEST);
 
@@ -3887,8 +3864,6 @@ public class DefaultDockerClientTest {
   public void testNetworks() throws Exception {
     requireDockerApiVersionAtLeast("1.21", "createNetwork and listNetworks");
 
-    assumeFalse(CIRCLECI);
-
     final String networkName = randomName();
     final IpamConfig ipamConfig =
         IpamConfig.create("192.168.0.0/24", "192.168.0.0/24", "192.168.0.1");
@@ -4062,7 +4037,6 @@ public class DefaultDockerClientTest {
   @Test
   public void testNetworksConnectContainer() throws Exception {
     requireDockerApiVersionAtLeast("1.21", "createNetwork and listNetworks");
-    assumeFalse(CIRCLECI);
 
     sut.pull(BUSYBOX_LATEST);
     final String networkName = randomName();
@@ -4119,7 +4093,6 @@ public class DefaultDockerClientTest {
   public void testNetworksConnectContainerWithEndpointConfig() throws Exception {
     requireDockerApiVersionAtLeast("1.22", "createNetwork and listNetworks");
 
-    assumeFalse(CIRCLECI);
     final String networkName = randomName();
     final String containerName = randomName();
 
@@ -4978,17 +4951,15 @@ public class DefaultDockerClientTest {
   public void testSecretOperations() throws Exception {
     requireDockerApiVersionAtLeast("1.25", "secret support");
 
-    for (final Secret secret : sut.listSecrets()) {
-      sut.deleteSecret(secret.id());
-    }
     assertThat(sut.listSecrets().size(), equalTo(0));
 
     final String secretData = Base64.getEncoder().encodeToString("testdata".getBytes(StandardCharsets.UTF_8));
     
     final Map<String, String> labels = ImmutableMap.of("foo", "bar", "1", "a");
 
-    final SecretSpec secretSpec = SecretSpec.builder()
-        .name("asecret")
+    String secretName = randomName();
+	final SecretSpec secretSpec = SecretSpec.builder()
+        .name(secretName)
         .data(secretData)
         .labels(labels)
         .build();
@@ -4998,7 +4969,7 @@ public class DefaultDockerClientTest {
     assertThat(secretId, is(notNullValue()));
     
     final SecretSpec secretSpecConflict = SecretSpec.builder()
-        .name("asecret")
+        .name(secretName)
         .data(secretData)
         .labels(labels)
         .build();
@@ -5011,8 +4982,9 @@ public class DefaultDockerClientTest {
       // Recent versions return 409 which translates into ConflictException.
     }
 
-    final SecretSpec secretSpecInvalidData = SecretSpec.builder()
-        .name("asecret2")
+    String secretName2 = randomName();
+	final SecretSpec secretSpecInvalidData = SecretSpec.builder()
+        .name(secretName2)
         .data("plainData")
         .labels(labels)
         .build();
@@ -5147,17 +5119,15 @@ public class DefaultDockerClientTest {
     final String[] hosts = {"127.0.0.1 test.local", "127.0.0.1 test"};
     final String[] healthcheckCmd = {"ping", "-c", "1", "127.0.0.1"};
 
-    for (final Secret secret : sut.listSecrets()) {
-      sut.deleteSecret(secret.id());
-    }
     assertThat(sut.listSecrets().size(), equalTo(0));
 
     final String secretData = Base64.getEncoder().encodeToString("testdata".getBytes(StandardCharsets.UTF_8));
 
     final Map<String, String> labels = ImmutableMap.of("foo", "bar", "1", "a");
 
-    final SecretSpec secretSpec = SecretSpec.builder()
-            .name("asecret")
+    String secretName = randomName();
+	final SecretSpec secretSpec = SecretSpec.builder()
+            .name(secretName)
             .data(secretData)
             .labels(labels)
             .build();
@@ -5166,8 +5136,9 @@ public class DefaultDockerClientTest {
     final String secretId = secretResponse.id();
     assertThat(secretId, is(notNullValue()));
 
-    final SecretFile secretFile = SecretFile.builder()
-            .name("bsecret")
+    String secretFileName = randomName();
+	final SecretFile secretFile = SecretFile.builder()
+            .name(secretFileName)
             .uid("1001")
             .gid("1002")
             .mode(0640L)
@@ -5175,7 +5146,7 @@ public class DefaultDockerClientTest {
     final SecretBind secretBind = SecretBind.builder()
             .file(secretFile)
             .secretId(secretId)
-            .secretName("asecret")
+            .secretName(secretName)
             .build();
 
     final String[] commandLine = {"ping", "-c4", "localhost"};
@@ -5216,8 +5187,8 @@ public class DefaultDockerClientTest {
             equalTo(1));
     SecretBind secret = service.spec().taskTemplate().containerSpec().secrets().get(0);
     assertThat(secret.secretId(), equalTo(secretId));
-    assertThat(secret.secretName(), equalTo("asecret"));
-    assertThat(secret.file().name(), equalTo("bsecret"));
+    assertThat(secret.secretName(), equalTo(secretName));
+    assertThat(secret.file().name(), equalTo(secretFileName));
     assertThat(secret.file().uid(), equalTo("1001"));
     assertThat(secret.file().gid(), equalTo("1002"));
     assertThat(secret.file().mode(), equalTo(0640L));
@@ -5584,7 +5555,14 @@ public class DefaultDockerClientTest {
   }
 
   private String randomName() {
-    return nameTag + '-' + toHexString(ThreadLocalRandom.current().nextLong());
+	String alphabet = "abcdefghijklmnopqrstuvwxyz0123456789";
+	StringBuilder sb = new StringBuilder();
+	for (int i = 0; i < 10; i++) {
+		int index = r.nextInt(alphabet.length());
+		char nextChar = alphabet.charAt(index);
+		sb.append(nextChar);
+	}
+	return sb.toString();
   }
 
   private void awaitConnectable(final InetAddress address, final int port)
