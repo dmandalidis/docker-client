@@ -37,3 +37,4 @@ after_success:
 branches:
   only:
   - master
+  - /^release-\d+\.\d+\.\d+$/
