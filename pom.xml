@@ -43,15 +43,9 @@
     </developer>
   </developers>
 
-  <repositories>
-    <repository>
-       <id>jcenter</id>
-       <url>https://jcenter.bintray.com</url>
-    </repository>
-  </repositories>
-
   <properties>
   	<version.jackson>2.9.10</version.jackson>
+    <version.jersey>2.28</version.jersey>
   </properties>
   
   <dependencies>
@@ -84,17 +78,22 @@
     <dependency>
       <groupId>org.glassfish.jersey.core</groupId>
       <artifactId>jersey-client</artifactId>
-      <version>2.22.2</version>
+      <version>${version.jersey}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.inject</groupId>
+      <artifactId>jersey-hk2</artifactId>
+      <version>${version.jersey}</version>
     </dependency>
     <dependency>
       <groupId>org.glassfish.jersey.connectors</groupId>
       <artifactId>jersey-apache-connector</artifactId>
-      <version>2.22.2</version>
+      <version>${version.jersey}</version>
     </dependency>
     <dependency>
       <groupId>org.glassfish.jersey.media</groupId>
       <artifactId>jersey-media-json-jackson</artifactId>
-      <version>2.22.2</version>
+      <version>${version.jersey}</version>
     </dependency>
     <dependency>
       <groupId>javax.activation</groupId>
