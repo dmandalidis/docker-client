@@ -25,10 +25,12 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.io.BaseEncoding;
-import com.spotify.docker.client.ObjectMapperProvider;
+import java.util.Base64;
+
 import org.junit.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.spotify.docker.client.ObjectMapperProvider;
 
 public class RegistryAuthTest {
 
@@ -49,7 +51,7 @@ public class RegistryAuthTest {
   public void testForAuth() {
     final String username = "johndoe";
     final String password = "pass123";
-    final String encoded = BaseEncoding.base64().encode((username + ":" + password).getBytes());
+    final String encoded = Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
 
     final RegistryAuth registryAuth = RegistryAuth.forAuth(encoded).build();
     assertThat(registryAuth.username(), is(username));
@@ -60,7 +62,7 @@ public class RegistryAuthTest {
   public void testForAuth_PasswordContainsColon() {
     final String username = "johndoe";
     final String password = "foo:bar";
-    final String encoded = BaseEncoding.base64().encode((username + ":" + password).getBytes());
+    final String encoded = Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
 
     final RegistryAuth registryAuth = RegistryAuth.forAuth(encoded).build();
     assertThat(registryAuth.username(), is(username));

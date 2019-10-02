@@ -50,7 +50,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.io.BaseEncoding;
 import com.google.common.io.Resources;
 import com.spotify.docker.client.DockerClient.Signal;
 import com.spotify.docker.client.auth.RegistryAuthSupplier;
@@ -89,11 +88,13 @@ import com.spotify.docker.client.messages.swarm.Task;
 import com.spotify.docker.client.messages.swarm.TaskSpec;
 import com.spotify.docker.client.messages.swarm.Version;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Date;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -105,7 +106,6 @@ import okhttp3.mockwebserver.RecordedRequest;
 import okio.Buffer;
 
 import org.glassfish.jersey.client.RequestEntityProcessing;
-import org.glassfish.jersey.internal.util.Base64;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -414,7 +414,7 @@ public class DefaultDockerClientUnitTest {
 
     // check that the JSON in the header is equivalent to what we mocked out above from
     // the registryAuthSupplier
-    final JsonNode headerJsonNode = toJson(BaseEncoding.base64().decode(registryConfigHeader));
+    final JsonNode headerJsonNode = toJson(Base64.getDecoder().decode(registryConfigHeader));
     assertThat(headerJsonNode, is(toJson(registryConfigs.configs())));
   }
 
@@ -769,7 +769,7 @@ public class DefaultDockerClientUnitTest {
 
     final ConfigSpec configSpec = ConfigSpec
         .builder()
-        .data(Base64.encodeAsString("foobar"))
+        .data(Base64.getEncoder().encodeToString("foobar".getBytes(StandardCharsets.UTF_8)))
         .name("foo.yaml")
         .build();
 
@@ -849,7 +849,7 @@ public class DefaultDockerClientUnitTest {
 
     final ConfigSpec configSpec = ConfigSpec
         .builder()
-        .data(Base64.encodeAsString("foobar"))
+        .data(Base64.getEncoder().encodeToString("foobar".getBytes(StandardCharsets.UTF_8)))
         .name("foo.yaml")
         .build();
 
@@ -871,7 +871,7 @@ public class DefaultDockerClientUnitTest {
 
     final ConfigSpec configSpec = ConfigSpec
         .builder()
-        .data(Base64.encodeAsString("foobar"))
+        .data(Base64.getEncoder().encodeToString("foobar".getBytes(StandardCharsets.UTF_8)))
         .name("foo.yaml")
         .build();
 
@@ -891,7 +891,7 @@ public class DefaultDockerClientUnitTest {
 
     final ConfigSpec configSpec = ConfigSpec
         .builder()
-        .data(Base64.encodeAsString("foobar"))
+        .data(Base64.getEncoder().encodeToString("foobar".getBytes(StandardCharsets.UTF_8)))
         .name("foo.yaml")
         .build();
 
@@ -1005,7 +1005,7 @@ public class DefaultDockerClientUnitTest {
 
     final ConfigSpec configSpec = ConfigSpec
         .builder()
-        .data(Base64.encodeAsString("foobar"))
+        .data(Base64.getEncoder().encodeToString("foobar".getBytes(StandardCharsets.UTF_8)))
         .name("foo.yaml")
         .build();
 
@@ -1025,7 +1025,7 @@ public class DefaultDockerClientUnitTest {
 
     final ConfigSpec configSpec = ConfigSpec
         .builder()
-        .data(Base64.encodeAsString("foobar"))
+        .data(Base64.getEncoder().encodeToString("foobar".getBytes(StandardCharsets.UTF_8)))
         .name("foo.yaml")
         .build();
 
