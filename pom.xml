@@ -46,6 +46,7 @@
   <properties>
   	<version.jackson>2.9.10</version.jackson>
     <version.jersey>2.28</version.jersey>
+    <version.guava>24.1.1-jre</version.guava>
   </properties>
   
   <dependencies>
@@ -58,7 +59,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>23.0</version>
+      <version>${version.guava}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.jaxrs</groupId>
