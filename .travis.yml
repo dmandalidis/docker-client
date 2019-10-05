@@ -38,3 +38,6 @@ branches:
   only:
   - master
   - /^release-\d+\.\d+\.\d+$/
+cache:
+  directories:
+    - $HOME/.m2
