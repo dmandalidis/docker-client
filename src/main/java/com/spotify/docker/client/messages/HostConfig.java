@@ -26,6 +26,12 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Nullable;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -34,14 +40,6 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Nullable;
 
 @AutoValue
 @JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
@@ -715,7 +713,6 @@ public abstract class HostConfig {
       return new AutoValue_HostConfig_Bind.Builder().readOnly(false);
     }
 
-    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     public String toString() {
       if (isNullOrEmpty(to())) {
         return "";
