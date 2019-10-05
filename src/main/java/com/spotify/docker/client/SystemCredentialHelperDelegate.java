@@ -20,12 +20,6 @@
 
 package com.spotify.docker.client;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.annotations.VisibleForTesting;
-import com.spotify.docker.client.DockerCredentialHelper.CredentialHelperDelegate;
-import com.spotify.docker.client.messages.DockerCredentialHelperAuth;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -35,14 +29,20 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
+import com.spotify.docker.client.DockerCredentialHelper.CredentialHelperDelegate;
+import com.spotify.docker.client.messages.DockerCredentialHelperAuth;
 
 /**
  * The default credential helper delegate.
  * Executes each credential helper operation on the system.
  */
-@SuppressFBWarnings("SIC_INNER_SHOULD_BE_STATIC_ANON")
 class SystemCredentialHelperDelegate implements CredentialHelperDelegate {
 
   private static final Logger log = LoggerFactory.getLogger(DockerConfigReader.class);
@@ -115,7 +115,7 @@ class SystemCredentialHelperDelegate implements CredentialHelperDelegate {
         if ("The specified item could not be found in the keychain.".equals(serverAuthDetails)) {
           return null;
         }
-        return mapper.readValue(serverAuthDetails, new TypeReference<Map<String, String>>() {});
+        return mapper.readValue(serverAuthDetails, new MapTypeReference());
       }
     }
   }
@@ -138,5 +138,9 @@ class SystemCredentialHelperDelegate implements CredentialHelperDelegate {
     final String cmd = "docker-credential-" + credsStore + " " + subcommand;
     log.debug("Executing \"{}\"", cmd);
     return Runtime.getRuntime().exec(cmd);
+  }
+  
+  private static class MapTypeReference extends TypeReference<Map<String, String>> {
+	  
   }
 }

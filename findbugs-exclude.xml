@@ -5,20 +5,9 @@
     <Bug pattern="SE_BAD_FIELD"/>
   </Match>
   
-  <Match>
-  	<Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
-  </Match>
-  
+  <!-- Check https://github.com/spotbugs/spotbugs/issues/756 -->
   <Match>
   	<Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"/>
-  </Match>
-
-  <Match>
-  	<Bug pattern="NP_NULL_PARAM_DEREF_ALL_TARGETS_DANGEROUS"/>
-  </Match>
-  
-  <Match>
-  	<Bug pattern="NP_NULL_PARAM_DEREF_NONVIRTUAL"/>
   </Match>
 
 </FindBugsFilter>
