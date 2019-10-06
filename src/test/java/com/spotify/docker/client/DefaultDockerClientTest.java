@@ -379,7 +379,7 @@ public class DefaultDockerClientTest {
       if (info != null) {
         try {
           sut.killContainer(info.id());
-        } catch (DockerRequestException e) {
+        } catch (DockerRequestException | ContainerNotFoundException e) {
           // Docker 1.6 sometimes fails to kill a container because it disappears.
           // https://github.com/docker/docker/issues/12738
           log.warn("Failed to kill container {}", info.id(), e);
@@ -2347,6 +2347,16 @@ public class DefaultDockerClientTest {
       assertEquals(volumeName, volumeCreate.actor().id());
       assertThat(volumeCreate.actor().attributes(), hasEntry("driver", "local"));
       assertNotNull(volumeCreate.timeNano());
+      
+      if (dockerApiVersionAtLeast("1.38")) {
+    	  // check: https://github.com/moby/moby/issues/40047; double create event
+    	  final Event volumeCreate2 = stream.next();
+          assertEquals(VOLUME, volumeCreate2.type());
+          assertEquals("create", volumeCreate2.action());
+          assertEquals(volumeName, volumeCreate2.actor().id());
+          assertThat(volumeCreate2.actor().attributes(), hasEntry("driver", "local"));
+          assertNotNull(volumeCreate2.timeNano());
+      }
 
       assertTrue("Docker did not return enough volume events."
                       + "Expected a volume mount event.",
@@ -5026,11 +5036,27 @@ public class DefaultDockerClientTest {
   public void testCreateServiceWithDefaults() throws Exception {
     requireDockerApiVersionAtLeast("1.24", "swarm support");
 
-    final List<Network> overlayNetworks = sut.listNetworks(ListNetworksParam.withDriver("overlay"));
-    assumeFalse(dockerApiVersionEquals("1.27") && overlayNetworks.isEmpty());
-    final String networkTarget = overlayNetworks.get(0).name();
+    final String networkName = randomName();
+    NetworkConfig.Builder networkConfigBuilder =
+            NetworkConfig.builder()
+                    .driver("overlay")
+                    .name(networkName);
+    
+    if (dockerApiVersionEquals("1.24")) {
+      // workaround for https://github.com/docker/docker/issues/25735
+      networkConfigBuilder = networkConfigBuilder
+              .ipam(Ipam.create("default", Collections.<IpamConfig>emptyList()));
+    }
 
+    final NetworkCreation networkCreation =
+            sut.createNetwork(networkConfigBuilder.build());
+
+    final String networkId = networkCreation.id();
+
+    assertThat(networkId, is(notNullValue()));
+    
     final String serviceName = randomName();
+    
     final TaskSpec taskSpec = TaskSpec
         .builder()
         .containerSpec(ContainerSpec.builder()
@@ -5047,7 +5073,7 @@ public class DefaultDockerClientTest {
         .resources(ResourceRequirements.builder().build())
         .restartPolicy(RestartPolicy.builder().build())
         .placement(Placement.create(null))
-        .networks(NetworkAttachmentConfig.builder().target(networkTarget).build())
+        .networks(NetworkAttachmentConfig.builder().target(networkName).build())
         .logDriver(Driver.builder().build())
         .build();
 
