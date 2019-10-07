@@ -48,7 +48,7 @@
     <version.jersey>2.28</version.jersey>
     <version.guava>24.1.1-jre</version.guava>
     
-    <version.plugin.spotbugs>3.1.12</version.plugin.spotbugs>
+    <version.plugin.spotbugs>3.1.12.2</version.plugin.spotbugs>
   </properties>
   
   <dependencies>
