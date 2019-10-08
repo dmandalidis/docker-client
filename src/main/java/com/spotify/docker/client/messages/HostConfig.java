@@ -29,6 +29,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -39,7 +40,10 @@ import com.google.auto.value.AutoValue;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.spotify.docker.client.messages.ContainerConfig.Builder;
+import com.spotify.docker.client.messages.mount.Mount;
 
 @AutoValue
 @JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
@@ -249,7 +253,10 @@ public abstract class HostConfig {
   @Nullable
   @JsonProperty("Runtime")
   public abstract String runtime();
-
+  
+  @Nullable
+  @JsonProperty("Mounts")
+  public abstract ImmutableList<Mount> mounts();
 
   @JsonCreator
   static HostConfig create(
@@ -302,7 +309,8 @@ public abstract class HostConfig {
       @JsonProperty("Tmpfs") final Map<String, String> tmpfs,
       @JsonProperty("ReadonlyRootfs") final Boolean readonlyRootfs,
       @JsonProperty("Runtime") final String runtime,
-      @JsonProperty("StorageOpt") final Map<String, String> storageOpt) {
+      @JsonProperty("StorageOpt") final Map<String, String> storageOpt,
+      @JsonProperty("Mounts") final List<Mount> mounts) {
     return builder()
         .binds(binds)
         .blkioWeight(blkioWeight)
@@ -354,6 +362,7 @@ public abstract class HostConfig {
         .readonlyRootfs(readonlyRootfs)
         .storageOpt(storageOpt)
         .runtime(runtime)
+        .mounts(mounts)
         .build();
   }
 
@@ -661,6 +670,23 @@ public abstract class HostConfig {
 
     public abstract Builder runtime(String runtime);
 
+    public abstract Builder mounts(final List<Mount> mounts);
+
+    public abstract Builder mounts(final Mount... mounts);
+    
+    abstract ImmutableList.Builder<Mount> mountsBuilder();
+    
+    public Builder addMount(final Mount mount) {
+    	mountsBuilder().add(mount);
+    	return this;
+    }
+
+    public Builder addMounts(final Mount... mounts) {
+    	for (final Mount mount : mounts) {
+    		mountsBuilder().add(mount);
+    	}
+    	return this;
+    }
     // Validation of property values using AutoValue requires we split the build method into two.
     // AutoValue implements this package-private method.
     // See https://github.com/google/auto/blob/master/value/userguide/builders-howto.md#validate.
