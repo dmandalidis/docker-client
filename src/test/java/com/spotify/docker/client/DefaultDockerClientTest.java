@@ -133,6 +133,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -2857,6 +2858,75 @@ public class DefaultDockerClientTest {
     }
   }
 
+  @Test
+  public void testContainerMounts() throws Exception {
+	  requireDockerApiVersionAtLeast(
+	            "1.30", "Creating a container with mounts and inspecting mounts");
+	  
+	  sut.pull(BUSYBOX_LATEST);
+	  
+	  String volumeName = randomName();
+	  final HostConfig hostConfig = HostConfig.builder()
+			.addMount(Mount.builder()
+				.type("volume")
+				.source(volumeName)
+				.target("/container/target")
+				.build()
+			)
+	        .build();
+	  
+	  final ContainerConfig volumeConfig = ContainerConfig.builder()
+	        .image(BUSYBOX_LATEST)
+	        .hostConfig(hostConfig)
+	        .build();
+	  
+	  final String id = sut.createContainer(volumeConfig, randomName()).id();
+	  final ContainerInfo containerInfo = sut.inspectContainer(id);
+	  final List<ContainerMount> mounts = containerInfo.mounts();
+	  assertThat(mounts.size(), equalTo(1));
+	  ContainerMount mnt = mounts.get(0);
+	  assertThat(mnt.name(), is(volumeName));
+	  assertThat(mnt.driver(), is("local"));
+	  assertThat(mnt.rw(), is(true));
+	  assertThat(mnt.propagation(), is(""));
+	  if (dockerApiVersionNot("1.30")) {
+		  assertThat(mnt.mode(), is("z"));
+	  } else {
+		  assertThat(mnt.mode(), is(""));
+	  }
+	  assertThat(mnt.type(), is("volume"));
+	  assertThat(mnt.destination(), is("/container/target"));
+  }
+  
+  @Test
+  public void testContainerMountsFailBind() throws Exception {
+	  requireDockerApiVersionAtLeast(
+	            "1.30", "Creating a container with mounts and inspecting mounts");
+	  
+	  sut.pull(BUSYBOX_LATEST);
+	  
+	  final HostConfig hostConfig = HostConfig.builder()
+			.addMount(Mount.builder()
+				.type("bind")
+				.source("/local/path")
+				.target("/remote/path")
+				.build()
+			)
+	        .build();
+	  
+	  final ContainerConfig volumeConfig = ContainerConfig.builder()
+	        .image(BUSYBOX_LATEST)
+	        .hostConfig(hostConfig)
+	        .build();
+	  
+	  try {
+		  sut.createContainer(volumeConfig, randomName()).id();
+		  fail();
+	  } catch (DockerRequestException e) {
+		  assertThat(e.status(), is(equalTo(400)));
+	  }
+  }
+  
   @Test
   public void testContainerVolumes() throws Exception {
     requireDockerApiVersionAtLeast(
