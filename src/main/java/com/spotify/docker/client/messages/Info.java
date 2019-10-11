@@ -86,16 +86,6 @@ public abstract class Info {
   @JsonProperty("DriverStatus")
   public abstract ImmutableList<ImmutableList<String>> driverStatus();
 
-  /**
-   * @return Execution Driver
-   * @deprecated Removed in API 1.24 https://github.com/docker/docker/pull/24501
-   */
-  @SuppressWarnings("DeprecatedIsStillUsed")
-  @Deprecated
-  @Nullable
-  @JsonProperty("ExecutionDriver")
-  public abstract String executionDriver();
-
   @Nullable
   @JsonProperty("ExperimentalBuild")
   public abstract Boolean experimentalBuild();
@@ -214,7 +204,6 @@ public abstract class Info {
       @JsonProperty("DockerRootDir") final String dockerRootDir,
       @JsonProperty("Driver") final String storageDriver,
       @JsonProperty("DriverStatus") final List<List<String>> driverStatus,
-      @JsonProperty("ExecutionDriver") final String executionDriver,
       @JsonProperty("ExperimentalBuild") final Boolean experimentalBuild,
       @JsonProperty("HttpProxy") final String httpProxy,
       @JsonProperty("HttpsProxy") final String httpsProxy,
@@ -261,7 +250,7 @@ public abstract class Info {
     }
     return new AutoValue_Info(architecture, clusterStore, cgroupDriver, containers,
         containersRunning, containersStopped, containersPaused, cpuCfsPeriod, cpuCfsQuota, debug,
-        dockerRootDir, storageDriver, driverStatusB.build(), executionDriver, experimentalBuild,
+        dockerRootDir, storageDriver, driverStatusB.build(), experimentalBuild,
         httpProxy, httpsProxy, id, ipv4Forwarding, images, indexServerAddress, initPath, initSha1,
         kernelMemory, kernelVersion, labelsT, memTotal, memoryLimit, cpus, eventsListener,
         fileDescriptors, goroutines, name, noProxy, oomKillDisable, operatingSystem, osType,

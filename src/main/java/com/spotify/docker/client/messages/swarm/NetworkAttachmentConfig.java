@@ -54,40 +54,9 @@ public abstract class NetworkAttachmentConfig {
 
     public abstract Builder target(String target);
 
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #target(String)}.
-     */
-    @Deprecated
-    public Builder withTarget(String target) {
-      target(target);
-      return this;
-    }
-
     public abstract Builder aliases(String... aliases);
 
     public abstract Builder aliases(List<String> aliases);
-
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #aliases(String...)}.
-     */
-    @Deprecated
-    public Builder withAliases(String... aliases) {
-      if (aliases != null && aliases.length > 0) {
-        aliases(aliases);
-      }
-      return this;
-    }
-
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #aliases(List)}.
-     */
-    @Deprecated
-    public Builder withAliases(List<String> aliases) {
-      if (aliases != null && !aliases.isEmpty()) {
-        aliases(aliases);
-      }
-      return this;
-    }
 
     public abstract NetworkAttachmentConfig build();
   }

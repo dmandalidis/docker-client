@@ -257,45 +257,6 @@ public interface DockerClient extends Closeable {
    */
   List<ImageSearchResult> searchImages(String term) throws DockerException, InterruptedException;
 
-
-  /**
-   * Creates a single image from a tarball. This method also tags the image
-   * with the given image name upon loading completion.
-   *
-   * @param image        the name to assign to the image.
-   * @param imagePayload the image's payload (i.e.: the stream corresponding to the image's .tar
-   *                     file).
-   * @throws DockerException      if a server error occurred (500).
-   * @throws InterruptedException if the thread is interrupted.
-   *
-   * @deprecated Use {@link #load(InputStream)} to load a set of image layers from a tarball. Use
-   * {@link #create(String, InputStream)} to create a single image from the contents of a tarball.
-   */
-  @Deprecated
-  void load(String image, InputStream imagePayload)
-      throws DockerException, InterruptedException;
-
-
-  /**
-   * Creates a single image from a tarball. This method also tags the image
-   * with the given image name upon loading completion.
-   *
-   * @param image        the name to assign to the image.
-   * @param imagePayload the image's payload (i.e.: the stream corresponding to the image's .tar
-   *                     file).
-   * @param handler      The handler to use for processing each progress message received from
-   *                     Docker.
-   * @throws DockerException      if a server error occurred (500).
-   * @throws InterruptedException if the thread is interrupted.
-   *
-   * @deprecated Use {@link #load(InputStream)} to load a set of image layers from a tarball. Use
-   *             {@link #create(String, InputStream, ProgressHandler)} to create a single image
-   *             from the contents of a tarball.
-   */
-  @Deprecated
-  void load(String image, InputStream imagePayload, ProgressHandler handler)
-      throws DockerException, InterruptedException;
-
   /**
    * Load a set of images and tags from a tarball.
    *
@@ -1210,23 +1171,6 @@ public interface DockerClient extends Closeable {
       throws DockerException, InterruptedException;
 
   /**
-   * Remove a docker container.
-   *
-   * @param containerId   The id of the container to remove.
-   * @param removeVolumes Whether to remove volumes as well.
-   * @throws BadParamException
-   *                            if one or more params were bad (400)
-   * @throws ContainerNotFoundException
-   *                              if container is not found (404)
-   * @throws DockerException      If a server error occurred (500)
-   * @throws InterruptedException If the thread is interrupted
-   * @deprecated Use {@link #removeContainer(String, RemoveContainerParam...)}
-   */
-  @Deprecated
-  void removeContainer(String containerId, boolean removeVolumes)
-      throws DockerException, InterruptedException;
-
-  /**
    * Parameters for {@link #removeContainer(String)}.
    */
   class RemoveContainerParam extends Param {
@@ -1297,33 +1241,6 @@ public interface DockerClient extends Closeable {
    * @throws InterruptedException If the thread is interrupted
    */
   InputStream exportContainer(String containerId) throws DockerException, InterruptedException;
-
-  /**
-   * Copies some files out of a container. (removed on API version 1.24)
-   *
-   * @param containerId The id of the container to copy files from.
-   * @param path        The path inside of the container to copy.  If this is a directory, it will
-   *                    be copied recursively.  If this is a file, only that file will be copied.
-   * @return A stream in tar format that contains the copied files.  If a directory was copied, the
-   *         directory will be at the root of the tar archive (so {@code copy(..., "/usr/share")}
-   *         will result in a directory called {@code share} in the tar archive).  The directory
-   *         name is completely resolved, so copying {@code "/usr/share/././."} will still create
-   *         a directory called {@code "share"} in the tar archive.  If a single file was copied,
-   *         that file will be the sole entry in the tar archive.  Copying {@code "."} or
-   *         equivalently {@code "/"} will result in the tar archive containing a single folder
-   *         named after the container ID.
-   * @throws ContainerNotFoundException
-   *                              if container is not found (404)
-   * @throws DockerException      if a server error occurred (500)
-   * @throws InterruptedException If the thread is interrupted
-   * @throws UnsupportedApiVersionException
-   *                              If client API is greater than or equal to 1.24
-   * @deprecated Replaced by {@link #archiveContainer(String, String)} in API 1.20, removed in 1.24.
-   */
-  @Deprecated
-  InputStream copyContainer(String containerId, String path)
-      throws DockerException, InterruptedException;
-
 
   /**
    * Copies an archive out of a container. (API version 1.20+)
@@ -2450,17 +2367,6 @@ public interface DockerClient extends Closeable {
     }
 
     /**
-     * Show exited containers.
-     *
-     * @return ListContainersParam
-     * @deprecated Replaced by {@link #withStatusExited()}
-     */
-    @Deprecated
-    public static ListContainersParam exitedContainers() {
-      return withStatusExited();
-    }
-
-    /**
      * Show containers with a label value.
      *
      * @param label The label to filter on
@@ -2712,18 +2618,6 @@ public interface DockerClient extends Closeable {
      */
     public static EventsParam daemon(final String daemon) {
       return filter("daemon", daemon);
-    }
-
-    /**
-     * Show events of a given type. For instance, "type=image" for all image events.
-     * @param type A type of event. Possible values: container, image, volume, network, or daemon
-     * @return EventsParam
-     * @deprecated Use {@link #type(Event.Type)}.
-     * @since API 1.22
-     */
-    @Deprecated
-    public static EventsParam type(final String type) {
-      return filter("type", type);
     }
 
     /**

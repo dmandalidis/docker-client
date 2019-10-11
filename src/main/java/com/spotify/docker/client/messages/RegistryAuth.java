@@ -88,22 +88,6 @@ public abstract class RegistryAuth {
   public abstract Builder toBuilder();
 
   /**
-   * This function looks for and parses credentials for logging into Docker registries. We first
-   * look in ~/.docker/config.json and fallback to ~/.dockercfg.
-   * These files are created from running `docker login`.
-   * If the file contains multiple credentials, which entry is returned from this method
-   * depends on hashing and should not be considered reliable.
-   *
-   * @return a {@link Builder}
-   * @throws IOException when we can't parse the docker config file
-   * @deprecated in favor of {@link com.spotify.docker.client.auth.ConfigFileRegistryAuthSupplier}
-   */
-  @Deprecated
-  public static Builder fromDockerConfig() throws IOException {
-    return new DockerConfigReader().anyRegistryAuth().toBuilder();
-  }
-
-  /**
    * This function looks for and parses credentials for logging into the Docker registry specified
    * by serverAddress. We first look in ~/.docker/config.json and fallback to ~/.dockercfg. These
    * files are created from running `docker login`.
@@ -112,7 +96,6 @@ public abstract class RegistryAuth {
    * @return a {@link Builder}
    * @throws IOException when we can't parse the docker config file
    */
-  @SuppressWarnings("unused")
   public static Builder fromDockerConfig(final String serverAddress) throws IOException {
     DockerConfigReader dockerCfgReader = new DockerConfigReader();
     return dockerCfgReader

@@ -86,28 +86,6 @@ public abstract class EndpointSpec {
 
     public abstract Builder ports(List<PortConfig> ports);
 
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #ports(PortConfig...)}.
-     */
-    @Deprecated
-    public Builder withPorts(final PortConfig... ports) {
-      if (ports != null && ports.length > 0) {
-        ports(ImmutableList.copyOf(ports));
-      }
-      return this;
-    }
-
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #ports(List)}.
-     */
-    @Deprecated
-    public Builder withPorts(final List<PortConfig> ports) {
-      if (ports != null && !ports.isEmpty()) {
-        ports(ports);
-      }
-      return this;
-    }
-
     public abstract EndpointSpec build();
   }
 

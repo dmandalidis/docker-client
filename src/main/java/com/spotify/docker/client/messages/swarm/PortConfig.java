@@ -63,47 +63,11 @@ public abstract class PortConfig {
 
     public abstract Builder name(String name);
 
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #name(String)}.
-     */
-    @Deprecated
-    public Builder withName(final String name) {
-      name(name);
-      return this;
-    }
-
     public abstract Builder protocol(String protocol);
-
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #protocol(String)}.
-     */
-    @Deprecated
-    public Builder withProtocol(final String protocol) {
-      protocol(protocol);
-      return this;
-    }
 
     public abstract Builder targetPort(Integer targetPort);
 
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #targetPort(Integer)}.
-     */
-    @Deprecated
-    public Builder withTargetPort(final Integer targetPort) {
-      targetPort(targetPort);
-      return this;
-    }
-
     public abstract Builder publishedPort(Integer publishedPort);
-
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #publishedPort(Integer)}.
-     */
-    @Deprecated
-    public Builder withPublishedPort(final Integer publishedPort) {
-      publishedPort(publishedPort);
-      return this;
-    }
 
     public abstract Builder publishMode(PortConfigPublishMode publishMode);
 

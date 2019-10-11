@@ -94,30 +94,6 @@ public abstract class ContainerInfo {
   @JsonProperty("MountLabel")
   public abstract String mountLabel();
 
-  /**
-   * Volumes returned by execInspect
-   *
-   * @return A map of volumes where the key is the source path on the local file system, and the key
-   *         is the target path on the Docker host.
-   * @deprecated Replaced by {@link #mounts()} in API 1.20.
-   */
-  @Nullable
-  @Deprecated
-  @JsonProperty("Volumes")
-  public abstract ImmutableMap<String, String> volumes();
-
-  /**
-   * Volumes returned by execInspect
-   *
-   * @return A map of volumes where the key is the source path on the local file system, and the key
-   *         is the target path on the Docker host.
-   * @deprecated Replaced by {@link #mounts()} in API 1.20.
-   */
-  @Nullable
-  @Deprecated
-  @JsonProperty("VolumesRW")
-  public abstract ImmutableMap<String, Boolean> volumesRw();
-
   @JsonProperty("AppArmorProfile")
   public abstract String appArmorProfile();
 
@@ -162,18 +138,12 @@ public abstract class ContainerInfo {
       @JsonProperty("ExecDriver") final String execDriver,
       @JsonProperty("ProcessLabel") final String processLabel,
       @JsonProperty("MountLabel") final String mountLabel,
-      @JsonProperty("Volumes") final Map<String, String> volumes,
-      @JsonProperty("VolumesRW") final Map<String, Boolean> volumesRw,
       @JsonProperty("AppArmorProfile") final String appArmorProfile,
       @JsonProperty("ExecIDs") final List<String> execIds,
       @JsonProperty("LogPath") final String logPath,
       @JsonProperty("RestartCount") final Long restartCount,
       @JsonProperty("Mounts") final List<ContainerMount> mounts,
       @JsonProperty("Node") final Node node) {
-    final ImmutableMap<String, String> volumesCopy = volumes == null
-                                                     ? null : ImmutableMap.copyOf(volumes);
-    final ImmutableMap<String, Boolean> volumesRwCopy = volumesRw == null
-                                                        ? null : ImmutableMap.copyOf(volumesRw);
     final ImmutableList<String> execIdsCopy = execIds == null
                                               ? null : ImmutableList.copyOf(execIds);
     final ImmutableList<ContainerMount> mountsCopy = mounts == null
@@ -181,8 +151,8 @@ public abstract class ContainerInfo {
     return new AutoValue_ContainerInfo(
         id, created, path, ImmutableList.copyOf(args), containerConfig, hostConfig, containerState,
         image, networkSettings, resolvConfPath, hostnamePath, hostsPath, name, driver, execDriver,
-        processLabel, mountLabel, volumesCopy, volumesRwCopy,
-        appArmorProfile, execIdsCopy, logPath, restartCount, mountsCopy, node);
+        processLabel, mountLabel, appArmorProfile, execIdsCopy, logPath, restartCount, mountsCopy, 
+        node);
   }
 
   @AutoValue

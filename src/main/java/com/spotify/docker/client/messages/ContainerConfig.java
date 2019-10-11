@@ -97,14 +97,6 @@ public abstract class ContainerConfig {
   @JsonProperty("Image")
   public abstract String image();
 
-  /**
-   * @deprecated As of 8.10.0, use {@link #volumes()}.
-   */
-  @Deprecated
-  public Set<String> volumeNames() {
-    return volumes();
-  }
-
   @Nullable
   @JsonProperty("Volumes")
   public abstract ImmutableSet<String> volumes();
@@ -144,14 +136,6 @@ public abstract class ContainerConfig {
   @Nullable
   @JsonProperty("Healthcheck")
   public abstract Healthcheck healthcheck();
-
-  /**
-   * @deprecated  As of release 7.0.0, replaced by {@link #stopSignal()}.
-   */
-  @Deprecated
-  public String getStopSignal() {
-    return stopSignal();
-  }
 
   @Nullable
   @JsonProperty("NetworkingConfig")
@@ -269,16 +253,6 @@ public abstract class ContainerConfig {
       for (final String volume : volumes) {
         volumesBuilder().add(volume);
       }
-      return this;
-    }
-
-    /**
-     * @deprecated As of 8.10.0, use {@link #volumes(Set)} or
-     *             {@link #volumes(String...)}.
-     */
-    @Deprecated
-    public Builder volumes(final Map<String, Map> volumes) {
-      this.volumes(volumes.keySet());
       return this;
     }
 

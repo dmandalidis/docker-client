@@ -31,7 +31,6 @@ import static com.google.common.collect.Maps.newHashMap;
 import static com.spotify.docker.client.ObjectMapperProvider.objectMapper;
 import static com.spotify.docker.client.VersionCompare.compareVersion;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.singletonMap;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.ws.rs.HttpMethod.DELETE;
 import static javax.ws.rs.HttpMethod.GET;
@@ -115,9 +114,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
@@ -892,13 +888,6 @@ public class DefaultDockerClient implements DockerClient, Closeable {
     removeContainer(containerId, new RemoveContainerParam[0]);
   }
 
-  @Deprecated
-  @Override
-  public void removeContainer(final String containerId, final boolean removeVolumes)
-      throws DockerException, InterruptedException {
-    removeContainer(containerId, RemoveContainerParam.removeVolumes(removeVolumes));
-  }
-
   @Override
   public void removeContainer(final String containerId, final RemoveContainerParam... params)
       throws DockerException, InterruptedException {
@@ -930,40 +919,6 @@ public class DefaultDockerClient implements DockerClient, Closeable {
     try {
       return request(GET, InputStream.class, resource,
                      resource.request(APPLICATION_OCTET_STREAM_TYPE));
-    } catch (DockerRequestException e) {
-      switch (e.status()) {
-        case 404:
-          throw new ContainerNotFoundException(containerId, e);
-        default:
-          throw e;
-      }
-    }
-  }
-
-
-  @Override
-  @Deprecated
-  public InputStream copyContainer(String containerId, String path)
-      throws DockerException, InterruptedException {
-    final String apiVersion = version().apiVersion();
-    final int versionComparison = compareVersion(apiVersion, "1.24");
-
-    // Version above 1.24
-    if (versionComparison >= 0) {
-      throw new UnsupportedApiVersionException(apiVersion);
-    }
-
-    final WebTarget resource = resource()
-        .path("containers").path(containerId).path("copy");
-
-    // Internal JSON object; not worth it to create class for this
-    final JsonNodeFactory nf = JsonNodeFactory.instance;
-    final JsonNode params = nf.objectNode().set("Resource", nf.textNode(path));
-
-    try {
-      return request(POST, InputStream.class, resource,
-                     resource.request(APPLICATION_OCTET_STREAM_TYPE),
-                     Entity.json(params));
     } catch (DockerRequestException e) {
       switch (e.status()) {
         case 404:
@@ -1196,21 +1151,6 @@ public class DefaultDockerClient implements DockerClient, Closeable {
     final WebTarget resource = resource().path("images").path("search").queryParam("term", term);
     return request(GET, IMAGES_SEARCH_RESULT_LIST, resource,
                    resource.request(APPLICATION_JSON_TYPE));
-  }
-
-  @Override
-  @Deprecated
-  public void load(final String image, final InputStream imagePayload)
-      throws DockerException, InterruptedException {
-    create(image, imagePayload);
-  }
-
-  @Override
-  @Deprecated
-  public void load(final String image, final InputStream imagePayload,
-                   final ProgressHandler handler)
-      throws DockerException, InterruptedException {
-    create(image, imagePayload, handler);
   }
 
   @Override
@@ -2979,9 +2919,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
     private long readTimeoutMillis = DEFAULT_READ_TIMEOUT_MILLIS;
     private int connectionPoolSize = DEFAULT_CONNECTION_POOL_SIZE;
     private DockerCertificatesStore dockerCertificatesStore;
-    private boolean dockerAuth;
     private boolean useProxy = true;
-    private RegistryAuth registryAuth;
     private RegistryAuthSupplier registryAuthSupplier;
     private Map<String, Object> headers = new HashMap<>();
     private RequestEntityProcessing requestEntityProcessing;
@@ -3085,23 +3023,6 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       return this;
     }
 
-    public boolean dockerAuth() {
-      return dockerAuth;
-    }
-
-    /**
-     * Allows reusing Docker auth info.
-     *
-     * @param dockerAuth tells if Docker auth info should be used
-     * @return Builder
-     * @deprecated in favor of {@link #registryAuthSupplier(RegistryAuthSupplier)}
-     */
-    @Deprecated
-    public Builder dockerAuth(final boolean dockerAuth) {
-      this.dockerAuth = dockerAuth;
-      return this;
-    }
-
     public boolean useProxy() {
       return useProxy;
     }
@@ -3114,37 +3035,6 @@ public class DefaultDockerClient implements DockerClient, Closeable {
      */
     public Builder useProxy(final boolean useProxy) {
       this.useProxy = useProxy;
-      return this;
-    }
-
-    public RegistryAuth registryAuth() {
-      return registryAuth;
-    }
-
-    /**
-     * Set the auth parameters for pull/push requests from/to private repositories.
-     *
-     * @param registryAuth RegistryAuth object
-     * @return Builder
-     *
-     * @deprecated in favor of {@link #registryAuthSupplier(RegistryAuthSupplier)}
-     */
-    @Deprecated
-    public Builder registryAuth(final RegistryAuth registryAuth) {
-      if (this.registryAuthSupplier != null) {
-        throw new IllegalStateException(ERROR_MESSAGE);
-      }
-      this.registryAuth = registryAuth;
-
-      // stuff the static RegistryAuth into a RegistryConfigs instance to maintain what
-      // DefaultDockerClient used to do with the RegistryAuth before we introduced the
-      // RegistryAuthSupplier
-      final RegistryConfigs configs = RegistryConfigs.create(singletonMap(
-          MoreObjects.firstNonNull(registryAuth.serverAddress(), ""),
-          registryAuth
-      ));
-
-      this.registryAuthSupplier = new FixedRegistryAuthSupplier(registryAuth, configs);
       return this;
     }
 

@@ -70,15 +70,6 @@ public abstract class ServiceSpec {
 
     public abstract Builder name(String name);
 
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #name(String)}.
-     */
-    @Deprecated
-    public Builder withName(String name) {
-      name(name);
-      return this;
-    }
-
     abstract ImmutableMap.Builder<String, String> labelsBuilder();
 
     public Builder addLabel(final String label, final String value) {
@@ -86,91 +77,19 @@ public abstract class ServiceSpec {
       return this;
     }
 
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #addLabel(String, String)}.
-     */
-    @Deprecated
-    public Builder withLabel(final String label, final String value) {
-      addLabel(label, value);
-      return this;
-    }
-
     public abstract Builder labels(Map<String, String> labels);
-
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #labels(Map)}.
-     */
-    @Deprecated
-    public Builder withLabels(final Map<String, String> labels) {
-      labels(labels);
-      return this;
-    }
 
     public abstract Builder taskTemplate(TaskSpec taskTemplate);
 
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #taskTemplate(TaskSpec)}.
-     */
-    @Deprecated
-    public Builder withTaskTemplate(TaskSpec taskTemplate) {
-      taskTemplate(taskTemplate);
-      return this;
-    }
-
     public abstract Builder mode(ServiceMode mode);
 
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #mode(ServiceMode)}.
-     */
-    @Deprecated
-    public Builder withServiceMode(final ServiceMode mode) {
-      mode(mode);
-      return this;
-    }
-
     public abstract Builder updateConfig(UpdateConfig updateConfig);
-
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #updateConfig(UpdateConfig)}.
-     */
-    @Deprecated
-    public Builder withUpdateConfig(final UpdateConfig updateConfig) {
-      updateConfig(updateConfig);
-      return this;
-    }
 
     public abstract Builder networks(NetworkAttachmentConfig... networks);
 
     public abstract Builder networks(List<NetworkAttachmentConfig> networks);
 
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #networks(NetworkAttachmentConfig...)}.
-     */
-    @Deprecated
-    public Builder withNetworks(NetworkAttachmentConfig... networks) {
-      networks(networks);
-      return this;
-    }
-
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #networks(List)}.
-     */
-    @Deprecated
-    public Builder withNetworks(List<NetworkAttachmentConfig> networks) {
-      networks(networks);
-      return this;
-    }
-
     public abstract Builder endpointSpec(EndpointSpec endpointSpec);
-
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #endpointSpec(EndpointSpec)}.
-     */
-    @Deprecated
-    public Builder withEndpointSpec(final EndpointSpec endpointSpec) {
-      endpointSpec(endpointSpec);
-      return this;
-    }
 
     public abstract ServiceSpec build();
   }

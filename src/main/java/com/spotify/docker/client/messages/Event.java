@@ -43,39 +43,6 @@ import javax.annotation.Nullable;
 @JsonAutoDetect(fieldVisibility = ANY, setterVisibility = NONE, getterVisibility = NONE)
 public abstract class Event {
 
-  /**
-   * Event status.
-   * @return status
-   * @deprecated Use {@link #action()} instead
-   */
-  @Deprecated
-  @Nullable
-  @JsonProperty("status")
-  public abstract String status();
-
-  /**
-   * Event actor id. When the event type is "container" this is the container id.
-   * @return id
-   * @deprecated Use the {@link com.spotify.docker.client.messages.Event.Actor#id()}
-   *     field from {@link #actor()}
-   */
-  @Deprecated
-  @Nullable
-  @JsonProperty("id")
-  public abstract String id();
-
-  /**
-   * When the event type is "container" this is the image id.
-   * @return from
-   * @deprecated Use the "image" attribute in the
-   *     {@link com.spotify.docker.client.messages.Event.Actor#attributes()}
-   *     map from {@link #actor()}
-   */
-  @Deprecated
-  @Nullable
-  @JsonProperty("from")
-  public abstract String from();
-
   @Nullable
   @JsonProperty("Type")
   public abstract Type type();
@@ -109,15 +76,12 @@ public abstract class Event {
 
   @JsonCreator
   static Event create(
-      @JsonProperty("status") final String status,
-      @JsonProperty("id") final String id,
-      @JsonProperty("from") final String from,
       @JsonProperty("Type") final Type type,
       @JsonProperty("Action") final String action,
       @JsonProperty("Actor") final Actor actor,
       @JsonProperty("time") final Date time,
       @JsonProperty("timeNano") final Long timeNano) {
-    return new AutoValue_Event(status, id, from, type, action, actor, time, timeNano);
+    return new AutoValue_Event(type, action, actor, time, timeNano);
   }
 
   @AutoValue

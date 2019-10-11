@@ -154,69 +154,15 @@ public abstract class Task {
 
       public abstract Builder taskId(final String taskId);
 
-      /**
-       * @deprecated  As of release 7.0.0, replaced by {@link #taskId(String)}.
-       */
-      @Deprecated
-      public Builder withTaskId(final String taskId) {
-        taskId(taskId);
-        return this;
-      }
-
       public abstract Builder taskName(final String taskName);
-
-      /**
-       * @deprecated  As of release 7.0.0, replaced by {@link #taskName(String)}.
-       */
-      @Deprecated
-      public Builder withTaskName(final String taskName) {
-        taskName(taskName);
-        return this;
-      }
 
       public abstract Builder serviceName(final String serviceName);
 
-      /**
-       * @deprecated  As of release 7.0.0, replaced by {@link #serviceName(String)}.
-       */
-      @Deprecated
-      public Builder withServiceName(final String serviceName) {
-        serviceName(serviceName);
-        return this;
-      }
-
       public abstract Builder nodeId(final String nodeId);
-
-      /**
-       * @deprecated  As of release 7.0.0, replaced by {@link #nodeId(String)}.
-       */
-      @Deprecated
-      public Builder withNodeId(final String nodeId) {
-        nodeId(nodeId);
-        return this;
-      }
 
       public abstract Builder label(final String label);
 
-      /**
-       * @deprecated  As of release 7.0.0, replaced by {@link #label(String)}.
-       */
-      @Deprecated
-      public Builder withLabel(final String label) {
-        label(label);
-        return this;
-      }
-
       public abstract Builder desiredState(final String desiredState);
-
-      /**
-       * @deprecated  As of release 7.0.0, replaced by {@link #desiredState(String)}.
-       */
-      @Deprecated
-      public Builder withDesiredState(final String desiredState) {
-        desiredState(desiredState);
-        return this;
-      }
 
       public abstract Criteria build();
     }
