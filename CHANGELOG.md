@@ -1,9 +1,28 @@
-# Changelog
+# Change Log
 
-If you are interested in the history of changes when this project was managed
-by Spotify you can refer to [Changelog pre-fork history][]
+## 1.1.0
 
-[Changelog pre-fork history]: https://github.com/dmandalidis/docker-client/blob/master/CHANGELOG_PREFORK.md
+### Enhancements
+
+* Support Init for containers and services (fixes [#36](https://github.com/dmandalidis/docker-client/issues/36))
+* Support --mount option in container creation (fixes [#59](https://github.com/dmandalidis/docker-client/issues/10))
+* Fix [#44](https://github.com/dmandalidis/docker-client/issues/44) Add missing 'Order' attribute in UpdateConfig (thanks [@Allen57](https://github.com/Allen57))
+
+### Misc
+
+* Build against docker-ce 19.03.3
+* Bump google-auth-library-oauth2-http from 0.17.2 to 0.18.0
+* Bump version.jackson from 2.9.10 to 2.10.0
+* Bump activation from 1.1 to 1.1.1
+* Bump bcpkix-jdk15on from 1.60 to 1.63
+* Bump mockwebserver from 4.2.1 to 4.2.2
+* Bump slf4j-api from 1.7.22 to 1.7.28
+* Bump spotbugs-maven-plugin from 3.1.12 to 3.1.12.2
+* Bump guava from 24.1.1-jre to 28.1-jre
+* Support the most recent docker versions
+* Fix in README link
+* Switch to ubuntu xenial and OpenJDK11 (fixes #5, #7)
+* Caching maven artifacts
 
 ## 1.0.2
 
@@ -45,3 +64,10 @@ Users of the original project should be able to switch by simply replacing the g
 and the version (otherwise it's a bug, triggering an immediate patch release)
 
 [the upgrade to Jackson 2.9.10]: https://github.com/dmandalidis/docker-client/issues/3
+
+## Previous releases 
+
+If you are interested in the history of changes when this project was managed
+by Spotify you can refer to [Changelog pre-fork history][]
+
+[Changelog pre-fork history]: https://github.com/dmandalidis/docker-client/blob/master/CHANGELOG_PREFORK.md
