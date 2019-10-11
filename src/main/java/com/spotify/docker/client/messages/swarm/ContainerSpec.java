@@ -122,6 +122,12 @@ public abstract class ContainerSpec {
   @JsonProperty("DNSConfig")
   public abstract DnsConfig dnsConfig();
 
+  /**
+   * @since 1.37
+   */
+  @Nullable
+  @JsonProperty("Init")
+  public abstract Boolean init();
 
   @AutoValue.Builder
   public abstract static class Builder {
@@ -347,6 +353,8 @@ public abstract class ContainerSpec {
     public abstract Builder secrets(List<SecretBind> secrets);
 
     public abstract Builder configs(List<ConfigBind> configs);
+    
+    public abstract Builder init(Boolean init);
 
     public abstract ContainerSpec build();
   }
@@ -373,7 +381,8 @@ public abstract class ContainerSpec {
       @JsonProperty("Hosts") final List<String> hosts,
       @JsonProperty("Secrets") final List<SecretBind> secrets,
       @JsonProperty("DNSConfig") final DnsConfig dnsConfig,
-      @JsonProperty("Configs") final List<ConfigBind> configs) {
+      @JsonProperty("Configs") final List<ConfigBind> configs,
+      @JsonProperty("Init") final Boolean init) {
     final Builder builder = builder()
         .image(image)
         .hostname(hostname)
@@ -390,7 +399,8 @@ public abstract class ContainerSpec {
         .dnsConfig(dnsConfig)
         .command(command)
         .secrets(secrets)
-        .configs(configs);
+        .configs(configs)
+        .init(init);
 
     if (labels != null) {
       builder.labels(labels);

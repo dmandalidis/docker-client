@@ -258,6 +258,10 @@ public abstract class HostConfig {
   @JsonProperty("Mounts")
   public abstract ImmutableList<Mount> mounts();
 
+  @Nullable
+  @JsonProperty("Init")
+  public abstract Boolean init();
+  
   @JsonCreator
   static HostConfig create(
       @JsonProperty("Binds") final List<String> binds,
@@ -310,7 +314,8 @@ public abstract class HostConfig {
       @JsonProperty("ReadonlyRootfs") final Boolean readonlyRootfs,
       @JsonProperty("Runtime") final String runtime,
       @JsonProperty("StorageOpt") final Map<String, String> storageOpt,
-      @JsonProperty("Mounts") final List<Mount> mounts) {
+      @JsonProperty("Mounts") final List<Mount> mounts,
+      @JsonProperty("Init") final Boolean init) {
     return builder()
         .binds(binds)
         .blkioWeight(blkioWeight)
@@ -363,6 +368,7 @@ public abstract class HostConfig {
         .storageOpt(storageOpt)
         .runtime(runtime)
         .mounts(mounts)
+        .init(init)
         .build();
   }
 
@@ -687,6 +693,9 @@ public abstract class HostConfig {
     	}
     	return this;
     }
+    
+    public abstract Builder init(Boolean init);
+    
     // Validation of property values using AutoValue requires we split the build method into two.
     // AutoValue implements this package-private method.
     // See https://github.com/google/auto/blob/master/value/userguide/builders-howto.md#validate.

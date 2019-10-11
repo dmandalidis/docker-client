@@ -4822,6 +4822,24 @@ public class DefaultDockerClientTest {
     exception.expect(ContainerNotFoundException.class);
     sut.inspectContainer(container.id());
   }
+  
+  @Test
+  public void testInitWhenSetToTrue() throws Exception {
+    requireDockerApiVersionAtLeast("1.25", "HostConfig.Init");
+
+    sut.pull(BUSYBOX_LATEST);
+
+    final ContainerConfig config = ContainerConfig.builder()
+        .image(BUSYBOX_LATEST)
+        .hostConfig(HostConfig.builder()
+                        .init(true)
+                        .build())
+        .build();
+
+    final ContainerCreation container = sut.createContainer(config, randomName());
+    final ContainerInfo info = sut.inspectContainer(container.id());
+    assertThat(info.hostConfig().init(), is(true));
+  }
 
   @Test
   public void testInspectSwarm() throws Exception {
