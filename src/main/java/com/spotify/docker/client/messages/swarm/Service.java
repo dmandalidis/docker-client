@@ -90,25 +90,7 @@ public abstract class Service {
 
       public abstract Builder serviceId(final String serviceId);
 
-      /**
-       * @deprecated  As of release 7.0.0, replaced by {@link #serviceId(String)}.
-       */
-      @Deprecated
-      public Builder withServiceId(final String serviceId) {
-        serviceId(serviceId);
-        return this;
-      }
-
       public abstract Builder serviceName(final String serviceName);
-
-      /**
-       * @deprecated  As of release 7.0.0, replaced by {@link #serviceName(String)}.
-       */
-      @Deprecated
-      public Builder withServiceName(final String serviceName) {
-        serviceName(serviceName);
-        return this;
-      }
 
       public abstract Builder labels(final Map<String, String> labels);
       

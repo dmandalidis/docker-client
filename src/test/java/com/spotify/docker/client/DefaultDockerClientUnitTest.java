@@ -348,21 +348,6 @@ public class DefaultDockerClientUnitTest {
   }
 
   @Test
-  @SuppressWarnings("deprecated")
-  public void buildThrowsIfRegistryAuthandRegistryAuthSupplierAreBothSpecified() {
-    thrown.expect(IllegalStateException.class);
-    thrown.expectMessage("LOGIC ERROR");
-
-    final RegistryAuthSupplier authSupplier = mock(RegistryAuthSupplier.class);
-
-    //noinspection deprecation
-    DefaultDockerClient.builder()
-        .registryAuth(RegistryAuth.builder().identityToken("hello").build())
-        .registryAuthSupplier(authSupplier)
-        .build();
-  }
-
-  @Test
   public void testBuildPassesMultipleRegistryConfigs() throws Exception {
     final RegistryConfigs registryConfigs = RegistryConfigs.create(ImmutableMap.of(
         "server1", RegistryAuth.builder()

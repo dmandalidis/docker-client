@@ -65,84 +65,17 @@ public abstract class TaskSpec {
 
     public abstract Builder containerSpec(ContainerSpec containerSpec);
 
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #containerSpec(ContainerSpec)}.
-     */
-    @Deprecated
-    public Builder withContainerSpec(final ContainerSpec containerSpec) {
-      containerSpec(containerSpec);
-      return this;
-    }
-
     public abstract Builder resources(ResourceRequirements resources);
-
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #resources(ResourceRequirements)}.
-     */
-    @Deprecated
-    public Builder withResources(final ResourceRequirements resources) {
-      resources(resources);
-      return this;
-    }
 
     public abstract Builder restartPolicy(RestartPolicy restartPolicy);
 
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #restartPolicy(RestartPolicy)}.
-     */
-    @Deprecated
-    public Builder withRestartPolicy(final RestartPolicy restartPolicy) {
-      restartPolicy(restartPolicy);
-      return this;
-    }
-
     public abstract Builder placement(Placement placement);
-
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #placement(Placement)}.
-     */
-    @Deprecated
-    public Builder withPlacement(final Placement placement) {
-      placement(placement);
-      return this;
-    }
 
     public abstract Builder networks(NetworkAttachmentConfig... networks);
 
     public abstract Builder networks(List<NetworkAttachmentConfig> networks);
 
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #networks(NetworkAttachmentConfig...)}.
-     */
-    @Deprecated
-    public Builder withNetworks(NetworkAttachmentConfig... networks) {
-      if (networks != null && networks.length > 0) {
-        networks(networks);
-      }
-      return this;
-    }
-
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #networks(List)}.
-     */
-    @Deprecated
-    public Builder withNetworks(final List<NetworkAttachmentConfig> networks) {
-      if (networks != null && !networks.isEmpty()) {
-        networks(networks);
-      }
-      return this;
-    }
-
     public abstract Builder logDriver(Driver logDriver);
-
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #logDriver(Driver)}.
-     */
-    @Deprecated
-    public Builder withLogDriver(final Driver logDriver) {
-      logDriver(logDriver);
-      return this;
-    }
 
     public abstract TaskSpec build();
   }

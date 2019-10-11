@@ -36,7 +36,7 @@ public class EventTest {
   @Test
   public void serializationRoundTripTest() throws Exception {
     // Test serializing and deserializing the same Event instance works and preserves data
-    final Event event = Event.create("create", "foo", "nginx", Event.Type.CONTAINER, "create",
+    final Event event = Event.create(Event.Type.CONTAINER, "create",
         Event.Actor.create("bar", ImmutableMap.of("image", "nginx", "name", "docker-nginx")),
         new Date(1487356000), 100L);
 

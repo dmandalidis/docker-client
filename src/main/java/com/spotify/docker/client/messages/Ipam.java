@@ -64,14 +64,6 @@ public abstract class Ipam {
 
     public abstract Builder config(List<IpamConfig> config);
 
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #config(List)}.
-     */
-    @Deprecated
-    public Builder config(final String subnet, final String ipRange, final String gateway) {
-      return Ipam.builder().config(singletonList(IpamConfig.create(subnet, ipRange, gateway)));
-    }
-
     public abstract Ipam build();
   }
 

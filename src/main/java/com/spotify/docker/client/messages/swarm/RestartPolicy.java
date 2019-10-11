@@ -59,47 +59,11 @@ public abstract class RestartPolicy {
 
     public abstract Builder condition(String condition);
 
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #condition(String)}.
-     */
-    @Deprecated
-    public Builder withCondition(final String condition) {
-      condition(condition);
-      return this;
-    }
-
     public abstract Builder delay(Long delay);
-
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #delay(Long)}.
-     */
-    @Deprecated
-    public Builder withDelay(final Long delay) {
-      delay(delay);
-      return this;
-    }
 
     public abstract Builder maxAttempts(Integer maxAttempts);
 
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #maxAttempts(Integer)}.
-     */
-    @Deprecated
-    public Builder withMaxAttempts(final Integer maxAttempts) {
-      maxAttempts(maxAttempts);
-      return this;
-    }
-
     public abstract Builder window(Long window);
-
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #window(Long)}.
-     */
-    @Deprecated
-    public Builder withWindow(long window) {
-      window(window);
-      return this;
-    }
 
     public abstract RestartPolicy build();
   }

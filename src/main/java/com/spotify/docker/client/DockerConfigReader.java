@@ -47,33 +47,6 @@ public class DockerConfigReader {
 
   private static final ObjectMapper MAPPER = ObjectMapperProvider.objectMapper();
 
-
-  /**
-   * Parse the contents of the config file and generate all possible
-   * {@link RegistryAuth}s, which are bundled into a {@link RegistryConfigs} instance.
-   * @param configPath Path to config file.
-   * @return All registry configs that can be generated from the config file
-   * @throws IOException If the file cannot be read, or its JSON cannot be parsed
-   * @deprecated Use {@link #authForAllRegistries(Path)} instead.
-   */
-  @Deprecated
-  public RegistryConfigs fromConfig(final Path configPath) throws IOException {
-    return authForAllRegistries(configPath);
-  }
-
-  /**
-   * Returns the RegistryAuth for the config file for the given registry server name.
-   *
-   * @throws IllegalArgumentException if the config file does not contain registry auth info for the
-   *                                  registry
-   * @deprecated In favor of {@link #authForRegistry(Path, String)}
-   */
-  @Deprecated
-  public RegistryAuth fromConfig(final Path configPath, final String serverAddress)
-      throws IOException {
-    return authForRegistry(configPath, serverAddress);
-  }
-
   /**
    * Return a single RegistryAuth from the default config file.
    * If there is only one, it'll be that one.

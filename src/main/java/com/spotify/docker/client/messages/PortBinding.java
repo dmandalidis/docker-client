@@ -41,14 +41,6 @@ public abstract class PortBinding {
   @JsonProperty("HostPort")
   public abstract String hostPort();
 
-  /**
-   * @deprecated  As of release 7.0.0, replaced by {@link #of(String, String)}.
-   */
-  @Deprecated
-  public static PortBinding hostPort(final String port) {
-    return new AutoValue_PortBinding(null, port);
-  }
-
   public static PortBinding of(final String ip, final String port) {
     return new AutoValue_PortBinding(ip, port);
   }

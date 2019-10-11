@@ -353,24 +353,20 @@ public class DefaultDockerClientTest {
 
   @After
   public void tearDown() throws Exception {
-    if (dockerApiVersionAtLeast("1.24")) {
-      try {
-        final List<Service> services = sut.listServices();
-        for (final Service service : services) {
-          sut.removeService(service.id());
-        }
-      } catch (DockerException e) {
-        log.warn("Ignoring DockerException in teardown", e);
+    try {
+      final List<Service> services = sut.listServices();
+      for (final Service service : services) {
+        sut.removeService(service.id());
       }
+    } catch (DockerException e) {
+      log.warn("Ignoring DockerException in teardown", e);
     }
-    if (dockerApiVersionAtLeast("1.25")) {
-    	try {
-	    	for (final Secret secret : sut.listSecrets()) {
-	    		sut.deleteSecret(secret.id());
-	    	}
-    	} catch (DockerException e) {
-            log.warn("Ignoring DockerException in teardown", e);
-        }
+  	try {
+  		for (final Secret secret : sut.listSecrets()) {
+  			sut.deleteSecret(secret.id());
+	    }
+    } catch (DockerException e) {
+        log.warn("Ignoring DockerException in teardown", e);
     }
 
     // Remove containers
@@ -440,8 +436,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testSearchImage() throws Exception {
-    requireDockerApiVersionNot("1.19", "Docker 1.7.x sends the wrong Content-Type header for "
-                                       + "/images/search. So we skip this test.");
     // when
     final List<ImageSearchResult> searchResult = sut.searchImages(BUSYBOX);
     // then
@@ -515,8 +509,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testBuildImageIdWithBuildargs() throws Exception {
-    requireDockerApiVersionAtLeast("1.21", "build args");
-
     final Path dockerDirectory = getResource("dockerDirectoryWithBuildargs");
     final String buildargs = "{\"testargument\":\"22-12-2015\"}";
     final BuildParam buildParam =
@@ -526,8 +518,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testHealthCheck() throws Exception {
-    requireDockerApiVersionAtLeast("1.24", "health check");
-
     // Create image
     final Path dockerDirectory = getResource("dockerDirectoryWithHealthCheck");
     final String imageId = sut.build(dockerDirectory, "test-healthcheck");
@@ -627,24 +617,20 @@ public class DefaultDockerClientTest {
       loadedImages = sut.load(imageFileInputStream, messages::add);
     }
 
-    if (dockerApiVersionAtLeast("1.24")) {
-      // Verify that both images are loaded
-      assertEquals(loadedImages.size(), 2);
-      assertTrue(loadedImages.contains(image1));
-      assertTrue(loadedImages.contains(image2));
-    }
+    // Verify that both images are loaded
+    assertEquals(loadedImages.size(), 2);
+    assertTrue(loadedImages.contains(image1));
+    assertTrue(loadedImages.contains(image2));
 
-    if (dockerApiVersionAtLeast("1.23")) {
-      // Verify that we have multiple messages, and each one has a non-null field
-      assertThat(messages, not(empty()));
-      for (final ProgressMessage message : messages) {
-        assertTrue(message.error() != null
-                   || message.id() != null
-                   || message.progress() != null
-                   || message.progressDetail() != null
-                   || message.status() != null
-                   || message.stream() != null);
-      }
+    // Verify that we have multiple messages, and each one has a non-null field
+    assertThat(messages, not(empty()));
+    for (final ProgressMessage message : messages) {
+      assertTrue(message.error() != null
+                 || message.id() != null
+                 || message.progress() != null
+                 || message.progressDetail() != null
+                 || message.status() != null
+                 || message.stream() != null);
     }
 
     // Try to inspect created images and make sure ImageNotFoundException is not thrown
@@ -717,9 +703,7 @@ public class DefaultDockerClientTest {
     assertThat(version.kernelVersion(), not(isEmptyOrNullString()));
     assertThat(version.os(), not(isEmptyOrNullString()));
     assertThat(version.version(), not(isEmptyOrNullString()));
-    if (dockerApiVersionAtLeast("1.22")) {
-      assertThat(version.buildTime(), not(isEmptyOrNullString()));
-    }
+    assertThat(version.buildTime(), not(isEmptyOrNullString()));
   }
 
   @Test
@@ -740,16 +724,6 @@ public class DefaultDockerClientTest {
   }
 
   @Test
-  public void testMissingAuthParam() throws Exception {
-    requireDockerApiVersionLessThan("1.23", "https://github.com/docker/docker/issues/24093");
-    final RegistryAuth badRegistryAuth = RegistryAuth.builder()
-        .username(AUTH_USERNAME)
-        .build();
-    final int statusCode = sut.auth(badRegistryAuth);
-    assertThat(statusCode, equalTo(500));
-  }
-
-  @Test
   @SuppressWarnings("deprecation")
   public void testInfo() throws Exception {
     final Info info = sut.info();
@@ -758,20 +732,10 @@ public class DefaultDockerClientTest {
     assertThat(info.dockerRootDir(), not(isEmptyOrNullString()));
     assertThat(info.storageDriver(), not(isEmptyOrNullString()));
     assertThat(info.driverStatus(), is(anything()));
-    if (dockerApiVersionLessThan("1.23")) {
-      // Execution driver was removed in 1.24 https://github.com/docker/docker/pull/24501
-      // But it also shows up as "" in 1.23, and I don't know why - JF
-      assertThat(info.executionDriver(), not(isEmptyOrNullString()));
-    }
     assertThat(info.id(), not(isEmptyOrNullString()));
     assertThat(info.ipv4Forwarding(), is(anything()));
     assertThat(info.images(), greaterThan(-1));
     assertThat(info.indexServerAddress(), not(isEmptyOrNullString()));
-    if (dockerApiVersionLessThan("1.23")) {
-      // Init path seems to have been removed in API 1.23.
-      // Still documented as of 2016-09-26, but InitPath field is not in /info - JF
-      assertThat(info.initPath(), not(isEmptyOrNullString()));
-    }
     assertThat(info.initSha1(), is(anything()));
     assertThat(info.kernelVersion(), not(isEmptyOrNullString()));
     assertThat(info.labels(), is(anything()));
@@ -788,38 +752,24 @@ public class DefaultDockerClientTest {
     assertThat(info.swapLimit(), not(nullValue()));
     assertThat(info.swarm(), is(anything()));
 
-    if (dockerApiVersionAtLeast("1.18")) {
-      assertThat(info.httpProxy(), is(anything()));
-      assertThat(info.httpsProxy(), is(anything()));
-      assertThat(info.noProxy(), is(anything()));
-      assertThat(info.systemTime(), not(nullValue()));
-    }
-
-    if (dockerApiVersionAtLeast("1.19")) {
-      assertThat(info.cpuCfsPeriod(), is(anything()));
-      assertThat(info.cpuCfsQuota(), is(anything()));
-      assertThat(info.experimentalBuild(), is(anything()));
-      assertThat(info.oomKillDisable(), is(anything()));
-    }
-
-    if (dockerApiVersionAtLeast("1.21")) {
-      assertThat(info.clusterStore(), is(anything()));
-      assertEquals(info.serverVersion(), sut.version().version());
-    }
-
-    if (dockerApiVersionAtLeast("1.22")) {
-      assertThat(info.architecture(), not(isEmptyOrNullString()));
-      assertThat(info.containersRunning(), is(anything()));
-      assertThat(info.containersStopped(), is(anything()));
-      assertThat(info.containersPaused(), is(anything()));
-      assertThat(info.osType(), not(isEmptyOrNullString()));
-      assertThat(info.systemStatus(), is(anything()));
-    }
-
-    if (dockerApiVersionAtLeast("1.23")) {
-      assertThat(info.cgroupDriver(), not(isEmptyOrNullString()));
-      assertThat(info.kernelMemory(), is(anything()));
-    }
+    assertThat(info.httpProxy(), is(anything()));
+    assertThat(info.httpsProxy(), is(anything()));
+    assertThat(info.noProxy(), is(anything()));
+    assertThat(info.systemTime(), not(nullValue()));
+    assertThat(info.cpuCfsPeriod(), is(anything()));
+    assertThat(info.cpuCfsQuota(), is(anything()));
+    assertThat(info.experimentalBuild(), is(anything()));
+    assertThat(info.oomKillDisable(), is(anything()));
+    assertThat(info.clusterStore(), is(anything()));
+    assertEquals(info.serverVersion(), sut.version().version());
+    assertThat(info.architecture(), not(isEmptyOrNullString()));
+    assertThat(info.containersRunning(), is(anything()));
+    assertThat(info.containersStopped(), is(anything()));
+    assertThat(info.containersPaused(), is(anything()));
+    assertThat(info.osType(), not(isEmptyOrNullString()));
+    assertThat(info.systemStatus(), is(anything()));
+    assertThat(info.cgroupDriver(), not(isEmptyOrNullString()));
+    assertThat(info.kernelMemory(), is(anything()));
   }
 
   @Test
@@ -892,15 +842,6 @@ public class DefaultDockerClientTest {
     assertThat(info.dockerVersion(), not(isEmptyOrNullString()));
     assertThat(info.id(), not(isEmptyOrNullString()));
     assertThat(info.os(), equalTo("linux"));
-
-    //noinspection StatementWithEmptyBody
-    if (dockerApiVersionLessThan("1.22")) {
-      assertThat(info.parent(), not(isEmptyOrNullString()));
-    } else {
-      // The "parent" field can be empty because of changes in
-      // image storage in 1.10. See https://github.com/docker/docker/issues/19650.
-    }
-
     assertThat(info.size(), notNullValue());
     assertThat(info.virtualSize(), notNullValue());
     assertThat(info.rootFs(), notNullValue());
@@ -1013,7 +954,7 @@ public class DefaultDockerClientTest {
     final Path dockerDirectory = getResource("dockerDirectory");
     final String imageId = sut.build(dockerDirectory, imageName);
     final ImageInfo info = sut.inspectImage(imageName);
-    final String expectedId = dockerApiVersionLessThan("1.22") ? imageId : "sha256:" + imageId;
+    final String expectedId = "sha256:" + imageId;
     assertThat(info.id(), startsWith(expectedId));
   }
 
@@ -1082,8 +1023,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testBuildWithPull() throws Exception {
-    requireDockerApiVersionAtLeast("1.19", "build with pull");
-
     final Path dockerDirectory = getResource("dockerDirectory");
     final String pullMsg = "Pulling from";
 
@@ -1175,8 +1114,7 @@ public class DefaultDockerClientTest {
     // The progress handler uses ascii escape characters to move the cursor around to nicely print
     // progress bars. This is hard to test programmatically, so let's just verify the output
     // contains some expected phrases.
-    final String pullingStr = dockerApiVersionAtLeast("1.20")
-                              ? "Pulling from library/busybox" : "Pulling from busybox";
+    final String pullingStr = "Pulling from library/busybox";
     assertThat(out.toString(), allOf(containsString(pullingStr),
                                      containsString("Image is up to date")));
   }
@@ -1207,59 +1145,7 @@ public class DefaultDockerClientTest {
   }
 
   @Test
-  @SuppressWarnings("deprecation")
-  public void testCopyContainer() throws Exception {
-    requireDockerApiVersionLessThan("1.24", "failCopyToContainer");
-
-    // Pull image
-    sut.pull(BUSYBOX_LATEST);
-
-    // Create container
-    final ContainerConfig config = ContainerConfig.builder()
-        .image(BUSYBOX_LATEST)
-        .build();
-    final String name = randomName();
-    final ContainerCreation creation = sut.createContainer(config, name);
-    final String id = creation.id();
-
-    final ImmutableSet.Builder<String> files = ImmutableSet.builder();
-    try (final TarArchiveInputStream tarStream =
-             new TarArchiveInputStream(sut.copyContainer(id, "/bin"))) {
-      TarArchiveEntry entry;
-      while ((entry = tarStream.getNextTarEntry()) != null) {
-        files.add(entry.getName());
-      }
-    }
-
-    // Check that some common files exist
-    assertThat(files.build(), both(hasItem("bin/")).and(hasItem("bin/wc")));
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void testFailCopyContainer() throws Exception {
-    requireDockerApiVersionAtLeast("1.24", "failCopyToContainer");
-
-    exception.expect(UnsupportedApiVersionException.class);
-
-    // Pull image
-    sut.pull(BUSYBOX_LATEST);
-
-    // Create container
-    final ContainerConfig config = ContainerConfig.builder()
-        .image(BUSYBOX_LATEST)
-        .build();
-    final String name = randomName();
-    final ContainerCreation creation = sut.createContainer(config, name);
-    final String id = creation.id();
-
-    sut.copyContainer(id, "/bin");
-  }
-
-  @Test
   public void testArchiveContainer() throws Exception {
-    requireDockerApiVersionAtLeast("1.20", "copyToContainer");
-
     // Pull image
     sut.pull(BUSYBOX_LATEST);
 
@@ -1285,29 +1171,7 @@ public class DefaultDockerClientTest {
   }
 
   @Test
-  public void testFailArchiveContainer() throws Exception {
-    requireDockerApiVersionLessThan("1.20", "failCopyToContainer");
-
-    exception.expect(UnsupportedApiVersionException.class);
-
-    // Pull image
-    sut.pull(BUSYBOX_LATEST);
-
-    // Create container
-    final ContainerConfig config = ContainerConfig.builder()
-        .image(BUSYBOX_LATEST)
-        .build();
-    final String name = randomName();
-    final ContainerCreation creation = sut.createContainer(config, name);
-    final String id = creation.id();
-
-    sut.archiveContainer(id, "/bin");
-  }
-
-  @Test
   public void testCopyToContainer() throws Exception {
-    requireDockerApiVersionAtLeast("1.20", "copyToContainer");
-
     // Pull image
     sut.pull(BUSYBOX_LATEST);
 
@@ -1327,8 +1191,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testCopyToContainerWithTarInputStream() throws Exception {
-    requireDockerApiVersionAtLeast("1.20", "copyToContainer");
-
     // Pull image
     sut.pull(BUSYBOX_LATEST);
 
@@ -1496,8 +1358,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testKillContainerWithSignals() throws Exception {
-    requireDockerApiVersionAtLeast("1.18", "killContainerWithSignals");
-
     sut.pull(BUSYBOX_LATEST);
 
     final ContainerConfig containerConfig = ContainerConfig.builder()
@@ -1563,38 +1423,35 @@ public class DefaultDockerClientTest {
     // Copy files to container
     // Docker API should be at least v1.20 to support extracting an archive of files or folders
     // to a directory in a container
-    if (dockerApiVersionAtLeast("1.20")) {
-      try {
-        sut.copyToContainer(dockerDirectory, id, "/tmp");
-      } catch (Exception e) {
-        fail("error copying files to container");
-      }
+    try {
+      sut.copyToContainer(dockerDirectory, id, "/tmp");
+    } catch (Exception e) {
+      fail("error copying files to container");
+    }
 
-      // Copy the same files from container
-      final ImmutableSet.Builder<String> filesDownloaded = ImmutableSet.builder();
-      try (TarArchiveInputStream tarStream = new TarArchiveInputStream(
-          dockerApiVersionLessThan("1.24")
-          ? sut.copyContainer(id, "/tmp") : sut.archiveContainer(id, "/tmp"))) {
-        TarArchiveEntry entry;
-        while ((entry = tarStream.getNextTarEntry()) != null) {
-          filesDownloaded.add(entry.getName());
-        }
+    // Copy the same files from container
+    final ImmutableSet.Builder<String> filesDownloaded = ImmutableSet.builder();
+    try (TarArchiveInputStream tarStream = new TarArchiveInputStream(
+        sut.archiveContainer(id, "/tmp"))) {
+      TarArchiveEntry entry;
+      while ((entry = tarStream.getNextTarEntry()) != null) {
+        filesDownloaded.add(entry.getName());
       }
+    }
 
       // Check that we got back what we put in
-      final File folder = new File(dockerDirectory.toString());
-      final File[] files = folder.listFiles();
-      if (files != null) {
-        for (final File file : files) {
-          if (!file.isDirectory()) {
-            boolean found = false;
-            for (final String fileDownloaded : filesDownloaded.build()) {
-              if (fileDownloaded.contains(file.getName())) {
-                found = true;
-              }
+    final File folder = new File(dockerDirectory.toString());
+    final File[] files = folder.listFiles();
+    if (files != null) {
+      for (final File file : files) {
+        if (!file.isDirectory()) {
+          boolean found = false;
+          for (final String fileDownloaded : filesDownloaded.build()) {
+            if (fileDownloaded.contains(file.getName())) {
+              found = true;
             }
-            assertTrue(found);
           }
+          assertTrue(found);
         }
       }
     }
@@ -1823,8 +1680,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testContainerWithHostConfig() throws Exception {
-    requireDockerApiVersionAtLeast("1.18", "Container creation with HostConfig");
-
     sut.pull(BUSYBOX_LATEST);
 
     final boolean privileged = true;
@@ -1851,9 +1706,7 @@ public class DefaultDockerClientTest {
         .devices(expectedDevice)
         .ulimits(ulimits);
 
-    if (dockerApiVersionAtLeast("1.21")) {
-      hostConfigBuilder.dnsOptions("some", "options");
-    }
+    hostConfigBuilder.dnsOptions("some", "options");
 
     final HostConfig expected = hostConfigBuilder.build();
 
@@ -1872,9 +1725,7 @@ public class DefaultDockerClientTest {
     assertThat(actual.privileged(), equalTo(expected.privileged()));
     assertThat(actual.publishAllPorts(), equalTo(expected.publishAllPorts()));
     assertThat(actual.dns(), equalTo(expected.dns()));
-    if (dockerApiVersionAtLeast("1.21")) {
-      assertThat(actual.dnsOptions(), equalTo(expected.dnsOptions()));
-    }
+    assertThat(actual.dnsOptions(), equalTo(expected.dnsOptions()));
     assertThat(actual.dnsSearch(), equalTo(expected.dnsSearch()));
     assertEquals(ulimits, actual.ulimits());
     assertThat(actual.devices(), contains(expectedDevice));
@@ -1882,8 +1733,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testContainerWithCpuOptions() throws Exception {
-    requireDockerApiVersionAtLeast("1.18", "Container creation with cpu options");
-
     sut.pull(BUSYBOX_LATEST);
 
     final HostConfig expected = HostConfig.builder()
@@ -1909,8 +1758,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testContainerWithMoreCpuOptions() throws Exception {
-    requireDockerApiVersionAtLeast("1.19", "Container creation with more cpu options");
-
     sut.pull(BUSYBOX_LATEST);
 
     final HostConfig expected = HostConfig.builder()
@@ -1941,30 +1788,19 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testContainerWithBlkioOptions() throws Exception {
-    requireDockerApiVersionAtLeast("1.19", "Container creation with blkio options");
-
     sut.pull(BUSYBOX_LATEST);
 
     final HostConfig.Builder hostConfigBuilder = HostConfig.builder();
 
-    if (dockerApiVersionAtLeast("1.19")) {
-      hostConfigBuilder.blkioWeight(300);
-    }
+    hostConfigBuilder.blkioWeight(300);
 
-    if (dockerApiVersionAtLeast("1.22")) {
-      // TODO (dxia) Some kernels don't support blkio weight. How detect to skip this check?
-      // hostConfigBuilder.blkioWeightDevice(ImmutableList.of(
-      //     HostConfig.BlkioWeightDevice.builder().path("/dev/random").weight(500).build(),
-      //     HostConfig.BlkioWeightDevice.builder().path("/dev/urandom").weight(200).build()
-      // ));
-      final List<HostConfig.BlkioDeviceRate> deviceRates = ImmutableList.of(
-          HostConfig.BlkioDeviceRate.builder().path("/dev/loop0").rate(1024).build()
-      );
-      hostConfigBuilder.blkioDeviceReadBps(deviceRates);
-      hostConfigBuilder.blkioDeviceWriteBps(deviceRates);
-      hostConfigBuilder.blkioDeviceReadIOps(deviceRates);
-      hostConfigBuilder.blkioDeviceWriteIOps(deviceRates);
-    }
+    final List<HostConfig.BlkioDeviceRate> deviceRates = ImmutableList.of(
+        HostConfig.BlkioDeviceRate.builder().path("/dev/loop0").rate(1024).build()
+    );
+    hostConfigBuilder.blkioDeviceReadBps(deviceRates);
+    hostConfigBuilder.blkioDeviceWriteBps(deviceRates);
+    hostConfigBuilder.blkioDeviceReadIOps(deviceRates);
+    hostConfigBuilder.blkioDeviceWriteIOps(deviceRates);
 
     final HostConfig expected = hostConfigBuilder.build();
 
@@ -1979,24 +1815,14 @@ public class DefaultDockerClientTest {
     sut.startContainer(id);
 
     final HostConfig actual = sut.inspectContainer(id).hostConfig();
-
-    if (dockerApiVersionAtLeast("1.19")) {
-      // TODO (dxia) Some kernels don't support blkio weight. How detect to skip this check?
-      // assertThat(actual.blkioWeight(), equalTo(expected.blkioWeight()));
-    }
-    if (dockerApiVersionAtLeast("1.22")) {
-      // TODO (dxia) Some kernels don't support blkio weight device. How detect to skip this check?
-      // assertThat(actual.blkioWeightDevice(), equalTo(expected.blkioWeightDevice()));
-      assertThat(actual.blkioDeviceReadBps(), equalTo(expected.blkioDeviceReadBps()));
-      assertThat(actual.blkioDeviceWriteBps(), equalTo(expected.blkioDeviceWriteBps()));
-      assertThat(actual.blkioDeviceReadIOps(), equalTo(expected.blkioDeviceReadIOps()));
-      assertThat(actual.blkioDeviceWriteBps(), equalTo(expected.blkioDeviceWriteBps()));
-    }
+    assertThat(actual.blkioDeviceReadBps(), equalTo(expected.blkioDeviceReadBps()));
+    assertThat(actual.blkioDeviceWriteBps(), equalTo(expected.blkioDeviceWriteBps()));
+    assertThat(actual.blkioDeviceReadIOps(), equalTo(expected.blkioDeviceReadIOps()));
+    assertThat(actual.blkioDeviceWriteBps(), equalTo(expected.blkioDeviceWriteBps()));
   }
 
   @Test
   public void testContainerWithMemoryOptions() throws Exception {
-    requireDockerApiVersionNot("1.21", "For some reason this test fails on TravisCI.");
     sut.pull(BUSYBOX_LATEST);
 
     final HostConfig.Builder hostConfigBuilder = HostConfig.builder()
@@ -2004,9 +1830,7 @@ public class DefaultDockerClientTest {
         .memorySwap(33554432L)
         .kernelMemory(5000000L);
 
-    if (dockerApiVersionAtLeast("1.20")) {
-      hostConfigBuilder.memorySwappiness(42);
-    }
+    hostConfigBuilder.memorySwappiness(42);
 
     final HostConfig expected = hostConfigBuilder.build();
 
@@ -2022,25 +1846,14 @@ public class DefaultDockerClientTest {
 
     final HostConfig actual = sut.inspectContainer(id).hostConfig();
 
-    if (dockerApiVersionAtLeast("1.19")) {
-      // TODO (dxia) Although 1.18 docs implies these two settings are supported by that API
-      // version, travis-CI fails on these two checks. It's not a big deal since we'll probably
-      // stop supporting 1.18 soon.
-      assertThat(actual.memory(), equalTo(expected.memory()));
-      assertThat(actual.memorySwap(), equalTo(expected.memorySwap()));
-    }
-    if (dockerApiVersionAtLeast("1.20")) {
-      assertThat(actual.memorySwappiness(), equalTo(expected.memorySwappiness()));
-    }
-    if (dockerApiVersionAtLeast("1.21")) {
-      assertThat(actual.kernelMemory(), equalTo(expected.kernelMemory()));
-    }
+    assertThat(actual.memory(), equalTo(expected.memory()));
+    assertThat(actual.memorySwap(), equalTo(expected.memorySwap()));
+    assertThat(actual.memorySwappiness(), equalTo(expected.memorySwappiness()));
+    assertThat(actual.kernelMemory(), equalTo(expected.kernelMemory()));
   }
 
   @Test
   public void testContainerWithAppArmorLogs() throws Exception {
-    requireDockerApiVersionAtLeast("1.21", "StopSignal and AppArmorProfile");
-
     sut.pull(BUSYBOX_LATEST);
 
     final boolean privileged = true;
@@ -2091,8 +1904,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testContainerWithCpuQuota() throws Exception {
-    requireDockerApiVersionAtLeast("1.19", "Container Creation with HostConfig");
-
     sut.pull(BUSYBOX_LATEST);
 
     final boolean privileged = true;
@@ -2125,8 +1936,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testUpdateContainer() throws Exception {
-    requireDockerApiVersionAtLeast("1.22", "update container");
-
     final String containerName = randomName();
     final HostConfig hostConfig = HostConfig.builder()
             .cpuShares(256L)
@@ -2159,8 +1968,6 @@ public class DefaultDockerClientTest {
     // In this test we open an event stream, do stuff, and check that
     // the events for the stuff we did got pushed over the stream
 
-    requireDockerApiVersionNot("1.19", "Docker 1.7.x has a bug that breaks DockerClient.events(). "
-                                       + "So we skip this test.");
     Thread.sleep(2000); // Waiting to ensure event stream has no events from prior tests
     try (final EventStream eventStream = getImageAndContainerEventStream()) {
 
@@ -2270,8 +2077,6 @@ public class DefaultDockerClientTest {
 
   @Test(timeout = 10000)
   public void testEventTypes() throws Exception {
-    requireDockerApiVersionAtLeast("1.22", "Event types");
-
     final String volumeName = randomName();
     final String containerName = randomName();
     final String mountPath = "/anywhere";
@@ -2418,24 +2223,16 @@ public class DefaultDockerClientTest {
 
   private EventStream getImageAndContainerEventStream(final EventsParam... eventsParams)
       throws Exception {
-    // I only want my event streams to contain image and container events.
-    // For API 1.22 and greater, we can use the type() filter. But for earlier versions,
-    // that filter didn't exist, so we should not add it.
-    if (dockerApiVersionAtLeast("1.22")) {
-      final int originalNumberOfParams = eventsParams.length;
-      final EventsParam[] eventsParamsWithTypes =
-          Arrays.copyOf(eventsParams, originalNumberOfParams + 2);
-      eventsParamsWithTypes[originalNumberOfParams] = type(IMAGE);
-      eventsParamsWithTypes[originalNumberOfParams + 1] = type(CONTAINER);
-      return sut.events(eventsParamsWithTypes);
-    }
-    return sut.events(eventsParams);
+    final int originalNumberOfParams = eventsParams.length;
+    final EventsParam[] eventsParamsWithTypes =
+        Arrays.copyOf(eventsParams, originalNumberOfParams + 2);
+    eventsParamsWithTypes[originalNumberOfParams] = type(IMAGE);
+    eventsParamsWithTypes[originalNumberOfParams + 1] = type(CONTAINER);
+    return sut.events(eventsParamsWithTypes);
   }
 
   @Test
   public void testEventFiltersWithSpaces() throws Exception {
-    requireDockerApiVersionAtLeast("1.24", "Docker events and health check");
-
     sut.pull(BUSYBOX_LATEST);
     final String containerName = randomName();
     final ContainerConfig config = ContainerConfig.builder()
@@ -2468,16 +2265,10 @@ public class DefaultDockerClientTest {
                                     final String imageName,
                                     final String action) throws Exception {
     assertThat(event.time(), notNullValue());
-    if (dockerApiVersionAtLeast("1.22")) {
-      assertEquals(IMAGE, event.type());
-      assertEquals(action, event.action());
-      assertEquals(imageName, event.actor().id());
-
-      assertNotNull(event.timeNano());
-    } else {
-      assertEquals(action, event.status());
-      assertThat(event.id(), equalTo(imageName));
-    }
+    assertEquals(IMAGE, event.type());
+    assertEquals(action, event.action());
+    assertEquals(imageName, event.actor().id());
+    assertNotNull(event.timeNano());
   }
 
   @SuppressWarnings("deprecation")
@@ -2487,23 +2278,17 @@ public class DefaultDockerClientTest {
                                         final String action,
                                         final String imageName) throws Exception {
     assertThat(event.time(), notNullValue());
-    if (dockerApiVersionAtLeast("1.22")) {
-      assertEquals(CONTAINER, event.type());
-      assertEquals(action, event.action());
-
-      assertNotNull(event.actor());
-      assertEquals(containerId, event.actor().id());
-
-      final Map<String, String> attributes = event.actor().attributes();
-      assertThat(attributes, hasEntry("image", imageName));
-      assertThat(attributes, hasEntry("name", containerName));
-
-      assertNotNull(event.timeNano());
-    } else {
-      assertEquals(action, event.status());
-      assertEquals(containerId, event.id());
-      assertEquals(imageName, event.from());
-    }
+	assertEquals(CONTAINER, event.type());
+	assertEquals(action, event.action());
+	
+	assertNotNull(event.actor());
+	assertEquals(containerId, event.actor().id());
+	
+	final Map<String, String> attributes = event.actor().attributes();
+	assertThat(attributes, hasEntry("image", imageName));
+	assertThat(attributes, hasEntry("name", containerName));
+	
+	assertNotNull(event.timeNano());
   }
 
   @Test
@@ -2526,9 +2311,6 @@ public class DefaultDockerClientTest {
     assertThat(busybox.repoTags(), notNullValue());
     assertThat(busybox.repoTags().size(), greaterThan(0));
     assertThat(BUSYBOX_LATEST, isIn(busybox.repoTags()));
-    if (dockerApiVersionLessThan("1.22")) {
-      assertThat(busybox.parentId(), not(isEmptyOrNullString()));
-    }
 
     final List<Image> imagesWithDigests = sut.listImages(digests());
     assertThat(imagesWithDigests.size(), greaterThan(0));
@@ -2539,9 +2321,6 @@ public class DefaultDockerClientTest {
       }
     }
     assertNotNull(busybox);
-    if (dockerApiVersionLessThan("1.22")) {
-      assertThat(busybox.repoDigests(), notNullValue());
-    }
 
     // Using allImages() should give us more images
     final List<Image> allImages = sut.listImages(allImages());
@@ -2682,8 +2461,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testExtraHosts() throws Exception {
-    requireDockerApiVersionAtLeast("1.15", "Container Creation with HostConfig.ExtraHosts");
-
     sut.pull(BUSYBOX_LATEST);
 
     final HostConfig expected = HostConfig.builder()
@@ -2721,8 +2498,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testLogDriver() throws Exception {
-    requireDockerApiVersionAtLeast("1.21", "Container Creation with HostConfig.LogConfig");
-
     sut.pull(BUSYBOX_LATEST);
     final String name = randomName();
 
@@ -2754,52 +2529,7 @@ public class DefaultDockerClientTest {
   }
 
   @Test
-  @SuppressWarnings("deprecation")
-  public void testContainerVolumesOldStyle() throws Exception {
-    requireDockerApiVersionLessThan(
-        "1.20", "Creating a container with volumes and inspecting volumes in old style");
-
-    sut.pull(BUSYBOX_LATEST);
-
-    final HostConfig hostConfig = HostConfig.builder()
-        .binds(Bind.from("/local/path")
-                   .to("/remote/path")
-                   .build())
-        .build();
-    final ContainerConfig volumeConfig = ContainerConfig.builder()
-        .image(BUSYBOX_LATEST)
-        .addVolume("/foo")
-        .hostConfig(hostConfig)
-        .build();
-    final String id = sut.createContainer(volumeConfig, randomName()).id();
-    final ContainerInfo volumeContainer = sut.inspectContainer(id);
-
-    final List<String> expectedDestinations = newArrayList("/foo", "/remote/path");
-    final Set<String> actualDestinations = volumeContainer.volumes().keySet();
-
-    // To make sure two sets are equal, when they may be in different orders,
-    // we check that each one contains all the elements of the other.
-    // Equivalent to, in math, proving two sets are one-to-one by proving
-    // they are injective ("into") and surjective ("onto").
-    assertThat(actualDestinations, everyItem(isIn(expectedDestinations)));
-    assertThat(expectedDestinations, everyItem(isIn(actualDestinations)));
-
-    // The local paths returned from ContainerInfo.volumes() are paths in the docker
-    // file system. So they are not predictable (at least by me, the test writer,
-    // John Flavin.) However, the local path we asked for will always be included as part of
-    // the path that is returned. So we can just check that one in the list of items
-    // we got back contains our expected path.
-    final String expectedLocalPath = "/local/path";
-    assertThat(volumeContainer.volumes().values(), hasItem(containsString(expectedLocalPath)));
-
-    assertThat(volumeContainer.config().volumes(), hasItem("/foo"));
-  }
-
-  @Test
   public void testContainerVolumeNoCopy() throws Exception {
-    requireDockerApiVersionAtLeast(
-        "1.23", "Creating a container with volumes with nocopy mode");
-
     sut.pull(BUSYBOX_LATEST);
 
     final String aVolumeName = "avolume";
@@ -2929,9 +2659,6 @@ public class DefaultDockerClientTest {
   
   @Test
   public void testContainerVolumes() throws Exception {
-    requireDockerApiVersionAtLeast(
-            "1.20", "Creating a container with volumes and inspecting volumes");
-
     sut.pull(BUSYBOX_LATEST);
 
     final String namedVolumeName = "aVolume";
@@ -2986,27 +2713,18 @@ public class DefaultDockerClientTest {
       assertThat(bindObjectMount.rw(), is(false));
       assertThat(bindObjectMount.mode(), is(equalTo("ro")));
 
-      if (dockerApiVersionAtLeast("1.25") && dockerApiVersionLessThan("1.30")) {
+      if (dockerApiVersionLessThan("1.30")) {
         // From version 1.25 to 1.29, the API behaved like this
         assertThat(bindObjectMount.name(), isEmptyOrNullString());
         assertThat(bindObjectMount.propagation(), isEmptyOrNullString());
-      } else if (dockerApiVersionAtLeast("1.22") || dockerApiVersionAtLeast("1.30")) {
-        // From version 1.22 to 1.24, and from 1.30 up, the API behaves like this
+      } else {
+        // from 1.30 up, the API behaves like this
         assertThat(bindObjectMount.name(), isEmptyOrNullString());
         assertThat(bindObjectMount.propagation(), is(equalTo("rprivate")));
-      } else {
-        // Below version 1.22
-        assertThat(bindObjectMount.name(), is(nullValue()));
-        assertThat(bindObjectMount.propagation(), is(nullValue()));
       }
 
-      if (dockerApiVersionAtLeast("1.26")) {
-        assertThat(bindObjectMount.type(), is(equalTo("bind")));
-        assertThat(bindObjectMount.driver(), isEmptyOrNullString());
-      } else {
-        assertThat(bindObjectMount.type(), is(nullValue()));
-        assertThat(bindObjectMount.driver(), is(nullValue()));
-      }
+      assertThat(bindObjectMount.type(), is(equalTo("bind")));
+      assertThat(bindObjectMount.driver(), isEmptyOrNullString());
     }
 
     {
@@ -3021,11 +2739,11 @@ public class DefaultDockerClientTest {
       assertThat(bindStringMount.rw(), is(true));
       assertThat(bindStringMount.mode(), is(equalTo("")));
 
-      if (dockerApiVersionAtLeast("1.25") && dockerApiVersionLessThan("1.30")) {
+      if (dockerApiVersionLessThan("1.30")) {
         // From version 1.25 to 1.29, the API behaved like this
         assertThat(bindStringMount.name(), isEmptyOrNullString());
         assertThat(bindStringMount.propagation(), isEmptyOrNullString());
-      } else if (dockerApiVersionAtLeast("1.22") || dockerApiVersionAtLeast("1.30")) {
+      } else if (dockerApiVersionAtLeast("1.30")) {
         // From version 1.22 to 1.24, and from 1.30 up, the API behaves like this
         assertThat(bindStringMount.name(), isEmptyOrNullString());
         assertThat(bindStringMount.propagation(), is(equalTo("rprivate")));
@@ -3035,13 +2753,8 @@ public class DefaultDockerClientTest {
         assertThat(bindStringMount.propagation(), is(nullValue()));
       }
 
-      if (dockerApiVersionAtLeast("1.26")) {
-        assertThat(bindStringMount.type(), is(equalTo("bind")));
-        assertThat(bindStringMount.driver(), isEmptyOrNullString());
-      } else {
-        assertThat(bindStringMount.type(), is(nullValue()));
-        assertThat(bindStringMount.driver(), is(nullValue()));
-      }
+      assertThat(bindStringMount.type(), is(equalTo("bind")));
+      assertThat(bindStringMount.driver(), isEmptyOrNullString());
     }
 
     {
@@ -3360,8 +3073,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testLogsSince() throws Exception {
-    requireDockerApiVersionAtLeast("1.19", "/logs?since=timestamp");
-
     sut.pull(BUSYBOX_LATEST);
 
     final String container = randomName();
@@ -3513,8 +3224,6 @@ public class DefaultDockerClientTest {
 
   @Test @Ignore // TODO: https://github.com/moby/moby/issues/31421
   public void testExec() throws Exception {
-    requireDockerApiVersionAtLeast("1.15", "Exec");
-
     sut.pull(BUSYBOX_LATEST);
 
     final ContainerConfig containerConfig = ContainerConfig.builder()
@@ -3546,8 +3255,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testExecCreateOnNonRunningContainer() throws Exception {
-    requireDockerApiVersionAtLeast("1.15", "Exec");
-
     sut.pull(BUSYBOX_LATEST);
 
     final ContainerConfig containerConfig = ContainerConfig.builder()
@@ -3568,8 +3275,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testExecInspect() throws Exception {
-    requireDockerApiVersionAtLeast("1.16", "Exec Inspect");
-
     sut.pull(BUSYBOX_LATEST);
 
     final ContainerConfig containerConfig = ContainerConfig.builder()
@@ -3588,11 +3293,7 @@ public class DefaultDockerClientTest {
         ExecCreateParam.attachStdin(),
         ExecCreateParam.tty());
 
-    // some functionality in this test depends on API 1.19 (exec user)
-    final boolean execUserSupported = dockerApiVersionAtLeast("1.19");
-    if (execUserSupported) {
-      createParams.add(ExecCreateParam.user("1000"));
-    }
+    createParams.add(ExecCreateParam.user("1000"));
 
     final ExecCreation execCreation = sut.execCreate(
         containerId, new String[] {"sh", "-c", "exit 2"},
@@ -3603,11 +3304,7 @@ public class DefaultDockerClientTest {
     final ExecState notStarted = sut.execInspect(execId);
     assertThat(notStarted.id(), is(execId));
     assertThat(notStarted.running(), is(false));
-    if (dockerApiVersionLessThan("1.22")) {
-      assertThat(notStarted.exitCode(), is(0L));
-    } else {
-      assertThat(notStarted.exitCode(), nullValue());
-    }
+    assertThat(notStarted.exitCode(), nullValue());
     assertThat(notStarted.openStdin(), is(true));
     assertThat(notStarted.openStderr(), is(true));
     assertThat(notStarted.openStdout(), is(true));
@@ -3626,29 +3323,16 @@ public class DefaultDockerClientTest {
 
     final ProcessConfig processConfig = started.processConfig();
     assertThat(processConfig.privileged(), is(false));
-    if (execUserSupported) {
-      assertThat(processConfig.user(), is("1000"));
-    }
+    assertThat(processConfig.user(), is("1000"));
     assertThat(processConfig.tty(), is(true));
     assertThat(processConfig.entrypoint(), is("sh"));
     assertThat(processConfig.arguments(),
                Matchers.<List<String>>is(ImmutableList.of("-c", "exit 2")));
-
-    if (dockerApiVersionLessThan("1.22")) {
-      final ContainerInfo containerInfo = started.container();
-      assertThat(containerInfo.path(), is("sh"));
-      assertThat(containerInfo.args(),
-                 Matchers.<List<String>>is(ImmutableList.of("-c", "while :; do sleep 1; done")));
-      assertThat(containerInfo.config().image(), is(BUSYBOX_LATEST));
-    } else {
-      assertNotNull(started.containerId(), "containerId");
-    }
+    assertNotNull(started.containerId(), "containerId");
   }
 
   @Test
   public void testExecInspectNoUser() throws Exception {
-    requireDockerApiVersionAtLeast("1.16", "Exec Inspect");
-
     sut.pull(BUSYBOX_LATEST);
 
     final ContainerConfig containerConfig = ContainerConfig.builder()
@@ -3704,9 +3388,7 @@ public class DefaultDockerClientTest {
     // can only filter by created status in docker API version >= 1.20 - the status of "created"
     // did not exist in docker prior to 1.8.0
     final DockerClient.ListContainersParam[] createdParams =
-        dockerApiVersionAtLeast("1.20")
-        ? new DockerClient.ListContainersParam[] {allContainers(), withStatusCreated()}
-        : new DockerClient.ListContainersParam[] {allContainers()};
+        new DockerClient.ListContainersParam[] {allContainers(), withStatusCreated()};
 
     final List<Container> created = sut.listContainers(createdParams);
     assertThat("listContainers is unexpectedly empty", created, not(empty()));
@@ -3745,29 +3427,22 @@ public class DefaultDockerClientTest {
         withLabel(label, labelValue));
     assertThat(containerId, isIn(containersToIds(statusAndLabels)));
 
-    if (dockerApiVersionAtLeast("1.21")) {
-      for (final Container c : running) {
-        assertThat(c.imageId(), is(notNullValue()));
-      }
+    for (final Container c : running) {
+      assertThat(c.imageId(), is(notNullValue()));
     }
 
-    if (dockerApiVersionAtLeast("1.22")) {
-      for (final Container c : running) {
-        assertThat(c.networkSettings(), is(notNullValue()));
-      }
+    for (final Container c : running) {
+      assertThat(c.networkSettings(), is(notNullValue()));
     }
 
-    if (dockerApiVersionAtLeast("1.23")) {
-      for (final Container c : running) {
-        assertThat(c.state(), equalTo("running"));
-        assertThat(c.mounts(), is(notNullValue()));
-      }
+    for (final Container c : running) {
+      assertThat(c.state(), equalTo("running"));
+      assertThat(c.mounts(), is(notNullValue()));
     }
   }
 
   @Test
   public void testContainerLabels() throws Exception {
-    requireDockerApiVersionAtLeast("1.18", "labels");
     sut.pull(BUSYBOX_LATEST);
 
     final Map<String, String> labels = ImmutableMap.of(
@@ -3843,8 +3518,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testImageLabels() throws Exception {
-    requireDockerApiVersionAtLeast("1.17", "image labels");
-
     final Path dockerDirectory = getResource("dockerDirectoryWithImageLabels");
 
     // Create test images
@@ -3856,9 +3529,7 @@ public class DefaultDockerClientTest {
 
     // Check that both test images are listed when we filter with a "name" label
     final List<Image> nameImages = sut.listImages(ListImagesParam.withLabel("name"));
-    final List<String> nameIds = dockerApiVersionLessThan("1.22")
-                                 ? imagesToShortIds(nameImages)
-                                 : imagesToShortIdsAndRemoveSha256(nameImages);
+    final List<String> nameIds = imagesToShortIdsAndRemoveSha256(nameImages);
 
     assertThat(barId, isIn(nameIds));
     assertThat(bazId, isIn(nameIds));
@@ -3866,9 +3537,7 @@ public class DefaultDockerClientTest {
     // Check that the first image is listed when we filter with a "foo=bar" label
     final List<Image> barImages = sut.listImages(
         ListImagesParam.withLabel("foo", "bar"));
-    final List<String> barIds = dockerApiVersionLessThan("1.22")
-                                ? imagesToShortIds(barImages)
-                                : imagesToShortIdsAndRemoveSha256(barImages);
+    final List<String> barIds = imagesToShortIdsAndRemoveSha256(barImages);
     assertThat(barId, isIn(barIds));
 
     // Check that we find the first image again when searching with the full
@@ -3876,17 +3545,13 @@ public class DefaultDockerClientTest {
     final List<Image> barImages2 = sut.listImages(
         ListImagesParam.withLabel("foo", "bar"),
         ListImagesParam.withLabel("name", "testtesttest"));
-    final List<String> barIds2 = dockerApiVersionLessThan("1.22")
-                                 ? imagesToShortIds(barImages2)
-                                 : imagesToShortIdsAndRemoveSha256(barImages2);
+    final List<String> barIds2 = imagesToShortIdsAndRemoveSha256(barImages2);
     assertThat(barId, isIn(barIds2));
 
     // Check that the second image is listed when we filter with a "foo=baz" label
     final List<Image> bazImages = sut.listImages(
         ListImagesParam.withLabel("foo", "baz"));
-    final List<String> bazIds = dockerApiVersionLessThan("1.22")
-                                ? imagesToShortIds(bazImages)
-                                : imagesToShortIdsAndRemoveSha256(bazImages);
+    final List<String> bazIds = imagesToShortIdsAndRemoveSha256(bazImages);
     assertThat(bazId, isIn(bazIds));
 
     // Check that no containers are listed when we filter with a "foo=qux" label
@@ -3901,8 +3566,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testMacAddress() throws Exception {
-    requireDockerApiVersionAtLeast("1.18", "Mac Address");
-
     sut.pull(MEMCACHED_LATEST);
     final ContainerConfig config = ContainerConfig.builder()
         .image(BUSYBOX_LATEST)
@@ -3918,8 +3581,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testStats() throws Exception {
-    requireDockerApiVersionAtLeast("1.19", "stats without streaming");
-
     final ContainerConfig config = ContainerConfig.builder()
         .image(BUSYBOX_LATEST)
         .cmd("sh", "-c", "while :; do sleep 1; done")
@@ -3933,17 +3594,11 @@ public class DefaultDockerClientTest {
     assertThat(stats.cpuStats(), notNullValue());
     assertThat(stats.memoryStats(), notNullValue());
     assertThat(stats.blockIoStats(), notNullValue());
-    if (dockerApiVersionLessThan("1.21")) {
-      assertThat(stats.network(), notNullValue());
-    } else {
-      assertThat(stats.networks(), notNullValue());
-    }
+    assertThat(stats.networks(), notNullValue());
   }
 
   @Test
   public void testNetworks() throws Exception {
-    requireDockerApiVersionAtLeast("1.21", "createNetwork and listNetworks");
-
     final String networkName = randomName();
     final IpamConfig ipamConfig =
         IpamConfig.create("192.168.0.0/24", "192.168.0.0/24", "192.168.0.1");
@@ -3977,11 +3632,9 @@ public class DefaultDockerClientTest {
     assertThat(sut.inspectNetwork(network.id()).name(), is(networkName));
     assertThat(network.ipam(), equalTo(ipam));
 
-    if (dockerApiVersionAtLeast("1.23")) {
-      assertThat(network.internal(), is(false));
-      assertThat(network.enableIPv6(), is(false));
-      assertThat(network.labels(), is(labels));
-    }
+    assertThat(network.internal(), is(false));
+    assertThat(network.enableIPv6(), is(false));
+    assertThat(network.labels(), is(labels));
 
     sut.removeNetwork(network.id());
 
@@ -3992,8 +3645,6 @@ public class DefaultDockerClientTest {
   
   @Test
   public void testFilterNetworks() throws Exception {
-    requireDockerApiVersionAtLeast("1.22", "networks");
-
     final NetworkConfig network1Config = NetworkConfig.builder().checkDuplicate(true)
         .name(randomName()).labels(ImmutableMap.of("is-test", "true")).build();
     final NetworkConfig network2Config = NetworkConfig.builder().checkDuplicate(true)
@@ -4028,29 +3679,24 @@ public class DefaultDockerClientTest {
     assertThat(networks, hasItems(network1, network2));
     
     // filter by driver
-    if (dockerApiVersionAtLeast("1.24")) {
-      networks = sut.listNetworks(ListNetworksParam.withDriver("bridge"));
-      assertThat(networks, not(hasItem(hostNetwork)));
-      assertThat(networks, hasItems(network1, network2));
+    networks = sut.listNetworks(ListNetworksParam.withDriver("bridge"));
+    assertThat(networks, not(hasItem(hostNetwork)));
+    assertThat(networks, hasItems(network1, network2));
       
-      networks = sut.listNetworks(ListNetworksParam.withDriver("host"));
-      assertThat(networks, hasItem(hostNetwork));
-      assertThat(networks, not(hasItems(network1, network2)));
-    }
+    networks = sut.listNetworks(ListNetworksParam.withDriver("host"));
+    assertThat(networks, hasItem(hostNetwork));
+    assertThat(networks, not(hasItems(network1, network2)));
     
-    // filter by label
-    if (dockerApiVersionAtLeast("1.24")) {
-      networks = sut.listNetworks(ListNetworksParam.withLabel("is-test"));
-      assertThat(networks, not(hasItem(hostNetwork)));
-      assertThat(networks, hasItems(network1, network2));
+    networks = sut.listNetworks(ListNetworksParam.withLabel("is-test"));
+    assertThat(networks, not(hasItem(hostNetwork)));
+    assertThat(networks, hasItems(network1, network2));
       
-      networks = sut.listNetworks(ListNetworksParam.withLabel("is-test", "true"));
-      assertThat(networks, hasItem(network1));
-      assertThat(networks, not(hasItem(network2)));
+    networks = sut.listNetworks(ListNetworksParam.withLabel("is-test", "true"));
+    assertThat(networks, hasItem(network1));
+    assertThat(networks, not(hasItem(network2)));
       
-      networks = sut.listNetworks(ListNetworksParam.withLabel("is-test", "false"));
-      assertThat(networks, not(hasItems(network1, network2)));
-    }
+    networks = sut.listNetworks(ListNetworksParam.withLabel("is-test", "false"));
+    assertThat(networks, not(hasItems(network1, network2)));
     
     sut.removeNetwork(network1.id());
     sut.removeNetwork(network2.id());
@@ -4076,15 +3722,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testNetworkDrivers() throws Exception {
-    requireDockerApiVersionAtLeast("1.21", "networks");
-
     NetworkConfig.Builder networkConfigBuilder = NetworkConfig.builder();
-
-    if (dockerApiVersionEquals("1.24")) {
-      // workaround for https://github.com/docker/docker/issues/25735
-      networkConfigBuilder = networkConfigBuilder.ipam(
-          Ipam.create("default", Collections.emptyList()));
-    }
 
     final NetworkConfig bridgeDriverConfig = networkConfigBuilder.name(randomName())
             .driver("bridge").build();
@@ -4094,30 +3732,26 @@ public class DefaultDockerClientTest {
     assertThat(bridgeDriverCreation.warnings(), anyOf(nullValue(String.class), equalTo("")));
     sut.removeNetwork(bridgeDriverCreation.id());
 
-    if (dockerApiVersionAtLeast("1.24")) {
-      // These network drivers only exist in later versions
-      final NetworkConfig macvlanDriverConfig = networkConfigBuilder.name(randomName())
-              .driver("macvlan").build();
-      final NetworkCreation macvlanDriverCreation = sut.createNetwork(macvlanDriverConfig);
-      assertThat(macvlanDriverCreation, notNullValue());
-      assertThat(macvlanDriverCreation.id(), notNullValue());
-      assertThat(macvlanDriverCreation.warnings(), anyOf(nullValue(String.class), equalTo("")));
-      sut.removeNetwork(macvlanDriverCreation.id());
+    // These network drivers only exist in later versions
+    final NetworkConfig macvlanDriverConfig = networkConfigBuilder.name(randomName())
+            .driver("macvlan").build();
+    final NetworkCreation macvlanDriverCreation = sut.createNetwork(macvlanDriverConfig);
+    assertThat(macvlanDriverCreation, notNullValue());
+    assertThat(macvlanDriverCreation.id(), notNullValue());
+    assertThat(macvlanDriverCreation.warnings(), anyOf(nullValue(String.class), equalTo("")));
+    sut.removeNetwork(macvlanDriverCreation.id());
 
-      final NetworkConfig overlayDriverConfig = networkConfigBuilder.name(randomName())
-              .driver("overlay").build();
-      final NetworkCreation overlayDriverCreation = sut.createNetwork(overlayDriverConfig);
-      assertThat(overlayDriverCreation, notNullValue());
-      assertThat(overlayDriverCreation.id(), notNullValue());
-      assertThat(overlayDriverCreation.warnings(), anyOf(nullValue(String.class), equalTo("")));
-      sut.removeNetwork(overlayDriverCreation.id());
-    }
+    final NetworkConfig overlayDriverConfig = networkConfigBuilder.name(randomName())
+            .driver("overlay").build();
+    final NetworkCreation overlayDriverCreation = sut.createNetwork(overlayDriverConfig);
+    assertThat(overlayDriverCreation, notNullValue());
+    assertThat(overlayDriverCreation.id(), notNullValue());
+    assertThat(overlayDriverCreation.warnings(), anyOf(nullValue(String.class), equalTo("")));
+    sut.removeNetwork(overlayDriverCreation.id());
   }
 
   @Test
   public void testNetworksConnectContainer() throws Exception {
-    requireDockerApiVersionAtLeast("1.21", "createNetwork and listNetworks");
-
     sut.pull(BUSYBOX_LATEST);
     final String networkName = randomName();
     final String containerName = randomName();
@@ -4136,9 +3770,7 @@ public class DefaultDockerClientTest {
     assertThat(network.containers().size(), equalTo(1));
     final Network.Container container = network.containers().get(containerCreation.id());
     assertThat(container, notNullValue());
-    if (dockerApiVersionAtLeast("1.22")) {
-      assertThat(container.name(), notNullValue());
-    }
+    assertThat(container.name(), notNullValue());
     assertThat(container.macAddress(), notNullValue());
     assertThat(container.ipv4Address(), notNullValue());
     assertThat(container.ipv6Address(), notNullValue());
@@ -4148,9 +3780,7 @@ public class DefaultDockerClientTest {
     final AttachedNetwork attachedNetwork =
         containerInfo.networkSettings().networks().get(networkName);
     assertThat(attachedNetwork, is(notNullValue()));
-    if (dockerApiVersionAtLeast("1.22")) {
-      assertThat(attachedNetwork.networkId(), is(notNullValue()));
-    }
+    assertThat(attachedNetwork.networkId(), is(notNullValue()));
     assertThat(attachedNetwork.endpointId(), is(notNullValue()));
     assertThat(attachedNetwork.gateway(), is(notNullValue()));
     assertThat(attachedNetwork.ipAddress(), is(notNullValue()));
@@ -4171,8 +3801,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testNetworksConnectContainerWithEndpointConfig() throws Exception {
-    requireDockerApiVersionAtLeast("1.22", "createNetwork and listNetworks");
-
     final String networkName = randomName();
     final String containerName = randomName();
 
@@ -4331,8 +3959,7 @@ public class DefaultDockerClientTest {
       // See https://github.com/docker/docker/issues/21016.
       // Fixed in version 1.11.0 API version 1.23. So we should see a lower API version here.
       // Seems to be a regression in API version 1.3[23] https://github.com/moby/moby/issues/35472
-      assertThat(dockerApiVersionLessThan("1.23")
-                 || dockerApiVersionEquals("1.32")
+      assertThat(dockerApiVersionEquals("1.32")
                  || dockerApiVersionEquals("1.33"),
           is(true));
     }
@@ -4388,22 +4015,13 @@ public class DefaultDockerClientTest {
       sut.resizeTty(id, 100, 80);
       fail("Should get an exception resizing TTY for non-running container");
     } catch (DockerRequestException e) {
-      if (dockerApiVersionLessThan("1.20")) {
-        assertEquals(
-            String.format("Cannot resize container %s, container is not running\n", id),
-            e.getResponseBody());
-      } else if (dockerApiVersionLessThan("1.24")) {
-        assertEquals(String.format("Container %s is not running\n", id),
-                     e.getResponseBody());
-      } else {
-        final ObjectMapper mapper = ObjectMapperProvider.objectMapper();
-        final Map<String, String> jsonMessage =
-            mapper.readValue(e.getResponseBody(), new TypeReference<Map<String, String>>() {
-            });
-        assertThat(jsonMessage, hasKey("message"));
-        assertEquals(String.format("Container %s is not running", id),
-                     jsonMessage.get("message"));
-      }
+      final ObjectMapper mapper = ObjectMapperProvider.objectMapper();
+      final Map<String, String> jsonMessage =
+          mapper.readValue(e.getResponseBody(), new TypeReference<Map<String, String>>() {
+          });
+      assertThat(jsonMessage, hasKey("message"));
+      assertEquals(String.format("Container %s is not running", id),
+                   jsonMessage.get("message"));
     }
 
     sut.startContainer(id);
@@ -4430,8 +4048,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testCreateVolume() throws Exception {
-    requireDockerApiVersionAtLeast("1.21", "volumes");
-
     // Create bare volume
     final Volume blankVolume = sut.createVolume();
     assertThat(blankVolume, not(nullValue()));
@@ -4441,18 +4057,11 @@ public class DefaultDockerClientTest {
     final ImmutableMap<String, String> labels = ImmutableMap.of("foo", "bar");
     final String volName = randomName();
     final Volume toCreate;
-    if (dockerApiVersionLessThan("1.23")) {
-      toCreate = Volume.builder()
-          .name(volName)
-          .driver("local")
-          .build();
-    } else {
-      toCreate = Volume.builder()
-          .name(volName)
-          .driver("local")
-          .labels(labels)
-          .build();
-    }
+    toCreate = Volume.builder()
+        .name(volName)
+        .driver("local")
+        .labels(labels)
+        .build();
     final Volume created = sut.createVolume(toCreate);
     assertEquals(toCreate.name(), created.name());
     assertEquals(toCreate.driver(), created.driver());
@@ -4460,21 +4069,14 @@ public class DefaultDockerClientTest {
 
     // mountpoint gets set by server regardless of whatever we ask for
     assertNotEquals(toCreate.mountpoint(), created.mountpoint());
-
-    if (dockerApiVersionAtLeast("1.23")) {
-      assertEquals(labels, created.labels());
-    }
-
-    if (dockerApiVersionAtLeast("1.24")) {
-      assertEquals("local", created.scope());
-    }
+    assertEquals(labels, created.labels());
+    assertEquals("local", created.scope());
 
     sut.removeVolume(created);
   }
 
   @Test
   public void testInspectVolume() throws Exception {
-    requireDockerApiVersionAtLeast("1.21", "volumes");
     final Volume volume = sut.createVolume();
 
     assertEquals(volume, sut.inspectVolume(volume.name()));
@@ -4500,7 +4102,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testListVolumes() throws Exception {
-    requireDockerApiVersionAtLeast("1.21", "volumes");
     final Volume volume = sut.createVolume();
     final String volumeName = volume.name();
     final String volumeDriver = volume.driver();
@@ -4522,37 +4123,32 @@ public class DefaultDockerClientTest {
     }
     assertThat(volume, isIn(volumeListWithDangling.volumes()));
 
-    if (dockerApiVersionAtLeast("1.24")) {
-      final VolumeList volumeListByName = sut.listVolumes(name(volumeName));
-      if (volumeListByName.warnings() != null
-          && !volumeListByName.warnings().isEmpty()) {
-        for (final String warning : volumeListByName.warnings()) {
-          log.warn(warning);
-        }
+    final VolumeList volumeListByName = sut.listVolumes(name(volumeName));
+    if (volumeListByName.warnings() != null
+        && !volumeListByName.warnings().isEmpty()) {
+      for (final String warning : volumeListByName.warnings()) {
+        log.warn(warning);
       }
-      assertThat(volume, isIn(volumeListByName.volumes()));
+    }
+    assertThat(volume, isIn(volumeListByName.volumes()));
 
-      final VolumeList volumeListByDriver = sut.listVolumes(driver(volumeDriver));
-      if (volumeListByDriver.warnings() != null
-          && !volumeListByDriver.warnings().isEmpty()) {
-        for (final String warning : volumeListByDriver.warnings()) {
-          log.warn(warning);
-        }
+    final VolumeList volumeListByDriver = sut.listVolumes(driver(volumeDriver));
+    if (volumeListByDriver.warnings() != null
+        && !volumeListByDriver.warnings().isEmpty()) {
+      for (final String warning : volumeListByDriver.warnings()) {
+        log.warn(warning);
       }
-      assertThat(volume, isIn(volumeListByDriver.volumes()));
     }
+    assertThat(volume, isIn(volumeListByDriver.volumes()));
 
-    if (dockerApiVersionAtLeast("1.24")) {
-      assertEquals("local", volume.scope());
-      assertThat(volume.status(), is(anything())); // I don't know what is in the status object - JF
-    }
+    assertEquals("local", volume.scope());
+    assertThat(volume.status(), is(anything())); // I don't know what is in the status object - JF
 
     sut.removeVolume(volume);
   }
 
   @Test
   public void testRemoveVolume() throws Exception {
-    requireDockerApiVersionAtLeast("1.21", "volumes");
     // Create a volume and remove it
     final Volume volume1 = sut.createVolume();
     sut.removeVolume(volume1);
@@ -4623,8 +4219,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testIpcMode() throws Exception {
-    requireDockerApiVersionAtLeast("1.18", "IpcMode");
-
     final HostConfig hostConfig = HostConfig.builder()
         .ipcMode("host")
         .build();
@@ -4646,8 +4240,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testShmSize() throws Exception {
-    requireDockerApiVersionAtLeast("1.22", "ShmSize");
-
     // Pull image
     sut.pull(BUSYBOX_LATEST);
 
@@ -4666,8 +4258,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testOomKillDisable() throws Exception {
-    requireDockerApiVersionAtLeast("1.20", "OomKillDisable");
-
     // Pull image
     sut.pull(BUSYBOX_LATEST);
 
@@ -4686,8 +4276,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testOomScoreAdj() throws Exception {
-    requireDockerApiVersionAtLeast("1.22", "OomScoreAdj");
-
     // Pull image
     sut.pull(BUSYBOX_LATEST);
 
@@ -4710,7 +4298,6 @@ public class DefaultDockerClientTest {
       assumeTrue("Linux kernel must be at least 4.3.",
                  compareVersion(System.getProperty("os.version"), "4.3") >= 0);
     }
-    requireDockerApiVersionAtLeast("1.23", "PidsLimit");
 
     // Pull image
     sut.pull(BUSYBOX_LATEST);
@@ -4730,8 +4317,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testTmpfs() throws Exception {
-    requireDockerApiVersionAtLeast("1.22", "TmpFs");
-
     // Pull image
     sut.pull(BUSYBOX_LATEST);
 
@@ -4771,7 +4356,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testStorageOpt() throws Exception {
-    requireDockerApiVersionAtLeast("1.24", "StorageOpt");
     requireStorageDriverNotAufs();
     // Doesn't work on Travis with Docker API >= v1.32 because storage driver doesn't have pquota
     // mount option enabled.
@@ -4797,8 +4381,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testAutoRemoveWhenSetToTrue() throws Exception {
-    requireDockerApiVersionAtLeast("1.25", "AutoRemove");
-
     // Container should be removed after it is stopped (new since API v.1.25)
     // Pull image
     sut.pull(BUSYBOX_LATEST);
@@ -4825,8 +4407,6 @@ public class DefaultDockerClientTest {
   
   @Test
   public void testInitWhenSetToTrue() throws Exception {
-    requireDockerApiVersionAtLeast("1.25", "HostConfig.Init");
-
     sut.pull(BUSYBOX_LATEST);
 
     final ContainerConfig config = ContainerConfig.builder()
@@ -4843,8 +4423,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testInspectSwarm() throws Exception {
-    requireDockerApiVersionAtLeast("1.24", "swarm support");
-
     final Swarm swarm = sut.inspectSwarm();
     assertThat(swarm.createdAt(), is(notNullValue()));
     assertThat(swarm.updatedAt(), is(notNullValue()));
@@ -4855,8 +4433,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testInitAndLeaveSwarm() throws Exception {
-    requireDockerApiVersionAtLeast("1.24", "swarm support");
-
     try {
       sut.leaveSwarm(true);
     } catch (final Exception ex) {
@@ -4893,8 +4469,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testUpdateSwarm() throws Exception {
-    requireDockerApiVersionAtLeast("1.24", "swarm support");
-
     final Swarm swarm = sut.inspectSwarm();
     final ThreadLocalRandom random = ThreadLocalRandom.current();
 
@@ -4937,18 +4511,7 @@ public class DefaultDockerClientTest {
 
     assertThat(updatedSwarm.id(), equalTo(swarm.id()));
     final SwarmSpec newSpec = updatedSwarm.swarmSpec();
-    if (dockerApiVersionLessThan("1.25")) {
-      assertThat(newSpec.name(), equalTo(updatedSpec.name()));
-      assertThat(newSpec.labels(), equalTo(updatedSpec.labels()));
-      assertThat(newSpec.orchestration(), equalTo(updatedSpec.orchestration()));
-      assertThat(newSpec.raft(), equalTo(updatedSpec.raft()));
-      assertThat(newSpec.dispatcher(), equalTo(updatedSpec.dispatcher()));
-      assertThat(newSpec.caConfig(), equalTo(updatedSpec.caConfig()));
-      assertThat(newSpec.encryptionConfig(), is(nullValue()));
-      assertThat(newSpec.taskDefaults(), equalTo(updatedSpec.taskDefaults()));
-    } else {
-      assertThat(newSpec, equalTo(updatedSpec));
-    }
+    assertThat(newSpec, equalTo(updatedSpec));
 
     // Return swarm back to old settings
     sut.updateSwarm(updatedSwarm.version().index(), swarm.swarmSpec());
@@ -4956,16 +4519,12 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testUnlockKey() throws Exception {
-    requireDockerApiVersionAtLeast("1.25", "swarm locking support");
-
     final UnlockKey unlockKey = sut.unlockKey();
     assertThat(unlockKey, is(notNullValue()));
   }
 
   @Test
   public void testCreateServiceWithNetwork() throws Exception {
-    requireDockerApiVersionAtLeast("1.24", "swarm support");
-
     final String networkName = randomName();
     final String serviceName = randomName();
 
@@ -4973,12 +4532,6 @@ public class DefaultDockerClientTest {
             NetworkConfig.builder()
                     .driver("overlay")
                     .name(networkName);
-    if (dockerApiVersionEquals("1.24")) {
-      // workaround for https://github.com/docker/docker/issues/25735
-      networkConfigBuilder = networkConfigBuilder
-              .ipam(Ipam.create("default", Collections.<IpamConfig>emptyList()));
-    }
-
 
     final NetworkCreation networkCreation =
             sut.createNetwork(networkConfigBuilder.build());
@@ -5013,8 +4566,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testCreateService() throws Exception {
-    requireDockerApiVersionAtLeast("1.24", "swarm support");
-
     final ServiceSpec spec = createServiceSpec(randomName());
 
     final ServiceCreateResponse response = sut.createService(spec);
@@ -5023,7 +4574,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testCreateServiceWithWarnings() throws Exception {
-    requireDockerApiVersionAtLeast("1.25", "swarm support");
     requireDockerApiVersionLessThan("1.30",
             "warning on create service with bad image");
 
@@ -5047,8 +4597,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testSecretOperations() throws Exception {
-    requireDockerApiVersionAtLeast("1.25", "secret support");
-
     assertThat(sut.listSecrets().size(), equalTo(0));
 
     final String secretData = Base64.getEncoder().encodeToString("testdata".getBytes(StandardCharsets.UTF_8));
@@ -5122,20 +4670,12 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testCreateServiceWithDefaults() throws Exception {
-    requireDockerApiVersionAtLeast("1.24", "swarm support");
-
     final String networkName = randomName();
     NetworkConfig.Builder networkConfigBuilder =
             NetworkConfig.builder()
                     .driver("overlay")
                     .name(networkName);
     
-    if (dockerApiVersionEquals("1.24")) {
-      // workaround for https://github.com/docker/docker/issues/25735
-      networkConfigBuilder = networkConfigBuilder
-              .ipam(Ipam.create("default", Collections.<IpamConfig>emptyList()));
-    }
-
     final NetworkCreation networkCreation =
             sut.createNetwork(networkConfigBuilder.build());
 
@@ -5201,10 +4741,7 @@ public class DefaultDockerClientTest {
 
     final PortConfig.Builder portConfigBuilder = PortConfig.builder()
         .protocol(PROTOCOL_TCP);
-    if (dockerApiVersionAtLeast("1.25")) {
-      // Ingress publish mode is the default for ports in API versions >= 1.25
-      portConfigBuilder.publishMode(PortConfigPublishMode.INGRESS);
-    }
+    portConfigBuilder.publishMode(PortConfigPublishMode.INGRESS);
     final PortConfig expectedPortConfig = portConfigBuilder.build();
 
     assertThat(actualServiceSpec.endpointSpec().ports(), contains(expectedPortConfig));
@@ -5232,8 +4769,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testCreateServiceWithSecretHostnameHostsAndHealthcheck() throws Exception {
-    requireDockerApiVersionAtLeast("1.26", "swarm support");
-
     final String hostname = "tshost-{{.Task.Slot}}";
     final String[] hosts = {"127.0.0.1 test.local", "127.0.0.1 test"};
     final String[] healthcheckCmd = {"ping", "-c", "1", "127.0.0.1"};
@@ -5327,8 +4862,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testInspectService() throws Exception {
-    requireDockerApiVersionAtLeast("1.24", "swarm support");
-
     final String[] commandLine = {"ping", "-c4", "localhost"};
     final TaskSpec taskSpec = TaskSpec
         .builder()
@@ -5375,8 +4908,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testInspectServiceEndpoint() throws Exception {
-    requireDockerApiVersionAtLeast("1.24", "swarm support");
-    
     final String name = randomName();
     final String imageName = "demo/test";
     final PortConfig.Builder portConfigBuilder = PortConfig.builder()
@@ -5384,9 +4915,7 @@ public class DefaultDockerClientTest {
         .protocol("tcp")
         .publishedPort(8080)
         .targetPort(80);
-    if (dockerApiVersionAtLeast("1.25")) {
-      portConfigBuilder.publishMode(PortConfigPublishMode.INGRESS);
-    }
+    portConfigBuilder.publishMode(PortConfigPublishMode.INGRESS);
     final PortConfig expectedPort1 = portConfigBuilder.build();
 
     final ServiceSpec spec = ServiceSpec.builder()
@@ -5412,9 +4941,7 @@ public class DefaultDockerClientTest {
     final PortConfig.Builder portConfigBuilder2 = PortConfig.builder()
         .targetPort(22)
         .protocol("tcp");
-    if (dockerApiVersionAtLeast("1.25")) {
-      portConfigBuilder2.publishMode(PortConfigPublishMode.HOST);
-    }
+    portConfigBuilder2.publishMode(PortConfigPublishMode.HOST);
     final PortConfig expectedPort2Spec = portConfigBuilder2.build();
 
     assertThat(endpoint.spec().ports(), containsInAnyOrder(expectedPort1, expectedPort2Spec));
@@ -5422,13 +4949,8 @@ public class DefaultDockerClientTest {
     // API versions less than 1.25 get assigned a random published port and have null publish mode
     final Matcher<Integer> publishedPortMatcher;
     final Matcher<PortConfigPublishMode> publishModeMatcher;
-    if (dockerApiVersionLessThan("1.25")) {
-      publishedPortMatcher = any(Integer.class);
-      publishModeMatcher = nullValue(PortConfigPublishMode.class);
-    } else {
-      publishedPortMatcher = nullValue(Integer.class);
-      publishModeMatcher = equalTo(PortConfigPublishMode.HOST);
-    }
+    publishedPortMatcher = nullValue(Integer.class);
+    publishModeMatcher = equalTo(PortConfigPublishMode.HOST);
 
     //noinspection unchecked
     assertThat(endpoint.ports(), containsInAnyOrder(
@@ -5441,7 +4963,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testUpdateService() throws Exception {
-    requireDockerApiVersionAtLeast("1.24", "swarm support");
     final ServiceSpec spec = createServiceSpec(randomName());
 
     final ServiceCreateResponse response = sut.createService(spec);
@@ -5465,7 +4986,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testListServices() throws Exception {
-    requireDockerApiVersionAtLeast("1.24", "swarm support");
     List<Service> services = sut.listServices();
     final int startingNumServices = services.size();
 
@@ -5479,7 +4999,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testListServicesFilterById() throws Exception {
-    requireDockerApiVersionAtLeast("1.24", "swarm support");
     final ServiceSpec spec = createServiceSpec(randomName());
     final ServiceCreateResponse response = sut.createService(spec);
 
@@ -5491,7 +5010,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testListServicesFilterByName() throws Exception {
-    requireDockerApiVersionAtLeast("1.24", "swarm support");
     final String serviceName = randomName();
     final ServiceSpec spec = createServiceSpec(serviceName);
     sut.createService(spec);
@@ -5504,7 +5022,6 @@ public class DefaultDockerClientTest {
   
   @Test
   public void testListServicesFilterByLabel() throws Exception {
-    requireDockerApiVersionAtLeast("1.24", "swarm support");
     final String serviceName = randomName();
     
     Map<String, String> labels = new HashMap<>();
@@ -5525,8 +5042,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testRemoveService() throws Exception {
-    requireDockerApiVersionAtLeast("1.24", "swarm support");
-
     final ServiceSpec spec = createServiceSpec(randomName());
     final ServiceCreateResponse response = sut.createService(spec);
     assertThat(sut.listServices(), is(not(empty())));
@@ -5536,8 +5051,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testListTasks() throws Exception {
-    requireDockerApiVersionAtLeast("1.24", "swarm support");
-
     final ServiceSpec spec = createServiceSpec(randomName());
     assertThat(sut.listTasks().size(), is(0));
     sut.createService(spec);
@@ -5547,7 +5060,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testListTasksWithGlobalService() throws Exception {
-    requireDockerApiVersionAtLeast("1.24", "swarm support");
     final int startingNumTasks = sut.listTasks().size();
 
     final TaskSpec taskSpec = TaskSpec.builder()
@@ -5570,7 +5082,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testListNodes() throws Exception {
-    requireDockerApiVersionAtLeast("1.24", "swarm support");
     List<Node> nodes = sut.listNodes();
     assertThat(nodes.size(), greaterThanOrEqualTo(1));
     
@@ -5612,7 +5123,6 @@ public class DefaultDockerClientTest {
   @SuppressWarnings("ConstantConditions")
   @Test
   public void testMountTmpfsOptions() throws Exception {
-    requireDockerApiVersionAtLeast("1.24", "swarm support");
     final long expectedSizeBytes = 100000L;
     final int expectedMode = 777;
 
@@ -5788,7 +5298,7 @@ public class DefaultDockerClientTest {
   }
 
   private Matcher<String> latestImageNameMatcher(final String imageName) throws Exception {
-    return dockerApiVersionLessThan("1.25") || dockerApiVersionAtLeast("1.30")
+    return dockerApiVersionAtLeast("1.30")
             ? is(imageName) : startsWith(imageName + ":latest@sha256:");
   }
 }

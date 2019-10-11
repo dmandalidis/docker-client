@@ -134,28 +134,10 @@ public abstract class ContainerSpec {
 
     public abstract Builder image(String image);
 
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #image(String)}.
-     */
-    @Deprecated
-    public Builder withImage(final String image) {
-      image(image);
-      return this;
-    }
-
     abstract ImmutableMap.Builder<String, String> labelsBuilder();
 
     public Builder addLabel(final String label, final String value) {
       labelsBuilder().put(label, value);
-      return this;
-    }
-
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #addLabel(String, String)} ()}.
-     */
-    @Deprecated
-    public Builder withLabel(final String label, final String value) {
-      addLabel(label, value);
       return this;
     }
 
@@ -167,182 +149,29 @@ public abstract class ContainerSpec {
 
     public abstract Builder command(List<String> commands);
 
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #command(String...)}.
-     */
-    @Deprecated
-    public Builder withCommands(final String... commands) {
-      if (commands != null && commands.length > 0) {
-        command(commands);
-      }
-      return this;
-    }
-
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #command(List)}.
-     */
-    @Deprecated
-    public Builder withCommands(final List<String> commands) {
-      if (commands != null && !commands.isEmpty()) {
-        command(commands);
-      }
-      return this;
-    }
-
     public abstract Builder args(String... args);
 
     public abstract Builder args(List<String> args);
-
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #args(String...)}.
-     */
-    @Deprecated
-    public Builder withArgs(final String... args) {
-      if (args != null && args.length > 0) {
-        args(args);
-      }
-      return this;
-    }
-
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #args(List)}.
-     */
-    @Deprecated
-    public Builder withArgs(final List<String> args) {
-      if (args != null && !args.isEmpty()) {
-        args(args);
-      }
-      return this;
-    }
 
     public abstract Builder env(String... env);
 
     public abstract Builder env(List<String> env);
 
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #env(String...)}.
-     */
-    @Deprecated
-    public Builder withEnv(final String... env) {
-      if (env != null && env.length > 0) {
-        env(env);
-      }
-      return this;
-    }
-
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #env(List)}.
-     */
-    @Deprecated
-    public Builder withEnv(final List<String> env) {
-      env(env);
-      return this;
-    }
-
     public abstract Builder dir(String dir);
 
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #dir(String)}.
-     */
-    @Deprecated
-    public Builder withDir(final String dir) {
-      dir(dir);
-      return this;
-    }
-
     public abstract Builder user(String user);
-
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #user(String)}.
-     */
-    @Deprecated
-    public Builder withUser(final String user) {
-      user(user);
-      return this;
-    }
 
     public abstract Builder groups(String... groups);
 
     public abstract Builder groups(List<String> groups);
 
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #groups(String...)}.
-     */
-    @Deprecated
-    public Builder withGroups(final String... groups) {
-      if (groups != null && groups.length > 0) {
-        groups(groups);
-      }
-      return this;
-    }
-
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #groups(List)}.
-     */
-    @Deprecated
-    public Builder withGroups(final List<String> groups) {
-      if (groups != null && !groups.isEmpty()) {
-        groups(groups);
-      }
-      return this;
-    }
-
     public abstract Builder tty(Boolean tty);
-
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #tty(Boolean)}
-     */
-    @Deprecated
-    public Builder withTty() {
-      tty(true);
-      return this;
-    }
-
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #tty(Boolean)}.
-     */
-    @Deprecated
-    public Builder withTty(final boolean tty) {
-      tty(tty);
-      return this;
-    }
 
     public abstract Builder mounts(Mount... mounts);
 
     public abstract Builder mounts(List<Mount> mounts);
 
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #mounts(Mount...)}.
-     */
-    @Deprecated
-    public Builder withMounts(final Mount... mounts) {
-      if (mounts != null && mounts.length > 0) {
-        mounts(mounts);
-      }
-      return this;
-    }
-
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #mounts(List)}.
-     */
-    @Deprecated
-    public Builder withMounts(final List<Mount> mounts) {
-      if (mounts != null && !mounts.isEmpty()) {
-        mounts(mounts);
-      }
-      return this;
-    }
-
     public abstract Builder stopGracePeriod(Long stopGracePeriod);
-
-    /**
-     * @deprecated  As of release 7.0.0, replaced by {@link #stopGracePeriod(Long)}.
-     */
-    @Deprecated
-    public Builder withStopGracePeriod(final long stopGracePeriod) {
-      stopGracePeriod(stopGracePeriod);
-      return this;
-    }
 
     public abstract Builder dnsConfig(DnsConfig dnsConfig);
 

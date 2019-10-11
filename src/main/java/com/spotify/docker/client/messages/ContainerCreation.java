@@ -44,11 +44,6 @@ public abstract class ContainerCreation {
   @JsonProperty("Warnings")
   public abstract ImmutableList<String> warnings();
 
-  @Deprecated
-  public List<String> getWarnings() {
-    return warnings();
-  }
-
   public static Builder builder() {
     return new AutoValue_ContainerCreation.Builder();
   }
