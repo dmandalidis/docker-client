@@ -1,5 +1,16 @@
 # Change Log
 
+## 2.0.0
+
+This release is the last step in moving away from the original process. That is,
+this is a breaking release as all `com.spotify.docker` packages have been renamed
+to `org.mandas.docker` and, normally, I find-and-replace would do the work for you.
+Last but not least, all deprecated methods and redundant API version checks have
+been removed.
+
+* Repackaging to org.mandas (fixes #8)
+* Remove deprecated code
+
 ## 1.1.1
 
 * Update commons-compress (CVE-2019-12402)
