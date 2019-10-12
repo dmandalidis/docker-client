@@ -1,10 +1,14 @@
 # Change Log
 
+## 1.1.1
+
+* Update commons-compress (CVE-2019-12402)
+
 ## 1.1.0
 
 ### Enhancements
 
-* Support Init for containers and services (fixes [#36](https://github.com/dmandalidis/docker-client/issues/36))
+* Support HostConfig.Init for containers and services (fixes [#36](https://github.com/dmandalidis/docker-client/issues/36))
 * Support --mount option in container creation (fixes [#59](https://github.com/dmandalidis/docker-client/issues/10))
 * Fix [#44](https://github.com/dmandalidis/docker-client/issues/44) Add missing 'Order' attribute in UpdateConfig (thanks [@Allen57](https://github.com/Allen57))
 
