@@ -713,7 +713,7 @@ API and any unexpected errors that the daemon encounters will be reported as a
 500 Internal Server Error, which bubbles up from docker-client as an exception 
 like:
 
-> Caused by: com.spotify.docker.client.shaded.javax.ws.rs.InternalServerErrorException: HTTP 500 Internal Server Error
+> Caused by: org.mandas.docker.client.shaded.javax.ws.rs.InternalServerErrorException: HTTP 500 Internal Server Error
 
 Check the Docker daemon log (typically at `/var/log/docker.log` or 
 `/var/log/upstart/docker.log`) for more details as to the root cause.

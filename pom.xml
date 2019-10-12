@@ -312,71 +312,71 @@
           <relocations>
             <relocation>
               <pattern>javax.annotation</pattern>
-              <shadedPattern>com.spotify.docker.client.shaded.javax.annotation</shadedPattern>
+              <shadedPattern>org.mandas.docker.client.shaded.javax.annotation</shadedPattern>
             </relocation>
             <relocation>
               <pattern>javax.inject</pattern>
-              <shadedPattern>com.spotify.docker.client.shaded.javax.inject</shadedPattern>
+              <shadedPattern>org.mandas.docker.client.shaded.javax.inject</shadedPattern>
             </relocation>
             <relocation>
               <pattern>javax.ws.rs</pattern>
-              <shadedPattern>com.spotify.docker.client.shaded.javax.ws.rs</shadedPattern>
+              <shadedPattern>org.mandas.docker.client.shaded.javax.ws.rs</shadedPattern>
             </relocation>
             <relocation>
               <pattern>org.glassfish</pattern>
-              <shadedPattern>com.spotify.docker.client.shaded.org.glassfish</shadedPattern>
+              <shadedPattern>org.mandas.docker.client.shaded.org.glassfish</shadedPattern>
             </relocation>
             <relocation>
               <pattern>org.jvnet.hk2</pattern>
-              <shadedPattern>com.spotify.docker.client.shaded.org.jvnet.hk2</shadedPattern>
+              <shadedPattern>org.mandas.docker.client.shaded.org.jvnet.hk2</shadedPattern>
             </relocation>
             <relocation>
               <pattern>com.fasterxml.jackson</pattern>
-              <shadedPattern>com.spotify.docker.client.shaded.com.fasterxml.jackson</shadedPattern>
+              <shadedPattern>org.mandas.docker.client.shaded.com.fasterxml.jackson</shadedPattern>
             </relocation>
             <relocation>
               <pattern>com.google.common</pattern>
-              <shadedPattern>com.spotify.docker.client.shaded.com.google.common</shadedPattern>
+              <shadedPattern>org.mandas.docker.client.shaded.com.google.common</shadedPattern>
             </relocation>
             <relocation>
               <pattern>com.google.thirdparty</pattern>
-              <shadedPattern>com.spotify.docker.client.shaded.com.google.thirdparty</shadedPattern>
+              <shadedPattern>org.mandas.docker.client.shaded.com.google.thirdparty</shadedPattern>
             </relocation>
             <relocation>
               <pattern>org.apache.http</pattern>
-              <shadedPattern>com.spotify.docker.client.shaded.org.apache.http</shadedPattern>
+              <shadedPattern>org.mandas.docker.client.shaded.org.apache.http</shadedPattern>
             </relocation>
             <relocation>
               <pattern>org.objectweb.asm</pattern>
-              <shadedPattern>com.spotify.docker.client.shaded.org.objectweb.asm</shadedPattern>
+              <shadedPattern>org.mandas.docker.client.shaded.org.objectweb.asm</shadedPattern>
             </relocation>
             <relocation>
               <pattern>org.aopalliance</pattern>
-              <shadedPattern>com.spotify.docker.client.shaded.org.aopalliance</shadedPattern>
+              <shadedPattern>org.mandas.docker.client.shaded.org.aopalliance</shadedPattern>
             </relocation>
             <relocation>
               <pattern>org.jvnet</pattern>
-              <shadedPattern>com.spotify.docker.client.shaded.org.jvnet</shadedPattern>
+              <shadedPattern>org.mandas.docker.client.shaded.org.jvnet</shadedPattern>
             </relocation>
             <relocation>
               <pattern>com.kenai.constantine</pattern>
-              <shadedPattern>com.spotify.docker.client.shaded.com.kenai.constantine</shadedPattern>
+              <shadedPattern>org.mandas.docker.client.shaded.com.kenai.constantine</shadedPattern>
             </relocation>
             <relocation>
               <pattern>com.kenai.jnr</pattern>
-              <shadedPattern>com.spotify.docker.client.shaded.com.kenai.jnr</shadedPattern>
+              <shadedPattern>org.mandas.docker.client.shaded.com.kenai.jnr</shadedPattern>
             </relocation>
             <relocation>
               <pattern>mozilla</pattern>
-              <shadedPattern>com.spotify.docker.client.shaded.mozilla</shadedPattern>
+              <shadedPattern>org.mandas.docker.client.shaded.mozilla</shadedPattern>
             </relocation>
             <relocation>
               <pattern>jnr</pattern>
-              <shadedPattern>com.spotify.docker.client.shaded.jnr</shadedPattern>
+              <shadedPattern>org.mandas.docker.client.shaded.jnr</shadedPattern>
             </relocation>
             <relocation>
               <pattern>jni</pattern>
-              <shadedPattern>com.spotify.docker.client.shaded.jni</shadedPattern>
+              <shadedPattern>org.mandas.docker.client.shaded.jni</shadedPattern>
              </relocation>
           </relocations>
           <shadedArtifactAttached>true</shadedArtifactAttached>
