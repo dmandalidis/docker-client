@@ -43,7 +43,7 @@ after_failure:
 branches:
   only:
   - master
-  - /^release-\d+\.\d+\.\d+$/
+  - /^v\d+\.\d+\.\d+$/
 cache:
   directories:
     - $HOME/.m2
