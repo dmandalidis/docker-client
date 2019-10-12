@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.1.1
+
+* Update commons-compress (CVE-2019-12402)
+
 ## 1.1.0
 
 ### Enhancements
