@@ -20,37 +20,25 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class ContainerStatus {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableContainerStatus.Builder.class)
+@Immutable
+public interface ContainerStatus {
 
   @Nullable
   @JsonProperty("ContainerID")
-  public abstract String containerId();
+  String containerId();
 
   @Nullable
   @JsonProperty("PID")
-  public abstract Integer pid();
+  Integer pid();
 
   @Nullable
   @JsonProperty("ExitCode")
-  public abstract Long exitCode();
-
-  @JsonCreator
-  static ContainerStatus create(
-      @JsonProperty("ContainerID") final String containerId,
-      @JsonProperty("PID") final Integer pid,
-      @JsonProperty("ExitCode") final Long exitCode) {
-    return new AutoValue_ContainerStatus(containerId, pid, exitCode);
-  }
+  Long exitCode();
 }

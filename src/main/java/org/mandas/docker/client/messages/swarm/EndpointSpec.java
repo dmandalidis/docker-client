@@ -20,22 +20,21 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
-
 import java.util.List;
+
+import org.immutables.value.Value.Auxiliary;
+import org.immutables.value.Value.Derived;
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class EndpointSpec {
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableEndpointSpec.Builder.class)
+@Immutable
+public interface EndpointSpec {
 
   public enum Mode {
     RESOLUTION_MODE_VIP("vip"),
@@ -55,55 +54,44 @@ public abstract class EndpointSpec {
 
   @Nullable
   @JsonProperty("Mode")
-  public abstract Mode mode();
+  Mode mode();
 
   @JsonProperty("Ports")
-  public abstract ImmutableList<PortConfig> ports();
+  List<PortConfig> ports();
 
-  abstract Builder toBuilder();
-
-  public EndpointSpec withVipMode() {
+  @JsonIgnore
+  @Derived
+  @Auxiliary
+  default Builder toBuilder() {
+	return ImmutableEndpointSpec.builder().from(this);
+  }
+  
+  default EndpointSpec withVipMode() {
     return toBuilder().mode(Mode.RESOLUTION_MODE_VIP).build();
   }
 
-  public EndpointSpec withDnsrrMode() {
+  default EndpointSpec withDnsrrMode() {
     return toBuilder().mode(Mode.RESOLUTION_MODE_DNSRR).build();
   }
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  interface Builder {
 
-    public abstract Builder mode(Mode mode);
+    Builder mode(Mode mode);
 
-    abstract ImmutableList.Builder<PortConfig> portsBuilder();
-
-    public Builder addPort(final PortConfig portConfig) {
-      portsBuilder().add(portConfig);
-      return this;
+    default Builder addPort(final PortConfig portConfig) {
+    	ports(portConfig);
+    	return this;
     }
 
-    public abstract Builder ports(PortConfig... ports);
+    Builder ports(PortConfig... ports);
 
-    public abstract Builder ports(List<PortConfig> ports);
+    Builder ports(Iterable<? extends PortConfig> ports);
 
-    public abstract EndpointSpec build();
+    EndpointSpec build();
   }
 
-  public static EndpointSpec.Builder builder() {
-    return new AutoValue_EndpointSpec.Builder();
+  public static Builder builder() {
+    return ImmutableEndpointSpec.builder();
   }
 
-  @JsonCreator
-  static EndpointSpec create(
-      @JsonProperty("Mode") final Mode mode,
-      @JsonProperty("Ports") final List<PortConfig> ports) {
-    final Builder builder = builder()
-        .mode(mode);
-
-    if (ports != null) {
-      builder.ports(ports);
-    }
-
-    return builder.build();
-  }
 }

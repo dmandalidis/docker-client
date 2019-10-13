@@ -20,20 +20,17 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
 import java.util.Date;
+
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class TaskStatus {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableTaskStatus.Builder.class)
+@Immutable
+public interface TaskStatus {
 
   public static final String TASK_STATE_NEW = "new";
   public static final String TASK_STATE_ALLOCATED = "allocated";
@@ -50,29 +47,19 @@ public abstract class TaskStatus {
   public static final String TASK_STATE_REJECTED = "rejected";
 
   @JsonProperty("Timestamp")
-  public abstract Date timestamp();
+  Date timestamp();
 
   @JsonProperty("State")
-  public abstract String state();
+  String state();
 
   @JsonProperty("Message")
-  public abstract String message();
+  String message();
 
   @Nullable
   @JsonProperty("Err")
-  public abstract String err();
+  String err();
 
   @Nullable
   @JsonProperty("ContainerStatus")
-  public abstract ContainerStatus containerStatus();
-
-  @JsonCreator
-  static TaskStatus create(
-      @JsonProperty("Timestamp") final Date timestamp,
-      @JsonProperty("State") final String state,
-      @JsonProperty("Message") final String message,
-      @JsonProperty("Err") final String err,
-      @JsonProperty("ContainerStatus") final ContainerStatus containerStatus) {
-    return new AutoValue_TaskStatus(timestamp, state, message, err, containerStatus);
-  }
+  ContainerStatus containerStatus();
 }

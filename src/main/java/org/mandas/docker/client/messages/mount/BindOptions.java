@@ -20,32 +20,28 @@
 
 package org.mandas.docker.client.messages.mount;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class BindOptions {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableBindOptions.Builder.class)
+@Immutable
+public interface BindOptions {
 
   @Nullable
   @JsonProperty("Propagation")
-  public abstract String propagation();
+  String propagation();
+  
+  interface Builder {
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+    Builder propagation(String propagation);
 
-    public abstract Builder propagation(String propagation);
-
-    public abstract BindOptions build();
+    BindOptions build();
   }
 
-  public static BindOptions.Builder builder() {
-    return new AutoValue_BindOptions.Builder();
+  public static Builder builder() {
+    return ImmutableBindOptions.builder();
   }
 }

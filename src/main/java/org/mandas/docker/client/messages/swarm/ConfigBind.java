@@ -20,51 +20,35 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
+import org.immutables.value.Value.Immutable;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class ConfigBind {
+@JsonDeserialize(builder = ImmutableConfigBind.Builder.class)
+@Immutable
+public interface ConfigBind {
   @JsonProperty("File")
-  public abstract ConfigFile file();
+  ConfigFile file();
 
   @JsonProperty("ConfigID")
-  public abstract String configId();
+  String configId();
 
   @JsonProperty("ConfigName")
-  public abstract String configName();
+  String configName();
 
   public static Builder builder() {
-    return new AutoValue_ConfigBind.Builder();
+    return ImmutableConfigBind.builder();
   }
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  interface Builder {
 
-    public abstract Builder file(ConfigFile file);
+    Builder file(ConfigFile file);
 
-    public abstract Builder configId(String configId);
+    Builder configId(String configId);
 
-    public abstract Builder configName(String configName);
+    Builder configName(String configName);
 
-    public abstract ConfigBind build();
-  }
-
-  @JsonCreator
-  static ConfigBind create(
-         @JsonProperty("File") ConfigFile file,
-         @JsonProperty("ConfigID") String configId,
-         @JsonProperty("ConfigName") String configName) {
-    return builder()
-        .file(file)
-        .configId(configId)
-        .configName(configName)
-        .build();
+    ConfigBind build();
   }
 }

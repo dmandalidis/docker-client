@@ -22,13 +22,6 @@ package org.mandas.docker.client;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableCollection;
-import org.mandas.docker.client.messages.DockerCredentialHelperAuth;
-import org.mandas.docker.client.messages.RegistryAuth;
-import org.mandas.docker.client.messages.RegistryConfigs;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -36,11 +29,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.mandas.docker.client.messages.DockerCredentialHelperAuth;
+import org.mandas.docker.client.messages.RegistryAuth;
+import org.mandas.docker.client.messages.RegistryConfigs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 
 public class DockerConfigReader {
   private static final Logger LOG = LoggerFactory.getLogger(DockerConfigReader.class);
@@ -71,7 +72,7 @@ public class DockerConfigReader {
    */
   @VisibleForTesting
   RegistryAuth anyRegistryAuth(final Path configPath) throws IOException {
-    final ImmutableCollection<RegistryAuth> registryAuths =
+    final Collection<RegistryAuth> registryAuths =
         authForAllRegistries(configPath).configs().values();
     return registryAuths.isEmpty()
         ? RegistryAuth.builder().build()
@@ -110,8 +111,10 @@ public class DockerConfigReader {
         final String aCredsStore = credHelpersEntry.getValue();
         if (!addedRegistries.contains(registry)) {
           addedRegistries.add(registry);
-          registryConfigsBuilder.addConfig(registry,
-              authWithCredentialHelper(aCredsStore, registry));
+          RegistryAuth authWithCredentialHelper = authWithCredentialHelper(aCredsStore, registry);
+          if (authWithCredentialHelper != null) {
+        	  registryConfigsBuilder.addConfig(registry, authWithCredentialHelper);
+          }
         }
       }
     }

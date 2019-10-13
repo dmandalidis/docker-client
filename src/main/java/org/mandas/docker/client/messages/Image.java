@@ -20,68 +20,43 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import java.util.List;
 import java.util.Map;
+
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class Image {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableImage.Builder.class)
+@Immutable
+public interface Image {
 
   @JsonProperty("Created")
-  public abstract String created();
+  String created();
 
   @JsonProperty("Id")
-  public abstract String id();
+  String id();
 
   @JsonProperty("ParentId")
-  public abstract String parentId();
+  String parentId();
 
   @Nullable
   @JsonProperty("RepoTags")
-  public abstract ImmutableList<String> repoTags();
+  List<String> repoTags();
 
   @Nullable
   @JsonProperty("RepoDigests")
-  public abstract ImmutableList<String> repoDigests();
+  List<String> repoDigests();
 
   @JsonProperty("Size")
-  public abstract Long size();
+  Long size();
 
   @JsonProperty("VirtualSize")
-  public abstract Long virtualSize();
+  Long virtualSize();
 
   @Nullable
   @JsonProperty("Labels")
-  public abstract ImmutableMap<String, String> labels();
-
-  @JsonCreator
-  static Image create(
-      @JsonProperty("Created") final String created,
-      @JsonProperty("Id") final String id,
-      @JsonProperty("ParentId") final String parentId,
-      @JsonProperty("RepoTags") final List<String> repoTags,
-      @JsonProperty("RepoDigests") final List<String> repoDigests,
-      @JsonProperty("Size") final Long size,
-      @JsonProperty("VirtualSize") final Long virtualSize,
-      @JsonProperty("Labels") final Map<String, String> labels) {
-    final ImmutableList<String> repoTagsCopy = repoTags == null
-                                               ? null : ImmutableList.copyOf(repoTags);
-    final ImmutableList<String> repoDigestsCopy = repoDigests == null
-                                                  ? null : ImmutableList.copyOf(repoDigests);
-    final ImmutableMap<String, String> labelsCopy = labels == null
-                                                    ? null : ImmutableMap.copyOf(labels);
-    return new AutoValue_Image(created, id, parentId, repoTagsCopy, repoDigestsCopy, size,
-        virtualSize, labelsCopy);
-  }
+  Map<String, String> labels();
 }

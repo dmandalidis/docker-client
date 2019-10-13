@@ -20,60 +20,42 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class ContainerMount {
+
+@JsonDeserialize(builder = ImmutableContainerMount.Builder.class)
+@Immutable
+public interface ContainerMount {
 
   @Nullable
   @JsonProperty("Type")
-  public abstract String type();
+  String type();
 
   @Nullable
   @JsonProperty("Name")
-  public abstract String name();
+  String name();
 
   @JsonProperty("Source")
-  public abstract String source();
+  String source();
 
   @JsonProperty("Destination")
-  public abstract String destination();
+  String destination();
 
   @Nullable
   @JsonProperty("Driver")
-  public abstract String driver();
+  String driver();
 
   @JsonProperty("Mode")
-  public abstract String mode();
+  String mode();
 
   @JsonProperty("RW")
-  public abstract Boolean rw();
+  Boolean rw();
 
   @Nullable
   @JsonProperty("Propagation")
-  public abstract String propagation();
-
-  @JsonCreator
-  static ContainerMount create(
-      @JsonProperty("Type") final String type,
-      @JsonProperty("Name") final String name,
-      @JsonProperty("Source") final String source,
-      @JsonProperty("Destination") final String destination,
-      @JsonProperty("Driver") final String driver,
-      @JsonProperty("Mode") final String mode,
-      @JsonProperty("RW") final Boolean rw,
-      @JsonProperty("Propagation") final String propagation) {
-    return new AutoValue_ContainerMount(type, name, source, destination,
-            driver, mode, rw, propagation);
-  }
+  String propagation();
 }

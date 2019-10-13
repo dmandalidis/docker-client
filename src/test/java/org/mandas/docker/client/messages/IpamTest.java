@@ -42,7 +42,7 @@ public class IpamTest {
     final Ipam ipam =
         objectMapper.readValue(fixture("fixtures/1.29/ipam.json"), Ipam.class);
     assertThat(ipam.driver(), equalTo("default"));
-    assertThat(ipam.config(), contains(IpamConfig.create("172.17.0.0/16", null, null)));
+    assertThat(ipam.config(), contains(IpamConfig.builder().subnet("172.17.0.0/16").build()));
     assertThat(ipam.options(), equalTo(ImmutableMap.of("foo", "bar")));
   }
 

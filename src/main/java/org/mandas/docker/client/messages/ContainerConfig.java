@@ -20,296 +20,245 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.immutables.value.Value.Auxiliary;
+import org.immutables.value.Value.Derived;
+import org.immutables.value.Value.Enclosing;
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
+import org.mandas.docker.client.ObjectMapperProvider;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class ContainerConfig {
+@JsonDeserialize(builder = ImmutableContainerConfig.Builder.class)
+@Immutable
+@Enclosing
+public interface ContainerConfig {
 
   @Nullable
   @JsonProperty("Hostname")
-  public abstract String hostname();
+  String hostname();
 
   @Nullable
   @JsonProperty("Domainname")
-  public abstract String domainname();
+  String domainname();
 
   @Nullable
   @JsonProperty("User")
-  public abstract String user();
+  String user();
 
   @Nullable
   @JsonProperty("AttachStdin")
-  public abstract Boolean attachStdin();
+  Boolean attachStdin();
 
   @Nullable
   @JsonProperty("AttachStdout")
-  public abstract Boolean attachStdout();
+  Boolean attachStdout();
 
   @Nullable
   @JsonProperty("AttachStderr")
-  public abstract Boolean attachStderr();
+  Boolean attachStderr();
 
   @Nullable
   @JsonProperty("PortSpecs")
-  public abstract ImmutableList<String> portSpecs();
+  List<String> portSpecs();
 
   @Nullable
   @JsonProperty("ExposedPorts")
-  public abstract ImmutableSet<String> exposedPorts();
+  @JsonSerialize(using=ObjectMapperProvider.SetSerializer.class)
+  @JsonDeserialize(using=ObjectMapperProvider.SetDeserializer.class)
+  Set<String> exposedPorts();
 
   @Nullable
   @JsonProperty("Tty")
-  public abstract Boolean tty();
+  Boolean tty();
 
   @Nullable
   @JsonProperty("OpenStdin")
-  public abstract Boolean openStdin();
+  Boolean openStdin();
 
   @Nullable
   @JsonProperty("StdinOnce")
-  public abstract Boolean stdinOnce();
+  Boolean stdinOnce();
 
   @Nullable
   @JsonProperty("Env")
-  public abstract ImmutableList<String> env();
+  List<String> env();
 
   @Nullable
   @JsonProperty("Cmd")
-  public abstract ImmutableList<String> cmd();
+  List<String> cmd();
 
   @Nullable
   @JsonProperty("Image")
-  public abstract String image();
+  String image();
 
   @Nullable
   @JsonProperty("Volumes")
-  public abstract ImmutableSet<String> volumes();
+  @JsonSerialize(using=ObjectMapperProvider.SetSerializer.class)
+  @JsonDeserialize(using=ObjectMapperProvider.SetDeserializer.class)
+  Set<String> volumes();
 
   @Nullable
   @JsonProperty("WorkingDir")
-  public abstract String workingDir();
+  String workingDir();
 
   @Nullable
   @JsonProperty("Entrypoint")
-  public abstract ImmutableList<String> entrypoint();
+  List<String> entrypoint();
 
   @Nullable
   @JsonProperty("NetworkDisabled")
-  public abstract Boolean networkDisabled();
+  Boolean networkDisabled();
 
   @Nullable
   @JsonProperty("OnBuild")
-  public abstract ImmutableList<String> onBuild();
+  List<String> onBuild();
 
   @Nullable
   @JsonProperty("Labels")
-  public abstract ImmutableMap<String, String> labels();
+  Map<String, String> labels();
 
   @Nullable
   @JsonProperty("MacAddress")
-  public abstract String macAddress();
+  String macAddress();
 
   @Nullable
   @JsonProperty("HostConfig")
-  public abstract HostConfig hostConfig();
+  HostConfig hostConfig();
 
   @Nullable
   @JsonProperty("StopSignal")
-  public abstract String stopSignal();
+  String stopSignal();
 
   @Nullable
   @JsonProperty("Healthcheck")
-  public abstract Healthcheck healthcheck();
+  Healthcheck healthcheck();
 
   @Nullable
   @JsonProperty("NetworkingConfig")
-  public abstract NetworkingConfig networkingConfig();
+  NetworkingConfig networkingConfig();
 
-  @JsonCreator
-  static ContainerConfig create(
-      @JsonProperty("Hostname") final String hostname,
-      @JsonProperty("Domainname") final String domainname,
-      @JsonProperty("User") final String user,
-      @JsonProperty("AttachStdin") final Boolean attachStdin,
-      @JsonProperty("AttachStdout") final Boolean attachStdout,
-      @JsonProperty("AttachStderr") final Boolean attachStderr,
-      @JsonProperty("PortSpecs") final List<String> portSpecs,
-      @JsonProperty("ExposedPorts") final Set<String> exposedPorts,
-      @JsonProperty("Tty") final Boolean tty,
-      @JsonProperty("OpenStdin") final Boolean openStdin,
-      @JsonProperty("StdinOnce") final Boolean stdinOnce,
-      @JsonProperty("Env") final List<String> env,
-      @JsonProperty("Cmd") final List<String> cmd,
-      @JsonProperty("Image") final String image,
-      @JsonProperty("Volumes") final Set<String> volumes,
-      @JsonProperty("WorkingDir") final String workingDir,
-      @JsonProperty("Entrypoint") final List<String> entrypoint,
-      @JsonProperty("NetworkDisabled") final Boolean networkDisabled,
-      @JsonProperty("OnBuild") final List<String> onBuild,
-      @JsonProperty("Labels") final Map<String, String> labels,
-      @JsonProperty("MacAddress") final String macAddress,
-      @JsonProperty("HostConfig") final HostConfig hostConfig,
-      @JsonProperty("StopSignal") final String stopSignal,
-      @JsonProperty("Healthcheck") final Healthcheck healthcheck,
-      @JsonProperty("NetworkingConfig") final NetworkingConfig networkingConfig) {
-    return builder()
-        .hostname(hostname)
-        .domainname(domainname)
-        .user(user)
-        .attachStdin(attachStdin)
-        .attachStdout(attachStdout)
-        .attachStderr(attachStderr)
-        .tty(tty)
-        .openStdin(openStdin)
-        .stdinOnce(stdinOnce)
-        .image(image)
-        .workingDir(workingDir)
-        .networkDisabled(networkDisabled)
-        .macAddress(macAddress)
-        .hostConfig(hostConfig)
-        .stopSignal(stopSignal)
-        .networkingConfig(networkingConfig)
-        .volumes(volumes)
-        .portSpecs(portSpecs)
-        .exposedPorts(exposedPorts)
-        .env(env)
-        .cmd(cmd)
-        .entrypoint(entrypoint)
-        .onBuild(onBuild)
-        .labels(labels)
-        .healthcheck(healthcheck)
-        .build();
+  @JsonIgnore
+  @Derived
+  @Auxiliary
+  default Builder toBuilder() {
+	return ImmutableContainerConfig.builder().from(this);
   }
-
-  public abstract Builder toBuilder();
-
+  
   public static Builder builder() {
-    return new AutoValue_ContainerConfig.Builder();
+    return ImmutableContainerConfig.builder();
   }
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  public interface Builder {
 
-    public abstract Builder hostname(final String hostname);
+    Builder hostname(final String hostname);
 
-    public abstract Builder domainname(final String domainname);
+    Builder domainname(final String domainname);
 
-    public abstract Builder user(final String user);
+    Builder user(final String user);
 
-    public abstract Builder attachStdin(final Boolean attachStdin);
+    Builder attachStdin(final Boolean attachStdin);
 
-    public abstract Builder attachStdout(final Boolean attachStdout);
+    Builder attachStdout(final Boolean attachStdout);
 
-    public abstract Builder attachStderr(final Boolean attachStderr);
+    Builder attachStderr(final Boolean attachStderr);
 
-    public abstract Builder portSpecs(final List<String> portSpecs);
+    Builder portSpecs(final Iterable<String> portSpecs);
 
-    public abstract Builder portSpecs(final String... portSpecs);
+    Builder portSpecs(final String... portSpecs);
 
-    public abstract Builder exposedPorts(final Set<String> exposedPorts);
+    Builder exposedPorts(final Iterable<String> exposedPorts);
 
-    public abstract Builder exposedPorts(final String... exposedPorts);
+    Builder exposedPorts(final String... exposedPorts);
 
-    public abstract Builder tty(final Boolean tty);
+    Builder tty(final Boolean tty);
 
-    public abstract Builder openStdin(final Boolean openStdin);
+    Builder openStdin(final Boolean openStdin);
 
-    public abstract Builder stdinOnce(final Boolean stdinOnce);
+    Builder stdinOnce(final Boolean stdinOnce);
 
-    public abstract Builder env(final List<String> env);
+    Builder env(final Iterable<String> env);
 
-    public abstract Builder env(final String... env);
+    Builder env(final String... env);
 
-    public abstract Builder cmd(final List<String> cmd);
+    Builder cmd(final Iterable<String> cmd);
 
-    public abstract Builder cmd(final String... cmd);
+    Builder cmd(final String... cmds);
 
-    public abstract Builder image(final String image);
+    Builder image(final String image);
 
-    abstract ImmutableSet.Builder<String> volumesBuilder();
-
-    public Builder addVolume(final String volume) {
-      volumesBuilder().add(volume);
-      return this;
+    default Builder addVolume(String volume) {
+    	volumes(volume);
+    	return this;
+    }
+    
+    default Builder addVolumes(String... volumes) {
+    	volumes(volumes);
+    	return this;
     }
 
-    public Builder addVolumes(final String... volumes) {
-      for (final String volume : volumes) {
-        volumesBuilder().add(volume);
-      }
-      return this;
-    }
+    Builder volumes(final Iterable<String> volumes);
 
-    public abstract Builder volumes(final Set<String> volumes);
+    Builder volumes(final String... volumes);
 
-    public abstract Builder volumes(final String... volumes);
+    Builder workingDir(final String workingDir);
 
-    public abstract Builder workingDir(final String workingDir);
+    Builder entrypoint(final Iterable<String> entrypoint);
 
-    public abstract Builder entrypoint(final List<String> entrypoint);
+    Builder entrypoint(final String... entrypoint);
 
-    public abstract Builder entrypoint(final String... entrypoint);
+    Builder networkDisabled(final Boolean networkDisabled);
 
-    public abstract Builder networkDisabled(final Boolean networkDisabled);
+    Builder onBuild(final Iterable<String> onBuild);
 
-    public abstract Builder onBuild(final List<String> onBuild);
+    Builder onBuild(final String... onBuild);
 
-    public abstract Builder onBuild(final String... onBuild);
+    Builder labels(final Map<String, ? extends String> labels);
 
-    public abstract Builder labels(final Map<String, String> labels);
+    Builder macAddress(final String macAddress);
 
-    public abstract Builder macAddress(final String macAddress);
+    Builder hostConfig(final HostConfig hostConfig);
 
-    public abstract Builder hostConfig(final HostConfig hostConfig);
+    Builder stopSignal(final String stopSignal);
 
-    public abstract Builder stopSignal(final String stopSignal);
+    Builder healthcheck(final Healthcheck healthcheck);
 
-    public abstract Builder healthcheck(final Healthcheck healthcheck);
+    Builder networkingConfig(final NetworkingConfig networkingConfig);
 
-    public abstract Builder networkingConfig(final NetworkingConfig networkingConfig);
-
-    public abstract ContainerConfig build();
+    ContainerConfig build();
   }
 
-  @AutoValue
-  public abstract static class Healthcheck {
+  @JsonDeserialize(builder = ImmutableContainerConfig.Healthcheck.Builder.class)
+  @Immutable
+  public interface Healthcheck {
     @Nullable
     @JsonProperty("Test")
-    public abstract ImmutableList<String> test();
+    List<String> test();
 
     /**
      * In nanoseconds.
      */
     @Nullable
     @JsonProperty("Interval")
-    public abstract Long interval();
+    Long interval();
 
     /**
      * In nanoseconds.
      */
     @Nullable
     @JsonProperty("Timeout")
-    public abstract Long timeout();
+    Long timeout();
 
     @Nullable
     @JsonProperty("Retries")
-    public abstract Integer retries();
+    Integer retries();
 
     /**
      * In nanoseconds.
@@ -317,23 +266,22 @@ public abstract class ContainerConfig {
      */
     @Nullable
     @JsonProperty("StartPeriod")
-    public abstract Long startPeriod();
+    Long startPeriod();
 
-    public static Healthcheck create(
-            @JsonProperty("Test") final List<String> test,
-            @JsonProperty("Interval") final Long interval,
-            @JsonProperty("Timeout") final Long timeout,
-            @JsonProperty("Retries") final Integer retries) {
+    static Healthcheck create(
+            final List<String> test,
+            final Long interval,
+            final Long timeout,
+            final Integer retries) {
       return create(test, interval, timeout, retries, null);
     }
 
-    @JsonCreator
-    public static Healthcheck create(
-            @JsonProperty("Test") final List<String> test,
-            @JsonProperty("Interval") final Long interval,
-            @JsonProperty("Timeout") final Long timeout,
-            @JsonProperty("Retries") final Integer retries,
-            @JsonProperty("StartPeriod") final Long startPeriod) {
+    static Healthcheck create(
+            final List<String> test,
+            final Long interval,
+            final Long timeout,
+            final Integer retries,
+            final Long startPeriod) {
       return builder()
           .test(test)
           .interval(interval)
@@ -342,40 +290,30 @@ public abstract class ContainerConfig {
           .startPeriod(startPeriod)
           .build();
     }
-
+    
     public static Builder builder() {
-      return new AutoValue_ContainerConfig_Healthcheck.Builder();
+      return ImmutableContainerConfig.Healthcheck.builder();
     }
 
-    @AutoValue.Builder
-    public abstract static class Builder {
-      public abstract Builder test(final List<String> test);
+    interface Builder {
+      Builder test(final Iterable<String> test);
 
-      public abstract Builder interval(final Long interval);
+      Builder interval(final Long interval);
 
-      public abstract Builder timeout(final Long timeout);
+      Builder timeout(final Long timeout);
 
-      public abstract Builder retries(final Integer retries);
+      Builder retries(final Integer retries);
 
-      public abstract Builder startPeriod(final Long startPeriod);
+      Builder startPeriod(final Long startPeriod);
 
-      public abstract Healthcheck build();
+      Healthcheck build();
     }
   }
 
-  @AutoValue
-  public abstract static class NetworkingConfig {
+  @JsonDeserialize(builder = ImmutableContainerConfig.NetworkingConfig.Builder.class)
+  @Immutable
+  public interface NetworkingConfig {
     @JsonProperty("EndpointsConfig")
-    public abstract ImmutableMap<String, EndpointConfig> endpointsConfig();
-
-    @JsonCreator
-    public static NetworkingConfig create(
-            @JsonProperty("EndpointsConfig") final Map<String, EndpointConfig> endpointsConfig) {
-      final ImmutableMap<String, EndpointConfig> endpointsConfigCopy =
-              endpointsConfig == null
-                      ? ImmutableMap.<String, EndpointConfig>of()
-                      : ImmutableMap.copyOf(endpointsConfig);
-      return new AutoValue_ContainerConfig_NetworkingConfig(endpointsConfigCopy);
-    }
+    Map<String, EndpointConfig> endpointsConfig();
   }
 }

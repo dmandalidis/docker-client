@@ -20,70 +20,47 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
-
 import java.util.List;
+
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class AttachedNetwork {
+@Immutable
+@JsonDeserialize(builder = ImmutableAttachedNetwork.Builder.class)
+public interface AttachedNetwork {
 
   @Nullable
   @JsonProperty("Aliases")
-  public abstract ImmutableList<String> aliases();
+  List<String> aliases();
 
   @Nullable
   @JsonProperty("NetworkID")
-  public abstract String networkId();
+  String networkId();
 
   @JsonProperty("EndpointID")
-  public abstract String endpointId();
+  String endpointId();
 
   @JsonProperty("Gateway")
-  public abstract String gateway();
+  String gateway();
 
   @JsonProperty("IPAddress")
-  public abstract String ipAddress();
+  String ipAddress();
 
   @JsonProperty("IPPrefixLen")
-  public abstract Integer ipPrefixLen();
+  Integer ipPrefixLen();
 
   @JsonProperty("IPv6Gateway")
-  public abstract String ipv6Gateway();
+  String ipv6Gateway();
 
   @JsonProperty("GlobalIPv6Address")
-  public abstract String globalIPv6Address();
+  String globalIPv6Address();
 
   @JsonProperty("GlobalIPv6PrefixLen")
-  public abstract Integer globalIPv6PrefixLen();
+  Integer globalIPv6PrefixLen();
 
   @JsonProperty("MacAddress")
-  public abstract String macAddress();
-
-  @JsonCreator
-  static AttachedNetwork create(
-      @JsonProperty("Aliases") final List<String> aliases,
-      @JsonProperty("NetworkID") final String networkId,
-      @JsonProperty("EndpointID") final String endpointId,
-      @JsonProperty("Gateway") final String gateway,
-      @JsonProperty("IPAddress") final String ipAddress,
-      @JsonProperty("IPPrefixLen") final Integer ipPrefixLen,
-      @JsonProperty("IPv6Gateway") final String ipv6Gateway,
-      @JsonProperty("GlobalIPv6Address") final String globalIPv6Address,
-      @JsonProperty("GlobalIPv6PrefixLen") final Integer globalIPv6PrefixLen,
-      @JsonProperty("MacAddress") final String macAddress) {
-    return new AutoValue_AttachedNetwork(
-            aliases == null ? null : ImmutableList.copyOf(aliases),
-            networkId, endpointId, gateway, ipAddress, ipPrefixLen,
-            ipv6Gateway, globalIPv6Address, globalIPv6PrefixLen, macAddress);
-  }
+  String macAddress();
 }

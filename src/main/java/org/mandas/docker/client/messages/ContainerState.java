@@ -20,124 +20,87 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
-
 import java.util.Date;
 import java.util.List;
 
+import org.immutables.value.Value.Enclosing;
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class ContainerState {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableContainerState.Builder.class)
+@Immutable
+@Enclosing
+public interface ContainerState {
 
   @Nullable
   @JsonProperty("Status")
-  public abstract String status();
+  String status();
 
   @JsonProperty("Running")
-  public abstract Boolean running();
+  boolean running();
 
   @JsonProperty("Paused")
-  public abstract Boolean paused();
+  boolean paused();
 
   @Nullable
   @JsonProperty("Restarting")
-  public abstract Boolean restarting();
+  Boolean restarting();
 
   @JsonProperty("Pid")
-  public abstract Integer pid();
+  Integer pid();
 
   @JsonProperty("ExitCode")
-  public abstract Long exitCode();
+  Long exitCode();
 
   @JsonProperty("StartedAt")
-  public abstract Date startedAt();
+  Date startedAt();
 
   @JsonProperty("FinishedAt")
-  public abstract Date finishedAt();
+  Date finishedAt();
 
   @Nullable
   @JsonProperty("Error")
-  public abstract String error();
+  String error();
 
   @Nullable
   @JsonProperty("OOMKilled")
-  public abstract Boolean oomKilled();
+  Boolean oomKilled();
 
   @Nullable
   @JsonProperty("Health")
-  public abstract Health health();
+  Health health();
 
-  @JsonCreator
-  static ContainerState create(
-      @JsonProperty("Status") final String status,
-      @JsonProperty("Running") final Boolean running,
-      @JsonProperty("Paused") final Boolean addr,
-      @JsonProperty("Restarting") final Boolean restarting,
-      @JsonProperty("Pid") final Integer pid,
-      @JsonProperty("ExitCode") final Long exitCode,
-      @JsonProperty("StartedAt") final Date startedAt,
-      @JsonProperty("FinishedAt") final Date finishedAt,
-      @JsonProperty("Error") final String error,
-      @JsonProperty("OOMKilled") final Boolean oomKilled,
-      @JsonProperty("Health") final Health health) {
-    return new AutoValue_ContainerState(status, running, addr, restarting, pid, exitCode,
-        startedAt, finishedAt, error, oomKilled, health);
-  }
-
-  @AutoValue
-  public abstract static class HealthLog {
+  @JsonDeserialize(builder = ImmutableContainerState.HealthLog.Builder.class)
+  @Immutable
+  public interface HealthLog {
 
     @JsonProperty("Start")
-    public abstract Date start();
+    Date start();
 
     @JsonProperty("End")
-    public abstract Date end();
+    Date end();
 
     @JsonProperty("ExitCode")
-    public abstract Long exitCode();
+    Long exitCode();
 
     @JsonProperty("Output")
-    public abstract String output();
-
-    @JsonCreator
-    static HealthLog create(
-        @JsonProperty("Start") final Date start,
-        @JsonProperty("End") final Date end,
-        @JsonProperty("ExitCode") final Long exitCode,
-        @JsonProperty("Output") final String output) {
-      return new AutoValue_ContainerState_HealthLog(start, end, exitCode, output);
-    }
+    String output();
   }
 
-  @AutoValue
-  public abstract static class Health {
+  @JsonDeserialize(builder = ImmutableContainerState.Health.Builder.class)
+  @Immutable
+  public interface Health {
 
     @JsonProperty("Status")
-    public abstract String status();
+    String status();
 
     @JsonProperty("FailingStreak")
-    public abstract Integer failingStreak();
+    Integer failingStreak();
 
     @JsonProperty("Log")
-    public abstract ImmutableList<HealthLog> log();
-
-    @JsonCreator
-    static Health create(
-        @JsonProperty("Status") final String status,
-        @JsonProperty("FailingStreak") final Integer failingStreak,
-        @JsonProperty("Log") final List<HealthLog> log) {
-      final ImmutableList<HealthLog> logT =
-          log == null ? ImmutableList.<HealthLog>of() : ImmutableList.copyOf(log);
-      return new AutoValue_ContainerState_Health(status, failingStreak, logT);
-    }
+    List<HealthLog> log();
   }
 }

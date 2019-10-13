@@ -20,39 +20,36 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
-import com.google.common.collect.ImmutableMap;
 import java.util.Map;
+
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class LogConfig {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableLogConfig.Builder.class)
+@Immutable
+public interface LogConfig {
 
   @JsonProperty("Type")
-  public abstract String logType();
+  String logType();
 
   @Nullable
   @JsonProperty("Config")
-  public abstract ImmutableMap<String, String> logOptions();
+  Map<String, String> logOptions();
 
-  public static LogConfig create(final String logType) {
-    return new AutoValue_LogConfig(logType, ImmutableMap.<String, String>builder().build());
+  static LogConfig create(final String logType) {
+    return ImmutableLogConfig.builder().logType(logType).build();
   }
-
-  @JsonCreator
-  public static LogConfig create(
-      @JsonProperty("Type") final String logType,
-      @JsonProperty("Config") final Map<String, String> logOptions) {
-    final ImmutableMap<String, String> logOptionsCopy = logOptions == null
-                                                        ? null : ImmutableMap.copyOf(logOptions);
-    return new AutoValue_LogConfig(logType, logOptionsCopy);
+  
+  interface Builder {
+	  Builder logType(String logType);
+	  Builder logOptions(Map<String, ? extends String> logOptions);
+	  LogConfig build();
+  }
+  
+  static Builder builder() {
+	  return ImmutableLogConfig.builder();
   }
 }

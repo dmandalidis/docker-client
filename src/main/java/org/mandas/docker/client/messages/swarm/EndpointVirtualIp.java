@@ -20,31 +20,20 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class EndpointVirtualIp {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableEndpointVirtualIp.Builder.class)
+@Immutable
+public interface EndpointVirtualIp {
 
   @JsonProperty("NetworkID")
-  public abstract String networkId();
+  String networkId();
 
   @Nullable
   @JsonProperty("Addr")
-  public abstract String addr();
-
-  @JsonCreator
-  static EndpointVirtualIp create(
-      @JsonProperty("NetworkID") final String networkId,
-      @JsonProperty("Addr") final String addr) {
-    return new AutoValue_EndpointVirtualIp(networkId, addr);
-  }
+  String addr();
 }

@@ -20,22 +20,21 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import com.google.common.base.MoreObjects;
-import org.mandas.docker.client.DockerConfigReader;
-
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
 import java.util.Base64;
 
+import org.immutables.value.Value.Auxiliary;
+import org.immutables.value.Value.Derived;
+import org.immutables.value.Value.Immutable;
+import org.immutables.value.Value.Redacted;
 import org.mandas.docker.Nullable;
+import org.mandas.docker.client.DockerConfigReader;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Represents all the auth info for a particular registry.
@@ -48,44 +47,40 @@ import org.mandas.docker.Nullable;
  * docker versions, these can be written directly into the ~/.docker/config.json file,
  * with the username and password joined with a ":" and base-64 encoded.</p>
  */
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class RegistryAuth {
+@Immutable
+public interface RegistryAuth {
 
   @Nullable
   @JsonProperty("username")
-  public abstract String username();
+  String username();
 
   @Nullable
+  @Redacted
   @JsonProperty("password")
-  public abstract String password();
+  String password();
 
   /**
    * Unused but must be a well-formed email address (e.g. 1234@5678.com).
    */
   @Nullable
+  @Redacted
   @JsonProperty("email")
-  public abstract String email();
+  String email();
 
   @Nullable
   @JsonProperty("serveraddress")
-  public abstract String serverAddress();
+  String serverAddress();
 
   @Nullable
   @JsonProperty("identitytoken")
-  public abstract String identityToken();
+  String identityToken();
 
-  @Override
-  public final String toString() {
-    return MoreObjects.toStringHelper(RegistryAuth.class)
-        .add("username", username())
-        // don't log the password or email
-        .add("serveraddress", serverAddress())
-        .add("identitytoken", identityToken())
-        .toString();
+  @JsonIgnore
+  @Derived
+  @Auxiliary
+  default Builder toBuilder() {
+	  return ImmutableRegistryAuth.builder().from(this);
   }
-
-  public abstract Builder toBuilder();
 
   /**
    * This function looks for and parses credentials for logging into the Docker registry specified
@@ -141,22 +136,21 @@ public abstract class RegistryAuth {
   }
 
   public static Builder builder() {
-    return new AutoValue_RegistryAuth.Builder();
+    return ImmutableRegistryAuth.builder();
   }
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  interface Builder {
 
-    public abstract Builder username(final String username);
+    Builder username(final String username);
 
-    public abstract Builder password(final String password);
+    Builder password(final String password);
 
-    public abstract Builder email(final String email);
+    Builder email(final String email);
 
-    public abstract Builder serverAddress(final String serverAddress);
+    Builder serverAddress(final String serverAddress);
 
-    public abstract Builder identityToken(final String token);
+    Builder identityToken(final String token);
 
-    public abstract RegistryAuth build();
+    RegistryAuth build();
   }
 }

@@ -20,57 +20,40 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class Device {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableDevice.Builder.class)
+@Immutable
+public interface Device {
 
   @Nullable
   @JsonProperty("PathOnHost")
-  public abstract String pathOnHost();
+  String pathOnHost();
 
   @Nullable
   @JsonProperty("PathInContainer")
-  public abstract String pathInContainer();
+  String pathInContainer();
 
   @Nullable
   @JsonProperty("CgroupPermissions")
-  public abstract String cgroupPermissions();
+  String cgroupPermissions();
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  interface Builder {
 
-    public abstract Builder pathOnHost(String pathOnHost);
+    Builder pathOnHost(String pathOnHost);
 
-    public abstract Builder pathInContainer(String pathInContainer);
+    Builder pathInContainer(String pathInContainer);
 
-    public abstract Builder cgroupPermissions(String cgroupPermissions);
+    Builder cgroupPermissions(String cgroupPermissions);
 
-    public abstract Device build();
+    Device build();
   }
 
   public static Device.Builder builder() {
-    return new AutoValue_Device.Builder();
-  }
-
-  @JsonCreator
-  static Device create(
-      @JsonProperty("PathOnHost") final String pathOnHost,
-      @JsonProperty("PathInContainer") final String pathInContainer,
-      @JsonProperty("CgroupPermissions") final String cgroupPermissions) {
-    return builder()
-        .pathOnHost(pathOnHost)
-        .pathInContainer(pathInContainer)
-        .cgroupPermissions(cgroupPermissions)
-        .build();
+    return ImmutableDevice.builder();
   }
 }

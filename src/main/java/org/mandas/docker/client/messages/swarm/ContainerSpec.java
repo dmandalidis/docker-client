@@ -20,221 +20,163 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
+import java.util.List;
+import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
+import org.immutables.value.Value.Immutable;
+import org.mandas.docker.Nullable;
 import org.mandas.docker.client.messages.ContainerConfig;
 import org.mandas.docker.client.messages.mount.Mount;
 
-import java.util.List;
-import java.util.Map;
-import org.mandas.docker.Nullable;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class ContainerSpec {
+@JsonDeserialize(builder = ImmutableContainerSpec.Builder.class)
+@Immutable
+public interface ContainerSpec {
 
   @JsonProperty("Image")
-  public abstract String image();
+  String image();
 
   /**
    * @since API 1.26
    */
   @Nullable
   @JsonProperty("Hostname")
-  public abstract String hostname();
+  String hostname();
 
-  @Nullable
   @JsonProperty("Labels")
-  public abstract ImmutableMap<String, String> labels();
+  Map<String, String> labels();
 
   @Nullable
   @JsonProperty("Command")
-  public abstract ImmutableList<String> command();
+  List<String> command();
 
   @Nullable
   @JsonProperty("Args")
-  public abstract ImmutableList<String> args();
+  List<String> args();
 
   @Nullable
   @JsonProperty("Env")
-  public abstract ImmutableList<String> env();
+  List<String> env();
 
   @Nullable
   @JsonProperty("Dir")
-  public abstract String dir();
+  String dir();
 
   @Nullable
   @JsonProperty("User")
-  public abstract String user();
+  String user();
 
   @Nullable
   @JsonProperty("Groups")
-  public abstract ImmutableList<String> groups();
+  List<String> groups();
 
   @Nullable
   @JsonProperty("TTY")
-  public abstract Boolean tty();
+  Boolean tty();
 
   @Nullable
   @JsonProperty("Mounts")
-  public abstract ImmutableList<Mount> mounts();
+  List<Mount> mounts();
 
   @Nullable
   @JsonProperty("StopGracePeriod")
-  public abstract Long stopGracePeriod();
+  Long stopGracePeriod();
 
   /**
    * @since API 1.26
    */
   @Nullable
   @JsonProperty("Healthcheck")
-  public abstract ContainerConfig.Healthcheck healthcheck();
+  ContainerConfig.Healthcheck healthcheck();
 
   /**
    * @since API 1.26
    */
   @Nullable
   @JsonProperty("Hosts")
-  public abstract ImmutableList<String> hosts();
+  List<String> hosts();
 
   /**
    * @since API 1.26
    */
   @Nullable
   @JsonProperty("Secrets")
-  public abstract ImmutableList<SecretBind> secrets();
+  List<SecretBind> secrets();
 
   /**
    * @since API 1.30
    */
   @Nullable
   @JsonProperty("Configs")
-  public abstract ImmutableList<ConfigBind> configs();
+  List<ConfigBind> configs();
 
   @Nullable
   @JsonProperty("DNSConfig")
-  public abstract DnsConfig dnsConfig();
+  DnsConfig dnsConfig();
 
   /**
    * @since 1.37
    */
   @Nullable
   @JsonProperty("Init")
-  public abstract Boolean init();
+  Boolean init();
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  interface Builder {
 
-    public abstract Builder image(String image);
+    Builder image(String image);
 
-    abstract ImmutableMap.Builder<String, String> labelsBuilder();
+    Builder addLabel(final String label, final String value);
 
-    public Builder addLabel(final String label, final String value) {
-      labelsBuilder().put(label, value);
-      return this;
-    }
+    Builder hostname(String hostname);
 
-    public abstract Builder hostname(String hostname);
+    Builder labels(Map<String, ? extends String> labels);
 
-    public abstract Builder labels(Map<String, String> labels);
+    Builder command(String... commands);
 
-    public abstract Builder command(String... commands);
+    Builder command(Iterable<String> commands);
 
-    public abstract Builder command(List<String> commands);
+    Builder args(String... args);
 
-    public abstract Builder args(String... args);
+    Builder args(Iterable<String> args);
 
-    public abstract Builder args(List<String> args);
+    Builder env(String... env);
 
-    public abstract Builder env(String... env);
+    Builder env(Iterable<String> env);
 
-    public abstract Builder env(List<String> env);
+    Builder dir(String dir);
 
-    public abstract Builder dir(String dir);
+    Builder user(String user);
 
-    public abstract Builder user(String user);
+    Builder groups(String... groups);
 
-    public abstract Builder groups(String... groups);
+    Builder groups(Iterable<String> groups);
 
-    public abstract Builder groups(List<String> groups);
+    Builder tty(Boolean tty);
 
-    public abstract Builder tty(Boolean tty);
+    Builder mounts(Mount... mounts);
 
-    public abstract Builder mounts(Mount... mounts);
+    Builder mounts(Iterable<? extends Mount> mounts);
 
-    public abstract Builder mounts(List<Mount> mounts);
+    Builder stopGracePeriod(Long stopGracePeriod);
 
-    public abstract Builder stopGracePeriod(Long stopGracePeriod);
+    Builder dnsConfig(DnsConfig dnsConfig);
 
-    public abstract Builder dnsConfig(DnsConfig dnsConfig);
+    Builder healthcheck(ContainerConfig.Healthcheck healthcheck);
 
-    public abstract Builder healthcheck(ContainerConfig.Healthcheck healthcheck);
+    Builder hosts(Iterable<String> hosts);
 
-    public abstract Builder hosts(List<String> hosts);
+    Builder secrets(Iterable<? extends SecretBind> secrets);
 
-    public abstract Builder secrets(List<SecretBind> secrets);
-
-    public abstract Builder configs(List<ConfigBind> configs);
+    Builder configs(Iterable<? extends ConfigBind> configs);
     
-    public abstract Builder init(Boolean init);
+    Builder init(Boolean init);
 
-    public abstract ContainerSpec build();
+    ContainerSpec build();
   }
 
-  public static ContainerSpec.Builder builder() {
-    return new AutoValue_ContainerSpec.Builder();
-  }
-
-  @JsonCreator
-  static ContainerSpec create(
-      @JsonProperty("Image") final String image,
-      @JsonProperty("Labels") final Map<String, String> labels,
-      @JsonProperty("Hostname") final String hostname,
-      @JsonProperty("Command") final List<String> command,
-      @JsonProperty("Args") final List<String> args,
-      @JsonProperty("Env") final List<String> env,
-      @JsonProperty("Dir") final String dir,
-      @JsonProperty("User") final String user,
-      @JsonProperty("Groups") final List<String> groups,
-      @JsonProperty("TTY") final Boolean tty,
-      @JsonProperty("Mounts") final List<Mount> mounts,
-      @JsonProperty("StopGracePeriod") final Long stopGracePeriod,
-      @JsonProperty("Healthcheck") final ContainerConfig.Healthcheck healthcheck,
-      @JsonProperty("Hosts") final List<String> hosts,
-      @JsonProperty("Secrets") final List<SecretBind> secrets,
-      @JsonProperty("DNSConfig") final DnsConfig dnsConfig,
-      @JsonProperty("Configs") final List<ConfigBind> configs,
-      @JsonProperty("Init") final Boolean init) {
-    final Builder builder = builder()
-        .image(image)
-        .hostname(hostname)
-        .args(args)
-        .env(env)
-        .dir(dir)
-        .user(user)
-        .groups(groups)
-        .tty(tty)
-        .mounts(mounts)
-        .stopGracePeriod(stopGracePeriod)
-        .healthcheck(healthcheck)
-        .hosts(hosts)
-        .dnsConfig(dnsConfig)
-        .command(command)
-        .secrets(secrets)
-        .configs(configs)
-        .init(init);
-
-    if (labels != null) {
-      builder.labels(labels);
-    }
-
-    return builder.build();
+  public static Builder builder() {
+    return ImmutableContainerSpec.builder();
   }
 }

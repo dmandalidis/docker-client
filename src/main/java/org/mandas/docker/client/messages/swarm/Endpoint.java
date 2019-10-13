@@ -20,48 +20,30 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
-import com.google.common.collect.ImmutableList;
 import java.util.List;
+
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class Endpoint {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableEndpoint.Builder.class)
+@Immutable
+public interface Endpoint {
 
   @JsonProperty("Spec")
-  public abstract EndpointSpec spec();
+  EndpointSpec spec();
 
   @Nullable
   @JsonProperty("ExposedPorts")
-  public abstract ImmutableList<PortConfig> exposedPorts();
+  List<PortConfig> exposedPorts();
 
   @Nullable
   @JsonProperty("Ports")
-  public abstract ImmutableList<PortConfig> ports();
+  List<PortConfig> ports();
 
   @Nullable
   @JsonProperty("VirtualIPs")
-  public abstract ImmutableList<EndpointVirtualIp> virtualIps();
-
-  @JsonCreator
-  static Endpoint create(
-      @JsonProperty("Spec") final EndpointSpec spec,
-      @JsonProperty("ExposedPorts") final List<PortConfig> exposedPorts,
-      @JsonProperty("Ports") final List<PortConfig> ports,
-      @JsonProperty("VirtualIPs") final List<EndpointVirtualIp> virtualIps) {
-    final ImmutableList<PortConfig> exposedPortsT = exposedPorts == null
-                                                    ? null : ImmutableList.copyOf(exposedPorts);
-    final ImmutableList<PortConfig> portsT = ports == null ? null : ImmutableList.copyOf(ports);
-    final ImmutableList<EndpointVirtualIp> virtualIpsT = virtualIps == null
-                                                         ? null : ImmutableList.copyOf(virtualIps);
-    return new AutoValue_Endpoint(spec, exposedPortsT, portsT, virtualIpsT);
-  }
+  List<EndpointVirtualIp> virtualIps();
 }

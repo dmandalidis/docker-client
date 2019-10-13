@@ -20,65 +20,47 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * An object that represents the JSON returned by the Docker API for low-level information about
  * exec commands.
  */
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class ExecState {
+@JsonDeserialize(builder = ImmutableExecState.Builder.class)
+@Immutable
+public interface ExecState {
 
   @JsonProperty("ID")
-  public abstract String id();
+  String id();
 
   @JsonProperty("Running")
-  public abstract Boolean running();
+  Boolean running();
 
   @Nullable
   @JsonProperty("ExitCode")
-  public abstract Long exitCode();
+  Long exitCode();
 
   @JsonProperty("ProcessConfig")
-  public abstract ProcessConfig processConfig();
+  ProcessConfig processConfig();
 
   @JsonProperty("OpenStdin")
-  public abstract Boolean openStdin();
+  Boolean openStdin();
 
   @JsonProperty("OpenStdout")
-  public abstract Boolean openStdout();
+  Boolean openStdout();
 
   @JsonProperty("OpenStderr")
-  public abstract Boolean openStderr();
+  Boolean openStderr();
 
   @Nullable
   @JsonProperty("Container")
-  public abstract ContainerInfo container();
+  ContainerInfo container();
 
   @Nullable
   @JsonProperty("ContainerID")
-  public abstract String containerId();
-
-  @JsonCreator
-  static ExecState create(
-      @JsonProperty("ID") final String id,
-      @JsonProperty("Running") final Boolean running,
-      @JsonProperty("ExitCode") final Long exitCode,
-      @JsonProperty("ProcessConfig") final ProcessConfig processConfig,
-      @JsonProperty("OpenStdin") final Boolean openStdin,
-      @JsonProperty("OpenStdout") final Boolean openStdout,
-      @JsonProperty("OpenStderr") final Boolean openStderr,
-      @JsonProperty("Container") final ContainerInfo containerInfo,
-      @JsonProperty("ContainerID") final String containerId) {
-    return new AutoValue_ExecState(id, running, exitCode, processConfig, openStdin, openStdout,
-                                   openStderr, containerInfo, containerId);
-  }
+  String containerId();
 }

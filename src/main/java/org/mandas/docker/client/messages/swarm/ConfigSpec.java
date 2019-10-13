@@ -20,42 +20,38 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableMap;
 import java.util.Map;
+
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class ConfigSpec {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableConfigSpec.Builder.class)
+@Immutable
+public interface ConfigSpec {
 
   @JsonProperty("Name")
-  public abstract String name();
+  String name();
 
   @Nullable
   @JsonProperty("Labels")
-  public abstract ImmutableMap<String, String> labels();
+  Map<String, String> labels();
 
   @Nullable
   @JsonProperty("Data")
-  public abstract String data();
+  String data();
 
-  public static ConfigSpec.Builder builder() {
-    return new AutoValue_ConfigSpec.Builder();
+  public static Builder builder() {
+    return ImmutableConfigSpec.builder();
   }
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  interface Builder {
 
-    public abstract ConfigSpec.Builder name(String name);
+    Builder name(String name);
 
-    public abstract ConfigSpec.Builder labels(Map<String, String> labels);
+    Builder labels(Map<String, ? extends String> labels);
 
     /**
      * Base64-url-safe-encoded secret data.
@@ -63,20 +59,8 @@ public abstract class ConfigSpec {
      * @param data the config data.
      * @return the builder
      */
-    public abstract ConfigSpec.Builder data(String data);
+    Builder data(String data);
 
-    public abstract ConfigSpec build();
-  }
-
-  @JsonCreator
-  static ConfigSpec create(
-      @JsonProperty("Name") String name,
-      @JsonProperty("Labels") Map<String, String> labels,
-      @JsonProperty("Data") String data) {
-    return builder()
-        .name(name)
-        .labels(labels)
-        .data(data)
-        .build();
+    ConfigSpec build();
   }
 }

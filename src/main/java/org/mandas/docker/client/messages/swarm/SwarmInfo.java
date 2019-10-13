@@ -20,63 +20,47 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
+import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class SwarmInfo {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableSwarmInfo.Builder.class)
+@Immutable
+public interface SwarmInfo {
 
   @Nullable
   @JsonProperty("Cluster")
-  public abstract SwarmCluster cluster();
+  SwarmCluster cluster();
   
   @JsonProperty("ControlAvailable")
-  public abstract boolean controlAvailable();
+  boolean controlAvailable();
 
   @JsonProperty("Error")
-  public abstract String error();
+  String error();
 
   @JsonProperty("LocalNodeState")
-  public abstract String localNodeState();
+  String localNodeState();
 
   @JsonProperty("NodeAddr")
-  public abstract String nodeAddr();
+  String nodeAddr();
 
   @JsonProperty("NodeID")
-  public abstract String nodeId();
+  String nodeId();
 
   @Nullable
   @JsonProperty("Nodes")
-  public abstract Integer nodes();
+  Integer nodes();
 
   @Nullable
   @JsonProperty("Managers")
-  public abstract Integer managers();
+  Integer managers();
   
   @Nullable
   @JsonProperty("RemoteManagers")
-  public abstract ImmutableList<RemoteManager> remoteManagers();
+  List<RemoteManager> remoteManagers();
 
-  @JsonCreator
-  static SwarmInfo create(
-      @JsonProperty("Cluster") final SwarmCluster cluster,
-      @JsonProperty("ControlAvailable") final boolean controlAvailable,
-      @JsonProperty("Error") final String error,
-      @JsonProperty("LocalNodeState") final String localNodeState,
-      @JsonProperty("NodeAddr") final String nodeAddr,
-      @JsonProperty("NodeID") final String nodeId,
-      @JsonProperty("Nodes") final Integer nodes,
-      @JsonProperty("Managers") final Integer managers,
-      @JsonProperty("RemoteManagers") final ImmutableList<RemoteManager> remoteManagers) {
-    return new AutoValue_SwarmInfo(cluster, controlAvailable, error, localNodeState, nodeAddr, 
-        nodeId, nodes, managers, remoteManagers);
-  }
 }

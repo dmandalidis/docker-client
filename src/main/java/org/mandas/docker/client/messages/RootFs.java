@@ -20,29 +20,19 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
 import java.util.List;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class RootFs {
+import org.immutables.value.Value.Immutable;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableRootFs.Builder.class)
+@Immutable
+public interface RootFs {
   @JsonProperty("Type")
-  public abstract String type();
+  String type();
 
   @JsonProperty("Layers")
-  public abstract List<String> layers();
-
-  @JsonCreator
-  static RootFs create(
-      @JsonProperty("Type") final String type,
-      @JsonProperty("Layers") final List<String> layers) {
-    return new AutoValue_RootFs(type, layers);
-  }
+  List<String> layers();
 }

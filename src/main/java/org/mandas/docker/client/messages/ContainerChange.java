@@ -20,29 +20,28 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
+import org.immutables.value.Value.Immutable;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class ContainerChange {
+@JsonDeserialize(builder = ImmutableContainerChange.Builder.class)
+@Immutable
+public interface ContainerChange {
 
   @JsonProperty("Path")
-  public abstract String path();
+  String path();
 
   @JsonProperty("Kind")
-  public abstract Integer kind();
-
-  @JsonCreator
-  public static ContainerChange create(
-      @JsonProperty("Path") final String path,
-      @JsonProperty("Kind") final Integer kind) {
-    return new AutoValue_ContainerChange(path, kind);
+  Integer kind();
+  
+  static Builder builder() {
+	  return ImmutableContainerChange.builder();
+  }
+  
+  interface Builder {
+	  Builder path(String path);
+	  Builder kind(Integer kind);
+	  ContainerChange build();
   }
 }

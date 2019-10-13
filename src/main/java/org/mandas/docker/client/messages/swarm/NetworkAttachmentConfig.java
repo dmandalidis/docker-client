@@ -20,54 +20,38 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
-
 import java.util.List;
 
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class NetworkAttachmentConfig {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableNetworkAttachmentConfig.Builder.class)
+@Immutable
+public interface NetworkAttachmentConfig {
 
   @Nullable
   @JsonProperty("Target")
-  public abstract String target();
+  String target();
 
   @Nullable
   @JsonProperty("Aliases")
-  public abstract ImmutableList<String> aliases();
+  List<String> aliases();
 
   public static Builder builder() {
-    return new AutoValue_NetworkAttachmentConfig.Builder();
+    return ImmutableNetworkAttachmentConfig.builder();
   }
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  interface Builder {
 
-    public abstract Builder target(String target);
+    Builder target(String target);
 
-    public abstract Builder aliases(String... aliases);
+    Builder aliases(String... aliases);
 
-    public abstract Builder aliases(List<String> aliases);
+    Builder aliases(Iterable<String> aliases);
 
-    public abstract NetworkAttachmentConfig build();
-  }
-
-  @JsonCreator
-  static NetworkAttachmentConfig create(
-      @JsonProperty("Target") final String target,
-      @JsonProperty("Aliases") final List<String> aliases) {
-    return builder()
-        .target(target)
-        .aliases(aliases)
-        .build();
+    NetworkAttachmentConfig build();
   }
 }

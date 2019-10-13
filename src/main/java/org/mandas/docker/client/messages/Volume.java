@@ -20,99 +20,72 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
-import com.google.common.collect.ImmutableMap;
 import java.util.Map;
+
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class Volume {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@Immutable
+@JsonDeserialize(builder = ImmutableVolume.Builder.class)
+public interface Volume {
 
   @Nullable
   @JsonProperty("Name")
-  public abstract String name();
+  String name();
 
   @Nullable
   @JsonProperty("Driver")
-  public abstract String driver();
+  String driver();
 
   @Nullable
   @JsonProperty("DriverOpts")
-  public abstract ImmutableMap<String, String> driverOpts();
+  Map<String, String> driverOpts();
 
   @Nullable
   @JsonProperty("Options")
-  public abstract ImmutableMap<String, String> options();
+  Map<String, String> options();
 
   @Nullable
   @JsonProperty("Labels")
-  public abstract ImmutableMap<String, String> labels();
+  Map<String, String> labels();
 
   @Nullable
   @JsonProperty("Mountpoint")
-  public abstract String mountpoint();
+  String mountpoint();
 
   @Nullable
   @JsonProperty("Scope")
-  public abstract String scope();
+  String scope();
 
   @Nullable
   @JsonProperty("Status")
-  public abstract ImmutableMap<String, String> status();
-
-  @JsonCreator
-  static Volume create(
-      @JsonProperty("Name") final String name,
-      @JsonProperty("Driver") final String driver,
-      @JsonProperty("DriverOpts") final Map<String, String> driverOpts,
-      @JsonProperty("Options") final Map<String, String> options,
-      @JsonProperty("Labels") final Map<String, String> labels,
-      @JsonProperty("Mountpoint") final String mountpoint,
-      @JsonProperty("Scope") final String scope,
-      @JsonProperty("Status") final Map<String, String> status) {
-    return builder()
-        .name(name)
-        .driver(driver)
-        .driverOpts(driverOpts)
-        .options(options)
-        .labels(labels)
-        .mountpoint(mountpoint)
-        .scope(scope)
-        .status(status)
-        .build();
-  }
+  Map<String, String> status();
 
   public static Builder builder() {
-    return new AutoValue_Volume.Builder();
+    return ImmutableVolume.builder();
   }
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  public interface Builder {
 
-    public abstract Builder name(String name);
+    Builder name(String name);
 
-    public abstract Builder driver(String driver);
+    Builder driver(String driver);
 
-    public abstract Builder driverOpts(Map<String, String> driverOpts);
+    Builder driverOpts(Map<String, ? extends String> driverOpts);
 
-    public abstract Builder options(Map<String, String> options);
+    Builder options(Map<String, ? extends String> options);
 
-    public abstract Builder labels(Map<String, String> labels);
+    Builder labels(Map<String, ? extends String> labels);
 
-    public abstract Builder mountpoint(String mountpoint);
+    Builder mountpoint(String mountpoint);
 
-    public abstract Builder scope(String scope);
+    Builder scope(String scope);
 
-    public abstract Builder status(Map<String, String> status);
+    Builder status(Map<String, ? extends String> status);
 
-    public abstract Volume build();
+    Volume build();
   }
 }

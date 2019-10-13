@@ -20,48 +20,34 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.DEFAULT;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
+import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = DEFAULT)
-public abstract class Distribution {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableDistribution.Builder.class)
+@Immutable
+public interface Distribution {
 
   @JsonProperty("Descriptor")
-  public abstract Descriptor descriptor();
+  Descriptor descriptor();
 
   @Nullable
   @JsonProperty("Platforms")
-  public abstract ImmutableList<Platform> platforms();
+  List<Platform> platforms();
 
-  @AutoValue.Builder
-  public abstract static class Builder {
-    public abstract Builder descriptor(Descriptor descriptor);
+  interface Builder {
+    Builder descriptor(Descriptor descriptor);
 
-    public abstract Builder platforms(ImmutableList<Platform> platforms);
+    Builder platforms(Iterable<? extends Platform> platforms);
 
-    public abstract Distribution build();
+    Distribution build();
   }
 
-  public static Builder builder() {
-    return new AutoValue_Distribution.Builder();
-  }
-
-  @JsonCreator
-  static Distribution create(
-          @JsonProperty("Descriptor") Descriptor descriptor,
-          @JsonProperty("Platforms") ImmutableList<Platform> platforms) {
-    return builder()
-            .descriptor(descriptor)
-            .platforms(platforms)
-            .build();
+  static Builder builder() {
+    return ImmutableDistribution.builder();
   }
 }

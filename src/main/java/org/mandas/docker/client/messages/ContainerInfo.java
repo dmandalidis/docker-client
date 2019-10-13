@@ -20,96 +20,91 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import java.util.Date;
-
 import java.util.List;
-import java.util.Map;
+
+import org.immutables.value.Value.Enclosing;
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, setterVisibility = NONE, getterVisibility = NONE)
-public abstract class ContainerInfo {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableContainerInfo.Builder.class)
+@Immutable
+@Enclosing
+public interface ContainerInfo {
 
   @Nullable
   @JsonProperty("Id")
-  public abstract String id();
+  String id();
 
   @JsonProperty("Created")
-  public abstract Date created();
+  Date created();
 
   @JsonProperty("Path")
-  public abstract String path();
+  String path();
 
   @JsonProperty("Args")
-  public abstract ImmutableList<String> args();
+  List<String> args();
 
   @JsonProperty("Config")
-  public abstract ContainerConfig config();
+  ContainerConfig config();
 
   @Nullable
   @JsonProperty("HostConfig")
-  public abstract HostConfig hostConfig();
+  HostConfig hostConfig();
 
   @JsonProperty("State")
-  public abstract ContainerState state();
+  ContainerState state();
 
   @JsonProperty("Image")
-  public abstract String image();
+  String image();
 
   @JsonProperty("NetworkSettings")
-  public abstract NetworkSettings networkSettings();
+  NetworkSettings networkSettings();
 
   @JsonProperty("ResolvConfPath")
-  public abstract String resolvConfPath();
+  String resolvConfPath();
 
   @JsonProperty("HostnamePath")
-  public abstract String hostnamePath();
+  String hostnamePath();
 
   @JsonProperty("HostsPath")
-  public abstract String hostsPath();
+  String hostsPath();
 
   @JsonProperty("Name")
-  public abstract String name();
+  String name();
 
   @JsonProperty("Driver")
-  public abstract String driver();
+  String driver();
 
   @Nullable
   @JsonProperty("ExecDriver")
-  public abstract String execDriver();
+  String execDriver();
 
   @JsonProperty("ProcessLabel")
-  public abstract String processLabel();
+  String processLabel();
 
   @JsonProperty("MountLabel")
-  public abstract String mountLabel();
+  String mountLabel();
 
   @JsonProperty("AppArmorProfile")
-  public abstract String appArmorProfile();
+  String appArmorProfile();
 
   @Nullable
   @JsonProperty("ExecIDs")
-  public abstract ImmutableList<String> execIds();
+  List<String> execIds();
 
   @JsonProperty("LogPath")
-  public abstract String logPath();
+  String logPath();
 
   @JsonProperty("RestartCount")
-  public abstract Long restartCount();
+  Long restartCount();
 
   @Nullable
   @JsonProperty("Mounts")
-  public abstract ImmutableList<ContainerMount> mounts();
+  List<ContainerMount> mounts();
 
   /**
    * This field is an extension defined by the Docker Swarm API, therefore it will only be populated
@@ -117,66 +112,22 @@ public abstract class ContainerInfo {
    */
   @Nullable
   @JsonProperty("Node")
-  public abstract Node node();
+  Node node();
 
-  @JsonCreator
-  static ContainerInfo create(
-      @JsonProperty("Id") final String id,
-      @JsonProperty("Created") final Date created,
-      @JsonProperty("Path") final String path,
-      @JsonProperty("Args") final List<String> args,
-      @JsonProperty("Config") final ContainerConfig containerConfig,
-      @JsonProperty("HostConfig") final HostConfig hostConfig,
-      @JsonProperty("State") final ContainerState containerState,
-      @JsonProperty("Image") final String image,
-      @JsonProperty("NetworkSettings") final NetworkSettings networkSettings,
-      @JsonProperty("ResolvConfPath") final String resolvConfPath,
-      @JsonProperty("HostnamePath") final String hostnamePath,
-      @JsonProperty("HostsPath") final String hostsPath,
-      @JsonProperty("Name") final String name,
-      @JsonProperty("Driver") final String driver,
-      @JsonProperty("ExecDriver") final String execDriver,
-      @JsonProperty("ProcessLabel") final String processLabel,
-      @JsonProperty("MountLabel") final String mountLabel,
-      @JsonProperty("AppArmorProfile") final String appArmorProfile,
-      @JsonProperty("ExecIDs") final List<String> execIds,
-      @JsonProperty("LogPath") final String logPath,
-      @JsonProperty("RestartCount") final Long restartCount,
-      @JsonProperty("Mounts") final List<ContainerMount> mounts,
-      @JsonProperty("Node") final Node node) {
-    final ImmutableList<String> execIdsCopy = execIds == null
-                                              ? null : ImmutableList.copyOf(execIds);
-    final ImmutableList<ContainerMount> mountsCopy = mounts == null
-                                                     ? null : ImmutableList.copyOf(mounts);
-    return new AutoValue_ContainerInfo(
-        id, created, path, ImmutableList.copyOf(args), containerConfig, hostConfig, containerState,
-        image, networkSettings, resolvConfPath, hostnamePath, hostsPath, name, driver, execDriver,
-        processLabel, mountLabel, appArmorProfile, execIdsCopy, logPath, restartCount, mountsCopy, 
-        node);
-  }
-
-  @AutoValue
-  public abstract static class Node {
+  @JsonDeserialize(builder = ImmutableContainerInfo.Node.Builder.class)
+  @Immutable
+  public interface Node {
 
     @JsonProperty("ID")
-    public abstract String id();
+    String id();
 
     @JsonProperty("IP")
-    public abstract String ip();
+    String ip();
 
     @JsonProperty("Addr")
-    public abstract String addr();
+    String addr();
 
     @JsonProperty("Name")
-    public abstract String name();
-
-    @JsonCreator
-    static Node create(
-        @JsonProperty("ID") final String id,
-        @JsonProperty("IP") final String ip,
-        @JsonProperty("Addr") final String addr,
-        @JsonProperty("Name") final String name) {
-      return new AutoValue_ContainerInfo_Node(id, ip, addr, name);
-    }
+    String name();
   }
 }

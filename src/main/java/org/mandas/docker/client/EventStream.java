@@ -25,6 +25,8 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.AbstractIterator;
 import org.mandas.docker.client.messages.Event;
 
+import static com.google.common.base.Throwables.throwIfUnchecked;
+
 import java.io.Closeable;
 import java.io.IOException;
 
@@ -44,7 +46,8 @@ public class EventStream extends AbstractIterator<Event> implements Closeable {
     try {
       event = reader.nextMessage();
     } catch (IOException e) {
-      throw Throwables.propagate(e);
+    	throwIfUnchecked(e);
+        throw new RuntimeException(e);
     }
     if (event == null) {
       return endOfData();
@@ -57,7 +60,8 @@ public class EventStream extends AbstractIterator<Event> implements Closeable {
     try {
       reader.close();
     } catch (IOException e) {
-      throw Throwables.propagate(e);
+    	throwIfUnchecked(e);
+        throw new RuntimeException(e);
     }
   }
 }

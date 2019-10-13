@@ -20,24 +20,17 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
+import org.immutables.value.Value.Immutable;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class UnlockKey {
+@JsonDeserialize(builder = ImmutableUnlockKey.Builder.class)
+@Immutable
+public interface UnlockKey {
 
   @JsonProperty("UnlockKey")
-  public abstract String unlockKey();
+  String unlockKey();
 
-  @JsonCreator
-  static UnlockKey create(@JsonProperty("UnlockKey") final String unlockKey) {
-    return new AutoValue_UnlockKey(unlockKey);
-  }
 }

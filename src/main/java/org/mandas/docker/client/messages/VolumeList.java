@@ -20,38 +20,23 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
-import com.google.common.collect.ImmutableList;
 import java.util.List;
+
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class VolumeList {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableVolumeList.Builder.class)
+@Immutable
+public interface VolumeList {
 
   @Nullable
   @JsonProperty("Volumes")
-  public abstract ImmutableList<Volume> volumes();
+  List<Volume> volumes();
 
   @Nullable
   @JsonProperty("Warnings")
-  public abstract ImmutableList<String> warnings();
-
-  @JsonCreator
-  static VolumeList create(
-      @JsonProperty("Volumes") final List<Volume> volumes,
-      @JsonProperty("Warnings") final List<String> warnings) {
-    final ImmutableList<Volume> volumesCopy = volumes == null
-                                               ? null : ImmutableList.copyOf(volumes);
-    final ImmutableList<String> warningsCopy = warnings == null
-                                               ? null : ImmutableList.copyOf(warnings);
-    return new AutoValue_VolumeList(volumesCopy, warningsCopy);
-  }
+  List<String> warnings();
 }

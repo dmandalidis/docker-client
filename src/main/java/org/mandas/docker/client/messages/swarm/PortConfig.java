@@ -20,78 +20,58 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
+import org.immutables.value.Value.Immutable;
+import org.mandas.docker.Nullable;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.google.auto.value.AutoValue;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import org.mandas.docker.Nullable;
-
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class PortConfig {
+@JsonDeserialize(builder = ImmutablePortConfig.Builder.class)
+@Immutable
+public interface PortConfig {
 
   public static final String PROTOCOL_TCP = "tcp";
   public static final String PROTOCOL_UDP = "udp";
 
   @Nullable
   @JsonProperty("Name")
-  public abstract String name();
+  String name();
 
   @Nullable
   @JsonProperty("Protocol")
-  public abstract String protocol();
+  String protocol();
 
   @Nullable
   @JsonProperty("TargetPort")
-  public abstract Integer targetPort();
+  Integer targetPort();
 
   @Nullable
   @JsonProperty("PublishedPort")
-  public abstract Integer publishedPort();
+  Integer publishedPort();
 
   @Nullable
   @JsonProperty("PublishMode")
-  public abstract PortConfigPublishMode publishMode();
+  PortConfigPublishMode publishMode();
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  interface Builder {
 
-    public abstract Builder name(String name);
+    Builder name(String name);
 
-    public abstract Builder protocol(String protocol);
+    Builder protocol(String protocol);
 
-    public abstract Builder targetPort(Integer targetPort);
+    Builder targetPort(Integer targetPort);
 
-    public abstract Builder publishedPort(Integer publishedPort);
+    Builder publishedPort(Integer publishedPort);
 
-    public abstract Builder publishMode(PortConfigPublishMode publishMode);
+    Builder publishMode(PortConfigPublishMode publishMode);
 
-    public abstract PortConfig build();
+    PortConfig build();
   }
 
-  public static PortConfig.Builder builder() {
-    return new AutoValue_PortConfig.Builder();
-  }
-
-  @JsonCreator
-  static PortConfig create(
-      @JsonProperty("Name") final String name,
-      @JsonProperty("Protocol") final String protocol,
-      @JsonProperty("TargetPort") final Integer targetPort,
-      @JsonProperty("PublishedPort") final Integer publishedPort,
-      @JsonProperty("PublishMode") final PortConfigPublishMode publishMode) {
-    return builder()
-        .name(name)
-        .protocol(protocol)
-        .targetPort(targetPort)
-        .publishedPort(publishedPort)
-        .publishMode(publishMode)
-        .build();
+  public static Builder builder() {
+    return ImmutablePortConfig.builder();
   }
 
   public enum PortConfigPublishMode {

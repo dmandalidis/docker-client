@@ -20,63 +20,44 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class SecretFile {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableSecretFile.Builder.class)
+@Immutable
+public interface SecretFile {
   @JsonProperty("Name")
-  public abstract String name();
+  String name();
 
   @Nullable
   @JsonProperty("UID")
-  public abstract String uid();
+  String uid();
 
   @Nullable
   @JsonProperty("GID")
-  public abstract String gid();
+  String gid();
 
   @Nullable
   @JsonProperty("Mode")
-  public abstract Long mode();
+  Long mode();
 
   public static Builder builder() {
-    return new AutoValue_SecretFile.Builder();
+    return ImmutableSecretFile.builder();
   }
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  interface Builder {
 
-    public abstract Builder name(String name);
+    Builder name(String name);
 
-    public abstract Builder uid(String uid);
+    Builder uid(String uid);
 
-    public abstract Builder gid(String gid);
+    Builder gid(String gid);
 
-    public abstract Builder mode(Long mode);
+    Builder mode(Long mode);
 
-    public abstract SecretFile build();
-  }
-
-  @JsonCreator
-  static SecretFile create(
-         @JsonProperty("Name") String name,
-         @JsonProperty("UID") String uid,
-         @JsonProperty("GID") String gid,
-         @JsonProperty("Mode") Long mode) {
-    return builder()
-        .name(name)
-        .uid(uid)
-        .gid(gid)
-        .mode(mode)
-        .build();
+    SecretFile build();
   }
 }

@@ -20,37 +20,25 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
-import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class ExternalCa {
+import org.immutables.value.Value.Immutable;
 
-  public static final String PROTOCOL_CFSSL = "cfssl";
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableExternalCa.Builder.class)
+@Immutable
+public interface ExternalCa {
+
+  static final String PROTOCOL_CFSSL = "cfssl";
 
   @JsonProperty("Protocol")
-  public abstract String protocol();
+  String protocol();
 
   @JsonProperty("URL")
-  public abstract String url();
+  String url();
 
   @JsonProperty("Options")
-  public abstract ImmutableMap<String, String> options();
-
-  @JsonCreator
-  static ExternalCa create(
-      @JsonProperty("Protocol") final String protocol,
-      @JsonProperty("URL") final String url,
-      @JsonProperty("Options") final Map<String, String> options) {
-    return new AutoValue_ExternalCa(protocol, url, ImmutableMap.copyOf(options));
-  }
+  Map<String, String> options();
 }

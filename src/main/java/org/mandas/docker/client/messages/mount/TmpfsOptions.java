@@ -20,52 +20,37 @@
 
 package org.mandas.docker.client.messages.mount;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class TmpfsOptions {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableTmpfsOptions.Builder.class)
+@Immutable
+public interface TmpfsOptions {
 
   @Nullable
   @JsonProperty("SizeBytes")
-  public abstract Long sizeBytes();
+  Long sizeBytes();
 
   /**
    * The mode and permission bits.
    */
   @Nullable
   @JsonProperty("Mode")
-  public abstract Integer mode();
+  Integer mode();
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  interface Builder {
 
-    public abstract Builder sizeBytes(Long sizeBytes);
+    Builder sizeBytes(Long sizeBytes);
 
-    public abstract Builder mode(Integer mode);
+    Builder mode(Integer mode);
 
-    public abstract TmpfsOptions build();
+    TmpfsOptions build();
   }
 
   public static TmpfsOptions.Builder builder() {
-    return new AutoValue_TmpfsOptions.Builder();
-  }
-
-  @JsonCreator
-  static TmpfsOptions create(
-      @JsonProperty("SizeBytes") final Long sizeBytes,
-      @JsonProperty("Labels") final Integer mode) {
-    return builder()
-        .sizeBytes(sizeBytes)
-        .mode(mode)
-        .build();
+    return ImmutableTmpfsOptions.builder();
   }
 }

@@ -22,38 +22,24 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
-import com.google.common.collect.ImmutableList;
 import java.util.List;
+
+import org.immutables.value.Value.Immutable;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * Raw results from the "top" (or "ps") command for a specific container.
  */
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class TopResults {
+@JsonDeserialize(builder = ImmutableTopResults.Builder.class)
+@Immutable
+public interface TopResults {
 
   @JsonProperty("Titles")
-  public abstract ImmutableList<String> titles();
+  List<String> titles();
 
   @JsonProperty("Processes")
-  public abstract ImmutableList<ImmutableList<String>> processes();
+  List<List<String>> processes();
 
-  @JsonCreator
-  static TopResults create(
-      @JsonProperty("Titles") final List<String> titles,
-      @JsonProperty("Processes") final List<List<String>> processes) {
-    final ImmutableList.Builder<ImmutableList<String>> processesBuilder = ImmutableList.builder();
-    for (final List<String> process : processes) {
-      processesBuilder.add(ImmutableList.copyOf(process));
-    }
-    return new AutoValue_TopResults(ImmutableList.copyOf(titles), processesBuilder.build());
-  }
 }

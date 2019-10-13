@@ -20,43 +20,43 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class UpdateConfig {
+
+@JsonDeserialize(builder = ImmutableUpdateConfig.Builder.class)
+@Immutable
+public interface UpdateConfig {
 
   @Nullable
   @JsonProperty("Parallelism")
-  public abstract Long parallelism();
+  Long parallelism();
 
   @Nullable
   @JsonProperty("Delay")
-  public abstract Long delay();
+  Long delay();
 
   @Nullable
   @JsonProperty("FailureAction")
-  public abstract String failureAction();
+  String failureAction();
 
   @Nullable
   @JsonProperty("Order")
-  public abstract String order();
+  String order();
 
-  @JsonCreator
   public static UpdateConfig create(
-      @JsonProperty("Parallelism") final Long parallelism,
-      @JsonProperty("Delay") final Long delay,
-      @JsonProperty("FailureAction") final String failureAction,
-      @JsonProperty("Order") final String order) {
-    return new AutoValue_UpdateConfig(parallelism, delay, failureAction, order);
+      final Long parallelism,
+      final Long delay,
+      final String failureAction,
+      final String order) {
+	  
+    return ImmutableUpdateConfig.builder()
+    		.parallelism(parallelism)
+    		.delay(delay)
+    		.failureAction(failureAction)
+    		.order(order).build();
   }
 }

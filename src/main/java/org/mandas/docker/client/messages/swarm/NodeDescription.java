@@ -20,31 +20,24 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
+import org.immutables.value.Value.Immutable;
 
-@AutoValue
-public abstract class NodeDescription {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableNodeDescription.Builder.class)
+@Immutable
+public interface NodeDescription {
 
   @JsonProperty("Hostname")
-  public abstract String hostname();
+  String hostname();
 
   @JsonProperty("Platform")
-  public abstract Platform platform();
+  Platform platform();
 
   @JsonProperty("Resources")
-  public abstract Resources resources();
+  Resources resources();
 
   @JsonProperty("Engine")
-  public abstract EngineConfig engine();
-
-  @JsonCreator
-  static NodeDescription create(@JsonProperty("Hostname") final String hostname,
-      @JsonProperty("Platform") final Platform platform,
-      @JsonProperty("Resources") final Resources resources,
-      @JsonProperty("Engine") final EngineConfig engine) {
-    return new AutoValue_NodeDescription(hostname, platform, resources, engine);
-  }
-
+  EngineConfig engine();
 }

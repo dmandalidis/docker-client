@@ -20,42 +20,29 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class DispatcherConfig {
+
+@JsonDeserialize(builder = ImmutableDispatcherConfig.Builder.class)
+@Immutable
+public interface DispatcherConfig {
 
   @Nullable
   @JsonProperty("HeartbeatPeriod")
-  public abstract Long heartbeatPeriod();
+  Long heartbeatPeriod();
 
-  @JsonCreator
-  public static DispatcherConfig create(
-      @JsonProperty("HeartbeatPeriod") final Long heartbeatPeriod) {
-    return builder()
-        .heartbeatPeriod(heartbeatPeriod)
-        .build();
-  }
+  interface Builder {
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+    Builder heartbeatPeriod(Long heartbeatPeriod);
 
-    public abstract Builder heartbeatPeriod(Long heartbeatPeriod);
-
-    public abstract DispatcherConfig build();
+    DispatcherConfig build();
   }
 
   public static DispatcherConfig.Builder builder() {
-    return new AutoValue_DispatcherConfig.Builder();
+    return ImmutableDispatcherConfig.builder();
   }
 }

@@ -20,42 +20,28 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class OrchestrationConfig {
+
+@JsonDeserialize(builder = ImmutableOrchestrationConfig.Builder.class)
+@Immutable
+public interface OrchestrationConfig {
 
   @Nullable
   @JsonProperty("TaskHistoryRetentionLimit")
-  public abstract Integer taskHistoryRetentionLimit();
+  Integer taskHistoryRetentionLimit();
 
-  @JsonCreator
-  static OrchestrationConfig create(
-      @JsonProperty("TaskHistoryRetentionLimit") final Integer taskHistoryRetentionLimit) {
-    return builder()
-        .taskHistoryRetentionLimit(taskHistoryRetentionLimit)
-        .build();
+  interface Builder {
+    Builder taskHistoryRetentionLimit(Integer taskHistoryRetentionLimit);
+
+    OrchestrationConfig build();
   }
 
-  @AutoValue.Builder
-  public abstract static class Builder {
-
-    public abstract Builder taskHistoryRetentionLimit(Integer taskHistoryRetentionLimit);
-
-    public abstract OrchestrationConfig build();
-  }
-
-  public static OrchestrationConfig.Builder builder() {
-    return new AutoValue_OrchestrationConfig.Builder();
+  public static Builder builder() {
+    return ImmutableOrchestrationConfig.builder();
   }
 }

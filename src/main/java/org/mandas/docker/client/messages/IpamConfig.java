@@ -20,36 +20,39 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class IpamConfig {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableIpamConfig.Builder.class)
+@Immutable
+public interface IpamConfig {
 
   @Nullable
   @JsonProperty("Subnet")
-  public abstract String subnet();
+  String subnet();
 
   @Nullable
   @JsonProperty("IPRange")
-  public abstract String ipRange();
+  String ipRange();
 
   @Nullable
   @JsonProperty("Gateway")
-  public abstract String gateway();
-
-  @JsonCreator
-  public static IpamConfig create(
-      @JsonProperty("Subnet") final String subnet,
-      @JsonProperty("IPRange") final String ipRange,
-      @JsonProperty("Gateway") final String gateway) {
-    return new AutoValue_IpamConfig(subnet, ipRange, gateway);
+  String gateway();
+  
+  interface Builder {
+	  Builder subnet(String subnet);
+	  
+	  Builder ipRange(String subnet);
+	  
+	  Builder gateway(String subnet);
+	  
+	  IpamConfig build();
+  }
+  
+  static Builder builder() {
+	  return ImmutableIpamConfig.builder();
   }
 }

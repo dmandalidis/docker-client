@@ -20,120 +20,118 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
-
 import java.util.List;
+
+import org.immutables.value.Value.Enclosing;
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class EndpointConfig {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableEndpointConfig.Builder.class)
+@Immutable
+@Enclosing
+public interface EndpointConfig {
 
   @Nullable
   @JsonProperty("IPAMConfig")
-  public abstract EndpointIpamConfig ipamConfig();
+  EndpointIpamConfig ipamConfig();
 
   @Nullable
   @JsonProperty("Links")
-  public abstract ImmutableList<String> links();
+  List<String> links();
 
   @Nullable
   @JsonProperty("Aliases")
-  public abstract ImmutableList<String> aliases();
+  List<String> aliases();
 
   @Nullable
   @JsonProperty("Gateway")
-  public abstract String gateway();
+  String gateway();
 
   @Nullable
   @JsonProperty("IPAddress")
-  public abstract String ipAddress();
+  String ipAddress();
 
   @Nullable
   @JsonProperty("IPPrefixLen")
-  public abstract Integer ipPrefixLen();
+  Integer ipPrefixLen();
 
   @Nullable
   @JsonProperty("IPv6Gateway")
-  public abstract String ipv6Gateway();
+  String ipv6Gateway();
 
   @Nullable
   @JsonProperty("GlobalIPv6Address")
-  public abstract String globalIPv6Address();
+  String globalIPv6Address();
 
   @Nullable
   @JsonProperty("GlobalIPv6PrefixLen")
-  public abstract Integer globalIPv6PrefixLen();
+  Integer globalIPv6PrefixLen();
 
   @Nullable
   @JsonProperty("MacAddress")
-  public abstract String macAddress();
+  String macAddress();
 
   public static Builder builder() {
-    return new AutoValue_EndpointConfig.Builder();
+    return ImmutableEndpointConfig.builder();
   }
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  interface Builder {
 
-    public abstract Builder ipamConfig(EndpointIpamConfig ipamConfig);
+    Builder ipamConfig(EndpointIpamConfig ipamConfig);
 
-    public abstract Builder links(List<String> links);
+    Builder links(Iterable<String> links);
 
-    public abstract Builder aliases(ImmutableList<String> aliases);
+    Builder aliases(Iterable<String> aliases);
 
-    public abstract Builder gateway(String gateway);
+    Builder gateway(String gateway);
 
-    public abstract Builder ipAddress(String ipAddress);
+    Builder ipAddress(String ipAddress);
 
-    public abstract Builder ipPrefixLen(Integer ipPrefixLen);
+    Builder ipPrefixLen(Integer ipPrefixLen);
 
-    public abstract Builder ipv6Gateway(String ipv6Gateway);
+    Builder ipv6Gateway(String ipv6Gateway);
 
-    public abstract Builder globalIPv6Address(String globalIPv6Address);
+    Builder globalIPv6Address(String globalIPv6Address);
 
-    public abstract Builder globalIPv6PrefixLen(Integer globalIPv6PrefixLen);
+    Builder globalIPv6PrefixLen(Integer globalIPv6PrefixLen);
 
-    public abstract Builder macAddress(String macAddress);
+    Builder macAddress(String macAddress);
 
-    public abstract EndpointConfig build();
+    EndpointConfig build();
   }
 
-  @AutoValue
-  public abstract static class EndpointIpamConfig {
+  @JsonDeserialize(builder = ImmutableEndpointConfig.EndpointIpamConfig.Builder.class)
+  @Immutable
+  public interface EndpointIpamConfig {
 
     @Nullable
     @JsonProperty("IPv4Address")
-    public abstract String ipv4Address();
+    String ipv4Address();
 
     @Nullable
     @JsonProperty("IPv6Address")
-    public abstract String ipv6Address();
+    String ipv6Address();
 
     @Nullable
     @JsonProperty("LinkLocalIPs")
-    public abstract ImmutableList<String> linkLocalIPs();
+    List<String> linkLocalIPs();
 
     public static Builder builder() {
-      return new AutoValue_EndpointConfig_EndpointIpamConfig.Builder();
+      return ImmutableEndpointConfig.EndpointIpamConfig.builder();
     }
 
-    @AutoValue.Builder
-    public abstract static class Builder {
+    interface Builder {
 
-      public abstract Builder ipv4Address(String ipv4Address);
+      Builder ipv4Address(String ipv4Address);
 
-      public abstract Builder ipv6Address(String ipv6Address);
+      Builder ipv6Address(String ipv6Address);
 
-      public abstract Builder linkLocalIPs(List<String> linkLocalIPs);
+      Builder linkLocalIPs(Iterable<String> linkLocalIPs);
 
-      public abstract EndpointIpamConfig build();
+      EndpointIpamConfig build();
     }
   }
 }

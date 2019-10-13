@@ -20,101 +20,71 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
-
-import com.google.common.collect.ImmutableMap;
 import java.util.List;
 import java.util.Map;
+
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class ServiceSpec {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableServiceSpec.Builder.class)
+@Immutable
+public interface ServiceSpec {
 
   @Nullable
   @JsonProperty("Name")
-  public abstract String name();
+  String name();
 
   @Nullable
   @JsonProperty("Labels")
-  public abstract ImmutableMap<String, String> labels();
+  Map<String, String> labels();
 
   @JsonProperty("TaskTemplate")
-  public abstract TaskSpec taskTemplate();
+  TaskSpec taskTemplate();
 
   @Nullable
   @JsonProperty("Mode")
-  public abstract ServiceMode mode();
+  ServiceMode mode();
 
   @Nullable
   @JsonProperty("UpdateConfig")
-  public abstract UpdateConfig updateConfig();
+  UpdateConfig updateConfig();
 
   @Nullable
   @JsonProperty("Networks")
-  public abstract ImmutableList<NetworkAttachmentConfig> networks();
+  List<NetworkAttachmentConfig> networks();
 
   @Nullable
   @JsonProperty("EndpointSpec")
-  public abstract EndpointSpec endpointSpec();
+  EndpointSpec endpointSpec();
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  interface Builder {
 
-    public abstract Builder name(String name);
+    Builder name(String name);
 
-    abstract ImmutableMap.Builder<String, String> labelsBuilder();
+    Builder addLabel(final String label, final String value);
 
-    public Builder addLabel(final String label, final String value) {
-      labelsBuilder().put(label, value);
-      return this;
-    }
+    Builder labels(Map<String, ? extends String> labels);
 
-    public abstract Builder labels(Map<String, String> labels);
+    Builder taskTemplate(TaskSpec taskTemplate);
 
-    public abstract Builder taskTemplate(TaskSpec taskTemplate);
+    Builder mode(ServiceMode mode);
 
-    public abstract Builder mode(ServiceMode mode);
+    Builder updateConfig(UpdateConfig updateConfig);
 
-    public abstract Builder updateConfig(UpdateConfig updateConfig);
+    Builder networks(NetworkAttachmentConfig... networks);
 
-    public abstract Builder networks(NetworkAttachmentConfig... networks);
+    Builder networks(Iterable<? extends NetworkAttachmentConfig> networks);
 
-    public abstract Builder networks(List<NetworkAttachmentConfig> networks);
+    Builder endpointSpec(EndpointSpec endpointSpec);
 
-    public abstract Builder endpointSpec(EndpointSpec endpointSpec);
-
-    public abstract ServiceSpec build();
+    ServiceSpec build();
   }
 
-  public static ServiceSpec.Builder builder() {
-    return new AutoValue_ServiceSpec.Builder();
+  public static Builder builder() {
+    return ImmutableServiceSpec.builder();
   }
 
-  @JsonCreator
-  static ServiceSpec create(
-      @JsonProperty("Name") final String name,
-      @JsonProperty("Labels") final Map<String, String> labels,
-      @JsonProperty("TaskTemplate") final TaskSpec taskTemplate,
-      @JsonProperty("Mode") final ServiceMode mode,
-      @JsonProperty("UpdateConfig") final UpdateConfig updateConfig,
-      @JsonProperty("Networks") final List<NetworkAttachmentConfig> networks,
-      @JsonProperty("EndpointSpec") final EndpointSpec endpointSpec) {
-    return builder()
-        .name(name)
-        .labels(labels)
-        .taskTemplate(taskTemplate)
-        .mode(mode)
-        .updateConfig(updateConfig)
-        .endpointSpec(endpointSpec)
-        .networks(networks)
-        .build();
-  }
 }

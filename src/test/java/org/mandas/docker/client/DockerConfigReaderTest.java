@@ -45,17 +45,12 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.common.io.Resources;
-import org.mandas.docker.client.DockerCredentialHelper.CredentialHelperDelegate;
-import org.mandas.docker.client.messages.DockerCredentialHelperAuth;
-import org.mandas.docker.client.messages.RegistryAuth;
-import org.mandas.docker.client.messages.RegistryConfigs;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
 import org.apache.commons.lang.RandomStringUtils;
 import org.hamcrest.CustomTypeSafeMatcher;
 import org.hamcrest.Matcher;
@@ -64,6 +59,12 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mandas.docker.client.DockerCredentialHelper.CredentialHelperDelegate;
+import org.mandas.docker.client.messages.DockerCredentialHelperAuth;
+import org.mandas.docker.client.messages.RegistryAuth;
+import org.mandas.docker.client.messages.RegistryConfigs;
+
+import com.google.common.io.Resources;
 
 @SuppressWarnings("deprecated")
 public class DockerConfigReaderTest {
@@ -241,17 +242,17 @@ public class DockerConfigReaderTest {
     final String registry2 = "https://adventure.zone";
     final String registry3 = "https://beyond.zone";
     final DockerCredentialHelperAuth testAuth1 =
-            DockerCredentialHelperAuth.create(
-                    "cool user",
-                    "cool password",
-                    registry1
-            );
+            DockerCredentialHelperAuth.builder()
+                    .username("cool user")
+                    .secret("cool password")
+                    .serverUrl(registry1)
+                    .build();
     final DockerCredentialHelperAuth testAuth2 =
-            DockerCredentialHelperAuth.create(
-                    "taako",
-                    "lupe",
-                    registry2
-            );
+            DockerCredentialHelperAuth.builder()
+                    .username("taako")
+                    .secret("lupe")
+                    .serverUrl(registry2)
+                    .build();
 
     when(credentialHelperDelegate.get("a-cred-helper", registry1)).thenReturn(testAuth1);
     when(credentialHelperDelegate.get("magic-missile", registry2)).thenReturn(testAuth2);
@@ -278,11 +279,11 @@ public class DockerConfigReaderTest {
     // credsStore value which will trigger our mock and give us testAuth2.
     final String registry2 = "https://adventure.zone";
     final DockerCredentialHelperAuth testAuth2 =
-        DockerCredentialHelperAuth.create(
-            "taako",
-            "lupe",
-            registry2
-        );
+        DockerCredentialHelperAuth.builder()
+	        .username("taako")
+	        .secret("lupe")
+	        .serverUrl(registry2)
+	        .build();
     when(credentialHelperDelegate.get("magic-missile", registry2)).thenReturn(testAuth2);
     assertThat(reader.authForRegistry(path, registry2), is(testAuth2.toRegistryAuth()));
 
@@ -290,11 +291,12 @@ public class DockerConfigReaderTest {
     // to using the credsStore value, and our mock will return testAuth3.
     final String registry3 = "https://rush.in";
     final DockerCredentialHelperAuth testAuth3 =
-        DockerCredentialHelperAuth.create(
-            "magnus",
-            "julia",
-            registry3
-        );
+        DockerCredentialHelperAuth.builder()
+	        .username("magnus")
+	        .secret("julia")
+	        .serverUrl(registry3)
+	        .build();
+
     when(credentialHelperDelegate.get("starblaster", registry3)).thenReturn(testAuth3);
     assertThat(reader.authForRegistry(path, registry3), is(testAuth3.toRegistryAuth()));
 
@@ -315,11 +317,11 @@ public class DockerConfigReaderTest {
 
     final String registry = "https://index.docker.io/v1/";
     final DockerCredentialHelperAuth testAuth =
-        DockerCredentialHelperAuth.create(
-            "dockerman",
-            "sw4gy0lo",
-            registry
-        );
+        DockerCredentialHelperAuth.builder()
+	        .username("dockerman")
+	        .secret("sw4gy0lo")
+	        .serverUrl(registry)
+	        .build();
     when(credentialHelperDelegate.get("magic-missile", registry)).thenReturn(testAuth);
 
     // Test that for duplicate registries, credHelpers is preferred over auths.

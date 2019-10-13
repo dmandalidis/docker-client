@@ -20,81 +20,58 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
 import java.util.Date;
+
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class ImageInfo {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableImageInfo.Builder.class)
+@Immutable
+public interface ImageInfo {
 
   @JsonProperty("Id")
-  public abstract String id();
+  String id();
 
   @JsonProperty("Parent")
-  public abstract String parent();
+  String parent();
 
   @JsonProperty("Comment")
-  public abstract String comment();
+  String comment();
 
   @JsonProperty("Created")
-  public abstract Date created();
+  Date created();
 
   @JsonProperty("Container")
-  public abstract String container();
+  String container();
 
   @JsonProperty("ContainerConfig")
-  public abstract ContainerConfig containerConfig();
+  ContainerConfig containerConfig();
 
   @JsonProperty("DockerVersion")
-  public abstract String dockerVersion();
+  String dockerVersion();
 
   @JsonProperty("Author")
-  public abstract String author();
+  String author();
 
   @JsonProperty("Config")
-  public abstract ContainerConfig config();
+  ContainerConfig config();
 
   @JsonProperty("Architecture")
-  public abstract String architecture();
+  String architecture();
 
   @JsonProperty("Os")
-  public abstract String os();
+  String os();
 
   @JsonProperty("Size")
-  public abstract Long size();
+  Long size();
 
   @JsonProperty("VirtualSize")
-  public abstract Long virtualSize();
+  Long virtualSize();
 
   @Nullable
   @JsonProperty("RootFS")
-  public abstract RootFs rootFs();
-
-  @JsonCreator
-  static ImageInfo create(
-      @JsonProperty("Id") final String id,
-      @JsonProperty("Parent") final String parent,
-      @JsonProperty("Comment") final String comment,
-      @JsonProperty("Created") final Date created,
-      @JsonProperty("Container") final String container,
-      @JsonProperty("ContainerConfig") final ContainerConfig containerConfig,
-      @JsonProperty("DockerVersion") final String dockerVersion,
-      @JsonProperty("Author") final String author,
-      @JsonProperty("Config") final ContainerConfig config,
-      @JsonProperty("Architecture") final String architecture,
-      @JsonProperty("Os") final String os,
-      @JsonProperty("Size") final Long size,
-      @JsonProperty("VirtualSize") final Long virtualSize,
-      @JsonProperty("RootFS") final RootFs rootFs) {
-    return new AutoValue_ImageInfo(id, parent, comment, created, container, containerConfig,
-        dockerVersion, author, config, architecture, os, size, virtualSize, rootFs);
-  }
+  RootFs rootFs();
 }
