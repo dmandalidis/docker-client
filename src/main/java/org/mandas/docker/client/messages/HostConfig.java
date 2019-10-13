@@ -748,7 +748,8 @@ public abstract class HostConfig {
       return new AutoValue_HostConfig_Bind.Builder().readOnly(false);
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
       if (isNullOrEmpty(to())) {
         return "";
       } else if (isNullOrEmpty(from())) {

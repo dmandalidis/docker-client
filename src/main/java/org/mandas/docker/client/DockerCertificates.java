@@ -181,10 +181,12 @@ public class DockerCertificates implements DockerCertificatesStore {
     }
   }
 
+  @Override
   public SSLContext sslContext() {
     return this.sslContext;
   }
 
+  @Override
   public HostnameVerifier hostnameVerifier() {
     return NoopHostnameVerifier.INSTANCE;
   }

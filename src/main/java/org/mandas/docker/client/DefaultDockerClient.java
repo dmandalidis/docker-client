@@ -534,6 +534,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
     return hostnameWithWildcards.replace(".", "\\.").replace("*", ".*");
   }
 
+  @Override
   public String getHost() {
     return fromNullable(uri.getHost()).or("localhost");
   }

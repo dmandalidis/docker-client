@@ -98,5 +98,6 @@ public interface LogStream extends Iterator<LogMessage>, Closeable {
   /**
    * Redefine to not throw checked exceptions.
    */
+  @Override
   void close();
 }

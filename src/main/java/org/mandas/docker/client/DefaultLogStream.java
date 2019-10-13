@@ -72,7 +72,8 @@ class DefaultLogStream extends AbstractIterator<LogMessage> implements LogStream
     }
   }
 
-  public String readFully() {
+  @Override
+public String readFully() {
     final StringBuilder stringBuilder = new StringBuilder();
     while (hasNext()) {
       stringBuilder.append(UTF_8.decode(next().content()));
@@ -80,10 +81,12 @@ class DefaultLogStream extends AbstractIterator<LogMessage> implements LogStream
     return stringBuilder.toString();
   }
 
+  @Override
   public void attach(final OutputStream stdout, final OutputStream stderr) throws IOException {
     attach(stdout, stderr, true);
   }
 
+  @Override
   public void attach(final OutputStream stdout, final OutputStream stderr, boolean closeAtEof)
       throws IOException {
     final Closer closer = Closer.create();
