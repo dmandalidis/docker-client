@@ -31,7 +31,7 @@ import com.google.common.collect.ImmutableMap;
 import org.mandas.docker.client.messages.RegistryAuth;
 
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.mandas.docker.Nullable;
 
 /**
  * Represents the contents of the docker config.json file.

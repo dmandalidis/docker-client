@@ -32,7 +32,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.Nullable;
+import org.mandas.docker.Nullable;
 
 @AutoValue
 @JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
