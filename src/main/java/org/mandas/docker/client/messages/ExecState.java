@@ -27,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import javax.annotation.Nullable;
+import org.mandas.docker.Nullable;
 
 /**
  * An object that represents the JSON returned by the Docker API for low-level information about

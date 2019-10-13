@@ -33,7 +33,7 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.mandas.docker.Nullable;
 
 @AutoValue
 @JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)

@@ -35,7 +35,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import java.io.IOException;
 import java.util.Base64;
 
-import javax.annotation.Nullable;
+import org.mandas.docker.Nullable;
 
 /**
  * Represents all the auth info for a particular registry.

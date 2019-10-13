@@ -30,7 +30,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 
-import javax.annotation.Nullable;
+import org.mandas.docker.Nullable;
 
 /**
  * An object that represents the JSON returned by the Docker API for an exec command's process
