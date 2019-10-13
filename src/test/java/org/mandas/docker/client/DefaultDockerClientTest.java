@@ -25,6 +25,49 @@ import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static com.google.common.collect.Lists.newArrayList;
+import static java.lang.String.format;
+import static java.lang.System.getenv;
+import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
+import static org.apache.commons.lang.StringUtils.containsIgnoreCase;
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.any;
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.anything;
+import static org.hamcrest.Matchers.both;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.either;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.isIn;
+import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.hamcrest.collection.IsMapContaining.hasEntry;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeFalse;
+import static org.junit.Assume.assumeTrue;
 import static org.mandas.docker.client.DefaultDockerClient.NO_TIMEOUT;
 import static org.mandas.docker.client.DockerClient.EventsParam.since;
 import static org.mandas.docker.client.DockerClient.EventsParam.type;
@@ -58,50 +101,6 @@ import static org.mandas.docker.client.messages.Network.Type.BUILTIN;
 import static org.mandas.docker.client.messages.RemovedImage.Type.UNTAGGED;
 import static org.mandas.docker.client.messages.swarm.PortConfig.PROTOCOL_TCP;
 import static org.mandas.docker.client.messages.swarm.RestartPolicy.RESTART_POLICY_ANY;
-import static java.lang.String.format;
-import static java.lang.System.getenv;
-import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
-import static org.apache.commons.lang.StringUtils.containsIgnoreCase;
-import static org.awaitility.Awaitility.await;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.any;
-import static org.hamcrest.Matchers.anyOf;
-import static org.hamcrest.Matchers.anything;
-import static org.hamcrest.Matchers.both;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.either;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.everyItem;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.isIn;
-import static org.hamcrest.Matchers.lessThan;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.startsWith;
-import static org.hamcrest.collection.IsEmptyCollection.empty;
-import static org.hamcrest.collection.IsMapContaining.hasEntry;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeTrue;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -133,7 +132,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -165,21 +163,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TestName;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.StdDateFormat;
-import com.google.common.base.Throwables;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import com.google.common.io.Resources;
-import com.google.common.util.concurrent.SettableFuture;
 import org.mandas.docker.client.DockerClient.AttachParameter;
 import org.mandas.docker.client.DockerClient.BuildParam;
 import org.mandas.docker.client.DockerClient.EventsParam;
@@ -199,7 +182,6 @@ import org.mandas.docker.client.exceptions.ImagePushFailedException;
 import org.mandas.docker.client.exceptions.NetworkNotFoundException;
 import org.mandas.docker.client.exceptions.NotFoundException;
 import org.mandas.docker.client.exceptions.TaskNotFoundException;
-import org.mandas.docker.client.exceptions.UnsupportedApiVersionException;
 import org.mandas.docker.client.exceptions.VolumeNotFoundException;
 import org.mandas.docker.client.messages.AttachedNetwork;
 import org.mandas.docker.client.messages.Container;
@@ -284,6 +266,21 @@ import org.mandas.docker.client.messages.swarm.TaskDefaults;
 import org.mandas.docker.client.messages.swarm.TaskSpec;
 import org.mandas.docker.client.messages.swarm.UnlockKey;
 import org.mandas.docker.client.messages.swarm.UpdateConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
+import com.google.common.base.Throwables;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.google.common.io.Resources;
+import com.google.common.util.concurrent.SettableFuture;
 
 /**
  * Integration tests for DefaultDockerClient that assume a docker daemon is available to connect to
@@ -447,7 +444,6 @@ public class DefaultDockerClientTest {
     sut.pull(BUSYBOX_BUILDROOT_2013_08_1);
   }
 
-  @SuppressWarnings("emptyCatchBlock")
   @Test
   public void testPullInterruption() throws Exception {
     // Wait for container on a thread
@@ -462,6 +458,10 @@ public class DefaultDockerClientTest {
           try {
             sut.removeImage(BUSYBOX_BUILDROOT_2013_08_1);
           } catch (DockerException ignored) {
+        	log.debug("Ignoring error removing image", ignored);
+          } catch (Exception e) {
+        	log.warn("Unexpected exception", e);
+        	throw e;
           }
           sut.pull(BUSYBOX_BUILDROOT_2013_08_1, message -> {
             if (!started.isDone()) {
@@ -471,6 +471,9 @@ public class DefaultDockerClientTest {
           return null;
         } catch (InterruptedException e) {
           interrupted.set(true);
+          throw e;
+        } catch (Exception e) {
+          log.warn("Error pulling image", e);
           throw e;
         }
       }
@@ -490,7 +493,8 @@ public class DefaultDockerClientTest {
     assertThat(interrupted.get(), is(true));
   }
 
-  @Test(expected = ImageNotFoundException.class) @Ignore // TODO: Docker < 17.12 returns 200 for this (!) 
+  // TODO: Docker < 17.12 returns 200 for this (!)
+  @Test(expected = ImageNotFoundException.class) @Ignore 
   public void testPullBadImage() throws Exception {
     sut.pull(randomName());
   }
@@ -958,7 +962,6 @@ public class DefaultDockerClientTest {
     assertThat(info.id(), startsWith(expectedId));
   }
 
-  @SuppressWarnings("emptyCatchBlock")
   @Test
   public void testBuildInterruption() throws Exception {
     // Wait for container on a thread
@@ -973,6 +976,10 @@ public class DefaultDockerClientTest {
         try {
           sut.removeImage(imageName);
         } catch (DockerException ignored) {
+          log.debug("Ignoring exception removing image", ignored);
+        } catch (Exception e) {
+          log.warn("Unexpected exception", e);
+          throw e;
         }
         final URL dockerDirectoryUrl = Resources.getResource("dockerDirectorySleeping");
         final Path dockerDirectory = Paths.get(dockerDirectoryUrl.toURI());
@@ -2082,7 +2089,7 @@ public class DefaultDockerClientTest {
     final String mountPath = "/anywhere";
     final Volume volume = Volume.builder().name(volumeName).build();
     final HostConfig hostConfig = HostConfig.builder()
-            .binds(Bind.from(volume).to(mountPath).build())
+            .binds(Bind.builder().from(volume.name()).to(mountPath).build())
             .build();
     final ContainerConfig config = ContainerConfig.builder()
             .image(BUSYBOX_LATEST)
@@ -2506,7 +2513,7 @@ public class DefaultDockerClientTest {
     logOptions.put("max-file", "2");
     logOptions.put("labels", name);
 
-    final LogConfig logConfig = LogConfig.create("json-file", logOptions);
+    final LogConfig logConfig = LogConfig.builder().logType("json-file").logOptions(logOptions).build();
     assertThat(logConfig.logType(), equalTo("json-file"));
     assertThat(logConfig.logOptions(), equalTo(logOptions));
 
@@ -2541,11 +2548,11 @@ public class DefaultDockerClientTest {
     sut.createVolume(Volume.builder().name(nocopyVolumeName).build());
 
     final HostConfig hostConfig = HostConfig.builder()
-        .appendBinds(Bind.from(aVolumeName)
+        .binds(Bind.builder().from(aVolumeName)
                 .to(aVolumeTo)
                 .readOnly(true)
-                .build())
-        .appendBinds(Bind.from(nocopyVolumeName)
+                .build(),
+               Bind.builder().from(nocopyVolumeName)
                 .to(nocopyVolumeTo)
                 .noCopy(true)
                 .build())
@@ -2597,7 +2604,7 @@ public class DefaultDockerClientTest {
 	  
 	  String volumeName = randomName();
 	  final HostConfig hostConfig = HostConfig.builder()
-			.addMount(Mount.builder()
+			.mounts(Mount.builder()
 				.type("volume")
 				.source(volumeName)
 				.target("/container/target")
@@ -2636,7 +2643,7 @@ public class DefaultDockerClientTest {
 	  sut.pull(BUSYBOX_LATEST);
 	  
 	  final HostConfig hostConfig = HostConfig.builder()
-			.addMount(Mount.builder()
+			.mounts(Mount.builder()
 				.type("bind")
 				.source("/local/path")
 				.target("/remote/path")
@@ -2676,19 +2683,19 @@ public class DefaultDockerClientTest {
             .build();
     sut.createVolume(volume);
     final Bind bindUsingVolume =
-        Bind.from(volume)
+        Bind.builder().from(volume.name())
             .to(namedVolumeTo)
             .build();
 
     final Bind bind =
-        Bind.from(bindObjectFrom)
+        Bind.builder().from(bindObjectFrom)
             .to(bindObjectTo)
             .readOnly(true)
             .build();
     final HostConfig hostConfig = HostConfig.builder()
-        .appendBinds(bind)
-        .appendBinds(bindStringFrom + ":" + bindStringTo)
-        .appendBinds(bindUsingVolume)
+        .binds(bind)
+        .binds(bindStringFrom + ":" + bindStringTo)
+        .binds(bindUsingVolume)
         .build();
     final ContainerConfig volumeConfig = ContainerConfig.builder()
         .image(BUSYBOX_LATEST)
@@ -3222,7 +3229,8 @@ public class DefaultDockerClientTest {
     sut.removeImage(randomName());
   }
 
-  @Test @Ignore // TODO: https://github.com/moby/moby/issues/31421
+  // TODO: https://github.com/moby/moby/issues/31421
+  @Test @Ignore
   public void testExec() throws Exception {
     sut.pull(BUSYBOX_LATEST);
 
@@ -3601,7 +3609,7 @@ public class DefaultDockerClientTest {
   public void testNetworks() throws Exception {
     final String networkName = randomName();
     final IpamConfig ipamConfig =
-        IpamConfig.create("192.168.0.0/24", "192.168.0.0/24", "192.168.0.1");
+        IpamConfig.builder().ipRange("192.168.0.0/24").subnet("192.168.0.0/24").gateway("192.168.0.1").build();
     final Ipam ipam = Ipam.builder()
         .driver("default")
         .config(singletonList(ipamConfig))
@@ -3808,7 +3816,7 @@ public class DefaultDockerClientTest {
     final String ipRange = "172.20.10.0/24";
     final String gateway = "172.20.10.11";
     final IpamConfig ipamConfigToCreate =
-            IpamConfig.create(subnet, ipRange, gateway);
+            IpamConfig.builder().subnet(subnet).ipRange(ipRange).gateway(gateway).build();
     final Ipam ipamToCreate = Ipam.builder()
             .driver("default")
             .config(Lists.newArrayList(ipamConfigToCreate))
@@ -3986,7 +3994,7 @@ public class DefaultDockerClientTest {
     final String id = creation.id();
     sut.startContainer(id);
 
-    final ContainerChange expected = ContainerChange.create("/tmp/foo.txt", 1);
+    final ContainerChange expected = ContainerChange.builder().path("/tmp/foo.txt").kind(1).build();
 
     assertThat(expected, isIn(sut.inspectContainerChanges(id)));
   }
@@ -4162,7 +4170,7 @@ public class DefaultDockerClientTest {
     // Should get a ConflictException.
     final Volume volume2 = sut.createVolume();
     final HostConfig hostConfig = HostConfig.builder()
-        .binds(Bind.from(volume2).to("/tmp").build())
+        .binds(Bind.builder().from(volume2.name()).to("/tmp").build())
         .build();
     final ContainerConfig config = ContainerConfig.builder()
         .image(BUSYBOX)

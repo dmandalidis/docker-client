@@ -20,58 +20,39 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
-import com.google.common.collect.ImmutableMap;
 import java.util.Date;
 import java.util.Map;
+
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class ContainerStats {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableContainerStats.Builder.class)
+@Immutable
+public interface ContainerStats {
 
   @JsonProperty("read")
-  public abstract Date read();
+  Date read();
 
   @Nullable
   @JsonProperty("network")
-  public abstract NetworkStats network();
+  NetworkStats network();
 
   @Nullable
   @JsonProperty("networks")
-  public abstract ImmutableMap<String, NetworkStats> networks();
+  Map<String, NetworkStats> networks();
 
   @JsonProperty("memory_stats")
-  public abstract MemoryStats memoryStats();
+  MemoryStats memoryStats();
 
   @JsonProperty("blkio_stats")
-  public abstract BlockIoStats blockIoStats();
+  BlockIoStats blockIoStats();
 
   @JsonProperty("cpu_stats")
-  public abstract CpuStats cpuStats();
+  CpuStats cpuStats();
 
   @JsonProperty("precpu_stats")
-  public abstract CpuStats precpuStats();
-
-  @JsonCreator
-  static ContainerStats create(
-      @JsonProperty("read") final Date read,
-      @JsonProperty("network") final NetworkStats networkStats,
-      @JsonProperty("networks") final Map<String, NetworkStats> networks,
-      @JsonProperty("memory_stats") final MemoryStats memoryStats,
-      @JsonProperty("blkio_stats") final BlockIoStats blockIoStats,
-      @JsonProperty("cpu_stats") final CpuStats cpuStats,
-      @JsonProperty("precpu_stats") final CpuStats precpuStats) {
-    final ImmutableMap<String, NetworkStats> networksCopy = networks == null
-                                                            ? null : ImmutableMap.copyOf(networks);
-    return new AutoValue_ContainerStats(read, networkStats, networksCopy,
-        memoryStats, blockIoStats, cpuStats, precpuStats);
-  }
+  CpuStats precpuStats();
 }

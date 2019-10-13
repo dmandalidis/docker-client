@@ -20,111 +20,98 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
 import java.util.Date;
+
+import org.immutables.value.Value.Enclosing;
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class Node {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableNode.Builder.class)
+@Immutable
+@Enclosing
+public interface Node {
 
   @JsonProperty("ID")
-  public abstract String id();
+  String id();
 
   @JsonProperty("Version")
-  public abstract Version version();
+  Version version();
 
   @JsonProperty("CreatedAt")
-  public abstract Date createdAt();
+  Date createdAt();
 
   @JsonProperty("UpdatedAt")
-  public abstract Date updatedAt();
+  Date updatedAt();
 
   @JsonProperty("Spec")
-  public abstract NodeSpec spec();
+  NodeSpec spec();
 
   @JsonProperty("Description")
-  public abstract NodeDescription description();
+  NodeDescription description();
 
   @JsonProperty("Status")
-  public abstract NodeStatus status();
+  NodeStatus status();
 
   @Nullable
   @JsonProperty("ManagerStatus")
-  public abstract ManagerStatus managerStatus();
+  ManagerStatus managerStatus();
 
-  @JsonCreator
-  static Node create(@JsonProperty("ID") final String id,
-      @JsonProperty("Version") final Version version,
-      @JsonProperty("CreatedAt") final Date createdAt,
-      @JsonProperty("UpdatedAt") final Date updatedAt,
-      @JsonProperty("Spec") final NodeSpec nodeSpec,
-      @JsonProperty("Description") final NodeDescription description,
-      @JsonProperty("Status") final NodeStatus nodeStatus,
-      @JsonProperty("ManagerStatus") final ManagerStatus managerStatus) {
-    return new AutoValue_Node(id, version, createdAt, updatedAt, nodeSpec, description,
-        nodeStatus, managerStatus);
-  }
-
-  @AutoValue
-  public abstract static class Criteria {
+  @JsonDeserialize(builder = ImmutableNode.Criteria.Builder.class)
+  @Immutable
+  public interface Criteria {
     /**
      * Filter by node id.
      */
     @Nullable
-    public abstract String nodeId();
+    String nodeId();
 
     /**
      * Filter by label.
      */
     @Nullable
-    public abstract String label();
+    String label();
 
     /**
      * Filter by membership {accepted | pending}.
      */
     @Nullable
-    public abstract String membership();
+    String membership();
 
     /**
      * Filter by node name.
      */
     @Nullable
-    public abstract String nodeName();
+    String nodeName();
 
     /**
      * Filter by node role {manager | worker}.
      */
     @Nullable
-    public abstract String nodeRole();
+    String nodeRole();
 
-    public static Builder builder() {
-      return new AutoValue_Node_Criteria.Builder();
+    public static Criteria.Builder builder() {
+      return ImmutableNode.Criteria.builder();
     }
     
-    @AutoValue.Builder
-    public abstract static class Builder {
-      public abstract Builder nodeId(String nodeId);
+    interface Builder {
+      Builder nodeId(String nodeId);
 
-      public abstract Builder label(String label);
+      Builder label(String label);
 
-      public abstract Builder nodeName(String nodeName);
+      Builder nodeName(String nodeName);
 
-      public abstract Builder membership(String membership);
+      Builder membership(String membership);
 
-      public abstract Builder nodeRole(String nodeRole);
+      Builder nodeRole(String nodeRole);
 
-      public abstract Node.Criteria build();
+      Criteria build();
     }
   }
 
   public static Node.Criteria.Builder find() {
-    return AutoValue_Node_Criteria.builder();
+    return ImmutableNode.Criteria.builder();
   }
 }

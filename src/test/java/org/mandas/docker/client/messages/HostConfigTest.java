@@ -20,16 +20,14 @@
 
 package org.mandas.docker.client.messages;
 
-import static org.mandas.docker.FixtureUtil.fixture;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
+import static org.mandas.docker.FixtureUtil.fixture;
+
+import org.junit.Test;
+import org.mandas.docker.client.ObjectMapperProvider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableList;
-import org.mandas.docker.client.ObjectMapperProvider;
-import java.util.List;
-import org.junit.Test;
 
 public class HostConfigTest {
 
@@ -57,48 +55,6 @@ public class HostConfigTest {
         .readValue(fixture("fixtures/hostConfig/restartPolicyOnFailure.json"),
                    HostConfig.class);
     assertThat(hostConfig.restartPolicy(), is(HostConfig.RestartPolicy.onFailure(5)));
-  }
-
-  @Test
-  public void testReplaceBinds() {
-    final List<String> initialBinds = ImmutableList.of("/one:/one", "/two:/two");
-    final HostConfig hostConfig = HostConfig.builder()
-        .binds(initialBinds)
-        .binds(initialBinds)
-        .build();
-
-    assertThat("Calling .binds() multiple times should replace the list each time",
-               hostConfig.binds(), is(initialBinds));
-  }
-
-  @Test
-  public void testAppendBinds() {
-    final List<String> initialBinds = ImmutableList.of("/one:/one", "/two:/two");
-    final HostConfig hostConfig = HostConfig.builder()
-        .binds(initialBinds)
-        .appendBinds("/three:/three")
-        .appendBinds("/four:/four")
-        .build();
-
-    final List<String> expected = ImmutableList.<String>builder()
-        .addAll(initialBinds)
-        .add("/three:/three")
-        .add("/four:/four")
-        .build();
-
-    assertThat("Calling .appendBinds should append to the list, not replace",
-               hostConfig.binds(), is(expected));
-  }
-
-  @Test
-  public void testPreventDuplicateBinds() {
-    final HostConfig hostConfig = HostConfig.builder()
-        .appendBinds("/one:/one")
-        .appendBinds("/one:/one")
-        .appendBinds("/one:/one")
-        .build();
-
-    assertThat(hostConfig.binds(), contains("/one:/one"));
   }
 
   @Test

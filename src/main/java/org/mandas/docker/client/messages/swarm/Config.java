@@ -20,83 +20,68 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
 import java.util.Date;
+
+import org.immutables.value.Value.Enclosing;
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class Config {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableConfig.Builder.class)
+@Immutable
+@Enclosing
+public interface Config {
 
   @JsonProperty("ID")
-  public abstract String id();
+  String id();
 
   @JsonProperty("Version")
-  public abstract Version version();
+  Version version();
 
   @JsonProperty("CreatedAt")
-  public abstract Date createdAt();
+  Date createdAt();
 
   @JsonProperty("UpdatedAt")
-  public abstract Date updatedAt();
+  Date updatedAt();
 
   @JsonProperty("Spec")
-  public abstract ConfigSpec configSpec();
+  ConfigSpec configSpec();
 
-  @AutoValue
-  public abstract static class Criteria {
+  @JsonDeserialize(builder = ImmutableConfig.Criteria.Builder.class)
+  @Immutable
+  public interface Criteria {
     /**
      * Filter by config id.
      */
     @Nullable
-    public abstract String configId();
+    String configId();
 
     /**
      * Filter by label.
      */
     @Nullable
-    public abstract String label();
+    String label();
 
     /**
      * Filter by config name.
      */
     @Nullable
-    public abstract String name();
+    String name();
 
-    public static Config.Criteria.Builder builder() {
-      return new AutoValue_Config_Criteria.Builder();
+    public static Criteria.Builder builder() {
+      return ImmutableConfig.Criteria.builder();
     }
 
-    @AutoValue.Builder
-    public abstract static class Builder {
-      public abstract Config.Criteria.Builder configId(String nodeId);
+    interface Builder {
+      Builder configId(String nodeId);
 
-      public abstract Config.Criteria.Builder label(String label);
+      Builder label(String label);
 
-      public abstract Config.Criteria.Builder name(String nodeName);
+      Builder name(String nodeName);
 
-      public abstract Config.Criteria build();
+      Criteria build();
     }
   }
-
-  public static Config.Criteria.Builder find() {
-    return AutoValue_Config_Criteria.builder();
-  }
-
-  @JsonCreator
-  static Config create(
-      @JsonProperty("ID") final String id,
-      @JsonProperty("Version") final Version version,
-      @JsonProperty("CreatedAt") final Date createdAt,
-      @JsonProperty("UpdatedAt") final Date updatedAt,
-      @JsonProperty("Spec") final ConfigSpec secretSpec) {
-    return new AutoValue_Config(id, version, createdAt, updatedAt, secretSpec);
-  }
-
 }

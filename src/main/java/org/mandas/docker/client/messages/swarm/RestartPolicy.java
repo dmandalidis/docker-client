@@ -20,19 +20,15 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class RestartPolicy {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableRestartPolicy.Builder.class)
+@Immutable
+public interface RestartPolicy {
 
   public static final String RESTART_POLICY_NONE = "none";
   public static final String RESTART_POLICY_ON_FAILURE = "on-failure";
@@ -40,49 +36,35 @@ public abstract class RestartPolicy {
 
   @Nullable
   @JsonProperty("Condition")
-  public abstract String condition();
+  String condition();
 
   @Nullable
   @JsonProperty("Delay")
-  public abstract Long delay();
+  Long delay();
 
   @Nullable
   @JsonProperty("MaxAttempts")
-  public abstract Integer maxAttempts();
+  Integer maxAttempts();
 
   @Nullable
   @JsonProperty("Window")
-  public abstract Long window();
+  Long window();
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  interface Builder {
 
-    public abstract Builder condition(String condition);
+    Builder condition(String condition);
 
-    public abstract Builder delay(Long delay);
+    Builder delay(Long delay);
 
-    public abstract Builder maxAttempts(Integer maxAttempts);
+    Builder maxAttempts(Integer maxAttempts);
 
-    public abstract Builder window(Long window);
+    Builder window(Long window);
 
-    public abstract RestartPolicy build();
+    RestartPolicy build();
   }
 
-  public static RestartPolicy.Builder builder() {
-    return new AutoValue_RestartPolicy.Builder();
+  public static Builder builder() {
+    return ImmutableRestartPolicy.builder();
   }
 
-  @JsonCreator
-  static RestartPolicy create(
-      @JsonProperty("Condition") final String condition,
-      @JsonProperty("Delay") final Long delay,
-      @JsonProperty("MaxAttempts") final Integer maxAttempts,
-      @JsonProperty("Window") final Long window) {
-    return builder()
-        .condition(condition)
-        .delay(delay)
-        .maxAttempts(maxAttempts)
-        .window(window)
-        .build();
-  }
 }

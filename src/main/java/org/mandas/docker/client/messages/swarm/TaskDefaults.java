@@ -20,40 +20,28 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class TaskDefaults {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableTaskDefaults.Builder.class)
+@Immutable
+public interface TaskDefaults {
 
   @Nullable
   @JsonProperty("LogDriver")
-  public abstract Driver logDriver();
+  Driver logDriver();
 
-  @JsonCreator
-  static TaskDefaults create(@JsonProperty("LogDriver") final Driver logDriver) {
-    return builder()
-        .logDriver(logDriver)
-        .build();
-  }
+  interface Builder {
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+    Builder logDriver(Driver logDriver);
 
-    public abstract Builder logDriver(Driver logDriver);
-
-    public abstract TaskDefaults build();
+    TaskDefaults build();
   }
 
   public static TaskDefaults.Builder builder() {
-    return new AutoValue_TaskDefaults.Builder();
+    return ImmutableTaskDefaults.builder();
   }
 }

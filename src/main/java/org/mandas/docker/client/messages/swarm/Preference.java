@@ -20,23 +20,19 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
+import org.immutables.value.Value.Immutable;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class Preference {
+@JsonDeserialize(builder = ImmutablePreference.Builder.class)
+@Immutable
+public interface Preference {
 
   @JsonProperty("Spread")
-  public abstract Spread spread();
+  Spread spread();
 
-  @JsonCreator
-  public static Preference create(@JsonProperty("Spread") final Spread spread) {
-    return new AutoValue_Preference(spread);
+  public static Preference create(final Spread spread) {
+    return ImmutablePreference.builder().spread(spread).build();
   }
 }

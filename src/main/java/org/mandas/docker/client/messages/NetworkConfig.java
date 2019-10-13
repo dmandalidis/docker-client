@@ -20,90 +20,79 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
-import com.google.common.collect.ImmutableMap;
-import java.util.HashMap;
 import java.util.Map;
+
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class NetworkConfig {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableNetworkConfig.Builder.class)
+@Immutable
+public interface NetworkConfig {
 
   @JsonProperty("Name")
-  public abstract String name();
+  String name();
 
   @Nullable
   @JsonProperty("Driver")
-  public abstract String driver();
+  String driver();
 
   @Nullable
   @JsonProperty("IPAM")
-  public abstract Ipam ipam();
+  Ipam ipam();
 
   @JsonProperty("Options")
-  public abstract ImmutableMap<String, String> options();
+  Map<String, String> options();
 
   @Nullable
   @JsonProperty("CheckDuplicate")
-  public abstract Boolean checkDuplicate();
+  Boolean checkDuplicate();
   
   @Nullable
   @JsonProperty("Internal")
-  public abstract Boolean internal();
+  Boolean internal();
   
   @Nullable
   @JsonProperty("EnableIPv6")
-  public abstract Boolean enableIPv6();
+  Boolean enableIPv6();
 
   @Nullable
   @JsonProperty("Attachable")
-  public abstract Boolean attachable();
+  Boolean attachable();
 
   @Nullable
   @JsonProperty("Labels")
-  public abstract ImmutableMap<String, String> labels();
+  Map<String, String> labels();
 
   public static Builder builder() {
-    return new AutoValue_NetworkConfig.Builder()
-        .options(new HashMap<String, String>());
+    return ImmutableNetworkConfig.builder();
   }
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  interface Builder {
 
-    public abstract Builder name(final String name);
+    Builder name(final String name);
 
-    abstract ImmutableMap.Builder<String, String> optionsBuilder();
-
-    public Builder addOption(final String key, final String value) {
-      optionsBuilder().put(key, value);
-      return this;
-    }
-
-    public abstract Builder options(Map<String, String> options);
-
-    public abstract Builder ipam(final Ipam ipam);
-
-    public abstract Builder driver(final String driver);
-
-    public abstract Builder checkDuplicate(Boolean check);
+    Builder addOption(final String key, final String value);
     
-    public abstract Builder internal(Boolean internal);
-    
-    public abstract Builder enableIPv6(Boolean ipv6);
+    Builder options(Map<String, ? extends String> options);
 
-    public abstract Builder attachable(Boolean attachable);
+    Builder ipam(final Ipam ipam);
 
-    public abstract Builder labels(Map<String, String> labels);
+    Builder driver(final String driver);
+
+    Builder checkDuplicate(Boolean check);
     
-    public abstract NetworkConfig build();
+    Builder internal(Boolean internal);
+    
+    Builder enableIPv6(Boolean ipv6);
+
+    Builder attachable(Boolean attachable);
+
+    Builder labels(Map<String, ? extends String> labels);
+    
+    NetworkConfig build();
   }
 
 }

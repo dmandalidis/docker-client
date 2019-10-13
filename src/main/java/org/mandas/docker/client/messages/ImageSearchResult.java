@@ -20,41 +20,28 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
+import org.immutables.value.Value.Immutable;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class ImageSearchResult {
+@JsonDeserialize(builder = ImmutableImageSearchResult.Builder.class)
+@Immutable
+public interface ImageSearchResult {
 
   @JsonProperty("description")
-  public abstract String description();
+  String description();
 
   @JsonProperty("is_official")
-  public abstract boolean official();
+  boolean official();
 
   @JsonProperty("is_automated")
-  public abstract boolean automated();
+  boolean automated();
 
   @JsonProperty("name")
-  public abstract String name();
+  String name();
 
   @JsonProperty("star_count")
-  public abstract int starCount();
-
-  @JsonCreator
-  static ImageSearchResult create(
-      @JsonProperty("description") final String description,
-      @JsonProperty("is_official") final boolean official,
-      @JsonProperty("is_automated") final boolean automated,
-      @JsonProperty("name") final String name,
-      @JsonProperty("star_count") final int starCount) {
-    return new AutoValue_ImageSearchResult(description, official, automated, name, starCount);
-  }
+  int starCount();
 }

@@ -20,40 +20,27 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class EncryptionConfig {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableEncryptionConfig.Builder.class)
+@Immutable
+public interface EncryptionConfig {
 
   @Nullable
   @JsonProperty("AutoLockManagers")
-  public abstract Boolean autoLockManagers();
+  Boolean autoLockManagers();
 
-  @JsonCreator
-  static EncryptionConfig create(
-      @JsonProperty("AutoLockManagers") final Boolean autoLockManagers) {
-    return builder()
-        .autoLockManagers(autoLockManagers)
-        .build();
-  }
+  interface Builder {
+    Builder autoLockManagers(Boolean autoLockManagers);
 
-  @AutoValue.Builder
-  public abstract static class Builder {
-    public abstract Builder autoLockManagers(Boolean autoLockManagers);
-
-    public abstract EncryptionConfig build();
+    EncryptionConfig build();
   }
 
   public static EncryptionConfig.Builder builder() {
-    return new AutoValue_EncryptionConfig.Builder();
+    return ImmutableEncryptionConfig.builder();
   }
 }

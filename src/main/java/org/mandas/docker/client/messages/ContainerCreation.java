@@ -20,51 +20,36 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
-
 import java.util.List;
+
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class ContainerCreation {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableContainerCreation.Builder.class)
+@Immutable
+public interface ContainerCreation {
 
   @Nullable
   @JsonProperty("Id")
-  public abstract String id();
+  String id();
 
   @Nullable
   @JsonProperty("Warnings")
-  public abstract ImmutableList<String> warnings();
+  List<String> warnings();
 
-  public static Builder builder() {
-    return new AutoValue_ContainerCreation.Builder();
+  static Builder builder() {
+    return ImmutableContainerCreation.builder();
   }
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  interface Builder {
 
-    public abstract Builder id(String id);
+    Builder id(String id);
 
-    public abstract Builder warnings(List<String> warnings);
+    Builder warnings(Iterable<String> warnings);
 
-    public abstract ContainerCreation build();
-  }
-
-  @JsonCreator
-  static ContainerCreation create(
-      @JsonProperty("Id") final String id,
-      @JsonProperty("Warnings") final List<String> warnings) {
-    return builder()
-        .id(id)
-        .warnings(warnings)
-        .build();
+    ContainerCreation build();
   }
 }

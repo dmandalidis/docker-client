@@ -20,42 +20,31 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
 import java.util.Date;
+
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class UpdateStatus {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableUpdateStatus.Builder.class)
+@Immutable
+public interface UpdateStatus {
 
   @Nullable
   @JsonProperty("State")
-  public abstract String state();
+  String state();
 
   @JsonProperty("StartedAt")
-  public abstract Date startedAt();
+  Date startedAt();
 
   @Nullable
   @JsonProperty("CompletedAt")
-  public abstract Date completedAt();
+  Date completedAt();
 
   @Nullable
   @JsonProperty("Message")
-  public abstract String message();
+  String message();
 
-  @JsonCreator
-  static UpdateStatus create(
-      @JsonProperty("State") final String state,
-      @JsonProperty("StartedAt") final Date startedAt,
-      @JsonProperty("CompletedAt") final Date completedAt,
-      @JsonProperty("Message") final String message) {
-    return new AutoValue_UpdateStatus(state, startedAt, completedAt, message);
-  }
 }

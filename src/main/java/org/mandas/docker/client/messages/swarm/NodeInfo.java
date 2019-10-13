@@ -20,60 +20,41 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
 import java.util.Date;
+
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class NodeInfo {
+
+@JsonDeserialize(builder = ImmutableNodeInfo.Builder.class)
+@Immutable
+public interface NodeInfo {
 
   @JsonProperty("ID")
-  public abstract String id();
+  String id();
 
   @JsonProperty("Version")
-  public abstract Version version();
+  Version version();
 
   @JsonProperty("CreatedAt")
-  public abstract Date createdAt();
+  Date createdAt();
 
   @JsonProperty("UpdatedAt")
-  public abstract Date updatedAt();
+  Date updatedAt();
 
   @JsonProperty("Spec")
-  public abstract NodeSpec spec();
+  NodeSpec spec();
 
   @JsonProperty("Description")
-  public abstract NodeDescription description();
+  NodeDescription description();
 
   @JsonProperty("Status")
-  public abstract NodeStatus status();
+  NodeStatus status();
 
   @Nullable
   @JsonProperty("ManagerStatus")
-  public abstract ManagerStatus managerStatus();
-
-  @JsonCreator
-  public static AutoValue_NodeInfo create(@JsonProperty("ID") final String id,
-                                          @JsonProperty("Version") final Version version,
-                                          @JsonProperty("CreatedAt") final Date createdAt,
-                                          @JsonProperty("UpdatedAt") final Date updatedAt,
-                                          @JsonProperty("Spec") final NodeSpec nodeSpec,
-                                          @JsonProperty("Description")
-                                            final NodeDescription description,
-                                          @JsonProperty("Status")
-                                            final NodeStatus nodeStatus,
-                                          @JsonProperty("ManagerStatus")
-                                            final ManagerStatus managerStatus) {
-
-    return new AutoValue_NodeInfo(id, version, createdAt, updatedAt,
-        nodeSpec, description, nodeStatus, managerStatus);
-  }
+  ManagerStatus managerStatus();
 }

@@ -20,116 +20,80 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
+import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import org.immutables.value.Value.Enclosing;
+import org.immutables.value.Value.Immutable;
+import org.mandas.docker.Nullable;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.google.auto.value.AutoValue;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import com.google.common.collect.ImmutableMap;
-
-import java.util.Map;
-import org.mandas.docker.Nullable;
-
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class Network {
+@JsonDeserialize(builder = ImmutableNetwork.Builder.class)
+@Immutable
+@Enclosing
+public interface Network {
 
   @JsonProperty("Name")
-  public abstract String name();
+  String name();
 
   @JsonProperty("Id")
-  public abstract String id();
+  String id();
 
   @JsonProperty("Scope")
-  public abstract String scope();
+  String scope();
 
   @JsonProperty("Driver")
-  public abstract String driver();
+  String driver();
 
   @JsonProperty("IPAM")
-  public abstract Ipam ipam();
+  Ipam ipam();
 
   @Nullable
   @JsonProperty("Containers")
-  public abstract ImmutableMap<String, Container> containers();
+  Map<String, Container> containers();
 
   @Nullable
   @JsonProperty("Options")
-  public abstract ImmutableMap<String, String> options();
+  Map<String, String> options();
   
   @Nullable
   @JsonProperty("Internal")
-  public abstract Boolean internal();
+  Boolean internal();
   
   @Nullable
   @JsonProperty("EnableIPv6")
-  public abstract Boolean enableIPv6();
+  Boolean enableIPv6();
 
   @Nullable
   @JsonProperty("Labels")
-  public abstract ImmutableMap<String, String> labels();
+  Map<String, String> labels();
 
   @Nullable
   @JsonProperty("Attachable")
-  public abstract Boolean attachable();
+  Boolean attachable();
 
-  @JsonCreator
-  static Network create(
-      @JsonProperty("Name") final String name,
-      @JsonProperty("Id") final String id,
-      @JsonProperty("Scope") final String scope,
-      @JsonProperty("Driver") final String driver,
-      @JsonProperty("IPAM") final Ipam ipam,
-      @JsonProperty("Containers") final Map<String, Container> containers,
-      @JsonProperty("Options") final Map<String, String> options,
-      @JsonProperty("Internal") final Boolean internal,
-      @JsonProperty("EnableIPv6") final Boolean enableIPv6,
-      @JsonProperty("Labels") final Map<String, String> labels,
-      @JsonProperty("Attachable") final Boolean attachable) {
-    final ImmutableMap<String, Container> containersCopy = containers == null
-                                                           ? null : ImmutableMap.copyOf(containers);
-    final ImmutableMap<String, String> optionsCopy = options == null
-                                                     ? null : ImmutableMap.copyOf(options);
-    final ImmutableMap<String, String> labelsCopy = labels == null
-                                                    ? null : ImmutableMap.copyOf(labels);
-    return new AutoValue_Network(name, id, scope, driver, ipam, containersCopy, optionsCopy,
-            internal, enableIPv6, labelsCopy, attachable);
-  }
-
-  @AutoValue
-  @JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-  public abstract static class Container {
+  @JsonDeserialize(builder = ImmutableNetwork.Container.Builder.class)
+  @Immutable
+  public interface Container {
 
     @Nullable
     @JsonProperty("Name")
-    public abstract String name();
+    String name();
 
     @JsonProperty("EndpointID")
-    public abstract String endpointId();
+    String endpointId();
 
     @JsonProperty("MacAddress")
-    public abstract String macAddress();
+    String macAddress();
 
     @JsonProperty("IPv4Address")
-    public abstract String ipv4Address();
+    String ipv4Address();
 
     @JsonProperty("IPv6Address")
-    public abstract String ipv6Address();
-
-    @JsonCreator
-    static Container create(
-        @JsonProperty("Name") final String name,
-        @JsonProperty("EndpointID") final String endpointId,
-        @JsonProperty("MacAddress") final String macAddress,
-        @JsonProperty("IPv4Address") final String ipv4Address,
-        @JsonProperty("IPv6Address") final String ipv6Address) {
-      return new AutoValue_Network_Container(
-          name, endpointId, macAddress, ipv4Address, ipv6Address);
-    }
+    String ipv6Address();
   }
   
   /**

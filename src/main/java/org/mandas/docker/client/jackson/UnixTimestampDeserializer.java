@@ -24,6 +24,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 
 import java.io.IOException;
@@ -48,8 +49,8 @@ public class UnixTimestampDeserializer extends JsonDeserializer<Date> {
     } else if (token == JsonToken.VALUE_NUMBER_INT) {
       return toDate(parser.getLongValue());
     }
-    throw ctxt.wrongTokenException(parser, JsonToken.VALUE_STRING,
-                                   "Expected a string or numeric value");
+    throw ctxt.wrongTokenException(parser, (JavaType) null, JsonToken.VALUE_STRING, 
+    		"Expected a string or numeric value");
   }
 
   private static Date toDate(long secondsSinceEpoch) {

@@ -20,104 +20,84 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableMap;
-
 import java.util.Date;
 import java.util.Map;
 
+import org.immutables.value.Value.Enclosing;
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class Service {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableService.Builder.class)
+@Immutable
+@Enclosing
+public interface Service {
 
   @JsonProperty("ID")
-  public abstract String id();
+  String id();
 
   @JsonProperty("Version")
-  public abstract Version version();
+  Version version();
 
   @JsonProperty("CreatedAt")
-  public abstract Date createdAt();
+  Date createdAt();
 
   @JsonProperty("UpdatedAt")
-  public abstract Date updatedAt();
+  Date updatedAt();
 
   @JsonProperty("Spec")
-  public abstract ServiceSpec spec();
+  ServiceSpec spec();
 
   @JsonProperty("Endpoint")
-  public abstract Endpoint endpoint();
+  Endpoint endpoint();
 
   @Nullable
   @JsonProperty("UpdateStatus")
-  public abstract UpdateStatus updateStatus();
+  UpdateStatus updateStatus();
 
-  @AutoValue
-  public abstract static class Criteria {
+  @JsonDeserialize(builder = ImmutableService.Criteria.Builder.class)
+  @Immutable
+  public interface Criteria {
 
     /**
      * Filter by service id.
      */
     @Nullable
-    public abstract String serviceId();
+    String serviceId();
 
     /**
      * Filter by service name.
      */
     @Nullable
-    public abstract String serviceName();
+    String serviceName();
 
     /**
      * Filter by label.
      */
-    @Nullable
-    public abstract ImmutableMap<String, String> labels();
+    Map<String, String> labels();
     
-    public static Builder builder() {
-      return new AutoValue_Service_Criteria.Builder();
+    public static Criteria.Builder builder() {
+      return ImmutableService.Criteria.builder();
     }
 
-    @AutoValue.Builder
-    public abstract static class Builder {
+    interface Builder {
 
-      public abstract Builder serviceId(final String serviceId);
+      Builder serviceId(final String serviceId);
 
-      public abstract Builder serviceName(final String serviceName);
+      Builder serviceName(final String serviceName);
 
-      public abstract Builder labels(final Map<String, String> labels);
+      Builder labels(final Map<String, ? extends String> labels);
       
-      abstract ImmutableMap.Builder<String, String> labelsBuilder();
-
-      public Builder addLabel(final String label, final String value) {
-        labelsBuilder().put(label, value);
-        return this;
-      }
+      Builder addLabel(final String label, final String value);
       
-      public abstract Criteria build();
+      Criteria build();
     }
   }
 
   public static Criteria.Builder find() {
-    return Service.Criteria.builder();
+    return ImmutableService.Criteria.builder();
   }
 
-  @JsonCreator
-  static Service create(
-      @JsonProperty("ID") final String id,
-      @JsonProperty("Version") final Version version,
-      @JsonProperty("CreatedAt") final Date createdAt,
-      @JsonProperty("UpdatedAt") final Date updatedAt,
-      @JsonProperty("Spec") final ServiceSpec spec,
-      @JsonProperty("Endpoint") final Endpoint endpoint,
-      @JsonProperty("UpdateStatus") final UpdateStatus updateStatus) {
-    return new AutoValue_Service(id, version, createdAt, updatedAt, spec, endpoint, updateStatus);
-  }
 }

@@ -20,62 +20,37 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
-import com.google.common.collect.ImmutableMap;
 import java.util.Map;
+
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class Driver {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableDriver.Builder.class)
+@Immutable
+public interface Driver {
 
   @Nullable
   @JsonProperty("Name")
-  public abstract String name();
+  String name();
 
-  @Nullable
   @JsonProperty("Options")
-  public abstract ImmutableMap<String, String> options();
+  Map<String, String> options();
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  interface Builder {
 
-    public abstract Builder name(String name);
+    Builder name(String name);
 
-    abstract ImmutableMap.Builder<String, String> optionsBuilder();
+    Builder addOption(final String name, final String value);
 
-    public Builder addOption(final String name, final String value) {
-      optionsBuilder().put(name, value);
-      return this;
-    }
+    Builder options(Map<String, ? extends String> options);
 
-    public abstract Builder options(Map<String, String> options);
-
-    public abstract Driver build();
+    Driver build();
   }
 
   public static Driver.Builder builder() {
-    return new AutoValue_Driver.Builder();
-  }
-
-  @JsonCreator
-  static Driver create(
-      @JsonProperty("Name") final String name,
-      @JsonProperty("Options") final Map<String, String> options) {
-    final Builder builder = builder()
-        .name(name);
-
-    if (options != null) {
-      builder.options(options);
-    }
-
-    return builder.build();
+    return ImmutableDriver.builder();
   }
 }

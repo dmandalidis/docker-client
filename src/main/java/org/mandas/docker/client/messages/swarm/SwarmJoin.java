@@ -20,62 +20,45 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
 import java.util.List;
 
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class SwarmJoin {
+
+@JsonDeserialize(builder = ImmutableSwarmJoin.Builder.class)
+@Immutable
+public interface SwarmJoin {
   @JsonProperty("ListenAddr")
-  public abstract String listenAddr();
+  String listenAddr();
 
   @Nullable
   @JsonProperty("AdvertiseAddr")
-  public abstract String advertiseAddr();
+  String advertiseAddr();
 
   @JsonProperty("RemoteAddrs")
-  public abstract List<String> remoteAddrs();
+  List<String> remoteAddrs();
 
   @JsonProperty("JoinToken")
-  public abstract String joinToken();
+  String joinToken();
 
-  @AutoValue.Builder
-  public abstract static class Builder {
-    public abstract Builder listenAddr(String listenAddr);
+  interface Builder {
+    Builder listenAddr(String listenAddr);
 
-    public abstract Builder advertiseAddr(String advertiseAddr);
+    Builder advertiseAddr(String advertiseAddr);
 
-    public abstract Builder remoteAddrs(List<String> remoteAddrs);
+    Builder remoteAddrs(Iterable<String> remoteAddrs);
 
-    public abstract Builder joinToken(String swarmSpec);
+    Builder joinToken(String swarmSpec);
 
-    public abstract SwarmJoin build();
+    SwarmJoin build();
   }
 
-  public static SwarmJoin.Builder builder() {
-    return new AutoValue_SwarmJoin.Builder();
+  public static Builder builder() {
+    return ImmutableSwarmJoin.builder();
   }
 
-  @JsonCreator
-  static SwarmJoin create(
-      @JsonProperty("ListenAddr") final String listenAddr,
-      @JsonProperty("AdvertiseAddr") final String advertiseAddr,
-      @JsonProperty("RemoteAddrs") final List<String> remoteAddrs,
-      @JsonProperty("JoinToken") final String joinToken) {
-    return builder()
-        .listenAddr(listenAddr)
-        .advertiseAddr(advertiseAddr)
-        .remoteAddrs(remoteAddrs)
-        .joinToken(joinToken)
-        .build();
-  }
 }

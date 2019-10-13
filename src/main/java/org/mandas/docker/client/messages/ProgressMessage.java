@@ -20,90 +20,70 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
+import org.immutables.value.Value.Derived;
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class ProgressMessage {
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableProgressMessage.Builder.class)
+@Immutable
+public interface ProgressMessage {
 
   // Prefix that appears before the actual image digest in a 1.6 status message. E.g.:
   // {"status":"Digest: sha256:ebd39c3e3962f804787f6b0520f8f1e35fbd5a01ab778ac14c8d6c37978e8445"}
-  private static final String STATUS_DIGEST_PREFIX_16 = "Digest: ";
+  static final String STATUS_DIGEST_PREFIX_16 = "Digest: ";
 
   // In 1.8, the message instead looks like
   // {"status":"<some-tag>: digest: <digest> size: <size>"}
-  private static final String STATUS_DIGEST_PREFIX_18 = "digest: ";
-  private static final String STATUS_SIZE_PREFIX_18 = "size: ";
+  static final String STATUS_DIGEST_PREFIX_18 = "digest: ";
+  static final String STATUS_SIZE_PREFIX_18 = "size: ";
 
   @Nullable
   @JsonProperty("id")
-  public abstract String id();
+  String id();
 
   @Nullable
   @JsonProperty("status")
-  public abstract String status();
+  String status();
 
   @Nullable
   @JsonProperty("stream")
-  public abstract String stream();
+  String stream();
 
   @Nullable
   @JsonProperty("error")
-  public abstract String error();
+  String error();
 
   @Nullable
   @JsonProperty("progress")
-  public abstract String progress();
+  String progress();
 
   @Nullable
   @JsonProperty("progressDetail")
-  public abstract ProgressDetail progressDetail();
-
-  @JsonCreator
-  static ProgressMessage create(
-      @JsonProperty("id") final String id,
-      @JsonProperty("status") final String status,
-      @JsonProperty("stream") final String stream,
-      @JsonProperty("error") final String error,
-      @JsonProperty("progress") final String progress,
-      @JsonProperty("progressDetail") final ProgressDetail progressDetail) {
-    return builder()
-        .id(id)
-        .status(status)
-        .stream(stream)
-        .error(error)
-        .progress(progress)
-        .progressDetail(progressDetail)
-        .build();
-  }
+  ProgressDetail progressDetail();
 
   public static Builder builder() {
-    return new AutoValue_ProgressMessage.Builder();
+    return ImmutableProgressMessage.builder();
   }
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  interface Builder {
 
-    public abstract Builder id(String id);
+    Builder id(String id);
 
-    public abstract Builder status(String status);
+    Builder status(String status);
 
-    public abstract Builder stream(String stream);
+    Builder stream(String stream);
 
-    public abstract Builder error(String error);
+    Builder error(String error);
 
-    public abstract Builder progress(String progress);
+    Builder progress(String progress);
 
-    public abstract Builder progressDetail(ProgressDetail progressDetail);
+    Builder progressDetail(ProgressDetail progressDetail);
 
-    public abstract ProgressMessage build();
+    ProgressMessage build();
   }
 
   /**
@@ -113,7 +93,10 @@ public abstract class ProgressMessage {
    *
    * @return The image id if this is a build success message, otherwise null.
    */
-  public String buildImageId() {
+  @JsonIgnore
+  @Derived
+  @Nullable
+  default String buildImageId() {
     // stream messages end with new line, so call trim to remove it
     final String stream = stream();
     return stream != null && stream.startsWith("Successfully built")
@@ -121,7 +104,10 @@ public abstract class ProgressMessage {
            : null;
   }
 
-  public String digest() {
+  @JsonIgnore
+  @Derived
+  @Nullable
+  default String digest() {
     final String status = status();
     if (status == null) {
       return null;

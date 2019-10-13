@@ -20,82 +20,48 @@
 
 package org.mandas.docker.client;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
+import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableMap;
+import org.immutables.value.Value.Immutable;
+import org.mandas.docker.Nullable;
 import org.mandas.docker.client.messages.RegistryAuth;
 
-import java.util.Map;
-import org.mandas.docker.Nullable;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * Represents the contents of the docker config.json file.
  */
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class DockerConfig {
+@Immutable
+@JsonDeserialize(builder = ImmutableDockerConfig.Builder.class)
+public interface DockerConfig {
 
-  @Nullable
   @JsonProperty("credHelpers")
-  public abstract ImmutableMap<String, String> credHelpers();
+  Map<String, String> credHelpers();
 
-  @Nullable
   @JsonProperty("auths")
-  public abstract ImmutableMap<String, RegistryAuth> auths();
+  Map<String, RegistryAuth> auths();
 
-  @Nullable
   @JsonProperty("HttpHeaders")
-  public abstract ImmutableMap<String, String> httpHeaders();
+  Map<String, String> httpHeaders();
 
   @Nullable
   @JsonProperty("credsStore")
-  public abstract String credsStore();
+  String credsStore();
 
   @Nullable
   @JsonProperty("detachKeys")
-  public abstract String detachKeys();
+  String detachKeys();
 
   @Nullable
   @JsonProperty("stackOrchestrator")
-  public abstract String stackOrchestrator();
+  String stackOrchestrator();
 
   @Nullable
   @JsonProperty("psFormat")
-  public abstract String psFormat();
+  String psFormat();
 
   @Nullable
   @JsonProperty("imagesFormat")
-  public abstract String imagesFormat();
-
-  @JsonCreator
-  public static DockerConfig create(
-          @JsonProperty("credHelpers") final Map<String, String> credHelpers,
-          @JsonProperty("auths") final Map<String, RegistryAuth> auths,
-          @JsonProperty("HttpHeaders") final Map<String, String> httpHeaders,
-          @JsonProperty("credsStore") final String credsStore,
-          @JsonProperty("detachKeys") final String detachKeys,
-          @JsonProperty("stackOrchestrator") final String stackOrchestrator,
-          @JsonProperty("psFormat") final String psFormat,
-          @JsonProperty("imagesFormat") final String imagesFormat) {
-    return new AutoValue_DockerConfig(
-        credHelpers == null
-            ? ImmutableMap.<String, String>of()
-            : ImmutableMap.copyOf(credHelpers),
-        auths == null
-            ? ImmutableMap.<String, RegistryAuth>of()
-            : ImmutableMap.copyOf(auths),
-        httpHeaders == null
-            ? ImmutableMap.<String, String>of()
-            : ImmutableMap.copyOf(httpHeaders),
-        credsStore,
-        detachKeys,
-        stackOrchestrator,
-        psFormat,
-        imagesFormat);
-  }
+  String imagesFormat();
 }

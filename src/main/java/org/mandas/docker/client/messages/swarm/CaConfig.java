@@ -20,51 +20,36 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
-import com.google.common.collect.ImmutableList;
 import java.util.List;
+
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class CaConfig {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableCaConfig.Builder.class)
+@Immutable
+public interface CaConfig {
 
   @Nullable
   @JsonProperty("NodeCertExpiry")
-  public abstract Long nodeCertExpiry();
+  Long nodeCertExpiry();
 
   @Nullable
   @JsonProperty("ExternalCAs")
-  public abstract ImmutableList<ExternalCa> externalCas();
+  List<ExternalCa> externalCas();
 
-  @JsonCreator
-  static CaConfig create(
-      @JsonProperty("NodeCertExpiry") final Long nodeCertExpiry,
-      @JsonProperty("ExternalCAs") final List<ExternalCa> externalCas) {
-    return builder()
-        .nodeCertExpiry(nodeCertExpiry)
-        .externalCas(externalCas)
-        .build();
+  interface Builder {
+
+    Builder nodeCertExpiry(Long nodeCertExpiry);
+
+    Builder externalCas(Iterable<? extends ExternalCa> externalCas);
+
+    CaConfig build();
   }
 
-  @AutoValue.Builder
-  public abstract static class Builder {
-
-    public abstract Builder nodeCertExpiry(Long nodeCertExpiry);
-
-    public abstract Builder externalCas(List<ExternalCa> externalCas);
-
-    public abstract CaConfig build();
-  }
-
-  public static CaConfig.Builder builder() {
-    return new AutoValue_CaConfig.Builder();
+  public static Builder builder() {
+    return ImmutableCaConfig.builder();
   }
 }

@@ -20,48 +20,34 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.DEFAULT;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
+import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
+import org.immutables.value.Value.Immutable;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = DEFAULT)
-public abstract class Platform {
+@JsonDeserialize(builder = ImmutablePlatform.Builder.class)
+@Immutable
+public interface Platform {
 
   @JsonProperty("Architecture")
-  public abstract String architecture();
+  String architecture();
 
   @JsonProperty("OS")
-  public abstract String os();
+  String os();
 
   @JsonProperty("OSVersion")
-  public abstract String osVersion();
+  String osVersion();
 
   @JsonProperty("OSFeatures")
-  public abstract ImmutableList<String> osFeatures();
+  List<String> osFeatures();
 
   @JsonProperty("Variant")
-  public abstract String variant();
+  String variant();
 
   @JsonProperty("Features")
-  public abstract ImmutableList<String> features();
+  List<String> features();
 
-  @JsonCreator
-  static Platform create(
-            @JsonProperty("Architecture") String architecture,
-            @JsonProperty("OS") String os,
-            @JsonProperty("OSVersion") String osVersion,
-            @JsonProperty("OSFeatures") ImmutableList<String> osFeatures,
-            @JsonProperty("Variant") String variant,
-            @JsonProperty("Features") ImmutableList<String> features) {
-    return new AutoValue_Platform(architecture, os, osVersion, osFeatures,
-                variant, features);
-  }
 }

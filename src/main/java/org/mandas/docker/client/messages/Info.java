@@ -20,316 +20,221 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import org.mandas.docker.client.messages.swarm.SwarmInfo;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class Info {
+import org.immutables.value.Value.Enclosing;
+import org.immutables.value.Value.Immutable;
+import org.mandas.docker.Nullable;
+import org.mandas.docker.client.messages.swarm.SwarmInfo;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableInfo.Builder.class)
+@Immutable
+@Enclosing
+public interface Info {
 
   @Nullable
   @JsonProperty("Architecture")
-  public abstract String architecture();
+  String architecture();
 
   @Nullable
   @JsonProperty("ClusterStore")
-  public abstract String clusterStore();
+  String clusterStore();
 
   @Nullable
   @JsonProperty("CgroupDriver")
-  public abstract String cgroupDriver();
+  String cgroupDriver();
 
   @JsonProperty("Containers")
-  public abstract Integer containers();
+  Integer containers();
 
   @Nullable
   @JsonProperty("ContainersRunning")
-  public abstract Integer containersRunning();
+  Integer containersRunning();
 
   @Nullable
   @JsonProperty("ContainersStopped")
-  public abstract Integer containersStopped();
+  Integer containersStopped();
 
   @Nullable
   @JsonProperty("ContainersPaused")
-  public abstract Integer containersPaused();
+  Integer containersPaused();
 
   @Nullable
   @JsonProperty("CpuCfsPeriod")
-  public abstract Boolean cpuCfsPeriod();
+  Boolean cpuCfsPeriod();
 
   @Nullable
   @JsonProperty("CpuCfsQuota")
-  public abstract Boolean cpuCfsQuota();
+  Boolean cpuCfsQuota();
 
   @JsonProperty("Debug")
-  public abstract Boolean debug();
+  Boolean debug();
 
   @JsonProperty("DockerRootDir")
-  public abstract String dockerRootDir();
+  String dockerRootDir();
 
   @JsonProperty("Driver")
-  public abstract String storageDriver();
+  String storageDriver();
 
   @JsonProperty("DriverStatus")
-  public abstract ImmutableList<ImmutableList<String>> driverStatus();
+  List<List<String>> driverStatus();
 
   @Nullable
   @JsonProperty("ExperimentalBuild")
-  public abstract Boolean experimentalBuild();
+  Boolean experimentalBuild();
 
   @Nullable
   @JsonProperty("HttpProxy")
-  public abstract String httpProxy();
+  String httpProxy();
 
   @Nullable
   @JsonProperty("HttpsProxy")
-  public abstract String httpsProxy();
+  String httpsProxy();
 
   @JsonProperty("ID")
-  public abstract String id();
+  String id();
 
   @JsonProperty("IPv4Forwarding")
-  public abstract Boolean ipv4Forwarding();
+  Boolean ipv4Forwarding();
 
   @JsonProperty("Images")
-  public abstract Integer images();
+  Integer images();
 
   @JsonProperty("IndexServerAddress")
-  public abstract String indexServerAddress();
+  String indexServerAddress();
 
   @Nullable
   @JsonProperty("InitPath")
-  public abstract String initPath();
+  String initPath();
 
   @Nullable
   @JsonProperty("InitSha1")
-  public abstract String initSha1();
+  String initSha1();
 
   @Nullable
   @JsonProperty("KernelMemory")
-  public abstract Boolean kernelMemory();
+  Boolean kernelMemory();
 
   @JsonProperty("KernelVersion")
-  public abstract String kernelVersion();
+  String kernelVersion();
 
   @JsonProperty("Labels")
-  public abstract ImmutableList<String> labels();
+  @JsonSetter(nulls = Nulls.AS_EMPTY)
+  List<String> labels();
 
   @JsonProperty("MemTotal")
-  public abstract Long memTotal();
+  Long memTotal();
 
   @JsonProperty("MemoryLimit")
-  public abstract Boolean memoryLimit();
+  Boolean memoryLimit();
 
   @JsonProperty("NCPU")
-  public abstract Integer cpus();
+  Integer cpus();
 
   @JsonProperty("NEventsListener")
-  public abstract Integer eventsListener();
+  Integer eventsListener();
 
   @JsonProperty("NFd")
-  public abstract Integer fileDescriptors();
+  Integer fileDescriptors();
 
   @JsonProperty("NGoroutines")
-  public abstract Integer goroutines();
+  Integer goroutines();
 
   @JsonProperty("Name")
-  public abstract String name();
+  String name();
 
   @Nullable
   @JsonProperty("NoProxy")
-  public abstract String noProxy();
+  String noProxy();
 
   @Nullable
   @JsonProperty("OomKillDisable")
-  public abstract Boolean oomKillDisable();
+  Boolean oomKillDisable();
 
   @JsonProperty("OperatingSystem")
-  public abstract String operatingSystem();
+  String operatingSystem();
 
   @Nullable
   @JsonProperty("OSType")
-  public abstract String osType();
+  String osType();
 
   @Nullable
   @JsonProperty("Plugins")
-  public abstract Plugins plugins();
+  Plugins plugins();
 
   @JsonProperty("RegistryConfig")
-  public abstract RegistryConfig registryConfig();
+  RegistryConfig registryConfig();
 
   @Nullable
   @JsonProperty("ServerVersion")
-  public abstract String serverVersion();
+  String serverVersion();
 
   @JsonProperty("SwapLimit")
-  public abstract Boolean swapLimit();
+  Boolean swapLimit();
   
   @Nullable
   @JsonProperty("Swarm")
-  public abstract SwarmInfo swarm();
+  SwarmInfo swarm();
 
   @Nullable
   @JsonProperty("SystemStatus")
-  public abstract ImmutableList<ImmutableList<String>> systemStatus();
+  List<List<String>> systemStatus();
 
   @JsonProperty("SystemTime")
-  public abstract Date systemTime();
+  Date systemTime();
 
-  @JsonCreator
-  static Info create(
-      @JsonProperty("Architecture") final String architecture,
-      @JsonProperty("ClusterStore") final String clusterStore,
-      @JsonProperty("CgroupDriver") final String cgroupDriver,
-      @JsonProperty("Containers") final Integer containers,
-      @JsonProperty("ContainersRunning") final Integer containersRunning,
-      @JsonProperty("ContainersStopped") final Integer containersStopped,
-      @JsonProperty("ContainersPaused") final Integer containersPaused,
-      @JsonProperty("CpuCfsPeriod") final Boolean cpuCfsPeriod,
-      @JsonProperty("CpuCfsQuota") final Boolean cpuCfsQuota,
-      @JsonProperty("Debug") final Boolean debug,
-      @JsonProperty("DockerRootDir") final String dockerRootDir,
-      @JsonProperty("Driver") final String storageDriver,
-      @JsonProperty("DriverStatus") final List<List<String>> driverStatus,
-      @JsonProperty("ExperimentalBuild") final Boolean experimentalBuild,
-      @JsonProperty("HttpProxy") final String httpProxy,
-      @JsonProperty("HttpsProxy") final String httpsProxy,
-      @JsonProperty("ID") final String id,
-      @JsonProperty("IPv4Forwarding") final Boolean ipv4Forwarding,
-      @JsonProperty("Images") final Integer images,
-      @JsonProperty("IndexServerAddress") final String indexServerAddress,
-      @JsonProperty("InitPath") final String initPath,
-      @JsonProperty("InitSha1") final String initSha1,
-      @JsonProperty("KernelMemory") final Boolean kernelMemory,
-      @JsonProperty("KernelVersion") final String kernelVersion,
-      @JsonProperty("Labels") final List<String> labels,
-      @JsonProperty("MemTotal") final Long memTotal,
-      @JsonProperty("MemoryLimit") final Boolean memoryLimit,
-      @JsonProperty("NCPU") final Integer cpus,
-      @JsonProperty("NEventsListener") final Integer eventsListener,
-      @JsonProperty("NFd") final Integer fileDescriptors,
-      @JsonProperty("NGoroutines") final Integer goroutines,
-      @JsonProperty("Name") final String name,
-      @JsonProperty("NoProxy") final String noProxy,
-      @JsonProperty("OomKillDisable") final Boolean oomKillDisable,
-      @JsonProperty("OperatingSystem") final String operatingSystem,
-      @JsonProperty("OSType") final String osType,
-      @JsonProperty("Plugins") final Plugins plugins,
-      @JsonProperty("RegistryConfig") final RegistryConfig registryConfig,
-      @JsonProperty("ServerVersion") final String serverVersion,
-      @JsonProperty("SwapLimit") final Boolean swapLimit,
-      @JsonProperty("Swarm") final SwarmInfo swarm,
-      @JsonProperty("SystemStatus") final List<List<String>> systemStatus,
-      @JsonProperty("SystemTime") final Date systemTime) {
-    final ImmutableList.Builder<ImmutableList<String>> driverStatusB = ImmutableList.builder();
-    if (driverStatus != null) {
-      for (final List<String> ds : driverStatus) {
-        driverStatusB.add(ImmutableList.copyOf(ds));
-      }
-    }
-    final ImmutableList<String> labelsT =
-        labels == null ? ImmutableList.<String>of() : ImmutableList.copyOf(labels);
-    final ImmutableList.Builder<ImmutableList<String>> systemStatusB = ImmutableList.builder();
-    if (systemStatus != null) {
-      for (final List<String> ss : systemStatus) {
-        systemStatusB.add(ImmutableList.copyOf(ss));
-      }
-    }
-    return new AutoValue_Info(architecture, clusterStore, cgroupDriver, containers,
-        containersRunning, containersStopped, containersPaused, cpuCfsPeriod, cpuCfsQuota, debug,
-        dockerRootDir, storageDriver, driverStatusB.build(), experimentalBuild,
-        httpProxy, httpsProxy, id, ipv4Forwarding, images, indexServerAddress, initPath, initSha1,
-        kernelMemory, kernelVersion, labelsT, memTotal, memoryLimit, cpus, eventsListener,
-        fileDescriptors, goroutines, name, noProxy, oomKillDisable, operatingSystem, osType,
-        plugins, registryConfig, serverVersion, swapLimit, swarm, systemStatusB.build(), 
-        systemTime);
-  }
-
-  @AutoValue
-  public abstract static class Plugins {
+  @JsonDeserialize(builder = ImmutableInfo.Plugins.Builder.class)
+  @Immutable
+  public interface Plugins {
 
     @JsonProperty("Volume")
-    public abstract ImmutableList<String> volumes();
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    List<String> volumes();
 
     /**
      * Return the value of the `network` json path.
      * todo this method should be renamed to network
      */
     @JsonProperty("Network")
-    public abstract ImmutableList<String> networks();
-
-    @JsonCreator
-    static Plugins create(
-        @JsonProperty("Volume") final List<String> volumes,
-        @JsonProperty("Network") final List<String> networks) {
-      final ImmutableList<String> volumesT =
-          volumes == null ? ImmutableList.<String>of() : ImmutableList.copyOf(volumes);
-      final ImmutableList<String> networksT =
-          networks == null ? ImmutableList.<String>of() : ImmutableList.copyOf(networks);
-      return new AutoValue_Info_Plugins(volumesT, networksT);
-    }
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    List<String> networks();
   }
 
-  @AutoValue
-  public abstract static class RegistryConfig {
+  @JsonDeserialize(builder = ImmutableInfo.RegistryConfig.Builder.class)
+  @Immutable
+  public interface RegistryConfig {
 
     @JsonProperty("IndexConfigs")
-    public abstract ImmutableMap<String, IndexConfig> indexConfigs();
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    Map<String, IndexConfig> indexConfigs();
 
     @JsonProperty("InsecureRegistryCIDRs")
-    public abstract ImmutableList<String> insecureRegistryCidrs();
-
-    @JsonCreator
-    static RegistryConfig create(
-        @JsonProperty("IndexConfigs") final Map<String, IndexConfig> indexConfigs,
-        @JsonProperty("InsecureRegistryCIDRs") final List<String> insecureRegistryCidrs) {
-      final ImmutableMap<String, IndexConfig> indexConfigsT =
-          indexConfigs == null
-          ? ImmutableMap.<String, IndexConfig>of() : ImmutableMap.copyOf(indexConfigs);
-      final ImmutableList<String> insecureRegistryCidrsT =
-          insecureRegistryCidrs == null
-          ? ImmutableList.<String>of() : ImmutableList.copyOf(insecureRegistryCidrs);
-      return new AutoValue_Info_RegistryConfig(indexConfigsT, insecureRegistryCidrsT);
-    }
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    List<String> insecureRegistryCidrs();
   }
 
-  @AutoValue
-  public abstract static class IndexConfig {
+  @JsonDeserialize(builder = ImmutableInfo.IndexConfig.Builder.class)
+  @Immutable
+  public interface IndexConfig {
 
     @JsonProperty("Name")
-    public abstract String name();
+    String name();
 
     @JsonProperty("Mirrors")
-    public abstract ImmutableList<String> mirrors();
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    List<String> mirrors();
 
     @JsonProperty("Secure")
-    public abstract Boolean secure();
+    Boolean secure();
 
     @JsonProperty("Official")
-    public abstract Boolean official();
-
-    @JsonCreator
-    static IndexConfig create(
-        @JsonProperty("Name") final String name,
-        @JsonProperty("Mirrors") final List<String> mirrors,
-        @JsonProperty("Secure") final Boolean secure,
-        @JsonProperty("Official") final Boolean official) {
-      final ImmutableList<String> mirrorsT =
-          mirrors == null ? ImmutableList.<String>of() : ImmutableList.copyOf(mirrors);
-      return new AutoValue_Info_IndexConfig(name, mirrorsT, secure, official);
-    }
+    Boolean official();
   }
 }

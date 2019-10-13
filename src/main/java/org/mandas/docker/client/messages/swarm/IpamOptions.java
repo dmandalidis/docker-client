@@ -20,35 +20,22 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
-
 import java.util.List;
+
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class IpamOptions {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableIpamOptions.Builder.class)
+@Immutable
+public interface IpamOptions {
 
   @JsonProperty("Driver")
-  public abstract Driver driver();
+  Driver driver();
 
   @Nullable
   @JsonProperty("Configs")
-  public abstract ImmutableList<IpamConfig> configs();
-
-  @JsonCreator
-  static IpamOptions create(
-      @JsonProperty("Driver") final Driver driver,
-      @JsonProperty("Configs") final List<IpamConfig> configs) {
-    final ImmutableList<IpamConfig> configsT = configs == null
-                                               ? null : ImmutableList.copyOf(configs);
-    return new AutoValue_IpamOptions(driver, configsT);
-  }
+  List<IpamConfig> configs();
 }

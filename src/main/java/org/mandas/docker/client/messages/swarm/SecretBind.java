@@ -20,51 +20,35 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
+import org.immutables.value.Value.Immutable;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class SecretBind {
+@JsonDeserialize(builder = ImmutableSecretBind.Builder.class)
+@Immutable
+public interface SecretBind {
   @JsonProperty("File")
-  public abstract SecretFile file();
+  SecretFile file();
 
   @JsonProperty("SecretID")
-  public abstract String secretId();
+  String secretId();
 
   @JsonProperty("SecretName")
-  public abstract String secretName();
+  String secretName();
 
   public static Builder builder() {
-    return new AutoValue_SecretBind.Builder();
+    return ImmutableSecretBind.builder();
   }
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  interface Builder {
 
-    public abstract Builder file(SecretFile file);
+    Builder file(SecretFile file);
 
-    public abstract Builder secretId(String secretId);
+    Builder secretId(String secretId);
 
-    public abstract Builder secretName(String secretName);
+    Builder secretName(String secretName);
 
-    public abstract SecretBind build();
-  }
-
-  @JsonCreator
-  static SecretBind create(
-         @JsonProperty("File") SecretFile file,
-         @JsonProperty("SecretID") String secretId,
-         @JsonProperty("SecretName") String secretName) {
-    return builder()
-        .file(file)
-        .secretId(secretId)
-        .secretName(secretName)
-        .build();
+    SecretBind build();
   }
 }

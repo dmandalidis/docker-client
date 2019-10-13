@@ -20,56 +20,38 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class Version {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableVersion.Builder.class)
+@Immutable
+public interface Version {
 
   @JsonProperty("ApiVersion")
-  public abstract String apiVersion();
+  String apiVersion();
 
   @JsonProperty("Arch")
-  public abstract String arch();
+  String arch();
 
   @Nullable
   @JsonProperty("BuildTime")
-  public abstract String buildTime();
+  String buildTime();
 
   @JsonProperty("GitCommit")
-  public abstract String gitCommit();
+  String gitCommit();
 
   @JsonProperty("GoVersion")
-  public abstract String goVersion();
+  String goVersion();
 
   @JsonProperty("KernelVersion")
-  public abstract String kernelVersion();
+  String kernelVersion();
 
   @JsonProperty("Os")
-  public abstract String os();
+  String os();
 
   @JsonProperty("Version")
-  public abstract String version();
-
-  @JsonCreator
-  static Version create(
-      @JsonProperty("ApiVersion") final String apiVersion,
-      @JsonProperty("Arch") final String arch,
-      @JsonProperty("BuildTime") final String buildTime,
-      @JsonProperty("GitCommit") final String gitCommit,
-      @JsonProperty("GoVersion") final String goVersion,
-      @JsonProperty("KernelVersion") final String kernelVersion,
-      @JsonProperty("Os") final String os,
-      @JsonProperty("Version") final String version) {
-    return new AutoValue_Version(apiVersion, arch, buildTime, gitCommit, goVersion, kernelVersion,
-        os, version);
-  }
+  String version();
 }

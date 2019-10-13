@@ -20,44 +20,26 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
 import java.util.List;
 
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class ServiceCreateResponse {
+
+@JsonDeserialize(builder = ImmutableServiceCreateResponse.Builder.class)
+@Immutable
+public interface ServiceCreateResponse {
 
   @JsonProperty("ID")
-  public abstract String id();
+  String id();
 
   /**
    * @since API 1.25
    */
   @Nullable
   @JsonProperty("Warnings")
-  public abstract ImmutableList<String> warnings();
-
-  static ServiceCreateResponse create(
-          @JsonProperty("ID") final String id) {
-    return create(id, null);
-  }
-
-  @JsonCreator
-  static ServiceCreateResponse create(
-          @JsonProperty("ID") final String id,
-          @JsonProperty("Warnings") final List<String> warnings) {
-    final ImmutableList<String> warningsT = warnings == null
-            ? null : ImmutableList.copyOf(warnings);
-    return new AutoValue_ServiceCreateResponse(id, warningsT);
-  }
+  List<String> warnings();
 }

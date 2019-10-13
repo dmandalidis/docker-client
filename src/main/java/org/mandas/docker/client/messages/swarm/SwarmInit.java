@@ -20,62 +20,45 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class SwarmInit {
+
+@JsonDeserialize(builder = ImmutableSwarmInit.Builder.class)
+@Immutable
+public interface SwarmInit {
 
   @JsonProperty("ListenAddr")
-  public abstract String listenAddr();
+  String listenAddr();
 
   @JsonProperty("AdvertiseAddr")
-  public abstract String advertiseAddr();
+  String advertiseAddr();
 
   @Nullable
   @JsonProperty("ForceNewCluster")
-  public abstract Boolean forceNewCluster();
+  Boolean forceNewCluster();
 
   @Nullable
   @JsonProperty("Spec")
-  public abstract SwarmSpec swarmSpec();
+  SwarmSpec swarmSpec();
 
-  @AutoValue.Builder
-  public abstract static class Builder {
-    public abstract Builder listenAddr(String listenAddr);
+  interface Builder {
+    Builder listenAddr(String listenAddr);
 
-    public abstract Builder advertiseAddr(String advertiseAddr);
+    Builder advertiseAddr(String advertiseAddr);
 
-    public abstract Builder forceNewCluster(Boolean forceNewCluster);
+    Builder forceNewCluster(Boolean forceNewCluster);
 
-    public abstract Builder swarmSpec(SwarmSpec swarmSpec);
+    Builder swarmSpec(SwarmSpec swarmSpec);
 
-    public abstract SwarmInit build();
+    SwarmInit build();
   }
 
   public static SwarmInit.Builder builder() {
-    return new AutoValue_SwarmInit.Builder();
+    return ImmutableSwarmInit.builder();
   }
 
-  @JsonCreator
-  static SwarmInit create(
-      @JsonProperty("ListenAddr") final String listenAddr,
-      @JsonProperty("AdvertiseAddr") final String advertiseAddr,
-      @JsonProperty("ForceNewCluster") final Boolean forceNewCluster,
-      @JsonProperty("Spec") final SwarmSpec swarmSpec) {
-    return builder()
-        .listenAddr(listenAddr)
-        .advertiseAddr(advertiseAddr)
-        .forceNewCluster(forceNewCluster)
-        .swarmSpec(swarmSpec)
-        .build();
-  }
 }

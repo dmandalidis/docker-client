@@ -20,50 +20,35 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
 import java.util.List;
 
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * An object that represents the JSON returned by the Docker API for an exec command's process
  * configuration.
  */
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class ProcessConfig {
+@JsonDeserialize(builder = ImmutableProcessConfig.Builder.class)
+@Immutable
+public interface ProcessConfig {
 
   @JsonProperty("privileged")
-  public abstract Boolean privileged();
+  Boolean privileged();
 
   @Nullable
   @JsonProperty("user")
-  public abstract String user();
+  String user();
 
   @JsonProperty("tty")
-  public abstract Boolean tty();
+  Boolean tty();
 
   @JsonProperty("entrypoint")
-  public abstract String entrypoint();
+  String entrypoint();
 
   @JsonProperty("arguments")
-  public abstract ImmutableList<String> arguments();
-
-  @JsonCreator
-  static ProcessConfig create(
-      @JsonProperty("privileged") final Boolean privileged,
-      @JsonProperty("user") final String user,
-      @JsonProperty("tty") final Boolean tty,
-      @JsonProperty("entrypoint") final String entrypoint,
-      @JsonProperty("arguments") final List<String> arguments) {
-    return new AutoValue_ProcessConfig(privileged, user, tty, entrypoint,
-        ImmutableList.copyOf(arguments));
-  }
+  List<String> arguments();
 }

@@ -20,46 +20,30 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
-import com.google.common.collect.ImmutableMap;
 import java.util.Date;
-import java.util.Map;
-import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class SwarmCluster {
+import org.immutables.value.Value.Immutable;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableSwarmCluster.Builder.class)
+@Immutable
+public interface SwarmCluster {
 
   @JsonProperty("ID")
-  public abstract String id();
+  String id();
 
   @JsonProperty("Version")
-  public abstract Version version();
+  Version version();
 
   @JsonProperty("CreatedAt")
-  public abstract Date createdAt();
+  Date createdAt();
 
   @JsonProperty("UpdatedAt")
-  public abstract Date updatedAt();
+  Date updatedAt();
 
   @JsonProperty("Spec")
-  public abstract SwarmSpec swarmSpec();
+  SwarmSpec swarmSpec();
 
-  @JsonCreator
-  static SwarmCluster create(
-      @JsonProperty("ID") final String id,
-      @JsonProperty("Version") final Version version,
-      @JsonProperty("CreatedAt") final Date createdAt,
-      @JsonProperty("UpdatedAt") final Date updatedAt,
-      @JsonProperty("Spec") final SwarmSpec swarmSpec) {
-    
-    return new AutoValue_SwarmCluster(id, version, createdAt, updatedAt, swarmSpec);
-  }
 }

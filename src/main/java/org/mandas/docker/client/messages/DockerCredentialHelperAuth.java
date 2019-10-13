@@ -20,11 +20,13 @@
 
 package org.mandas.docker.client.messages;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+import org.immutables.value.Value.Derived;
+import org.immutables.value.Value.Immutable;
+import org.mandas.docker.Nullable;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import org.mandas.docker.Nullable;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * Represents the auth response received from a docker credential helper
@@ -32,28 +34,36 @@ import org.mandas.docker.Nullable;
  *
  * <p>See {@link org.mandas.docker.client.DockerCredentialHelper}.</p>
  */
-@AutoValue
-public abstract class DockerCredentialHelperAuth {
+@JsonDeserialize(builder = ImmutableDockerCredentialHelperAuth.Builder.class)
+@Immutable
+public interface DockerCredentialHelperAuth {
   @JsonProperty("Username")
-  public abstract String username();
+  String username();
 
   @JsonProperty("Secret")
-  public abstract String secret();
+  String secret();
 
   @Nullable
   @JsonProperty("ServerURL")
-  public abstract String serverUrl();
+  String serverUrl();
 
-  @JsonCreator
-  public static DockerCredentialHelperAuth create(
-        @JsonProperty("Username") final String username,
-        @JsonProperty("Secret") final String secret,
-        @JsonProperty("ServerURL") final String serverUrl) {
-    return new AutoValue_DockerCredentialHelperAuth(username, secret, serverUrl);
+  interface Builder {
+	  Builder username(String username);
+	  
+	  Builder secret(String secret);
+	  
+	  Builder serverUrl(String serverUrl);
+	  
+	  DockerCredentialHelperAuth build();
   }
-
+  
+  static Builder builder() {
+	  return ImmutableDockerCredentialHelperAuth.builder();
+  }
+  
   @JsonIgnore
-  public RegistryAuth toRegistryAuth() {
+  @Derived
+  default RegistryAuth toRegistryAuth() {
     return RegistryAuth.builder()
         .username(username())
         .password(secret())

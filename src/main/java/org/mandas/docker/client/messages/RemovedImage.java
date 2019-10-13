@@ -20,40 +20,35 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class RemovedImage {
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-  public abstract Type type();
+@Immutable
+public interface RemovedImage {
+
+  Type type();
 
   @Nullable
-  public abstract String imageId();
+  String imageId();
 
   @JsonCreator
   public static RemovedImage create(
       @JsonProperty("Untagged") final String untagged,
       @JsonProperty("Deleted") final String deleted) {
     if (untagged != null) {
-      return new AutoValue_RemovedImage(Type.UNTAGGED, untagged);
+      return ImmutableRemovedImage.builder().type(Type.UNTAGGED).imageId(untagged).build();
     } else if (deleted != null) {
-      return new AutoValue_RemovedImage(Type.DELETED, deleted);
+      return ImmutableRemovedImage.builder().type(Type.DELETED).imageId(deleted).build();
     } else {
-      return new AutoValue_RemovedImage(Type.UNKNOWN, null);
+      return ImmutableRemovedImage.builder().type(Type.UNKNOWN).build();
     }
   }
 
   public static RemovedImage create(final Type type, final String imageId) {
-    return new AutoValue_RemovedImage(type, imageId);
+    return ImmutableRemovedImage.builder().type(type).imageId(imageId).build();
   }
 
   public enum Type {

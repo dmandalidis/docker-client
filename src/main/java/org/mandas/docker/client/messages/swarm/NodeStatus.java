@@ -20,31 +20,21 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class NodeStatus {
+
+@JsonDeserialize(builder = ImmutableNodeStatus.Builder.class)
+@Immutable
+public interface NodeStatus {
+  
   @JsonProperty("State")
-  public abstract String state();
+  String state();
 
   @Nullable
   @JsonProperty("Addr")
-  public abstract String addr();
-
-  @JsonCreator
-  static NodeStatus create(@JsonProperty("State") final String state,
-                           @JsonProperty("Addr") final String addr) {
-    return new AutoValue_NodeStatus(state, addr);
-  }
-
+  String addr();
 }

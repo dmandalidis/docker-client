@@ -20,182 +20,131 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
 import java.math.BigInteger;
+
+import org.immutables.value.Value.Enclosing;
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class MemoryStats {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableMemoryStats.Builder.class)
+@Immutable
+@Enclosing
+public interface MemoryStats {
 
   @Nullable
   @JsonProperty("stats")
-  public abstract Stats stats();
+  Stats stats();
 
   @Nullable
   @JsonProperty("max_usage")
-  public abstract Long maxUsage();
+  Long maxUsage();
 
   @Nullable
   @JsonProperty("usage")
-  public abstract Long usage();
+  Long usage();
 
   @Nullable
   @JsonProperty("failcnt")
-  public abstract Long failcnt();
+  Long failcnt();
 
   @Nullable
   @JsonProperty("limit")
-  public abstract Long limit();
+  Long limit();
 
-  @JsonCreator
-  static MemoryStats create(
-      @JsonProperty("stats") final Stats stats,
-      @JsonProperty("max_usage") final Long maxUsage,
-      @JsonProperty("usage") final Long usage,
-      @JsonProperty("failcnt") Long failcnt,
-      @JsonProperty("limit") Long limit
-  ) {
-    return new AutoValue_MemoryStats(stats, maxUsage, usage, failcnt, limit);
-  }
-
-  @AutoValue
-  public abstract static class Stats {
+  @JsonDeserialize(builder = ImmutableMemoryStats.Stats.Builder.class)
+  @Immutable
+  public interface Stats {
 
     @JsonProperty("active_file")
-    public abstract Long activeFile();
+    Long activeFile();
 
     @JsonProperty("total_active_file")
-    public abstract Long totalActiveFile();
+    Long totalActiveFile();
 
     @JsonProperty("inactive_file")
-    public abstract Long inactiveFile();
+    Long inactiveFile();
 
     @JsonProperty("total_inactive_file")
-    public abstract Long totalInactiveFile();
+    Long totalInactiveFile();
 
     @JsonProperty("cache")
-    public abstract Long cache();
+    Long cache();
 
     @JsonProperty("total_cache")
-    public abstract Long totalCache();
+    Long totalCache();
 
     @JsonProperty("active_anon")
-    public abstract Long activeAnon();
+    Long activeAnon();
 
     @JsonProperty("total_active_anon")
-    public abstract Long totalActiveAnon();
+    Long totalActiveAnon();
 
     @JsonProperty("inactive_anon")
-    public abstract Long inactiveAnon();
+    Long inactiveAnon();
 
     @JsonProperty("total_inactive_anon")
-    public abstract Long totalInactiveAnon();
+    Long totalInactiveAnon();
 
     @JsonProperty("hierarchical_memory_limit")
-    public abstract BigInteger hierarchicalMemoryLimit();
+    BigInteger hierarchicalMemoryLimit();
 
     @JsonProperty("mapped_file")
-    public abstract Long mappedFile();
+    Long mappedFile();
 
     @JsonProperty("total_mapped_file")
-    public abstract Long totalMappedFile();
+    Long totalMappedFile();
 
     @JsonProperty("pgmajfault")
-    public abstract Long pgmajfault();
+    Long pgmajfault();
 
     @JsonProperty("total_pgmajfault")
-    public abstract Long totalPgmajfault();
+    Long totalPgmajfault();
 
     @JsonProperty("pgpgin")
-    public abstract Long pgpgin();
+    Long pgpgin();
 
     @JsonProperty("total_pgpgin")
-    public abstract Long totalPgpgin();
+    Long totalPgpgin();
 
     @JsonProperty("pgpgout")
-    public abstract Long pgpgout();
+    Long pgpgout();
 
     @JsonProperty("total_pgpgout")
-    public abstract Long totalPgpgout();
+    Long totalPgpgout();
 
     @JsonProperty("pgfault")
-    public abstract Long pgfault();
+    Long pgfault();
 
     @JsonProperty("total_pgfault")
-    public abstract Long totalPgfault();
+    Long totalPgfault();
 
     @JsonProperty("rss")
-    public abstract Long rss();
+    Long rss();
 
     @JsonProperty("total_rss")
-    public abstract Long totalRss();
+    Long totalRss();
 
     @JsonProperty("rss_huge")
-    public abstract Long rssHuge();
+    Long rssHuge();
 
     @JsonProperty("total_rss_huge")
-    public abstract Long totalRssHuge();
+    Long totalRssHuge();
 
     @JsonProperty("unevictable")
-    public abstract Long unevictable();
+    Long unevictable();
 
     @JsonProperty("total_unevictable")
-    public abstract Long totalUnevictable();
+    Long totalUnevictable();
 
     @Nullable
     @JsonProperty("total_writeback")
-    public abstract Long totalWriteback();
+    Long totalWriteback();
 
     @Nullable
     @JsonProperty("writeback")
-    public abstract Long writeback();
-
-    @JsonCreator
-    static Stats create(
-        @JsonProperty("active_file") final Long activeFile,
-        @JsonProperty("total_active_file") final Long totalActiveFile,
-        @JsonProperty("inactive_file") final Long inactiveFile,
-        @JsonProperty("total_inactive_file") final Long totalInactivefile,
-        @JsonProperty("cache") final Long cache,
-        @JsonProperty("total_cache") final Long totalCache,
-        @JsonProperty("active_anon") final Long activeAnon,
-        @JsonProperty("total_active_anon") final Long totalActiveAnon,
-        @JsonProperty("inactive_anon") final Long inactiveAnon,
-        @JsonProperty("total_inactive_anon") final Long totalInactiveAnon,
-        @JsonProperty("hierarchical_memory_limit") final BigInteger hierarchicalMemoryLimit,
-        @JsonProperty("mapped_file") final Long mappedFile,
-        @JsonProperty("total_mapped_file") final Long totalMappedFile,
-        @JsonProperty("pgmajfault") final Long pgmajfault,
-        @JsonProperty("total_pgmajfault") final Long totalPgmajfault,
-        @JsonProperty("pgpgin") final Long pgpgin,
-        @JsonProperty("total_pgpgin") final Long totalPgpgin,
-        @JsonProperty("pgpgout") final Long pgpgout,
-        @JsonProperty("total_pgpgout") final Long totalPgpgout,
-        @JsonProperty("pgfault") final Long pgfault,
-        @JsonProperty("total_pgfault") final Long totalPgfault,
-        @JsonProperty("rss") final Long rss,
-        @JsonProperty("total_rss") final Long totalRss,
-        @JsonProperty("rss_huge") final Long rssHuge,
-        @JsonProperty("total_rss_huge") final Long totalRssHuge,
-        @JsonProperty("unevictable") final Long unevictable,
-        @JsonProperty("total_unevictable") final Long totalUnevictable,
-        @JsonProperty("writeback") final Long writeback,
-        @JsonProperty("total_writeback") final Long totalWriteback
-    ) {
-      return new AutoValue_MemoryStats_Stats(
-          activeFile, totalActiveFile, inactiveFile, totalInactivefile, cache, totalCache,
-          activeAnon, totalActiveAnon, inactiveAnon, totalInactiveAnon, hierarchicalMemoryLimit,
-          mappedFile, totalMappedFile, pgmajfault, totalPgmajfault, pgpgin, totalPgpgin, pgpgout,
-          totalPgpgout, pgfault, totalPgfault, rss, totalRss, rssHuge, totalRssHuge, unevictable,
-          totalUnevictable, writeback, totalWriteback);
-    }
+    Long writeback();
   }
 }

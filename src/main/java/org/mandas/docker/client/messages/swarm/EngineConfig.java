@@ -20,46 +20,27 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-
 import java.util.List;
 import java.util.Map;
 
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class EngineConfig {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableEngineConfig.Builder.class)
+@Immutable
+public interface EngineConfig {
 
   @JsonProperty("EngineVersion")
-  public abstract String engineVersion();
+  String engineVersion();
 
   @Nullable
   @JsonProperty("Labels")
-  public abstract ImmutableMap<String, String> labels();
+  Map<String, String> labels();
 
   @Nullable
   @JsonProperty("Plugins")
-  public abstract ImmutableList<EnginePlugin> plugins();
-
-  @JsonCreator
-  static EngineConfig create(@JsonProperty("EngineVersion") final String engineVersion,
-      @JsonProperty("Labels") final Map<String, String> labels,
-      @JsonProperty("Plugins") final List<EnginePlugin> plugins) {
-    final ImmutableMap<String, String> labelsT = labels == null ? null
-        : ImmutableMap.copyOf(labels);
-    
-    final ImmutableList<EnginePlugin> pluginsT = plugins == null ? null
-        : ImmutableList.copyOf(plugins);
-    return new AutoValue_EngineConfig(engineVersion, labelsT, pluginsT);
-  }
-
+  List<EnginePlugin> plugins();
 }

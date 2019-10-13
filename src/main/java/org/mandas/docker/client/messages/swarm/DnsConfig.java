@@ -20,68 +20,49 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
-
 import java.util.List;
+
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class DnsConfig {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableDnsConfig.Builder.class)
+@Immutable
+public interface DnsConfig {
 
   @Nullable
   @JsonProperty("Nameservers")
-  public abstract ImmutableList<String> nameServers();
+  List<String> nameServers();
 
   @Nullable
   @JsonProperty("Search")
-  public abstract ImmutableList<String> search();
+  List<String> search();
 
   @Nullable
   @JsonProperty("Options")
-  public abstract ImmutableList<String> options();
+  List<String> options();
 
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  interface Builder {
 
-    public abstract Builder nameServers(String... nameServers);
+    Builder nameServers(String... nameServers);
 
-    public abstract Builder nameServers(List<String> nameServers);
+    Builder nameServers(Iterable<String> nameServers);
     
-    public abstract Builder search(String... search);
-
-    public abstract Builder search(List<String> search);
+    Builder search(String... search);
     
-    public abstract Builder options(String... options);
+    Builder search(Iterable<String> search);
+    
+    Builder options(String... options);
 
-    public abstract Builder options(List<String> options);
+    Builder options(Iterable<String> options);
 
-
-    public abstract DnsConfig build();
+    DnsConfig build();
   }
 
   public static Builder builder() {
-    return new AutoValue_DnsConfig.Builder();
+    return ImmutableDnsConfig.builder();
   }
-
-  @JsonCreator
-  static DnsConfig create(
-      @JsonProperty("Nameservers") final List<String> nameServers,
-      @JsonProperty("Search") final List<String> search,
-      @JsonProperty("Options") final List<String> options) {
-    return builder()
-        .nameServers(nameServers)
-        .search(search)
-        .options(options)
-        .build();
-  }
-
 }

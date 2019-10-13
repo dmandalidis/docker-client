@@ -20,89 +20,64 @@
 
 package org.mandas.docker.client.messages.mount;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class Mount {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableMount.Builder.class)
+@Immutable
+public interface Mount {
 
   @Nullable
   @JsonProperty("Type")
-  public abstract String type();
+  String type();
 
   @Nullable
   @JsonProperty("Source")
-  public abstract String source();
+  String source();
 
   @Nullable
   @JsonProperty("Target")
-  public abstract String target();
+  String target();
 
   @Nullable
   @JsonProperty("ReadOnly")
-  public abstract Boolean readOnly();
+  Boolean readOnly();
 
   @Nullable
   @JsonProperty("BindOptions")
-  public abstract BindOptions bindOptions();
+  BindOptions bindOptions();
 
   @Nullable
   @JsonProperty("VolumeOptions")
-  public abstract VolumeOptions volumeOptions();
+  VolumeOptions volumeOptions();
 
   @Nullable
   @JsonProperty("TmpfsOptions")
-  public abstract TmpfsOptions tmpfsOptions();
+  TmpfsOptions tmpfsOptions();
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  interface Builder {
 
-    public abstract Builder type(String type);
+    Builder type(String type);
 
-    public abstract Builder source(String source);
+    Builder source(String source);
 
-    public abstract Builder target(String target);
+    Builder target(String target);
 
-    public abstract Builder readOnly(Boolean readOnly);
+    Builder readOnly(Boolean readOnly);
 
-    public abstract Builder bindOptions(BindOptions bindOptions);
+    Builder bindOptions(BindOptions bindOptions);
 
-    public abstract Builder volumeOptions(VolumeOptions volumeOptions);
+    Builder volumeOptions(VolumeOptions volumeOptions);
 
-    public abstract Builder tmpfsOptions(TmpfsOptions tmpfsOptions);
+    Builder tmpfsOptions(TmpfsOptions tmpfsOptions);
 
-    public abstract Mount build();
+    Mount build();
   }
 
-  public static Mount.Builder builder() {
-    return new AutoValue_Mount.Builder();
-  }
-
-  @JsonCreator
-  static Mount create(
-      @JsonProperty("Type") final String type,
-      @JsonProperty("Source") final String source,
-      @JsonProperty("Target") final String target,
-      @JsonProperty("ReadOnly") final Boolean readOnly,
-      @JsonProperty("BindOptions") final BindOptions bindOptions,
-      @JsonProperty("VolumeOptions") final VolumeOptions volumeOptions,
-      @JsonProperty("TmpfsOptions") final TmpfsOptions tmpfsOptions) {
-    return builder()
-        .type(type)
-        .source(source)
-        .target(target)
-        .readOnly(readOnly)
-        .bindOptions(bindOptions)
-        .volumeOptions(volumeOptions)
-        .tmpfsOptions(tmpfsOptions)
-        .build();
+  public static Builder builder() {
+    return ImmutableMount.builder();
   }
 }

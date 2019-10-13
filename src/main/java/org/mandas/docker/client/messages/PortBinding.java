@@ -20,43 +20,32 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class PortBinding {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutablePortBinding.Builder.class)
+@Immutable
+public interface PortBinding {
 
   @Nullable
   @JsonProperty("HostIp")
-  public abstract String hostIp();
+  String hostIp();
 
   @JsonProperty("HostPort")
-  public abstract String hostPort();
+  String hostPort();
 
   public static PortBinding of(final String ip, final String port) {
-    return new AutoValue_PortBinding(ip, port);
+    return ImmutablePortBinding.builder().hostIp(ip).hostPort(port).build();
   }
 
   public static PortBinding of(final String ip, final int port) {
-    return new AutoValue_PortBinding(ip, String.valueOf(port));
+    return ImmutablePortBinding.builder().hostIp(ip).hostPort(String.valueOf(port)).build();
   }
 
   public static PortBinding randomPort(final String ip) {
-    return new AutoValue_PortBinding(ip, "");
-  }
-
-  @JsonCreator
-  public static PortBinding create(
-      @JsonProperty("HostIp") final String hostIp,
-      @JsonProperty("HostPort") final String hostPort) {
-    return new AutoValue_PortBinding(hostIp, hostPort);
+    return ImmutablePortBinding.builder().hostIp(ip).hostPort("").build();
   }
 }

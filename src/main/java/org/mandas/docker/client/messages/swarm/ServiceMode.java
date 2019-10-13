@@ -20,59 +20,44 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class ServiceMode {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableServiceMode.Builder.class)
+@Immutable
+public interface ServiceMode {
 
   @Nullable
   @JsonProperty("Replicated")
-  public abstract ReplicatedService replicated();
+  ReplicatedService replicated();
 
   @Nullable
   @JsonProperty("Global")
-  public abstract GlobalService global();
+  GlobalService global();
 
   public static ServiceMode withReplicas(final long replicas) {
-    return ServiceMode.builder()
+    return ImmutableServiceMode.builder()
         .replicated(ReplicatedService.builder().replicas(replicas).build())
         .build();
   }
 
   public static ServiceMode withGlobal() {
-    return ServiceMode.builder().global(GlobalService.builder().build()).build();
+    return ImmutableServiceMode.builder().global(GlobalService.builder().build()).build();
   }
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  interface Builder {
 
-    public abstract Builder replicated(ReplicatedService replicated);
+    Builder replicated(ReplicatedService replicated);
 
-    public abstract Builder global(GlobalService global);
+    Builder global(GlobalService global);
 
-    public abstract ServiceMode build();
+    ServiceMode build();
   }
 
   public static ServiceMode.Builder builder() {
-    return new AutoValue_ServiceMode.Builder();
-  }
-
-  @JsonCreator
-  static ServiceMode create(
-      @JsonProperty("Replicated") final ReplicatedService replicated,
-      @JsonProperty("Global") final GlobalService global) {
-    return builder()
-        .replicated(replicated)
-        .global(global)
-        .build();
+    return ImmutableServiceMode.builder();
   }
 }

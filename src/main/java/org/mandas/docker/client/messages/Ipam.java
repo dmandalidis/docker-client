@@ -20,70 +20,50 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-import static java.util.Collections.singletonList;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-
 import java.util.List;
 import java.util.Map;
 
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class Ipam {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableIpam.Builder.class)
+@Immutable
+public interface Ipam {
 
   @JsonProperty("Driver")
-  public abstract String driver();
+  String driver();
 
   @Nullable
   @JsonProperty("Config")
-  public abstract ImmutableList<IpamConfig> config();
+  List<IpamConfig> config();
 
   @Nullable
   @JsonProperty("Options")
-  public abstract ImmutableMap<String, String> options();
+  Map<String, String> options();
 
   public static Builder builder() {
-    return new AutoValue_Ipam.Builder();
+    return ImmutableIpam.builder();
   }
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  interface Builder {
 
-    public abstract Builder driver(String driver);
+    Builder driver(String driver);
 
-    public abstract Builder options(Map<String, String> options);
+    Builder options(Map<String, ? extends String> options);
 
-    public abstract Builder config(List<IpamConfig> config);
+    Builder config(Iterable<? extends IpamConfig> config);
 
     public abstract Ipam build();
   }
 
-  public static Ipam create(final String driver, final List<IpamConfig> config) {
+  static Ipam create(final String driver, final List<IpamConfig> config) {
     return builder()
         .driver(driver)
         .config(config)
         .options(null)
-        .build();
-  }
-
-  @JsonCreator
-  public static Ipam create(
-      @JsonProperty("Driver") final String driver,
-      @JsonProperty("Config") final List<IpamConfig> config,
-      @JsonProperty("Options") final Map<String, String> options) {
-    return builder()
-        .driver(driver)
-        .config(config)
-        .options(options)
         .build();
   }
 }

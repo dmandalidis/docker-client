@@ -20,28 +20,18 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
+import org.immutables.value.Value.Immutable;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class EnginePlugin {
+@JsonDeserialize(builder = ImmutableEnginePlugin.Builder.class)
+@Immutable
+public interface EnginePlugin {
 
   @JsonProperty("Type")
-  public abstract String type();
+  String type();
 
   @JsonProperty("Name")
-  public abstract String name();
-
-  @JsonCreator
-  static EnginePlugin create(@JsonProperty("Type") final String type,
-      @JsonProperty("Name") final String name) {
-    return new AutoValue_EnginePlugin(type, name);
-  }
-
+  String name();
 }

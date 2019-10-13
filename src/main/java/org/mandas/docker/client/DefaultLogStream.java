@@ -21,6 +21,7 @@
 package org.mandas.docker.client;
 
 import static com.google.common.base.Charsets.UTF_8;
+import static com.google.common.base.Throwables.throwIfUnchecked;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
@@ -55,7 +56,8 @@ class DefaultLogStream extends AbstractIterator<LogMessage> implements LogStream
     try {
       message = reader.nextMessage();
     } catch (IOException e) {
-      throw Throwables.propagate(e);
+    	throwIfUnchecked(e);
+        throw new RuntimeException(e);
     }
     if (message == null) {
       return endOfData();
@@ -68,7 +70,8 @@ class DefaultLogStream extends AbstractIterator<LogMessage> implements LogStream
     try {
       reader.close();
     } catch (IOException e) {
-      throw Throwables.propagate(e);
+    	throwIfUnchecked(e);
+        throw new RuntimeException(e);
     }
   }
 

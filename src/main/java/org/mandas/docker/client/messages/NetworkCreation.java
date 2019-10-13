@@ -20,31 +20,20 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class NetworkCreation {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableNetworkCreation.Builder.class)
+@Immutable
+public interface NetworkCreation {
 
   @JsonProperty("Id")
-  public abstract String id();
+  String id();
 
   @Nullable
   @JsonProperty("Warnings")
-  public abstract String warnings();
-
-  @JsonCreator
-  static NetworkCreation create(
-      @JsonProperty("Id") final String id,
-      @JsonProperty("Warnings") final String warnings) {
-    return new AutoValue_NetworkCreation(id, warnings);
-  }
+  String warnings();
 }

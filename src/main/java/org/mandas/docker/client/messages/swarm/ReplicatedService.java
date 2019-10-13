@@ -20,41 +20,30 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class ReplicatedService {
+
+@JsonDeserialize(builder = ImmutableReplicatedService.Builder.class)
+@Immutable
+public interface ReplicatedService {
 
   @Nullable
   @JsonProperty("Replicas")
-  public abstract Long replicas();
+  Long replicas();
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  interface Builder {
 
-    public abstract Builder replicas(Long replicas);
+    Builder replicas(Long replicas);
 
-    public abstract ReplicatedService build();
+    ReplicatedService build();
   }
 
-  public static ReplicatedService.Builder builder() {
-    return new AutoValue_ReplicatedService.Builder();
+  public static Builder builder() {
+    return ImmutableReplicatedService.builder();
   }
 
-  @JsonCreator
-  static ReplicatedService create(@JsonProperty("Replicas") final Long replicas) {
-    return builder()
-        .replicas(replicas)
-        .build();
-  }
 }

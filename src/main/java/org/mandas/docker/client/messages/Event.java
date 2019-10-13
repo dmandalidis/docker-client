@@ -20,32 +20,29 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
+import java.util.Date;
+import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import org.immutables.value.Value.Enclosing;
+import org.immutables.value.Value.Immutable;
+import org.mandas.docker.Nullable;
+import org.mandas.docker.client.jackson.UnixTimestampDeserializer;
+import org.mandas.docker.client.jackson.UnixTimestampSerializer;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableMap;
-import org.mandas.docker.client.jackson.UnixTimestampDeserializer;
-import org.mandas.docker.client.jackson.UnixTimestampSerializer;
 
-import java.util.Date;
-import java.util.Map;
-
-import org.mandas.docker.Nullable;
-
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, setterVisibility = NONE, getterVisibility = NONE)
-public abstract class Event {
+@JsonDeserialize(builder = ImmutableEvent.Builder.class)
+@Immutable
+@Enclosing
+public interface Event {
 
   @Nullable
   @JsonProperty("Type")
-  public abstract Type type();
+  Type type();
 
   /**
    * Event action.
@@ -54,7 +51,7 @@ public abstract class Event {
    */
   @Nullable
   @JsonProperty("Action")
-  public abstract String action();
+  String action();
 
   /**
    * Event actor.
@@ -63,44 +60,51 @@ public abstract class Event {
    */
   @Nullable
   @JsonProperty("Actor")
-  public abstract Actor actor();
+  Actor actor();
 
   @JsonProperty("time")
   @JsonDeserialize(using = UnixTimestampDeserializer.class)
   @JsonSerialize(using = UnixTimestampSerializer.class)
-  public abstract Date time();
+  Date time();
 
   @Nullable
   @JsonProperty("timeNano")
-  public abstract Long timeNano();
+  Long timeNano();
 
-  @JsonCreator
-  static Event create(
-      @JsonProperty("Type") final Type type,
-      @JsonProperty("Action") final String action,
-      @JsonProperty("Actor") final Actor actor,
-      @JsonProperty("time") final Date time,
-      @JsonProperty("timeNano") final Long timeNano) {
-    return new AutoValue_Event(type, action, actor, time, timeNano);
+  interface Builder {
+	  Builder type(Type type);
+
+	  Builder action(String action);
+	  
+	  Builder actor(Actor actor);
+	  
+	  Builder time(Date time);
+	  
+	  Builder timeNano(Long timeNano);
+	  
+	  Event build();
   }
-
-  @AutoValue
-  public abstract static class Actor {
+  
+  static Builder builder() {
+	  return ImmutableEvent.builder();
+  }
+  
+  @JsonDeserialize(builder = ImmutableEvent.Actor.Builder.class)
+  @Immutable
+  public interface Actor {
 
     @JsonProperty("ID")
-    public abstract String id();
+    String id();
 
     @Nullable
     @JsonProperty("Attributes")
-    public abstract ImmutableMap<String, String> attributes();
+    Map<String, String> attributes();
 
-    @JsonCreator
     static Actor create(
-        @JsonProperty("ID") final String id,
-        @JsonProperty("Attributes") final Map<String, String> attributes) {
-      final ImmutableMap<String, String> attributesT = attributes == null
-                                                       ? null : ImmutableMap.copyOf(attributes);
-      return new AutoValue_Event_Actor(id, attributesT);
+        final String id,
+        final Map<String, String> attributes) {
+
+    	return ImmutableEvent.Actor.builder().id(id).attributes(attributes).build();
     }
   }
 

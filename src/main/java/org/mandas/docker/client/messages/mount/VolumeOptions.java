@@ -20,67 +20,44 @@
 
 package org.mandas.docker.client.messages.mount;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
-import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class VolumeOptions {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableVolumeOptions.Builder.class)
+@Immutable
+public interface VolumeOptions {
 
   @Nullable
   @JsonProperty("NoCopy")
-  public abstract Boolean noCopy();
+  Boolean noCopy();
 
   @Nullable
   @JsonProperty("Labels")
-  public abstract ImmutableMap<String, String> labels();
+  Map<String, String> labels();
 
   @Nullable
   @JsonProperty("DriverConfig")
-  public abstract Driver driverConfig();
+  Driver driverConfig();
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  interface Builder {
 
-    public abstract Builder noCopy(Boolean noCopy);
+    Builder noCopy(Boolean noCopy);
 
-    public abstract Builder labels(Map<String, String> labels);
+    Builder labels(Map<String, ? extends String> labels);
 
-    abstract ImmutableMap.Builder<String, String> labelsBuilder();
+    Builder addLabel(final String label, final String value);
 
-    public Builder addLabel(final String label, final String value) {
-      labelsBuilder().put(label, value);
-      return this;
-    }
+    Builder driverConfig(Driver driverConfig);
 
-    public abstract Builder driverConfig(Driver driverConfig);
-
-    public abstract VolumeOptions build();
+    VolumeOptions build();
   }
 
-  public static VolumeOptions.Builder builder() {
-    return new AutoValue_VolumeOptions.Builder();
-  }
-
-  @JsonCreator
-  static VolumeOptions create(
-      @JsonProperty("NoCopy") final Boolean noCopy,
-      @JsonProperty("Labels") final Map<String, String> labels,
-      @JsonProperty("DriverConfig") final Driver driverConfig) {
-    return builder()
-        .noCopy(noCopy)
-        .labels(labels)
-        .driverConfig(driverConfig)
-        .build();
+  public static Builder builder() {
+    return ImmutableVolumeOptions.builder();
   }
 }

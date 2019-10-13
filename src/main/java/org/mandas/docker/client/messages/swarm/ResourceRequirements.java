@@ -20,49 +20,35 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class ResourceRequirements {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableResourceRequirements.Builder.class)
+@Immutable
+public interface ResourceRequirements {
 
   @Nullable
   @JsonProperty("Limits")
-  public abstract Resources limits();
+  Resources limits();
 
   @Nullable
   @JsonProperty("Reservations")
-  public abstract Resources reservations();
+  Resources reservations();
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  interface Builder {
 
-    public abstract Builder limits(Resources limits);
+    Builder limits(Resources limits);
 
-    public abstract Builder reservations(Resources reservations);
+    Builder reservations(Resources reservations);
 
-    public abstract ResourceRequirements build();
+    ResourceRequirements build();
   }
 
-  public static ResourceRequirements.Builder builder() {
-    return new AutoValue_ResourceRequirements.Builder();
+  public static Builder builder() {
+    return ImmutableResourceRequirements.builder();
   }
 
-  @JsonCreator
-  static ResourceRequirements create(
-      @JsonProperty("Limits") final Resources limits,
-      @JsonProperty("Reservations") final Resources reservations) {
-    return builder()
-        .limits(limits)
-        .reservations(reservations)
-        .build();
-  }
 }

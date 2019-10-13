@@ -20,15 +20,12 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import java.util.Map;
+
+import org.immutables.value.Value.Immutable;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.google.common.collect.Maps;
 
 /**
  * A formatted string passed in X-Registry-Config request header.
@@ -52,15 +49,14 @@ import java.util.Map;
  * }
  * </pre>
  */
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class RegistryConfigs {
+@Immutable
+public interface RegistryConfigs {
 
   public static RegistryConfigs empty() {
     return builder().build();
   }
 
-  public abstract ImmutableMap<String, RegistryAuth> configs();
+  Map<String, RegistryAuth> configs();
 
   @JsonCreator
   public static RegistryConfigs create(final Map<String, RegistryAuth> configs) {
@@ -90,22 +86,14 @@ public abstract class RegistryConfigs {
   }
 
   public static Builder builder() {
-    return new AutoValue_RegistryConfigs.Builder();
+    return ImmutableRegistryConfigs.builder();
   }
 
-  @AutoValue.Builder
-  public abstract static class Builder {
-    public abstract Builder configs(Map<String, RegistryAuth> configs);
+  interface Builder {
+    Builder configs(Map<String, ? extends RegistryAuth> configs);
 
-    abstract ImmutableMap.Builder<String, RegistryAuth> configsBuilder();
+    Builder addConfig(final String server, final RegistryAuth registryAuth);
 
-    public Builder addConfig(final String server, final RegistryAuth registryAuth) {
-      if (registryAuth != null) {
-        configsBuilder().put(server, registryAuth);
-      }
-      return this;
-    }
-
-    public abstract RegistryConfigs build();
+    RegistryConfigs build();
   }
 }

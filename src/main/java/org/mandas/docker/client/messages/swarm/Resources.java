@@ -20,49 +20,35 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class Resources {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableResources.Builder.class)
+@Immutable
+public interface Resources {
 
   @Nullable
   @JsonProperty("NanoCPUs")
-  public abstract Long nanoCpus();
+  Long nanoCpus();
 
   @Nullable
   @JsonProperty("MemoryBytes")
-  public abstract Long memoryBytes();
+  Long memoryBytes();
 
-  @AutoValue.Builder
-  public abstract static class Builder {
+  interface Builder {
 
-    public abstract Builder nanoCpus(Long nanoCpus);
+    Builder nanoCpus(Long nanoCpus);
 
-    public abstract Builder memoryBytes(Long memoryBytes);
+    Builder memoryBytes(Long memoryBytes);
 
-    public abstract Resources build();
+    Resources build();
   }
 
   public static Resources.Builder builder() {
-    return new AutoValue_Resources.Builder();
+    return ImmutableResources.builder();
   }
 
-  @JsonCreator
-  static Resources create(
-      @JsonProperty("NanoCPUs") final Long nanoCpus,
-      @JsonProperty("MemoryBytes") final Long memoryBytes) {
-    return builder()
-        .nanoCpus(nanoCpus)
-        .memoryBytes(memoryBytes)
-        .build();
-  }
 }

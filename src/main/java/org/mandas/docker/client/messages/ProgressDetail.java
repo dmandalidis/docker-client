@@ -20,37 +20,25 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class ProgressDetail {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableProgressDetail.Builder.class)
+@Immutable
+public interface ProgressDetail {
 
   @Nullable
   @JsonProperty("current")
-  public abstract Long current();
+  Long current();
 
   @Nullable
   @JsonProperty("start")
-  public abstract Long start();
+  Long start();
 
   @Nullable
   @JsonProperty("total")
-  public abstract Long total();
-
-  @JsonCreator
-  static ProgressDetail create(
-      @JsonProperty("current") final Long current,
-      @JsonProperty("start") final Long start,
-      @JsonProperty("total") final Long total) {
-    return new AutoValue_ProgressDetail(current, start, total);
-  }
+  Long total();
 }

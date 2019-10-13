@@ -20,73 +20,52 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class RaftConfig {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableRaftConfig.Builder.class)
+@Immutable
+public interface RaftConfig {
 
   @Nullable
   @JsonProperty("SnapshotInterval")
-  public abstract Integer snapshotInterval();
+  Integer snapshotInterval();
 
   @Nullable
   @JsonProperty("KeepOldSnapshots")
-  public abstract Integer keepOldSnapshots();
+  Integer keepOldSnapshots();
 
   @Nullable
   @JsonProperty("LogEntriesForSlowFollowers")
-  public abstract Integer logEntriesForSlowFollowers();
+  Integer logEntriesForSlowFollowers();
 
   @Nullable
   @JsonProperty("ElectionTick")
-  public abstract Integer electionTick();
+  Integer electionTick();
 
   @Nullable
   @JsonProperty("HeartbeatTick")
-  public abstract Integer heartbeatTick();
+  Integer heartbeatTick();
 
-  @JsonCreator
-  static RaftConfig create(
-      @JsonProperty("SnapshotInterval") final Integer snapshotInterval,
-      @JsonProperty("KeepOldSnapshots") final Integer keepOldSnapshots,
-      @JsonProperty("LogEntriesForSlowFollowers") final Integer logEntriesForSlowFollowers,
-      @JsonProperty("ElectionTick") final Integer electionTick,
-      @JsonProperty("HeartbeatTick") final Integer heartbeatTick) {
-    return builder()
-        .snapshotInterval(snapshotInterval)
-        .keepOldSnapshots(keepOldSnapshots)
-        .logEntriesForSlowFollowers(logEntriesForSlowFollowers)
-        .electionTick(electionTick)
-        .heartbeatTick(heartbeatTick)
-        .build();
+  interface Builder {
+
+    Builder snapshotInterval(Integer snapshotInterval);
+
+    Builder keepOldSnapshots(Integer keepOldSnapshots);
+
+    Builder logEntriesForSlowFollowers(Integer logEntriesForSlowFollowers);
+
+    Builder electionTick(Integer electionTick);
+
+    Builder heartbeatTick(Integer heartbeatTick);
+
+    RaftConfig build();
   }
 
-  @AutoValue.Builder
-  public abstract static class Builder {
-
-    public abstract Builder snapshotInterval(Integer snapshotInterval);
-
-    public abstract Builder keepOldSnapshots(Integer keepOldSnapshots);
-
-    public abstract Builder logEntriesForSlowFollowers(Integer logEntriesForSlowFollowers);
-
-    public abstract Builder electionTick(Integer electionTick);
-
-    public abstract Builder heartbeatTick(Integer heartbeatTick);
-
-    public abstract RaftConfig build();
-  }
-
-  public static RaftConfig.Builder builder() {
-    return new AutoValue_RaftConfig.Builder();
+  public static Builder builder() {
+    return ImmutableRaftConfig.builder();
   }
 }

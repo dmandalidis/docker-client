@@ -20,52 +20,35 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
-
 import java.util.List;
+
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class ImageHistory {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableImageHistory.Builder.class)
+@Immutable
+public interface ImageHistory {
 
   @JsonProperty("Id")
-  public abstract String id();
+  String id();
 
   @JsonProperty("Created")
-  public abstract Long created();
+  Long created();
 
   @JsonProperty("CreatedBy")
-  public abstract String createdBy();
+  String createdBy();
 
   @Nullable
   @JsonProperty("Tags")
-  public abstract ImmutableList<String> tags();
+  List<String> tags();
 
   @JsonProperty("Size")
-  public abstract Long size();
+  Long size();
 
   @Nullable
   @JsonProperty("Comment")
-  public abstract String comment();
-
-  @JsonCreator
-  static ImageHistory create(
-      @JsonProperty("Id") final String id,
-      @JsonProperty("Created") final Long created,
-      @JsonProperty("CreatedBy") final String createdBy,
-      @JsonProperty("Tags") final List<String> tags,
-      @JsonProperty("Size") final Long size,
-      @JsonProperty("Comment") final String comment) {
-    final ImmutableList<String> tagsCopy = tags == null
-                                           ? null : ImmutableList.copyOf(tags);
-    return new AutoValue_ImageHistory(id, created, createdBy, tagsCopy, size, comment);
-  }
+  String comment();
 }

@@ -20,36 +20,32 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class NetworkConnection {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableNetworkConnection.Builder.class)
+@Immutable
+public interface NetworkConnection {
 
   @JsonProperty("Container")
-  public abstract String containerId();
+  String containerId();
 
   @Nullable
   @JsonProperty("EndpointConfig")
-  public abstract EndpointConfig endpointConfig();
+  EndpointConfig endpointConfig();
 
   public static Builder builder() {
-    return new AutoValue_NetworkConnection.Builder();
+    return ImmutableNetworkConnection.builder();
   }
 
+  interface Builder {
+    Builder containerId(String containerId);
 
-  @AutoValue.Builder
-  public abstract static class Builder {
-    public abstract Builder containerId(String containerId);
+    Builder endpointConfig(EndpointConfig endpointConfig);
 
-    public abstract Builder endpointConfig(EndpointConfig endpointConfig);
-
-    public abstract NetworkConnection build();
+    NetworkConnection build();
   }
 }

@@ -20,35 +20,23 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class IpamConfig {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(builder = ImmutableIpamConfig.Builder.class)
+@Immutable
+public interface IpamConfig {
 
   @JsonProperty("Subnet")
-  public abstract String subnet();
+  String subnet();
 
   @Nullable
   @JsonProperty("Range")
-  public abstract String range();
+  String range();
 
   @JsonProperty("Gateway")
-  public abstract String gateway();
-
-  @JsonCreator
-  static IpamConfig create(
-      @JsonProperty("Subnet") final String subnet,
-      @JsonProperty("Range") final String range,
-      @JsonProperty("Gateway") final String gateway) {
-    return new AutoValue_IpamConfig(subnet, range, gateway);
-  }
+  String gateway();
 }

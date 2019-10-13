@@ -20,74 +20,74 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
-import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-
 import java.util.List;
 import java.util.Map;
+
+import org.immutables.value.Value.Default;
+import org.immutables.value.Value.Derived;
+import org.immutables.value.Value.Enclosing;
+import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-@AutoValue
-@JsonAutoDetect(fieldVisibility = ANY, getterVisibility = NONE, setterVisibility = NONE)
-public abstract class Container {
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@Immutable
+@JsonDeserialize(builder = ImmutableContainer.Builder.class)
+@Enclosing
+public interface Container {
 
   @JsonProperty("Id")
-  public abstract String id();
+  String id();
 
   @Nullable
   @JsonProperty("Names")
-  public abstract ImmutableList<String> names();
+  List<String> names();
 
   @JsonProperty("Image")
-  public abstract String image();
+  String image();
 
   @Nullable
   @JsonProperty("ImageID")
-  public abstract String imageId();
+  String imageId();
 
   @JsonProperty("Command")
-  public abstract String command();
+  String command();
 
   @JsonProperty("Created")
-  public abstract Long created();
+  Long created();
 
   @Nullable
   @JsonProperty("State")
-  public abstract String state();
+  String state();
 
   @JsonProperty("Status")
-  public abstract String status();
+  String status();
 
   @Nullable
   @JsonProperty("Ports")
-  public abstract ImmutableList<PortMapping> ports();
+  List<PortMapping> ports();
 
   @Nullable
   @JsonProperty("Labels")
-  public abstract ImmutableMap<String, String> labels();
+  Map<String, String> labels();
 
   @Nullable
   @JsonProperty("SizeRw")
-  public abstract Long sizeRw();
+  Long sizeRw();
 
   @Nullable
   @JsonProperty("SizeRootFs")
-  public abstract Long sizeRootFs();
+  Long sizeRootFs();
 
   @Nullable
   @JsonProperty("NetworkSettings")
-  public abstract NetworkSettings networkSettings();
+  NetworkSettings networkSettings();
 
   @Nullable
   @JsonProperty("Mounts")
-  public abstract ImmutableList<ContainerMount> mounts();
+  List<ContainerMount> mounts();
 
   /**
    * Returns port information the way that <code>docker ps</code> does.
@@ -99,7 +99,9 @@ public abstract class Container {
    * @return port information as docker ps does.
    * @see org.mandas.docker.client.messages.PortBinding
    */
-  public String portsAsString() {
+  @JsonIgnore
+  @Derived
+  public default String portsAsString() {
     final StringBuilder sb = new StringBuilder();
     if (ports() != null) {
       for (final PortMapping port : ports()) {
@@ -121,59 +123,27 @@ public abstract class Container {
     return sb.toString();
   }
 
-  @JsonCreator
-  static Container create(
-      @JsonProperty("Id") final String id,
-      @JsonProperty("Names") final List<String> names,
-      @JsonProperty("Image") final String image,
-      @JsonProperty("ImageID") final String imageId,
-      @JsonProperty("Command") final String command,
-      @JsonProperty("Created") final Long created,
-      @JsonProperty("State") final String state,
-      @JsonProperty("Status") final String status,
-      @JsonProperty("Ports") final List<PortMapping> ports,
-      @JsonProperty("Labels") final Map<String, String> labels,
-      @JsonProperty("SizeRw") final Long sizeRw,
-      @JsonProperty("SizeRootFs") final Long sizeRootFs,
-      @JsonProperty("NetworkSettings") final NetworkSettings networkSettings,
-      @JsonProperty("Mounts") final List<ContainerMount> mounts) {
-    final ImmutableMap<String, String> labelsT = labels == null
-                                                 ? null : ImmutableMap.copyOf(labels);
-    final ImmutableList<ContainerMount> mountsT = mounts == null
-                                                  ? null : ImmutableList.copyOf(mounts);
-    final ImmutableList<String> namesT = names == null
-            ? null : ImmutableList.copyOf(names);
-    final ImmutableList<PortMapping> portsT = ports == null
-            ? null : ImmutableList.copyOf(ports);
-
-    return new AutoValue_Container(id, namesT, image, imageId, command,
-        created, state, status, portsT, labelsT, sizeRw,
-        sizeRootFs, networkSettings, mountsT);
-  }
-
-  @AutoValue
-  public abstract static class PortMapping {
+  @JsonDeserialize(builder = ImmutableContainer.PortMapping.Builder.class)
+  @Immutable
+  public interface PortMapping {
 
     @JsonProperty("PrivatePort")
-    public abstract Integer privatePort();
+    @Default
+    default int privatePort() {
+    	return 0;
+    }
 
     @JsonProperty("PublicPort")
-    public abstract Integer publicPort();
+    @Default
+    default int publicPort() {
+    	return 0;
+    }
 
     @JsonProperty("Type")
-    public abstract String type();
+    String type();
 
     @Nullable
     @JsonProperty("IP")
-    public abstract String ip();
-
-    @JsonCreator
-    static PortMapping create(
-        @JsonProperty("PrivatePort") final int privatePort,
-        @JsonProperty("PublicPort") final int publicPort,
-        @JsonProperty("Type") final String type,
-        @JsonProperty("IP") final String ip) {
-      return new AutoValue_Container_PortMapping(privatePort, publicPort, type, ip);
-    }
+    String ip();
   }
 }
