@@ -2,9 +2,9 @@
 
 ## 2.0.0
 
-This release is the last step in moving away from the original process. That is,
+This release is the last step in moving away from the original project. That is,
 this is a breaking release as all `com.spotify.docker` packages have been renamed
-to `org.mandas.docker` and, normally, I find-and-replace would do the work for you.
+to `org.mandas.docker` and, normally, A find-and-replace would do the work for you.
 Last but not least, all deprecated methods and redundant API version checks have
 been removed.
 
