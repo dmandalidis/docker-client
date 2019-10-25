@@ -4,6 +4,7 @@
 [![codecov](https://codecov.io/github/dmandalidis/docker-client/coverage.svg?branch=master)](https://codecov.io/github/dmandalidis/docker-client?branch=master)
 [![Maven Central](https://img.shields.io/maven-central/v/org.mandas/docker-client.svg)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.mandas%22%20docker-client)
 [![License](https://img.shields.io/github/license/dmandalidis/docker-client.svg)](LICENSE)
+[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=dmandalidis/docker-client)](https://dependabot.com)
 
 This is a [Docker](https://github.com/docker/docker) client written in Java.
 It was used in many critical production systems at Spotify until its 
