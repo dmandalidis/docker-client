@@ -23,21 +23,25 @@ package org.mandas.docker.client.messages;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
-import org.mandas.docker.client.ObjectMapperProvider;
-
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
+import org.mandas.docker.client.ObjectMapperProvider;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class EventTest {
 
   @Test
   public void serializationRoundTripTest() throws Exception {
     // Test serializing and deserializing the same Event instance works and preserves data
+	Map<String, String> attributes = new HashMap<>();
+	attributes.put("image", "nginx");
+	attributes.put("name", "docker-nginx");
     final Event event = Event.builder().type(Event.Type.CONTAINER).action("create")
-        .actor(Event.Actor.create("bar", ImmutableMap.of("image", "nginx", "name", "docker-nginx")))
+        .actor(Event.Actor.create("bar", attributes))
         .time(new Date(1487356000)).timeNano(100L).build();
 
     final ObjectMapper mapper = ObjectMapperProvider.objectMapper();

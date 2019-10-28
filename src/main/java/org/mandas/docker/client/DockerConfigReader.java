@@ -20,7 +20,7 @@
 
 package org.mandas.docker.client;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.net.URI;
@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.mandas.docker.client.messages.DockerCredentialHelperAuth;
@@ -41,7 +42,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.annotations.VisibleForTesting;
 
 public class DockerConfigReader {
   private static final Logger LOG = LoggerFactory.getLogger(DockerConfigReader.class);
@@ -70,7 +70,6 @@ public class DockerConfigReader {
    * @param configPath Path to the docker config file.
    * @return Some registry auth value.
    */
-  @VisibleForTesting
   RegistryAuth anyRegistryAuth(final Path configPath) throws IOException {
     final Collection<RegistryAuth> registryAuths =
         authForAllRegistries(configPath).configs().values();
@@ -87,7 +86,7 @@ public class DockerConfigReader {
    * @throws IOException If the file cannot be read, or its JSON cannot be parsed
    */
   public RegistryConfigs authForAllRegistries(final Path configPath) throws IOException {
-    checkNotNull(configPath);
+    requireNonNull(configPath);
 
     final DockerConfig config = MAPPER.readValue(configPath.toFile(), DockerConfig.class);
     if (config == null) {
@@ -177,8 +176,8 @@ public class DockerConfigReader {
    */
   public RegistryAuth authForRegistry(final Path configPath, final String registry)
       throws IOException {
-    checkNotNull(configPath);
-    checkNotNull(registry);
+    requireNonNull(configPath);
+    requireNonNull(registry);
 
     final DockerConfig config = MAPPER.readValue(configPath.toFile(), DockerConfig.class);
     if (config == null) {
@@ -265,8 +264,8 @@ public class DockerConfigReader {
   }
 
   private String getCredentialStore(final DockerConfig config, final String registry) {
-    checkNotNull(config, "Docker config cannot be null");
-    checkNotNull(registry, "registry cannot be null");
+    requireNonNull(config, "Docker config cannot be null");
+    requireNonNull(registry, "registry cannot be null");
 
     // Check for the registry in the credHelpers map first.
     // If it isn't there, default to credsStore.

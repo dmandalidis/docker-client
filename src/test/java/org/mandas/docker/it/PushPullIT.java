@@ -21,12 +21,27 @@
 package org.mandas.docker.it;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
+import static java.util.Collections.unmodifiableList;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.isA;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.io.Resources;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+
+import javax.ws.rs.NotAuthorizedException;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.rules.TestName;
 import org.mandas.docker.Polling;
 import org.mandas.docker.client.DefaultDockerClient;
 import org.mandas.docker.client.DockerClient;
@@ -46,21 +61,7 @@ import org.mandas.docker.client.messages.PortBinding;
 import org.mandas.docker.client.messages.RegistryAuth;
 import org.mandas.docker.client.messages.RegistryConfigs;
 
-import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-
-import javax.ws.rs.NotAuthorizedException;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.TestName;
+import com.google.common.io.Resources;
 
 /**
  * These integration tests check we can push images to and pull from a private registry running as a
@@ -308,10 +309,10 @@ public class PushPullIT {
     final Map<String, List<PortBinding>> ports = singletonMap(
         "5000/tcp", Collections.singletonList(PortBinding.of("0.0.0.0", 5000)));
     final HostConfig hostConfig = HostConfig.builder().portBindings(ports)
-        .binds(ImmutableList.of(
+        .binds(unmodifiableList(asList(
             Resources.getResource("dockerRegistry/auth").getPath() + ":/auth",
             Resources.getResource("dockerRegistry/certs").getPath() + ":/certs"
-        ))
+        )))
         /*
          *  Mounting volumes requires special permissions on Docker >= 1.10.
          *  Until a proper Seccomp profile is in place, run container privileged.
@@ -322,14 +323,14 @@ public class PushPullIT {
     final ContainerConfig containerConfig = ContainerConfig.builder()
         .image(REGISTRY_IMAGE)
         .hostConfig(hostConfig)
-        .env(ImmutableList.of(
+        .env(unmodifiableList(asList(
             "REGISTRY_AUTH=htpasswd",
             "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm",
             "REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd",
             "REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt",
             "REGISTRY_HTTP_TLS_KEY=/certs/domain.key",
             "REGISTRY_HTTP_SECRET=super-secret"
-        ))
+        )))
         .build();
 
     return startAndAwaitContainer(client, containerConfig, REGISTRY_NAME);

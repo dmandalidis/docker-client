@@ -20,28 +20,32 @@
 
 package org.mandas.docker.client.auth.gcr;
 
-import com.google.auth.oauth2.AccessToken;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.auth.oauth2.ServiceAccountCredentials;
-import com.google.auth.oauth2.UserCredentials;
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import org.mandas.docker.client.auth.RegistryAuthSupplier;
-import org.mandas.docker.client.exceptions.DockerException;
-import org.mandas.docker.client.messages.RegistryAuth;
-import org.mandas.docker.client.messages.RegistryConfigs;
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableSet;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Clock;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import org.mandas.docker.client.auth.RegistryAuthSupplier;
+import org.mandas.docker.client.exceptions.DockerException;
+import org.mandas.docker.client.messages.RegistryAuth;
+import org.mandas.docker.client.messages.RegistryConfigs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.auth.oauth2.AccessToken;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.auth.oauth2.ServiceAccountCredentials;
+import com.google.auth.oauth2.UserCredentials;
 
 /**
  * A RegistryAuthSupplier for getting access tokens from a Google Cloud Platform service or user
@@ -66,7 +70,7 @@ public class ContainerRegistryAuthSupplier implements RegistryAuthSupplier {
 
   // the list returned by `gcloud docker -a`
   // this may change in the future, and we can't know all values - but should cover most use cases
-  private static final Set<String> GCR_REGISTRIES = ImmutableSet.of(
+  private static final Set<String> GCR_REGISTRIES = unmodifiableSet(new HashSet<>(asList(
       "gcr.io",
       "us.gcr.io",
       "eu.gcr.io",
@@ -80,7 +84,7 @@ public class ContainerRegistryAuthSupplier implements RegistryAuthSupplier {
       "eu-mirror.gcr.io",
       "asia-mirror.gcr.io",
       "mirror.gcr.io"
-  );
+  )));
 
   /**
    * Constructs a ContainerRegistryAuthSupplier for the account with the given credentials.
@@ -127,7 +131,7 @@ public class ContainerRegistryAuthSupplier implements RegistryAuthSupplier {
     private final GoogleCredentials credentials;
 
     private Collection<String> scopes =
-        ImmutableList.of("https://www.googleapis.com/auth/devstorage.read_write");
+        Collections.singletonList("https://www.googleapis.com/auth/devstorage.read_write");
 
     private long minimumExpiryMillis = TimeUnit.MINUTES.toMillis(1);
 
@@ -182,7 +186,6 @@ public class ContainerRegistryAuthSupplier implements RegistryAuthSupplier {
    * Refreshes a GoogleCredentials instance. This only exists for testing - we cannot mock calls to
    * {@link GoogleCredentials#refresh()} as the method is final.
    */
-  @VisibleForTesting
   interface CredentialRefresher {
 
     void refresh(GoogleCredentials credentials) throws IOException;
@@ -201,7 +204,6 @@ public class ContainerRegistryAuthSupplier implements RegistryAuthSupplier {
   private final long minimumExpiryMillis;
   private final CredentialRefresher credentialRefresher;
 
-  @VisibleForTesting
   ContainerRegistryAuthSupplier(
       final GoogleCredentials credentials,
       final Clock clock,

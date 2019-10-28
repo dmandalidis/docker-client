@@ -20,6 +20,7 @@
 
 package org.mandas.docker.client.auth;
 
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -27,23 +28,23 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.ImmutableMap;
-import org.mandas.docker.client.DockerConfigReader;
-import org.mandas.docker.client.messages.RegistryAuth;
-import org.mandas.docker.client.messages.RegistryConfigs;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.mandas.docker.client.DockerConfigReader;
+import org.mandas.docker.client.messages.RegistryAuth;
+import org.mandas.docker.client.messages.RegistryConfigs;
 
 public class ConfigFileRegistryAuthSupplierTest {
 
@@ -120,7 +121,7 @@ public class ConfigFileRegistryAuthSupplierTest {
 
   @Test
   public void testAuthForBuild_Success() throws Exception {
-    final RegistryConfigs configs = RegistryConfigs.create(ImmutableMap.of(
+    final RegistryConfigs configs = RegistryConfigs.create(singletonMap(
         "server1",
         RegistryAuth.builder()
             .serverAddress("server1")

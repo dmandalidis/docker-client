@@ -20,10 +20,10 @@
 
 package org.mandas.docker.client;
 
-import com.google.common.annotations.VisibleForTesting;
-import org.mandas.docker.client.messages.DockerCredentialHelperAuth;
 import java.io.IOException;
 import java.util.Map;
+
+import org.mandas.docker.client.messages.DockerCredentialHelperAuth;
 
 /**
  * This class interacts with a docker credential helper.
@@ -53,7 +53,6 @@ public class DockerCredentialHelper {
   /**
    * An interface to be mocked during testing.
    */
-  @VisibleForTesting
   interface CredentialHelperDelegate {
 
     int store(String credsStore, DockerCredentialHelperAuth auth)
@@ -69,12 +68,10 @@ public class DockerCredentialHelper {
   private static CredentialHelperDelegate credentialHelperDelegate =
       new SystemCredentialHelperDelegate();
 
-  @VisibleForTesting
   static void setCredentialHelperDelegate(final CredentialHelperDelegate delegate) {
     credentialHelperDelegate = delegate;
   }
 
-  @VisibleForTesting
   static void restoreSystemCredentialHelperDelegate() {
     credentialHelperDelegate = new SystemCredentialHelperDelegate();
   }

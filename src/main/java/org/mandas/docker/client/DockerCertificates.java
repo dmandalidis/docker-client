@@ -20,10 +20,8 @@
 
 package org.mandas.docker.client;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableSet;
-import org.mandas.docker.client.exceptions.DockerCertificateException;
+import static java.util.Collections.unmodifiableSet;
+import static java.util.stream.Collectors.joining;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -45,7 +43,10 @@ import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.net.ssl.HostnameVerifier;
@@ -56,6 +57,7 @@ import org.apache.http.ssl.SSLContexts;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
+import org.mandas.docker.client.exceptions.DockerCertificateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +72,7 @@ public class DockerCertificates implements DockerCertificatesStore {
   public static final String DEFAULT_CLIENT_KEY_NAME = "key.pem";
 
   private static final char[] KEY_STORE_PASSWORD = "docker!!11!!one!".toCharArray();
-  private static final Set<String> PRIVATE_KEY_ALGS = ImmutableSet.of("RSA", "EC");
+  private static final Set<String> PRIVATE_KEY_ALGS = unmodifiableSet(new HashSet<>(Arrays.asList("RSA", "EC")));
   private static final Logger log = LoggerFactory.getLogger(DockerCertificates.class);
 
   private final SSLContext sslContext;
@@ -170,7 +172,7 @@ public class DockerCertificates implements DockerCertificatesStore {
     }
 
     final String error = String.format("Could not generate private key from spec. Tried using %s",
-        Joiner.on(", ").join(algorithms));
+    	algorithms.stream().collect(joining(", ")));
     throw new InvalidKeySpecException(error);
   }
 
@@ -250,14 +252,14 @@ public class DockerCertificates implements DockerCertificatesStore {
     public Optional<DockerCertificatesStore> build() throws DockerCertificateException {
       if (this.caCertPath == null || this.clientKeyPath == null || this.clientCertPath == null) {
         log.debug("caCertPath, clientKeyPath or clientCertPath not specified, not using SSL");
-        return Optional.absent();
+        return Optional.empty();
       } else if (Files.exists(this.caCertPath) && Files.exists(this.clientKeyPath)
                  && Files.exists(this.clientCertPath)) {
         return Optional.of((DockerCertificatesStore) new DockerCertificates(this));
       } else {
         log.debug("{}, {} or {} does not exist, not using SSL", this.caCertPath, this.clientKeyPath,
                   this.clientCertPath);
-        return Optional.absent();
+        return Optional.empty();
       }
     }
   }

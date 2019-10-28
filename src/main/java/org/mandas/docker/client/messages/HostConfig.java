@@ -20,9 +20,9 @@
 
 package org.mandas.docker.client.messages;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.lang.String.format;
 import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
@@ -41,7 +41,6 @@ import org.mandas.docker.client.messages.mount.Mount;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.common.base.Joiner;
 
 @JsonDeserialize(builder = ImmutableHostConfig.Builder.class)
 @Immutable
@@ -314,8 +313,9 @@ public interface HostConfig {
   default void check() {
     if (extraHosts() != null) {
 	    for (final String extraHost : extraHosts()) {
-	      checkArgument(extraHost.contains(":"),
-	      "extra host arg '%s' must contain a ':'", extraHost);
+	      if (!extraHost.contains(":")) {
+	    	 throw new IllegalArgumentException(format("extra host arg '%s' must contain a ':'", extraHost));
+	      }
 	    }
 	  }
   }
@@ -522,9 +522,9 @@ public interface HostConfig {
     @Derived
     @JsonIgnore
 	default String representation() {
-      if (isNullOrEmpty(to())) {
+      if (to() == null || "".equals(to().trim())) {
         return "";
-      } else if (isNullOrEmpty(from())) {
+      } else if (from() == null || "".equals(from().trim())) {
         return to();
       }
 
@@ -548,7 +548,7 @@ public interface HostConfig {
         }
       }
 
-      final String optionsValue = Joiner.on(',').join(options);
+      final String optionsValue = options.stream().collect(joining(","));
 
       return (optionsValue.isEmpty()) ? bind : bind + ":" + optionsValue;
     }

@@ -30,17 +30,6 @@ public interface LogStream extends Iterator<LogMessage>, Closeable {
   String readFully();
 
   /**
-   * Attaches two {@link java.io.OutputStream}s to the {@link LogStream}.  Closes the streams after
-   * use.
-   *
-   * @param stdout OutputStream for the standard out
-   * @param stderr OutputStream for the standard err
-   * @throws IOException if an I/O error occurs
-   * @see #attach(OutputStream, OutputStream, boolean) for control over stream lifecycles
-   */
-  void attach(OutputStream stdout, OutputStream stderr) throws IOException;
-
-  /**
    * Attaches two {@link java.io.OutputStream}s to the {@link LogStream}.
    *
    * <p> <b>Example usage:</b> </p>
@@ -88,16 +77,10 @@ public interface LogStream extends Iterator<LogMessage>, Closeable {
    *
    * @param stdout     OutputStream for the standard out
    * @param stderr     OutputStream for the standard err
-   * @param closeAtEof whether to close the streams when this log stream ends
    * @throws IOException if an I/O error occurs
    * @see java.io.PipedInputStream
    * @see java.io.PipedOutputStream
    */
-  void attach(OutputStream stdout, OutputStream stderr, boolean closeAtEof) throws IOException;
+  void attach(OutputStream stdout, OutputStream stderr) throws IOException;
 
-  /**
-   * Redefine to not throw checked exceptions.
-   */
-  @Override
-  void close();
 }

@@ -20,12 +20,14 @@
 
 package org.mandas.docker.client;
 
-import static org.mandas.docker.FixtureUtil.fixture;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonArray;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonObject;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonText;
 import static com.spotify.hamcrest.pojo.IsPojo.pojo;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
+import static java.util.Collections.unmodifiableList;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -40,17 +42,32 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mandas.docker.FixtureUtil.fixture;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.io.Resources;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.Date;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import org.glassfish.jersey.client.RequestEntityProcessing;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mandas.docker.client.DockerClient.Signal;
 import org.mandas.docker.client.auth.RegistryAuthSupplier;
 import org.mandas.docker.client.exceptions.ConflictException;
@@ -87,30 +104,18 @@ import org.mandas.docker.client.messages.swarm.SwarmJoin;
 import org.mandas.docker.client.messages.swarm.Task;
 import org.mandas.docker.client.messages.swarm.TaskSpec;
 import org.mandas.docker.client.messages.swarm.Version;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.Date;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Preconditions;
+import com.google.common.io.Resources;
+
 import okhttp3.HttpUrl;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import okio.Buffer;
-
-import org.glassfish.jersey.client.RequestEntityProcessing;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * Tests DefaultDockerClient against a {@link okhttp3.mockwebserver.MockWebServer} instance, so
@@ -240,7 +245,7 @@ public class DefaultDockerClientUnitTest {
   public void testCustomHeaders() throws Exception {
     builder.header("int", 1);
     builder.header("string", "2");
-    builder.header("list", Lists.newArrayList("a", "b", "c"));
+    builder.header("list", Arrays.asList("a", "b", "c"));
 
     server.enqueue(new MockResponse());
 
@@ -309,8 +314,8 @@ public class DefaultDockerClientUnitTest {
     final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
 
     final HostConfig hostConfig = HostConfig.builder()
-        .capAdd(ImmutableList.of("foo", "bar"))
-        .capAdd(ImmutableList.of("baz", "qux"))
+        .capAdd(unmodifiableList(asList("foo", "bar")))
+        .capAdd(unmodifiableList(asList("baz", "qux")))
         .build();
 
     final ContainerConfig containerConfig = ContainerConfig.builder()
@@ -349,21 +354,21 @@ public class DefaultDockerClientUnitTest {
 
   @Test
   public void testBuildPassesMultipleRegistryConfigs() throws Exception {
-    final RegistryConfigs registryConfigs = RegistryConfigs.create(ImmutableMap.of(
-        "server1", RegistryAuth.builder()
+	Map<String, RegistryAuth> registryAuths = new HashMap<>();
+	registryAuths.put("server1", RegistryAuth.builder()
             .serverAddress("server1")
             .username("u1")
             .password("p1")
             .email("e1")
-            .build(),
-
-        "server2", RegistryAuth.builder()
+            .build());
+	registryAuths.put("server2", RegistryAuth.builder()
             .serverAddress("server2")
             .username("u2")
             .password("p2")
             .email("e2")
-            .build()
-    ));
+            .build());
+	
+    final RegistryConfigs registryConfigs = RegistryConfigs.create(registryAuths);
 
     final RegistryAuthSupplier authSupplier = mock(RegistryAuthSupplier.class);
     when(authSupplier.authForBuild()).thenReturn(registryConfigs);
@@ -710,7 +715,7 @@ public class DefaultDockerClientUnitTest {
       throws IOException, DockerException, InterruptedException {
     final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
 
-    final ImmutableList<Preference> prefs = ImmutableList.of(
+    final List<Preference> prefs = Collections.singletonList(
         Preference.create(
             Spread.create(
                 "test"
@@ -775,7 +780,7 @@ public class DefaultDockerClientUnitTest {
     final TaskSpec taskSpec = TaskSpec.builder()
         .containerSpec(ContainerSpec.builder()
             .image("this_image_is_found_in_the_registry")
-            .configs(ImmutableList.of(configBind))
+            .configs(Collections.singletonList(configBind))
             .build())
         .build();
 
@@ -1163,16 +1168,16 @@ public class DefaultDockerClientUnitTest {
     assertThat(volume.name(), is("tardis"));
     assertThat(volume.driver(), is("custom"));
     assertThat(volume.mountpoint(), is("/var/lib/docker/volumes/tardis"));
-    assertThat(volume.status(), is(ImmutableMap.of("hello", "world")));
-    assertThat(volume.labels(), is(ImmutableMap.of(
-        "com.example.some-label", "some-value",
-        "com.example.some-other-label", "some-other-value"
-    )));
+    assertThat(volume.status(), is(singletonMap("hello", "world")));
+    Map<String, String> expectedLabels = new HashMap<>();
+    expectedLabels.put("com.example.some-label", "some-value");
+    expectedLabels.put("com.example.some-other-label", "some-other-value");
+    assertThat(volume.labels(), is(expectedLabels));
     assertThat(volume.scope(), is("local"));
-    assertThat(volume.options(), is(ImmutableMap.of(
-        "foo", "bar",
-        "baz", "qux"
-    )));
+    Map<String, String> expectedOptions = new HashMap<>();
+    expectedOptions.put("foo", "bar");
+    expectedOptions.put("baz", "qux");
+    assertThat(volume.options(), is(expectedOptions));
   }
   
   @Test
@@ -1241,15 +1246,15 @@ public class DefaultDockerClientUnitTest {
     assertThat(distribution.descriptor().mediaType(), is(
         "application/vnd.docker.distribution.manifest.v2+json"
     ));
-    assertThat(distribution.platforms().get(0).osFeatures(), is(ImmutableList.of(
+    assertThat(distribution.platforms().get(0).osFeatures(), is(unmodifiableList(asList(
         "feature1", "feature2"
-    )));
-    assertThat(distribution.platforms().get(0).features(), is(ImmutableList.of(
+    ))));
+    assertThat(distribution.platforms().get(0).features(), is(unmodifiableList(asList(
         "feature1", "feature2"
-    )));
-    assertThat(distribution.descriptor().urls(), is(ImmutableList.of(
+    ))));
+    assertThat(distribution.descriptor().urls(), is(unmodifiableList(asList(
         "url1", "url2"
-    )));
+    ))));
   }
 
   @Test

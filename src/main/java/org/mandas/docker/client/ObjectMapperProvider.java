@@ -20,8 +20,10 @@
 
 package org.mandas.docker.client;
 
+import static java.util.Collections.emptyMap;
+import static java.util.stream.Collectors.toMap;
+
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,21 +44,12 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.google.common.base.Function;
-import com.google.common.collect.Maps;
 
 @Produces(MediaType.APPLICATION_JSON)
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class ObjectMapperProvider implements ContextResolver<ObjectMapper> {
 
   private static final Logger log = LoggerFactory.getLogger(ObjectMapperProvider.class);
-
-  private static final Function<? super Object, ?> EMPTY_MAP = new Function<Object, Object>() {
-    @Override
-    public Object apply(final Object input) {
-      return Collections.emptyMap();
-    }
-  };
 
   private static final SimpleModule MODULE = new SimpleModule();
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -88,7 +81,7 @@ public class ObjectMapperProvider implements ContextResolver<ObjectMapper> {
     @Override
     public void serialize(final Set value, final JsonGenerator jgen,
                           final SerializerProvider provider) throws IOException {
-      final Map map = (value == null) ? null : Maps.asMap(value, EMPTY_MAP);
+      final Map map = (value == null) ? null : (Map) value.stream().collect(toMap(s -> s, s -> emptyMap()));
       OBJECT_MAPPER.writeValue(jgen, map);
     }
   }

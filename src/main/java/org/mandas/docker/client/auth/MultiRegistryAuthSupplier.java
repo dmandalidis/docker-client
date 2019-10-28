@@ -20,13 +20,16 @@
 
 package org.mandas.docker.client.auth;
 
-import com.google.common.collect.Lists;
-import org.mandas.docker.client.exceptions.DockerException;
-import org.mandas.docker.client.messages.RegistryAuth;
-import org.mandas.docker.client.messages.RegistryConfigs;
+import static java.util.Collections.reverse;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.mandas.docker.client.exceptions.DockerException;
+import org.mandas.docker.client.messages.RegistryAuth;
+import org.mandas.docker.client.messages.RegistryConfigs;
 
 /**
  * A RegistryAuthSupplier that combines authentication info from multiple RegistryAuthSupplier
@@ -73,7 +76,9 @@ public class MultiRegistryAuthSupplier implements RegistryAuthSupplier {
     final Map<String, RegistryAuth> allConfigs = new HashMap<>();
     // iterate through suppliers in reverse so that the earlier suppliers in the list
     // have precedence
-    for (RegistryAuthSupplier supplier : Lists.reverse(suppliers)) {
+    List<RegistryAuthSupplier> reversedSuppliers = new ArrayList<>(suppliers);
+    reverse(reversedSuppliers);
+    for (RegistryAuthSupplier supplier : reversedSuppliers) {
       final RegistryConfigs configs = supplier.authForBuild();
       if (configs != null && configs.configs() != null) {
         allConfigs.putAll(configs.configs());
