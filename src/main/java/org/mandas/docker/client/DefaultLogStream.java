@@ -20,28 +20,23 @@
 
 package org.mandas.docker.client;
 
-import static com.google.common.base.Charsets.UTF_8;
-import static com.google.common.base.Throwables.throwIfUnchecked;
-
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Throwables;
-import com.google.common.collect.AbstractIterator;
-import com.google.common.io.Closer;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.NoSuchElementException;
 
-class DefaultLogStream extends AbstractIterator<LogMessage> implements LogStream {
+class DefaultLogStream implements LogStream {
 
   private final LogReader reader;
-
+  private LogMessage next;
+  
   private DefaultLogStream(final InputStream stream) {
     this(new LogReader(stream));
   }
 
-  @VisibleForTesting
   DefaultLogStream(final LogReader reader) {
     this.reader = reader;
   }
@@ -51,32 +46,35 @@ class DefaultLogStream extends AbstractIterator<LogMessage> implements LogStream
   }
 
   @Override
-  protected LogMessage computeNext() {
-    final LogMessage message;
-    try {
-      message = reader.nextMessage();
-    } catch (IOException e) {
-    	throwIfUnchecked(e);
-        throw new RuntimeException(e);
-    }
-    if (message == null) {
-      return endOfData();
-    }
-    return message;
+  public void close() throws IOException {
+    reader.close();
   }
 
   @Override
-  public void close() {
-    try {
-      reader.close();
-    } catch (IOException e) {
-    	throwIfUnchecked(e);
-        throw new RuntimeException(e);
-    }
+  public boolean hasNext() {
+	if (next != null) {
+		return true;
+	}
+	try {
+		next = reader.nextMessage();
+	} catch (IOException e) {
+		throw new RuntimeException(e);
+	}
+	return next != null;
   }
 
   @Override
-public String readFully() {
+  public LogMessage next() {
+	if (!hasNext()) {
+		throw new NoSuchElementException();
+	}
+	LogMessage value = next;
+	next = null;
+	return value;
+  }
+  
+  @Override
+  public String readFully() {
     final StringBuilder stringBuilder = new StringBuilder();
     while (hasNext()) {
       stringBuilder.append(UTF_8.decode(next().content()));
@@ -86,40 +84,22 @@ public String readFully() {
 
   @Override
   public void attach(final OutputStream stdout, final OutputStream stderr) throws IOException {
-    attach(stdout, stderr, true);
-  }
-
-  @Override
-  public void attach(final OutputStream stdout, final OutputStream stderr, boolean closeAtEof)
-      throws IOException {
-    final Closer closer = Closer.create();
-    try {
-      if (closeAtEof) {
-        closer.register(stdout);
-        closer.register(stderr);
-      }
-
-      while (this.hasNext()) {
-        final LogMessage message = this.next();
-        final ByteBuffer content = message.content();
-
-        switch (message.stream()) {
-          case STDOUT:
-            writeAndFlush(content, stdout);
-            break;
-          case STDERR:
-            writeAndFlush(content, stderr);
-            break;
-          case STDIN:
-          default:
-            break;
-        }
-      }
-    } catch (Throwable t) {
-      throw closer.rethrow(t);
-    } finally {
-      closer.close();
-    }
+	  while (this.hasNext()) {
+	    final LogMessage message = this.next();
+	    final ByteBuffer content = message.content();
+	
+	    switch (message.stream()) {
+	      case STDOUT:
+	        writeAndFlush(content, stdout);
+	        break;
+	      case STDERR:
+	        writeAndFlush(content, stderr);
+	        break;
+	      case STDIN:
+	      default:
+	        break;
+	    }
+	  }
   }
 
   /** Write the contents of the given ByteBuffer to the OutputStream and flush the stream. */
@@ -141,5 +121,4 @@ public String readFully() {
     }
     outputStream.flush();
   }
-
 }

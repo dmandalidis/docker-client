@@ -20,48 +20,51 @@
 
 package org.mandas.docker.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Throwables;
-import com.google.common.collect.AbstractIterator;
-import org.mandas.docker.client.messages.Event;
-
-import static com.google.common.base.Throwables.throwIfUnchecked;
-
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.mandas.docker.client.messages.Event;
 
-public class EventStream extends AbstractIterator<Event> implements Closeable {
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class EventStream implements Iterator<Event>, Closeable {
 
   private final EventReader reader;
 
+  private Event next;
+  
   EventStream(final CloseableHttpResponse response, final ObjectMapper objectMapper) {
     this.reader = new EventReader(response, objectMapper);
   }
 
   @Override
-  protected Event computeNext() {
-    final Event event;
-    try {
-      event = reader.nextMessage();
-    } catch (IOException e) {
-    	throwIfUnchecked(e);
-        throw new RuntimeException(e);
-    }
-    if (event == null) {
-      return endOfData();
-    }
-    return event;
+  public void close() throws IOException {
+    reader.close();
   }
 
   @Override
-  public void close() {
-    try {
-      reader.close();
-    } catch (IOException e) {
-    	throwIfUnchecked(e);
-        throw new RuntimeException(e);
-    }
+  public boolean hasNext() {
+	if (next != null) {
+	  return true;
+	}
+	try {
+	  next = reader.nextMessage();
+	} catch (IOException e) {
+	  throw new RuntimeException(e);
+	}
+	return next != null;
+  }
+
+  @Override
+  public Event next() {
+	if (!hasNext()) {
+	  throw new NoSuchElementException();
+	}
+	Event value = next;
+	next = null;
+	return value;
   }
 }

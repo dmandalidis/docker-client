@@ -26,13 +26,12 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mandas.docker.client.DockerHost.SystemDelegate;
-
 import java.net.URI;
 
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
+import org.mandas.docker.client.DockerHost.SystemDelegate;
 
 public class DockerHostTest {
 

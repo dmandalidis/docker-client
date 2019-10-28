@@ -30,14 +30,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.mandas.docker.client.DockerCredentialHelper.CredentialHelperDelegate;
+import org.mandas.docker.client.messages.DockerCredentialHelperAuth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.annotations.VisibleForTesting;
-import org.mandas.docker.client.DockerCredentialHelper.CredentialHelperDelegate;
-import org.mandas.docker.client.messages.DockerCredentialHelperAuth;
 
 /**
  * The default credential helper delegate.
@@ -120,7 +119,6 @@ class SystemCredentialHelperDelegate implements CredentialHelperDelegate {
     }
   }
 
-  @VisibleForTesting
   static DockerCredentialHelperAuth readServerAuthDetails(final BufferedReader input)
       throws IOException {
     final String serverAuthDetails = input.lines().collect(Collectors.joining());

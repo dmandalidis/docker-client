@@ -20,21 +20,20 @@
 
 package org.mandas.docker.client;
 
-import static com.google.common.io.ByteStreams.copy;
-import static com.google.common.io.ByteStreams.nullOutputStream;
 import static org.mandas.docker.client.ObjectMapperProvider.objectMapper;
-
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.MappingIterator;
-import org.mandas.docker.client.exceptions.DockerException;
-import org.mandas.docker.client.exceptions.DockerTimeoutException;
-import org.mandas.docker.client.messages.ProgressMessage;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.SocketTimeoutException;
 import java.net.URI;
+
+import org.mandas.docker.client.exceptions.DockerException;
+import org.mandas.docker.client.exceptions.DockerTimeoutException;
+import org.mandas.docker.client.messages.ProgressMessage;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.MappingIterator;
 
 
 class ProgressStream implements Closeable {
@@ -80,9 +79,6 @@ class ProgressStream implements Closeable {
 
   @Override
   public void close() throws IOException {
-    // Jersey will close the stream and release the connection after we read all the data.
-    // We cannot call the stream's close method because it an instance of UncloseableInputStream,
-    // where close is a no-op.
-    copy(stream, nullOutputStream());
+	stream.close();
   }
 }

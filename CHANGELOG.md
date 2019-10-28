@@ -7,6 +7,12 @@
 * `RegistryConfigs.Builder#addConfig` does not ignore null `RegistryAuth` values anymore
 * `HostConfig.Builder#appendBinds*` methods removed
 * `HostConfig.Builder#binds(final Bind... binds)` method does not ignore null binds anymore
+* `Immutable*` types removed from public getters and builders
+* `EventStream` now implements `java.util.Iterator<Event>`
+* `EventStream#close` and `LogStream#close` can now throw `IOException`
+* `LogStream#attach(OutputStream, OutputStream, boolean)` method removed. Methods should
+not close streams they do not manage.
+* `LogStream#attach(OutputStream, OutputStream)` can now throw `IOException`
 
 ## 2.0.2
 

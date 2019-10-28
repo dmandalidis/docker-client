@@ -20,17 +20,20 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static org.mandas.docker.FixtureUtil.fixture;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mandas.docker.FixtureUtil.fixture;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.Test;
+import org.mandas.docker.client.ObjectMapperProvider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
-import org.mandas.docker.client.ObjectMapperProvider;
-import java.util.Collections;
-import org.junit.Test;
 
 public class DriverTest {
 
@@ -40,8 +43,11 @@ public class DriverTest {
   public void test1_32() throws Exception {
     final Driver driver = objectMapper.readValue(fixture(
         "fixtures/1.32/driver.json"), Driver.class);
+    Map<String, String> expected = new HashMap<>();
+    expected.put("1", "A");
+    expected.put("2", "B");
     assertThat(driver.name(), equalTo("my-driver"));
-    assertThat(driver.options(), equalTo(ImmutableMap.of("1", "A", "2", "B")));
+    assertThat(driver.options(), equalTo(expected));
   }
 
   @Test

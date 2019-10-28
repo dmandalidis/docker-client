@@ -45,12 +45,13 @@ public class DefaultLogStreamTest {
         null
     );
 
-    final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
-    final ByteArrayOutputStream stderr = new ByteArrayOutputStream();
-    logStream.attach(stdout, stderr);
+    try (final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    	final ByteArrayOutputStream stderr = new ByteArrayOutputStream()) {
+    	logStream.attach(stdout, stderr);
 
-    assertThat(stdout.toString(), is("hello\nworld!\n"));
-    assertThat(stderr.toString(), is("oops\n"));
+    	assertThat(stdout.toString(), is("hello\nworld!\n"));
+    	assertThat(stderr.toString(), is("oops\n"));
+    }
   }
 
   private static LogMessage logMessage(LogMessage.Stream stream, String msg) {

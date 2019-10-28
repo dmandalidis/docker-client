@@ -21,7 +21,6 @@
 
 package org.mandas.docker.client;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.mandas.docker.client.messages.Network.Type.BUILTIN;
 import static org.mandas.docker.client.messages.Network.Type.CUSTOM;
 
@@ -38,7 +37,6 @@ import org.mandas.docker.client.exceptions.NonSwarmNodeException;
 import org.mandas.docker.client.exceptions.NotFoundException;
 import org.mandas.docker.client.exceptions.PermissionException;
 import org.mandas.docker.client.exceptions.ServiceNotFoundException;
-import org.mandas.docker.client.exceptions.UnsupportedApiVersionException;
 import org.mandas.docker.client.messages.Container;
 import org.mandas.docker.client.messages.ContainerChange;
 import org.mandas.docker.client.messages.ContainerConfig;
@@ -1806,7 +1804,7 @@ public interface DockerClient extends Closeable {
      * @since Docker 1.12, API version 1.24
      */
     public static ListNetworksParam withLabel(String label, String value) {
-      return isNullOrEmpty(value) ? filter("label", label) : filter("label", label + "=" + value);
+      return value == null || "".equals(value.trim()) ? filter("label", label) : filter("label", label + "=" + value);
     }
 
     /**
@@ -2374,7 +2372,7 @@ public interface DockerClient extends Closeable {
      * @return ListContainersParam
      */
     public static ListContainersParam withLabel(final String label, final String value) {
-      return isNullOrEmpty(value) ? filter("label", label) : filter("label", label + "=" + value);
+      return value == null || "".equals(value.trim()) ? filter("label", label) : filter("label", label + "=" + value);
     }
 
     /**
@@ -2482,7 +2480,7 @@ public interface DockerClient extends Closeable {
      * @return ListImagesParam
      */
     public static ListImagesParam withLabel(final String label, final String value) {
-      return isNullOrEmpty(value) ? filter("label", label) : filter("label", label + "=" + value);
+      return value == null || "".equals(value.trim()) ? filter("label", label) : filter("label", label + "=" + value);
     }
 
     /**
@@ -2639,7 +2637,7 @@ public interface DockerClient extends Closeable {
      * @since API 1.21
      */
     public static EventsParam label(final String label, final String value) {
-      return isNullOrEmpty(value) ? filter("label", label) : filter("label", label + "=" + value);
+      return value == null || "".equals(value.trim()) ? filter("label", label) : filter("label", label + "=" + value);
     }
 
     /**

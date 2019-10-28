@@ -20,7 +20,7 @@
 
 package org.mandas.docker.client;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 import java.nio.ByteBuffer;
 
@@ -34,8 +34,10 @@ public class LogMessage {
   }
 
   public LogMessage(final Stream stream, final ByteBuffer content) {
-    this.stream = checkNotNull(stream, "stream");
-    this.content = checkNotNull(content, "content");
+	requireNonNull(stream, "stream");
+	requireNonNull(content, "content");
+    this.stream = stream;
+    this.content = content;
   }
 
   public Stream stream() {

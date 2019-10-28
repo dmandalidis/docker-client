@@ -20,12 +20,10 @@
 
 package org.mandas.docker.client;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.Collections.reverse;
+import static java.util.Collections.unmodifiableList;
 import static org.apache.commons.compress.archivers.tar.TarArchiveOutputStream.BIGNUMBER_POSIX;
 import static org.apache.commons.compress.archivers.tar.TarArchiveOutputStream.LONGFILE_POSIX;
-
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableList;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -44,7 +42,10 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -104,8 +105,7 @@ class CompressedDirectory implements Closeable {
     final Path file = Files.createTempFile("docker-client-", ".tar.gz");
 
     final Path dockerIgnorePath = directory.resolve(".dockerignore");
-    final ImmutableList<DockerIgnorePathMatcher> ignoreMatchers =
-        parseDockerIgnore(dockerIgnorePath);
+    final List<DockerIgnorePathMatcher> ignoreMatchers = parseDockerIgnore(dockerIgnorePath);
 
     try (final OutputStream fileOut = Files.newOutputStream(file);
          final GzipCompressorOutputStream gzipOut = new GzipCompressorOutputStream(fileOut);
@@ -137,14 +137,14 @@ class CompressedDirectory implements Closeable {
     Files.delete(file);
   }
 
-  static ImmutableList<DockerIgnorePathMatcher> parseDockerIgnore(Path dockerIgnorePath)
+  static List<DockerIgnorePathMatcher> parseDockerIgnore(Path dockerIgnorePath)
       throws IOException {
-    final ImmutableList.Builder<DockerIgnorePathMatcher> matchersBuilder = ImmutableList.builder();
+    final List<DockerIgnorePathMatcher> matchersBuilder = new ArrayList<>();
 
     if (Files.isReadable(dockerIgnorePath) && Files.isRegularFile(dockerIgnorePath)) {
       for (final String line : Files.readAllLines(dockerIgnorePath, StandardCharsets.UTF_8)) {
         final String pattern = createPattern(line);
-        if (isNullOrEmpty(pattern)) {
+        if (pattern == null || "".equals(pattern.trim())) {
           log.debug("Will skip '{}' - because it's empty after trimming or it's a comment", line);
           continue;
         }
@@ -158,7 +158,7 @@ class CompressedDirectory implements Closeable {
       }
     }
 
-    return matchersBuilder.build();
+    return unmodifiableList(matchersBuilder);
   }
 
   private static String createPattern(String line) {
@@ -172,7 +172,6 @@ class CompressedDirectory implements Closeable {
     return pattern.replace("/", "\\\\");
   }
 
-  @VisibleForTesting
   static PathMatcher goPathMatcher(FileSystem fs, String pattern) {
     // Supposed to work the same way as Go's path.filepath.match.Match:
     // http://golang.org/src/path/filepath/match.go#L34
@@ -253,15 +252,17 @@ class CompressedDirectory implements Closeable {
   private static class Visitor extends SimpleFileVisitor<Path> {
 
     private final Path root;
-    private final ImmutableList<DockerIgnorePathMatcher> ignoreMatchers;
+    private final List<DockerIgnorePathMatcher> ignoreMatchers;
     private final TarArchiveOutputStream tarStream;
 
-    private Visitor(final Path root, ImmutableList<DockerIgnorePathMatcher> ignoreMatchers,
+    private Visitor(final Path root, List<DockerIgnorePathMatcher> ignoreMatchers,
                     final TarArchiveOutputStream tarStream) {
       this.root = root;
       // .dockerignore matchers need to be read from the bottom of the file, 
       // so the given list should be reversed before using it.
-      this.ignoreMatchers = ignoreMatchers.reverse();
+      List<DockerIgnorePathMatcher> unsortedMatchers = new ArrayList<>(ignoreMatchers);
+      reverse(unsortedMatchers);
+      this.ignoreMatchers = Collections.unmodifiableList(unsortedMatchers);
       this.tarStream = tarStream;
     }
 
@@ -312,7 +313,7 @@ class CompressedDirectory implements Closeable {
      * @param path     the path to match
      * @return <code>true</code> if the given path should be excluded, <code>false</code> otherwise
      */
-    private static boolean exclude(ImmutableList<DockerIgnorePathMatcher> matchers, Path path) {
+    private static boolean exclude(List<DockerIgnorePathMatcher> matchers, Path path) {
       for (final DockerIgnorePathMatcher matcher : matchers) {
         if (matcher.matches(path)) {
           return matcher.isExclude();

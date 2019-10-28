@@ -20,9 +20,6 @@
 
 package org.mandas.docker.client;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.MoreObjects;
-
 public class ImageRef {
 
   private static final String DEFAULT_REGISTRY = "docker.io";
@@ -87,15 +84,14 @@ public class ImageRef {
 
   @Override
   public String toString() {
-    return MoreObjects.toStringHelper(this)
-        .add("registry", registry)
-        .add("image", image)
-        .add("tag", tag)
-        .toString();
+	return "ImageRef{"
+	  + "registry=" + registry
+	  + ",image=" + image
+	  + ",tag=" + tag
+	  + "}";
   }
 
   /** Return registry server address given first part of image. */
-  @VisibleForTesting
   static String parseRegistryUrl(final String url) {
     if (url.equals("docker.io") || url.equals("index.docker.io")) {
       return DEFAULT_REGISTRY_URL;

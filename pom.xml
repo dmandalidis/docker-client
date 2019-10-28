@@ -46,7 +46,6 @@
   <properties>
   	<version.jackson>2.10.1</version.jackson>
     <version.jersey>2.28</version.jersey>
-    <version.guava>28.1-jre</version.guava>
     <version.immutables>2.8.2</version.immutables>
     
     <version.plugin.spotbugs>3.1.12.2</version.plugin.spotbugs>
@@ -58,11 +57,6 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>1.7.29</version>
-    </dependency>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>${version.guava}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.jaxrs</groupId>
@@ -146,12 +140,6 @@
       <artifactId>google-auth-library-oauth2-http</artifactId>
       <version>0.18.0</version>
       <optional>true</optional>
-      <exclusions>
-        <exclusion>
-          <groupId>com.google.guava</groupId>
-          <artifactId>guava</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <!--test deps-->
@@ -237,7 +225,7 @@
         <configuration>
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
           <violationSeverity>warning</violationSeverity>
-          <excludes>**\/AutoValue_*.java</excludes>
+          <excludes>**\/Immutable*.java</excludes>
         </configuration>
       </plugin>
       <plugin>
@@ -294,7 +282,6 @@
               <include>org.jvnet.hk2.**</include>
               <include>com.github.jnr:*</include>
               <include>org.ow2.asm:*</include>
-              <include>com.google.guava:**</include>
               <include>org.apache.httpcomponents:httpclient</include>
               <include>org.apache.httpcomponents:httpcore</include>
               <include>asm:asm</include>
@@ -415,7 +402,6 @@
         <configuration>
         	<excludes>
             <exclude>org/mandas/**/Immutable*</exclude>
-            <exclude>org/mandas/**/AutoValue*</exclude>
 			    </excludes>	
         </configuration>
         <executions>

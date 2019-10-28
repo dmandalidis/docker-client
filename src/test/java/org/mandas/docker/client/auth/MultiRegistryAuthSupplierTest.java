@@ -20,6 +20,8 @@
 
 package org.mandas.docker.client.auth;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
@@ -29,11 +31,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.Test;
 import org.mandas.docker.client.messages.RegistryAuth;
 import org.mandas.docker.client.messages.RegistryConfigs;
-import org.junit.Test;
 
 public class MultiRegistryAuthSupplierTest {
 
@@ -41,7 +44,7 @@ public class MultiRegistryAuthSupplierTest {
   private final RegistryAuthSupplier supplier2 = mock(RegistryAuthSupplier.class);
 
   private final RegistryAuthSupplier multiSupplier =
-      new MultiRegistryAuthSupplier(ImmutableList.of(supplier1, supplier2));
+      new MultiRegistryAuthSupplier(unmodifiableList(asList(supplier1, supplier2)));
 
   @Test
   public void testAuthFor() throws Exception {
@@ -106,15 +109,15 @@ public class MultiRegistryAuthSupplierTest {
         .serverAddress("c")
         .build();
 
-    when(supplier1.authForBuild()).thenReturn(RegistryConfigs.create(ImmutableMap.of(
-        "a", auth1,
-        "b", auth2
-    )));
+    Map<String, RegistryAuth> expectedSup1Auths = new HashMap<>();
+    expectedSup1Auths.put("a", auth1);
+    expectedSup1Auths.put("b", auth2);
+    when(supplier1.authForBuild()).thenReturn(RegistryConfigs.create(expectedSup1Auths));
 
-    when(supplier2.authForBuild()).thenReturn(RegistryConfigs.create(ImmutableMap.of(
-        "b", auth3,
-        "c", auth4
-    )));
+    Map<String, RegistryAuth> expectedSup2Auths = new HashMap<>();
+    expectedSup2Auths.put("b", auth3);
+    expectedSup2Auths.put("c", auth4);
+    when(supplier2.authForBuild()).thenReturn(RegistryConfigs.create(expectedSup2Auths));
 
     // ensure that supplier1 had priority for server b
     assertThat(multiSupplier.authForBuild().configs(), allOf(
@@ -132,18 +135,17 @@ public class MultiRegistryAuthSupplierTest {
 
     when(supplier1.authForBuild()).thenReturn(null);
 
-    final RegistryConfigs registryConfigs = RegistryConfigs.create(ImmutableMap.of(
-        "a",
-        RegistryAuth.builder()
+    Map<String, RegistryAuth> expectedAuths = new HashMap<>();
+    expectedAuths.put("a", RegistryAuth.builder()
             .username("1")
             .serverAddress("a")
-            .build(),
-        "b",
-        RegistryAuth.builder()
+            .build());
+    expectedAuths.put("b", RegistryAuth.builder()
             .username("2")
             .serverAddress("b")
-            .build()
-    ));
+            .build());
+    
+    final RegistryConfigs registryConfigs = RegistryConfigs.create(expectedAuths);
     when(supplier2.authForBuild()).thenReturn(registryConfigs);
 
     assertThat(multiSupplier.authForBuild(), is(registryConfigs));

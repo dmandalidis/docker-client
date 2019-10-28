@@ -27,8 +27,11 @@ import static com.google.common.collect.Iterables.getOnlyElement;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.String.format;
 import static java.lang.System.getenv;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
+import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.containsIgnoreCase;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.allOf;
@@ -130,6 +133,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -273,12 +277,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.google.common.base.Throwables;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.common.io.Resources;
 import com.google.common.util.concurrent.SettableFuture;
 
@@ -681,8 +680,9 @@ public class DefaultDockerClientTest {
       sut.create(image, imagePayload);
     }
 
-    final Collection<Image> images = Collections2.filter(sut.listImages(),
-        img -> img.repoTags() != null && img.repoTags().contains(image + ":latest"));
+    final Collection<Image> images = sut.listImages().stream()
+    	.filter(img -> img.repoTags() != null && img.repoTags().contains(image + ":latest"))
+    	.collect(toList());
 
     assertThat(images.size(), greaterThan(0));
 
@@ -783,7 +783,7 @@ public class DefaultDockerClientTest {
     final String imageLatest = "dxia/cirros:latest";
     final String imageVersion = "dxia/cirros:0.3.0";
 
-    final Set<RemovedImage> removedImages = Sets.newHashSet();
+    final Set<RemovedImage> removedImages = new HashSet<>();
     removedImages.addAll(sut.removeImage(imageLatest));
     removedImages.addAll(sut.removeImage(imageVersion));
 
@@ -1139,7 +1139,7 @@ public class DefaultDockerClientTest {
     final ContainerCreation creation = sut.createContainer(config, name);
     final String id = creation.id();
 
-    final ImmutableSet.Builder<String> files = ImmutableSet.builder();
+    final Set<String> files = new HashSet<>();
     try (TarArchiveInputStream tarStream = new TarArchiveInputStream(sut.exportContainer(id))) {
       TarArchiveEntry entry;
       while ((entry = tarStream.getNextTarEntry()) != null) {
@@ -1148,7 +1148,7 @@ public class DefaultDockerClientTest {
     }
 
     // Check that some common files exist
-    assertThat(files.build(), both(hasItem("bin/")).and(hasItem("bin/sh")));
+    assertThat(files, both(hasItem("bin/")).and(hasItem("bin/sh")));
   }
 
   @Test
@@ -1164,7 +1164,7 @@ public class DefaultDockerClientTest {
     final ContainerCreation creation = sut.createContainer(config, name);
     final String id = creation.id();
 
-    final ImmutableSet.Builder<String> files = ImmutableSet.builder();
+    final Set<String> files = new HashSet<>();
     try (final TarArchiveInputStream tarStream =
              new TarArchiveInputStream(sut.archiveContainer(id, "/bin"))) {
       TarArchiveEntry entry;
@@ -1174,7 +1174,7 @@ public class DefaultDockerClientTest {
     }
 
     // Check that some common files exist
-    assertThat(files.build(), both(hasItem("bin/")).and(hasItem("bin/wc")));
+    assertThat(files, both(hasItem("bin/")).and(hasItem("bin/wc")));
   }
 
   @Test
@@ -1437,7 +1437,7 @@ public class DefaultDockerClientTest {
     }
 
     // Copy the same files from container
-    final ImmutableSet.Builder<String> filesDownloaded = ImmutableSet.builder();
+    final Set<String> filesDownloaded = new HashSet<>();
     try (TarArchiveInputStream tarStream = new TarArchiveInputStream(
         sut.archiveContainer(id, "/tmp"))) {
       TarArchiveEntry entry;
@@ -1453,7 +1453,7 @@ public class DefaultDockerClientTest {
       for (final File file : files) {
         if (!file.isDirectory()) {
           boolean found = false;
-          for (final String fileDownloaded : filesDownloaded.build()) {
+          for (final String fileDownloaded : filesDownloaded) {
             if (fileDownloaded.contains(file.getName())) {
               found = true;
             }
@@ -1824,7 +1824,7 @@ public class DefaultDockerClientTest {
 
     hostConfigBuilder.blkioWeight(300);
 
-    final List<HostConfig.BlkioDeviceRate> deviceRates = ImmutableList.of(
+    final List<HostConfig.BlkioDeviceRate> deviceRates = Collections.singletonList(
         HostConfig.BlkioDeviceRate.builder().path("/dev/loop0").rate(1024).build()
     );
     hostConfigBuilder.blkioDeviceReadBps(deviceRates);
@@ -2269,7 +2269,7 @@ public class DefaultDockerClientTest {
         .image(BUSYBOX_LATEST)
         .cmd("sleep", "5")
         // Generate some healthy_status events
-        .healthcheck(Healthcheck.create(ImmutableList.of("CMD-SHELL", "true"),
+        .healthcheck(Healthcheck.create(unmodifiableList(asList("CMD-SHELL", "true")),
             1000000000L, 1000000000L, 3, 1000000000L))
         .build();
 
@@ -2367,7 +2367,7 @@ public class DefaultDockerClientTest {
     // Can list by name
     final List<Image> imagesByName = sut.listImages(byName(BUSYBOX));
     assertThat(imagesByName.size(), greaterThan(0));
-    final Set<String> repoTags = Sets.newHashSet();
+    final Set<String> repoTags = new HashSet<>();
     for (final Image imageByName : imagesByName) {
       if (imageByName.repoTags() != null) {
         repoTags.addAll(imageByName.repoTags());
@@ -3358,7 +3358,7 @@ public class DefaultDockerClientTest {
     assertThat(processConfig.tty(), is(true));
     assertThat(processConfig.entrypoint(), is("sh"));
     assertThat(processConfig.arguments(),
-               Matchers.<List<String>>is(ImmutableList.of("-c", "exit 2")));
+               Matchers.<List<String>>is(unmodifiableList(asList("-c", "exit 2"))));
     assertNotNull(started.containerId(), "containerId");
   }
 
@@ -3409,7 +3409,7 @@ public class DefaultDockerClientTest {
     final ContainerConfig containerConfig = ContainerConfig.builder()
         .image(BUSYBOX_LATEST)
         .cmd("sh", "-c", "while :; do sleep 1; done")
-        .labels(ImmutableMap.of(label, labelValue))
+        .labels(singletonMap(label, labelValue))
         .build();
     final String containerName = randomName();
     final ContainerCreation containerCreation = sut.createContainer(containerConfig, containerName);
@@ -3476,9 +3476,9 @@ public class DefaultDockerClientTest {
   public void testContainerLabels() throws Exception {
     sut.pull(BUSYBOX_LATEST);
 
-    final Map<String, String> labels = ImmutableMap.of(
-        "name", "starship", "foo", "bar"
-    );
+    Map<String, String> labels = new HashMap<>();
+    labels.put("name", "starship");
+    labels.put("foo", "bar");
 
     // Create container
     final ContainerConfig config = ContainerConfig.builder()
@@ -3496,9 +3496,9 @@ public class DefaultDockerClientTest {
     final ContainerInfo containerInfo = sut.inspectContainer(id);
     assertThat(containerInfo.config().labels(), is(labels));
 
-    final Map<String, String> labels2 = ImmutableMap.of(
-        "name", "starship", "foo", "baz"
-    );
+    final Map<String, String> labels2 = new HashMap<>();
+    labels2.put("name", "starship");
+    labels2.put("foo", "baz");
 
     // Create second container with different labels
     final ContainerConfig config2 = ContainerConfig.builder()
@@ -3637,8 +3637,9 @@ public class DefaultDockerClientTest {
         .driver("default")
         .config(singletonList(ipamConfig))
         .build();
-    final Map<String, String> labels = ImmutableMap.of(
-        "name", "starship", "foo", "bar");
+    final Map<String, String> labels = new HashMap<>();
+    labels.put("name", "starship");
+    labels.put("foo", "bar");
     final NetworkConfig networkConfig =
         NetworkConfig.builder().name(networkName).driver("bridge").checkDuplicate(true).ipam(ipam)
             .internal(false).enableIPv6(false).labels(labels)
@@ -3677,9 +3678,9 @@ public class DefaultDockerClientTest {
   @Test
   public void testFilterNetworks() throws Exception {
     final NetworkConfig network1Config = NetworkConfig.builder().checkDuplicate(true)
-        .name(randomName()).labels(ImmutableMap.of("is-test", "true")).build();
+        .name(randomName()).labels(singletonMap("is-test", "true")).build();
     final NetworkConfig network2Config = NetworkConfig.builder().checkDuplicate(true)
-        .name(randomName()).labels(ImmutableMap.of("is-test", "")).build();
+        .name(randomName()).labels(singletonMap("is-test", "")).build();
     final Network network1 = createNetwork(network1Config);
     final Network network2 = createNetwork(network2Config);
     final Network hostNetwork = getHostNetwork();
@@ -3865,7 +3866,7 @@ public class DefaultDockerClientTest {
     final String dummyAlias = "value-does-not-matter";
     final EndpointConfig endpointConfig = EndpointConfig.builder()
         .ipamConfig(EndpointIpamConfig.builder().ipv4Address(ip).build())
-        .aliases(ImmutableList.of(dummyAlias))
+        .aliases(Collections.singletonList(dummyAlias))
         .build();
 
     final NetworkConnection networkConnection = NetworkConnection.builder()
@@ -4085,7 +4086,7 @@ public class DefaultDockerClientTest {
     sut.removeVolume(blankVolume);
 
     // Create volume with attributes
-    final ImmutableMap<String, String> labels = ImmutableMap.of("foo", "bar");
+    final Map<String, String> labels = Collections.singletonMap("foo", "bar");
     final String volName = randomName();
     final Volume toCreate;
     toCreate = Volume.builder()
@@ -4351,7 +4352,7 @@ public class DefaultDockerClientTest {
     // Pull image
     sut.pull(BUSYBOX_LATEST);
 
-    final ImmutableMap<String, String> tmpfs = ImmutableMap.of("/tmp", "rw,noexec,nosuid,size=50m");
+    final Map<String, String> tmpfs = Collections.singletonMap("/tmp", "rw,noexec,nosuid,size=50m");
 
     final ContainerConfig config = ContainerConfig.builder()
         .image(BUSYBOX_LATEST)
@@ -4394,7 +4395,7 @@ public class DefaultDockerClientTest {
     // Pull image
     sut.pull(BUSYBOX_LATEST);
 
-    final ImmutableMap<String, String> storageOpt = ImmutableMap.of("size", "20G");
+    final Map<String, String> storageOpt = Collections.singletonMap("size", "20G");
 
     final ContainerConfig config = ContainerConfig.builder()
                       .image(BUSYBOX_LATEST)
@@ -4503,7 +4504,7 @@ public class DefaultDockerClientTest {
     final Swarm swarm = sut.inspectSwarm();
     final ThreadLocalRandom random = ThreadLocalRandom.current();
 
-    final Map<String, String> newLabels = ImmutableMap.of("foo", "bar");
+    final Map<String, String> newLabels = Collections.singletonMap("foo", "bar");
     final OrchestrationConfig newOrchestration = OrchestrationConfig.builder()
         .taskHistoryRetentionLimit(random.nextInt(1, 10))
         .build();
@@ -4632,7 +4633,9 @@ public class DefaultDockerClientTest {
 
     final String secretData = Base64.getEncoder().encodeToString("testdata".getBytes(StandardCharsets.UTF_8));
     
-    final Map<String, String> labels = ImmutableMap.of("foo", "bar", "1", "a");
+    final Map<String, String> labels = new HashMap<>();
+    labels.put("foo", "bar");
+    labels.put("1", "a");
 
     String secretName = randomName();
 	final SecretSpec secretSpec = SecretSpec.builder()
@@ -4808,7 +4811,9 @@ public class DefaultDockerClientTest {
 
     final String secretData = Base64.getEncoder().encodeToString("testdata".getBytes(StandardCharsets.UTF_8));
 
-    final Map<String, String> labels = ImmutableMap.of("foo", "bar", "1", "a");
+    final Map<String, String> labels = new HashMap<>();
+    labels.put("foo", "bar");
+    labels.put("1", "a");
 
     String secretName = randomName();
 	final SecretSpec secretSpec = SecretSpec.builder()

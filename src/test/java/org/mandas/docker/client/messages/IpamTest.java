@@ -20,18 +20,18 @@
 
 package org.mandas.docker.client.messages;
 
-import static org.mandas.docker.FixtureUtil.fixture;
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
-import org.mandas.docker.client.ObjectMapperProvider;
+import static org.mandas.docker.FixtureUtil.fixture;
 
 import org.junit.Test;
+import org.mandas.docker.client.ObjectMapperProvider;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class IpamTest {
 
@@ -43,7 +43,7 @@ public class IpamTest {
         objectMapper.readValue(fixture("fixtures/1.29/ipam.json"), Ipam.class);
     assertThat(ipam.driver(), equalTo("default"));
     assertThat(ipam.config(), contains(IpamConfig.builder().subnet("172.17.0.0/16").build()));
-    assertThat(ipam.options(), equalTo(ImmutableMap.of("foo", "bar")));
+    assertThat(ipam.options(), equalTo(singletonMap("foo", "bar")));
   }
 
   @Test

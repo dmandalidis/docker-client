@@ -20,13 +20,6 @@
 
 package org.mandas.docker.client;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
-import static com.google.common.base.Strings.isNullOrEmpty;
-
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.MoreObjects;
-import com.google.common.net.HostAndPort;
-
 import java.net.URI;
 import java.nio.file.Paths;
 import java.util.Locale;
@@ -39,7 +32,6 @@ public class DockerHost {
   /**
    * An interface to be mocked during testing.
    */
-  @VisibleForTesting
   interface SystemDelegate {
 
     String getProperty(String key);
@@ -64,7 +56,6 @@ public class DockerHost {
   private static final String DEFAULT_WINDOWS_ENDPOINT = "npipe:////./pipe/docker_engine";
   private static final String DEFAULT_ADDRESS = "localhost";
   private static final int DEFAULT_PORT = 2375;
-
   private final String host;
   private final URI uri;
   private final URI bindUri;
@@ -81,12 +72,17 @@ public class DockerHost {
       this.bindUri = URI.create(endpoint);
     } else {
       final String stripped = endpoint.replaceAll(".*://", "");
-      final HostAndPort hostAndPort = HostAndPort.fromString(stripped);
-      final String hostText = hostAndPort.getHost();
-      final String scheme = isNullOrEmpty(certPath) ? "http" : "https";
-
-      this.port = hostAndPort.getPortOrDefault(defaultPort());
-      this.address = isNullOrEmpty(hostText) ? DEFAULT_ADDRESS : hostText;
+      final String scheme = certPath == null ? "http" : "https";
+      URI initialUri = URI.create(scheme + "://" + stripped);
+      if (initialUri.getPort() == -1 && initialUri.getHost() == null) {
+    	  initialUri = URI.create(scheme + "://" + DEFAULT_ADDRESS + ":" + defaultPort());
+      } else if (initialUri.getHost() == null) {
+    	  initialUri = URI.create(scheme + "://" + DEFAULT_ADDRESS + ":" + initialUri.getPort());
+      } else if (initialUri.getPort() == -1) {
+    	  initialUri = URI.create(scheme + "://" + initialUri.getHost() + ":" + defaultPort());
+      }
+      this.port = initialUri.getPort();
+      this.address = initialUri.getHost();
       this.host = address + ":" + port;
       this.uri = URI.create(scheme + "://" + address + ":" + port);
       this.bindUri = URI.create("tcp://" + address + ":" + port);
@@ -151,12 +147,10 @@ public class DockerHost {
     return certPath;
   }
 
-  @VisibleForTesting
   static void setSystemDelegate(final SystemDelegate delegate) {
     systemDelegate = delegate;
   }
 
-  @VisibleForTesting
   static void restoreSystemDelegate() {
     systemDelegate = defaultSystemDelegate;
   }
@@ -197,7 +191,12 @@ public class DockerHost {
   }
 
   static String endpointFromEnv() {
-    return firstNonNull(systemDelegate.getenv("DOCKER_HOST"), defaultDockerEndpoint());
+	String endPointFromEnv = systemDelegate.getenv("DOCKER_HOST");
+	if (endPointFromEnv != null) {
+	  return endPointFromEnv;
+	}
+
+    return defaultDockerEndpoint();
   }
 
   public static String defaultUnixEndpoint() {
@@ -243,14 +242,14 @@ public class DockerHost {
 
   @Override
   public String toString() {
-    return MoreObjects.toStringHelper(this)
-        .add("host", host)
-        .add("uri", uri)
-        .add("bindUri", bindUri)
-        .add("address", address)
-        .add("port", port)
-        .add("certPath", certPath)
-        .toString();
+	return "DockerHost{"
+		+ "host=" + host
+		+ ",uri=" + uri
+		+ ",bindUri=" + bindUri
+		+ ",address=" + address
+		+ ",port=" + port
+		+ ",certPath=" + certPath
+		+ "}";
   }
 
   @Override

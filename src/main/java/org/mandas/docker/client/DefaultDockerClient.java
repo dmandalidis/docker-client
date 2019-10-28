@@ -23,14 +23,11 @@
 
 package org.mandas.docker.client;
 
-import static com.google.common.base.Optional.fromNullable;
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Strings.isNullOrEmpty;
-import static com.google.common.collect.Maps.newHashMap;
-import static org.mandas.docker.client.ObjectMapperProvider.objectMapper;
-import static org.mandas.docker.client.VersionCompare.compareVersion;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableSet;
+import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.ws.rs.HttpMethod.DELETE;
 import static javax.ws.rs.HttpMethod.GET;
@@ -40,11 +37,17 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static javax.ws.rs.core.MediaType.APPLICATION_OCTET_STREAM;
 import static javax.ws.rs.core.MediaType.APPLICATION_OCTET_STREAM_TYPE;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN_TYPE;
+import static org.mandas.docker.client.DockerHost.certPathFromEnv;
+import static org.mandas.docker.client.DockerHost.configPathFromEnv;
+import static org.mandas.docker.client.DockerHost.defaultAddress;
+import static org.mandas.docker.client.DockerHost.defaultCertPath;
+import static org.mandas.docker.client.DockerHost.defaultPort;
+import static org.mandas.docker.client.ObjectMapperProvider.objectMapper;
+import static org.mandas.docker.client.VersionCompare.compareVersion;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.InterruptedIOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -56,7 +59,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -64,6 +66,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -109,21 +113,6 @@ import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.RequestEntityProcessing;
 import org.glassfish.jersey.jackson.JacksonFeature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Predicates;
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.io.CharStreams;
-import com.google.common.net.HostAndPort;
 import org.mandas.docker.client.auth.ConfigFileRegistryAuthSupplier;
 import org.mandas.docker.client.auth.FixedRegistryAuthSupplier;
 import org.mandas.docker.client.auth.RegistryAuthSupplier;
@@ -196,6 +185,11 @@ import org.mandas.docker.client.messages.swarm.SwarmSpec;
 import org.mandas.docker.client.messages.swarm.Task;
 import org.mandas.docker.client.messages.swarm.UnlockKey;
 import org.mandas.docker.client.npipe.NpipeConnectionSocketFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class DefaultDockerClient implements DockerClient, Closeable {
 
@@ -225,8 +219,9 @@ public class DefaultDockerClient implements DockerClient, Closeable {
     }
 
     private String getImageId() {
-      Preconditions.checkState(imageId != null,
-                               "Could not acquire image ID or digest following create");
+      if (imageId == null) {
+         throw new IllegalStateException("Could not acquire image ID or digest following create");
+      }
       return imageId;
     }
 
@@ -264,7 +259,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
     }
 
     private Set<String> getImageNames() {
-      return ImmutableSet.copyOf(imageNames);
+      return unmodifiableSet(new HashSet<>(imageNames));
     }
 
     @Override
@@ -298,8 +293,9 @@ public class DefaultDockerClient implements DockerClient, Closeable {
     }
 
     private String getImageId() {
-      Preconditions.checkState(imageId != null,
-                               "Could not acquire image ID or digest following build");
+	  if (imageId == null) {
+        throw new IllegalStateException("Could not acquire image ID or digest following build");
+      }
       return imageId;
     }
 
@@ -431,8 +427,9 @@ public class DefaultDockerClient implements DockerClient, Closeable {
    * @param builder DefaultDockerClient builder
    */
   protected DefaultDockerClient(final Builder builder) {
-    final URI originalUri = checkNotNull(builder.uri, "uri");
-    checkNotNull(originalUri.getScheme(), "url has null scheme");
+    requireNonNull(builder.uri, "uri");
+    final URI originalUri = builder.uri;
+    requireNonNull(originalUri.getScheme(), "url has null scheme");
     this.apiVersion = builder.apiVersion();
 
     if ((builder.dockerCertificatesStore != null) && !originalUri.getScheme().equals("https")) {
@@ -509,7 +506,8 @@ public class DefaultDockerClient implements DockerClient, Closeable {
           }
         }
         if (!skipProxy) {
-          String proxyPort = checkNotNull(System.getProperty("http.proxyPort"), "http.proxyPort");
+          String proxyPort = System.getProperty("http.proxyPort");
+          requireNonNull(proxyPort, "http.proxyPort");
           config.property(ClientProperties.PROXY_URI, (!proxyHost.startsWith("http") ? "http://" : "")
                   + proxyHost + ":" + proxyPort);
           final String proxyUser = System.getProperty("http.proxyUser");
@@ -536,7 +534,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
 
   @Override
   public String getHost() {
-    return fromNullable(uri.getHost()).or("localhost");
+    return ofNullable(uri.getHost()).orElse("localhost");
   }
 
   private HttpClientConnectionManager getConnectionManager(Builder builder) {
@@ -633,14 +631,14 @@ public class DefaultDockerClient implements DockerClient, Closeable {
 
   private WebTarget addParameters(WebTarget resource, final Param... params)
       throws DockerException {
-    final Map<String, List<String>> filters = newHashMap();
+    final Map<String, List<String>> filters = new HashMap<>();
     for (final Param param : params) {
       if (param instanceof FilterParam) {
         List<String> filterValueList;
         if (filters.containsKey(param.name())) {
           filterValueList = filters.get(param.name());
         } else {
-          filterValueList = Lists.newArrayList();
+          filterValueList = new ArrayList<>();
         }
         filterValueList.add(param.value());
         filters.put(param.name(), filterValueList);
@@ -660,7 +658,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
 
   private Map<String, String> getQueryParamMap(final WebTarget resource) {
     final String queryParams = resource.getUri().getQuery();
-    final Map<String, String> paramsMap = Maps.newHashMap();
+    final Map<String, String> paramsMap = new HashMap<>();
     if (queryParams != null) {
       for (final String queryParam : queryParams.split("&")) {
         final String[] kv = queryParam.split("=");
@@ -728,8 +726,9 @@ public class DefaultDockerClient implements DockerClient, Closeable {
         .path("containers").path("create");
 
     if (name != null) {
-      checkArgument(CONTAINER_NAME_PATTERN.matcher(name).matches(),
-                    "Invalid container name: \"%s\"", name);
+      if (!CONTAINER_NAME_PATTERN.matcher(name).matches()) {
+    	 throw new IllegalArgumentException(String.format("Invalid container name: \"%s\"", name));
+      }
       resource = resource.queryParam("name", name);
     }
 
@@ -753,7 +752,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   @Override
   public void startContainer(final String containerId)
       throws DockerException, InterruptedException {
-    checkNotNull(containerId, "containerId");
+    requireNonNull(containerId, "containerId");
 
     log.info("Starting container with Id: {}", containerId);
 
@@ -791,14 +790,14 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   @Override
   public void pauseContainer(final String containerId)
       throws DockerException, InterruptedException {
-    checkNotNull(containerId, "containerId");
+    requireNonNull(containerId, "containerId");
     containerAction(containerId, "pause");
   }
 
   @Override
   public void unpauseContainer(final String containerId)
       throws DockerException, InterruptedException {
-    checkNotNull(containerId, "containerId");
+	requireNonNull(containerId, "containerId");
     containerAction(containerId, "unpause");
   }
 
@@ -810,8 +809,8 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   @Override
   public void restartContainer(String containerId, int secondsToWaitBeforeRestart)
       throws DockerException, InterruptedException {
-    checkNotNull(containerId, "containerId");
-    checkNotNull(secondsToWaitBeforeRestart, "secondsToWait");
+	requireNonNull(containerId, "containerId");
+	requireNonNull(secondsToWaitBeforeRestart, "secondsToWait");
 
     MultivaluedMap<String, String> queryParameters = new MultivaluedHashMap<>();
     queryParameters.add("t", String.valueOf(secondsToWaitBeforeRestart));
@@ -821,14 +820,14 @@ public class DefaultDockerClient implements DockerClient, Closeable {
 
   @Override
   public void killContainer(final String containerId) throws DockerException, InterruptedException {
-    checkNotNull(containerId, "containerId");
+	requireNonNull(containerId, "containerId");
     containerAction(containerId, "kill");
   }
 
   @Override
   public void killContainer(final String containerId, final Signal signal)
       throws DockerException, InterruptedException {
-    checkNotNull(containerId, "containerId");
+	requireNonNull(containerId, "containerId");
 
     MultivaluedMap<String, String> queryParameters = new MultivaluedHashMap<>();
     queryParameters.add("signal", signal.getName());
@@ -839,7 +838,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   @Override
   public Distribution getDistribution(String imageName)
       throws DockerException, InterruptedException {
-    checkNotNull(imageName, "containerName");
+	requireNonNull(imageName, "containerName");
     final WebTarget resource = resource().path("distribution").path(imageName).path("json");
     return request(GET, DISTRIBUTION, resource, resource.request(APPLICATION_JSON_TYPE));
   }
@@ -969,7 +968,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       throws DockerException, InterruptedException {
     try {
       WebTarget resource = resource().path("containers").path(containerId).path("top");
-      if (!Strings.isNullOrEmpty(psArgs)) {
+      if (psArgs != null && !"".equals(psArgs.trim())) {
         resource = resource.queryParam("ps_args", psArgs);
       }
       return request(GET, TopResults.class, resource, resource.request(APPLICATION_JSON_TYPE));
@@ -1063,22 +1062,22 @@ public class DefaultDockerClient implements DockerClient, Closeable {
                                            final String author)
       throws DockerException, InterruptedException {
 
-    checkNotNull(containerId, "containerId");
-    checkNotNull(repo, "repo");
-    checkNotNull(config, "containerConfig");
+	requireNonNull(containerId, "containerId");
+	requireNonNull(repo, "repo");
+	requireNonNull(config, "containerConfig");
 
     WebTarget resource = resource()
         .path("commit")
         .queryParam("container", containerId)
         .queryParam("repo", repo);
 
-    if (!isNullOrEmpty(author)) {
+    if (author != null && !"".equals(author.trim())) {
       resource = resource.queryParam("author", author);
     }
-    if (!isNullOrEmpty(comment)) {
+    if (comment != null && !"".equals(comment.trim())) {
       resource = resource.queryParam("comment", comment);
     }
-    if (!isNullOrEmpty(tag)) {
+    if (tag != null && !"".equals(tag.trim())) {
       resource = resource.queryParam("tag", tag);
     }
 
@@ -1108,8 +1107,9 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       throw new IllegalArgumentException("Cannot rename container to null");
     }
 
-    checkArgument(CONTAINER_NAME_PATTERN.matcher(name).matches(),
-                  "Invalid container name: \"%s\"", name);
+    if (!CONTAINER_NAME_PATTERN.matcher(name).matches()) {
+    	throw new IllegalArgumentException(String.format("Invalid container name: \"%s\"", name));
+    }
     resource = resource.queryParam("name", name);
 
     log.info("Renaming container with id {}. New name {}.", containerId, name);
@@ -1221,7 +1221,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       resource = resource().path("images").path("get");
       if (images.length > 1) {
         for (final String image : images) {
-          if (!isNullOrEmpty(image)) {
+          if (image != null && !"".equals(image.trim())) {
             resource = resource.queryParam("names", urlEncode(image));
           }
         }
@@ -1410,7 +1410,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   public String build(final Path directory, final String name, final String dockerfile,
                       final ProgressHandler handler, final BuildParam... params)
       throws DockerException, InterruptedException, IOException {
-    checkNotNull(handler, "handler");
+	requireNonNull(handler, "handler");
 
     WebTarget resource = noTimeoutResource().path("build");
 
@@ -1536,7 +1536,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   public LogStream attachContainer(final String containerId,
                                    final AttachParameter... params) throws DockerException,
                                                                            InterruptedException {
-    checkNotNull(containerId, "containerId");
+    requireNonNull(containerId, "containerId");
     WebTarget resource = noTimeoutResource().path("containers").path(containerId).path("attach");
 
     for (final AttachParameter param : params) {
@@ -2371,7 +2371,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   private void checkTtyParams(final Integer height, final Integer width) throws BadParamException {
     if ((height == null && width == null) || (height != null && height == 0)
         || (width != null && width == 0)) {
-      final Map<String, String> paramMap = Maps.newHashMap();
+      final Map<String, String> paramMap = new HashMap<>();
       paramMap.put("h", height == null ? null : height.toString());
       paramMap.put("w", width == null ? null : width.toString());
       throw new BadParamException(paramMap, "Either width or height must be non-null and > 0");
@@ -2619,7 +2619,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
 
   private WebTarget resource() {
     final WebTarget target = client.target(uri);
-    if (!isNullOrEmpty(apiVersion)) {
+    if (apiVersion != null && !"".equals(apiVersion.trim())) {
       return target.path(apiVersion);
     }
     return target;
@@ -2627,7 +2627,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
 
   private WebTarget noTimeoutResource() {
     final WebTarget target = noTimeoutClient.target(uri);
-    if (!isNullOrEmpty(apiVersion)) {
+    if (apiVersion != null && !"".equals(apiVersion.trim())) {
       return target.path(apiVersion);
     }
     return target;
@@ -2737,7 +2737,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
     Response response = request(method, Response.class, resource, request);
     if (response.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
       throw new DockerRequestException(method, resource.getUri(), response.getStatus(),
-                message(response), null);
+    		  response.readEntity(String.class), null);
     }
     tailResponse(method, response, handler, resource);
   }
@@ -2777,7 +2777,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
 
     if (response != null) {
       throw new DockerRequestException(method, resource.getUri(), response.getStatus(),
-                                       message(response), cause);
+    		  	response.readEntity(String.class), cause);
     } else if ((cause instanceof SocketTimeoutException)
                || (cause instanceof ConnectTimeoutException)) {
       throw new DockerTimeoutException(method, resource.getUri(), ex);
@@ -2786,21 +2786,6 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       throw new InterruptedException("Interrupted: " + method + " " + resource);
     } else {
       throw new DockerException(ex);
-    }
-  }
-
-  private String message(final Response response) {
-    final Readable reader;
-    try {
-      reader = new InputStreamReader(response.readEntity(InputStream.class), UTF_8);
-    } catch (IllegalStateException e) {
-      return null;
-    }
-
-    try {
-      return CharStreams.toString(reader);
-    } catch (IOException ignore) {
-      return null;
     }
   }
 
@@ -2874,11 +2859,11 @@ public class DefaultDockerClient implements DockerClient, Closeable {
    */
   public static Builder fromEnv() throws DockerCertificateException {
     final String endpoint = DockerHost.endpointFromEnv();
-    final Path dockerCertPath = Paths.get(Iterables.find(
-        Arrays.asList(DockerHost.certPathFromEnv(),
-            DockerHost.configPathFromEnv(),
-            DockerHost.defaultCertPath()),
-        Predicates.notNull()));
+    final Path dockerCertPath = Paths.get(asList(certPathFromEnv(), configPathFromEnv(), defaultCertPath())
+    	.stream()
+    	.filter(cert -> cert != null)
+    	.findFirst()
+    	.orElseThrow(() -> new NoSuchElementException("Cannot find docker certificated path")));
 
     final Builder builder = new Builder();
 
@@ -2891,14 +2876,16 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       builder.uri(endpoint);
     } else {
       final String stripped = endpoint.replaceAll(".*://", "");
-      final HostAndPort hostAndPort = HostAndPort.fromString(stripped);
-      final String hostText = hostAndPort.getHost();
       final String scheme = certs.isPresent() ? "https" : "http";
-
-      final int port = hostAndPort.getPortOrDefault(DockerHost.defaultPort());
-      final String address = isNullOrEmpty(hostText) ? DockerHost.defaultAddress() : hostText;
-
-      builder.uri(scheme + "://" + address + ":" + port);
+      URI initialUri = URI.create(scheme + "://" + stripped);
+      if (initialUri.getPort() == -1 && initialUri.getHost() == null) {
+    	  initialUri = URI.create(scheme + "://" + defaultAddress() + ":" + defaultPort());
+      } else if (initialUri.getHost() == null) {
+    	  initialUri = URI.create(scheme + "://" + defaultAddress()+ ":" + initialUri.getPort());
+      } else if (initialUri.getPort() == -1) {
+    	  initialUri = URI.create(scheme + "://" + initialUri.getHost() + ":" + defaultPort());
+      }
+      builder.uri(initialUri);
     }
 
     if (certs.isPresent()) {

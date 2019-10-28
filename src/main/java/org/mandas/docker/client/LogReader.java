@@ -20,16 +20,13 @@
 
 package org.mandas.docker.client;
 
-import static com.google.common.io.ByteStreams.copy;
-import static com.google.common.io.ByteStreams.nullOutputStream;
-
-import com.google.common.io.ByteStreams;
-import org.mandas.docker.client.LogMessage.Stream;
-
 import java.io.Closeable;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+
+import org.mandas.docker.client.LogMessage.Stream;
 
 public class LogReader implements Closeable {
 
@@ -46,7 +43,7 @@ public class LogReader implements Closeable {
 
     // Read header
     final byte[] headerBytes = new byte[HEADER_SIZE];
-    final int n = ByteStreams.read(stream, headerBytes, 0, HEADER_SIZE);
+    final int n = readAllBytes(headerBytes);
     if (n == 0) {
       return null;
     }
@@ -66,15 +63,31 @@ public class LogReader implements Closeable {
       streamId = Stream.STDOUT.id();
       frame = new byte[stream.available()];
     }
-    ByteStreams.readFully(stream, frame);
+
+    int total = readAllBytes(frame);
+    
+    if (total < frame.length) {
+      throw new EOFException("EOF before reading " + frame.length + " bytes. " + total + " read instead.");
+    }
+    
     return new LogMessage(streamId, ByteBuffer.wrap(frame));
   }
 
+  private int readAllBytes(byte[] buf) throws IOException {
+	int total = 0;
+    while (total < buf.length) {
+      int result = stream.read(buf, total, buf.length - total);
+      if (result == -1) {
+        break;
+      }
+      total += result;
+    }
+    
+    return total;
+  }
+  
   @Override
   public void close() throws IOException {
-    // Jersey will close the stream and release the connection after we read all the data.
-    // We cannot call the stream's close method because it an instance of UncloseableInputStream,
-    // where close is a no-op.
-    copy(stream, nullOutputStream());
+	stream.close();  
   }
 }

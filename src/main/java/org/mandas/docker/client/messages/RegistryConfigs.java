@@ -20,12 +20,14 @@
 
 package org.mandas.docker.client.messages;
 
+import static java.util.stream.Collectors.toMap;
+
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.immutables.value.Value.Immutable;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.google.common.collect.Maps;
 
 /**
  * A formatted string passed in X-Registry-Config request header.
@@ -66,22 +68,18 @@ public interface RegistryConfigs {
 
     // need to add serverAddress to each RegistryAuth instance; it is not available when
     // Jackson is deserializing the RegistryAuth field
-    final Map<String, RegistryAuth> transformedMap = Maps.transformEntries(configs,
-        new Maps.EntryTransformer<String, RegistryAuth, RegistryAuth>() {
-          @Override
-          public RegistryAuth transformEntry(final String key, final RegistryAuth value) {
-            if (value == null) {
-              return null;
-            }
-            if (value.serverAddress() == null) {
-              return value.toBuilder()
-                  .serverAddress(key)
-                  .build();
-            }
-            return value;
-          }
-        });
-
+    final Map<String, RegistryAuth> transformedMap = configs.entrySet().stream()
+      .collect(toMap(Entry::getKey, entry -> {
+        RegistryAuth value = entry.getValue();
+    	if (value == null) {
+    	  return null;
+    	}
+    	if (value.serverAddress() == null) {
+    	  return value.toBuilder().serverAddress(entry.getKey()).build();
+    	}
+    	return value;
+      }));
+    
     return builder().configs(transformedMap).build();
   }
 

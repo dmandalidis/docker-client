@@ -20,13 +20,12 @@
 
 package org.mandas.docker.client;
 
-import com.google.common.collect.Maps;
+import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.mandas.docker.client.exceptions.DockerException;
 import org.mandas.docker.client.messages.ProgressMessage;
-
-import java.io.PrintStream;
-import java.util.Map;
 
 /**
  * Parses ProgressMessage objects and writes the output to a PrintStream. The output includes ANSI
@@ -46,7 +45,7 @@ public class AnsiProgressHandler implements ProgressHandler {
 
   public AnsiProgressHandler(PrintStream out) {
     this.out = out;
-    idsToLines = Maps.newHashMap();
+    idsToLines = new HashMap<>();
   }
 
   @Override
