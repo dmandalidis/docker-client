@@ -1792,6 +1792,29 @@ public class DefaultDockerClientTest {
     assertThat(actual.cpuQuota(), equalTo(expected.cpuQuota()));
     assertThat(actual.cpusetCpus(), equalTo(expected.cpusetCpus()));
   }
+  
+  @Test
+  public void testContainerWithSysctls() throws Exception {
+	sut.pull(BUSYBOX_LATEST);
+
+    final HostConfig expected = HostConfig.builder()
+    	.addSysctl("net.ipv4.tcp_syncookies", "1")
+        .build();
+
+    final ContainerConfig config = ContainerConfig.builder()
+        .image(BUSYBOX_LATEST)
+        .hostConfig(expected)
+        .build();
+    final String name = randomName();
+    final ContainerCreation creation = sut.createContainer(config, name);
+    final String id = creation.id();
+
+    sut.startContainer(id);
+
+    final HostConfig actual = sut.inspectContainer(id).hostConfig();
+
+    assertThat(actual.sysctls(), equalTo(singletonMap("net.ipv4.tcp_syncookies", "1")));
+  }
 
   @Test
   public void testContainerWithBlkioOptions() throws Exception {
