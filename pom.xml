@@ -232,8 +232,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.1</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <release>8</release>
         </configuration>
       </plugin>
       <plugin>
@@ -393,20 +392,24 @@
         <version>3.0.0-M3</version>
       </plugin>
       <plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.1.1</version>
-				<executions>
-					<execution>
-						<id>attach-javadocs</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-            <source>1.8</source>
-            <doclint>syntax,reference,html,missing</doclint>
+		    <groupId>org.apache.maven.plugins</groupId>
+		    <artifactId>maven-javadoc-plugin</artifactId>
+		    <version>3.1.1</version>
+		    <executions>
+			    <execution>
+				    <id>attach-javadocs</id>
+				    <goals>
+					    <goal>jar</goal>
+				    </goals>
+			    </execution>
+		    </executions>
+		    <configuration>
+          <source>8</source>
+          <failOnError>false</failOnError>
+          <doclint>syntax,reference,html,missing</doclint>
+          <sourceFileExcludes>
+            <sourceFileExclude>**/generated-sources/**</sourceFileExclude>
+          </sourceFileExcludes>
         </configuration>
 			</plugin>
       <plugin>
