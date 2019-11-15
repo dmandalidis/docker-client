@@ -1,5 +1,13 @@
 # Change Log
 
+## 2.0.1
+
+* Add the correct groupId for shading javax.ws.rs (fixes #84)
+* Bump version.jackson from 2.10.0 to 2.10.1
+* Bump slf4j-api from 1.7.28 to 1.7.29
+* Bump joda-time from 2.10.4 to 2.10.5
+* Bump bcpkix-jdk15on from 1.63 to 1.64
+
 ## 2.0.0
 
 This release is the last step in moving away from the original project. That is,
