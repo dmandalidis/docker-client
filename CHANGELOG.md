@@ -1,8 +1,12 @@
 # Change Log
 
+## 2.0.2
+
+* Proper cross-compile configuration (fixes #88)(thanks [@ieggel](https://github.com/ieggel))
+
 ## 2.0.1
 
-* Add the correct groupId for shading javax.ws.rs (fixes #84)
+* Add the correct groupId for shading javax.ws.rs (fixes #84)(thanks [@ieggel](https://github.com/ieggel))
 * Bump version.jackson from 2.10.0 to 2.10.1
 * Bump slf4j-api from 1.7.28 to 1.7.29
 * Bump joda-time from 2.10.4 to 2.10.5
