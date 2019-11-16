@@ -1,5 +1,13 @@
 # Change Log
 
+## 3.0.0 (unreleased)
+
+### Breaking changes
+
+* `RegistryConfigs.Builder#addConfig` does not ignore null `RegistryAuth` values anymore
+* `HostConfig.Builder#appendBinds*` methods removed
+* `HostConfig.Builder#binds(final Bind... binds)` method does not ignore null binds anymore
+
 ## 2.0.2
 
 * Proper cross-compile configuration (fixes #88)(thanks [@ieggel](https://github.com/ieggel))
