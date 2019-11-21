@@ -23,7 +23,6 @@ package org.mandas.docker.client.messages.swarm;
 import java.util.List;
 
 import org.immutables.value.Value.Immutable;
-import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -35,15 +34,12 @@ public interface Endpoint {
   @JsonProperty("Spec")
   EndpointSpec spec();
 
-  @Nullable
   @JsonProperty("ExposedPorts")
   List<PortConfig> exposedPorts();
 
-  @Nullable
   @JsonProperty("Ports")
   List<PortConfig> ports();
 
-  @Nullable
   @JsonProperty("VirtualIPs")
   List<EndpointVirtualIp> virtualIps();
 }

@@ -28,6 +28,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.String.format;
 import static java.lang.System.getenv;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.unmodifiableList;
@@ -3896,7 +3897,6 @@ public class DefaultDockerClientTest {
     assertThat(attachedNetwork.ipv6Gateway(), is(notNullValue()));
     assertThat(attachedNetwork.globalIPv6Address(), is(notNullValue()));
     assertThat(attachedNetwork.globalIPv6PrefixLen(), greaterThanOrEqualTo(0));
-    assertThat(attachedNetwork.aliases(), is(notNullValue()));
     assertThat(dummyAlias, isIn(attachedNetwork.aliases()));
 
     sut.disconnectFromNetwork(containerCreation.id(), networkCreation.id());
@@ -4782,7 +4782,7 @@ public class DefaultDockerClientTest {
     assertThat(service.endpoint().spec().ports(), contains(expectedPortConfig));
 
     final ContainerSpec containerSpec = actualServiceSpec.taskTemplate().containerSpec();
-    assertThat(containerSpec.labels(), equalTo(Collections.<String, String>emptyMap()));
+    assertThat(containerSpec.labels(), is(emptyMap()));
 
     assertThat(containerSpec.mounts().size(), equalTo(1));
     final Mount mount = containerSpec.mounts().get(0);
@@ -4790,11 +4790,11 @@ public class DefaultDockerClientTest {
 
     final VolumeOptions volumeOptions = mount.volumeOptions();
     assertThat(volumeOptions.noCopy(), nullValue());
-    assertThat(volumeOptions.labels(), nullValue());
+    assertThat(volumeOptions.labels(), is(emptyMap()));
 
     final org.mandas.docker.client.messages.mount.Driver driver = volumeOptions.driverConfig();
     assertThat(driver.name(), nullValue());
-    assertThat(driver.options(), nullValue());
+    assertThat(driver.options(), is(emptyMap()));
 
     final RestartPolicy restartPolicy = actualServiceSpec.taskTemplate().restartPolicy();
     assertThat(restartPolicy.condition(), equalTo(RESTART_POLICY_ANY));
@@ -5131,7 +5131,7 @@ public class DefaultDockerClientTest {
     NodeSpec specs = nut.spec();
     assertThat(specs, notNullValue());
     assertThat(specs.name(), is(anything())); // Can be null if not set
-    assertThat(specs.labels(), is(anything())); // Can be null if not set
+    assertThat(specs.labels(), is(notNullValue()));
     assertThat(specs.role(), isIn(new String [] {"manager", "worker"}));
     assertThat(specs.availability(), isIn(new String [] {"active", "pause", "drain"}));
     
@@ -5147,7 +5147,7 @@ public class DefaultDockerClientTest {
     EngineConfig engine = desc.engine();
     assertThat(engine, notNullValue());
     assertThat(engine.engineVersion(), allOf(notNullValue(), not("")));
-    assertThat(engine.labels(), is(anything()));
+    assertThat(engine.labels(), is(notNullValue()));
     assertThat(engine.plugins().size(), greaterThanOrEqualTo(0));
     
     for (EnginePlugin plugin : engine.plugins()) {

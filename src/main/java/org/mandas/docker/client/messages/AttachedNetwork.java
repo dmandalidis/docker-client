@@ -32,7 +32,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 @JsonDeserialize(builder = ImmutableAttachedNetwork.Builder.class)
 public interface AttachedNetwork {
 
-  @Nullable
   @JsonProperty("Aliases")
   List<String> aliases();
 

@@ -36,7 +36,6 @@ public interface NetworkAttachmentConfig {
   @JsonProperty("Target")
   String target();
 
-  @Nullable
   @JsonProperty("Aliases")
   List<String> aliases();
 

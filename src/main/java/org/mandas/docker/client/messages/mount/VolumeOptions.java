@@ -36,7 +36,6 @@ public interface VolumeOptions {
   @JsonProperty("NoCopy")
   Boolean noCopy();
 
-  @Nullable
   @JsonProperty("Labels")
   Map<String, String> labels();
 

@@ -20,15 +20,16 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static org.mandas.docker.FixtureUtil.fixture;
+import static java.util.Collections.emptyList;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.mandas.docker.FixtureUtil.fixture;
+
+import org.junit.Test;
+import org.mandas.docker.client.ObjectMapperProvider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.mandas.docker.client.ObjectMapperProvider;
-import org.junit.Test;
 
 public class DnsConfigTest {
 
@@ -46,8 +47,8 @@ public class DnsConfigTest {
   @Test
   public void test1_32_WithoutNullables() throws Exception {
     final DnsConfig config = objectMapper.readValue("{}", DnsConfig.class);
-    assertThat(config.nameServers(), is(nullValue()));
-    assertThat(config.search(), is(nullValue()));
-    assertThat(config.options(), is(nullValue()));
+    assertThat(config.nameServers(), equalTo(emptyList()));
+    assertThat(config.search(), equalTo(emptyList()));
+    assertThat(config.options(), equalTo(emptyList()));
   }
 }

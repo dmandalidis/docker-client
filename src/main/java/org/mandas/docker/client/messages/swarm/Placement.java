@@ -23,7 +23,6 @@ package org.mandas.docker.client.messages.swarm;
 import java.util.List;
 
 import org.immutables.value.Value.Immutable;
-import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -32,11 +31,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 @Immutable
 public interface Placement {
 
-  @Nullable
   @JsonProperty("Constraints")
   List<String> constraints();
 
-  @Nullable
   @JsonProperty("Preferences")
   List<Preference> preferences();
 

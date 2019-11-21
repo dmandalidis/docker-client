@@ -13,6 +13,46 @@
 * `LogStream#attach(OutputStream, OutputStream, boolean)` method removed. Methods should
 not close streams they do not manage.
 * `LogStream#attach(OutputStream, OutputStream)` can now throw `IOException`
+* API collections cannot be `null`. Affects:
+    * `AttachedNetwork#aliases`
+    * `BlockIoStats#ioServiceBytesRecursive`
+    * `BlockIoStats#ioServicedRecursive`
+    * `BlockIoStats#ioQueueRecursive`
+    * `BlockIoStats#ioServiceTimeRecursive`
+    * `BlockIoStats#ioWaitTimeRecursive`
+    * `BlockIoStats#ioMergedRecursive`
+    * `BlockIoStats#ioTimeRecursive`
+    * `BlockIoStats#sectorsRecursive`
+    * `Driver#options`
+    * `VolumeOptions#labels`
+    * `ConfigSpec#labels`
+    * `ContainerSpec#command`
+    * `ContainerSpec#args`
+    * `ContainerSpec#env`
+    * `ContainerSpec#groups`
+    * `ContainerSpec#mounts`
+    * `ContainerSpec#hosts`
+    * `ContainerSpec#secrets`
+    * `ContainerSpec#configs`
+    * `DnsConfig#nameServers`
+    * `DnsConfig#search`
+    * `DnsConfig#options`
+    * `Endpoint#spec`
+    * `Endpoint#exposedPorts`
+    * `Endpoint#ports`
+    * `EngineConfig#labels`
+    * `EngineConfig#plugins`
+    * `IpamOptions#configs`
+    * `NetworkAttachmentConfig#aliases`
+    * `NetworkSpec#labels`
+    * `NodeSpec#labels`
+    * `Placement#constraints`
+    * `Placement#labels`
+
+
+
+
+
 
 ## 2.0.2
 

@@ -20,15 +20,16 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static org.mandas.docker.FixtureUtil.fixture;
+import static java.util.Collections.emptyMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.mandas.docker.FixtureUtil.fixture;
+
+import org.junit.Test;
+import org.mandas.docker.client.ObjectMapperProvider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.mandas.docker.client.ObjectMapperProvider;
-import org.junit.Test;
 
 public class ContainerSpecTest {
 
@@ -39,9 +40,9 @@ public class ContainerSpecTest {
     final ContainerSpec spec = objectMapper.readValue(fixture(
         "fixtures/1.32/containerSpecWithoutNullables.json"), ContainerSpec.class);
     assertThat(spec.labels().size(), equalTo(0));
-    assertThat(spec.command(), is(nullValue()));
-    assertThat(spec.secrets(), is(nullValue()));
-    assertThat(spec.configs(), is(nullValue()));
+    assertThat(spec.command(), is(emptyMap()));
+    assertThat(spec.secrets(), is(emptyMap()));
+    assertThat(spec.configs(), is(emptyMap()));
   }
 
 }

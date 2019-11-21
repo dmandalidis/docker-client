@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.immutables.value.Value.Immutable;
-import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -36,11 +35,9 @@ public interface EngineConfig {
   @JsonProperty("EngineVersion")
   String engineVersion();
 
-  @Nullable
   @JsonProperty("Labels")
   Map<String, String> labels();
 
-  @Nullable
   @JsonProperty("Plugins")
   List<EnginePlugin> plugins();
 }

@@ -23,7 +23,6 @@ package org.mandas.docker.client.messages;
 import java.util.List;
 
 import org.immutables.value.Value.Immutable;
-import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -32,35 +31,27 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 @JsonDeserialize(builder = ImmutableBlockIoStats.Builder.class)
 public interface BlockIoStats {
 
-  @Nullable
   @JsonProperty("io_service_bytes_recursive")
   List<Object> ioServiceBytesRecursive();
 
-  @Nullable
   @JsonProperty("io_serviced_recursive")
   List<Object> ioServicedRecursive();
 
-  @Nullable
   @JsonProperty("io_queue_recursive")
   List<Object> ioQueueRecursive();
 
-  @Nullable
   @JsonProperty("io_service_time_recursive")
   List<Object> ioServiceTimeRecursive();
 
-  @Nullable
   @JsonProperty("io_wait_time_recursive")
   List<Object> ioWaitTimeRecursive();
 
-  @Nullable
   @JsonProperty("io_merged_recursive")
   List<Object> ioMergedRecursive();
 
-  @Nullable
   @JsonProperty("io_time_recursive")
   List<Object> ioTimeRecursive();
 
-  @Nullable
   @JsonProperty("sectors_recursive")
   List<Object> sectorsRecursive();
 }

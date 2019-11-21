@@ -36,7 +36,6 @@ public interface Driver {
   @JsonProperty("Name")
   String name();
 
-  @Nullable
   @JsonProperty("Options")
   Map<String, String> options();
 

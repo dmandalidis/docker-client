@@ -35,7 +35,6 @@ public interface ConfigSpec {
   @JsonProperty("Name")
   String name();
 
-  @Nullable
   @JsonProperty("Labels")
   Map<String, String> labels();
 

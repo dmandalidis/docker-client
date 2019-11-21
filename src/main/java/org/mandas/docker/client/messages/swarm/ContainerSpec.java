@@ -48,15 +48,12 @@ public interface ContainerSpec {
   @JsonProperty("Labels")
   Map<String, String> labels();
 
-  @Nullable
   @JsonProperty("Command")
   List<String> command();
 
-  @Nullable
   @JsonProperty("Args")
   List<String> args();
 
-  @Nullable
   @JsonProperty("Env")
   List<String> env();
 
@@ -68,7 +65,6 @@ public interface ContainerSpec {
   @JsonProperty("User")
   String user();
 
-  @Nullable
   @JsonProperty("Groups")
   List<String> groups();
 
@@ -76,7 +72,6 @@ public interface ContainerSpec {
   @JsonProperty("TTY")
   Boolean tty();
 
-  @Nullable
   @JsonProperty("Mounts")
   List<Mount> mounts();
 
@@ -94,21 +89,18 @@ public interface ContainerSpec {
   /**
    * @since API 1.26
    */
-  @Nullable
   @JsonProperty("Hosts")
   List<String> hosts();
 
   /**
    * @since API 1.26
    */
-  @Nullable
   @JsonProperty("Secrets")
   List<SecretBind> secrets();
 
   /**
    * @since API 1.30
    */
-  @Nullable
   @JsonProperty("Configs")
   List<ConfigBind> configs();
 
