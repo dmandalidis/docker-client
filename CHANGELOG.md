@@ -2,12 +2,18 @@
 
 ## 3.0.0 (unreleased)
 
+This release is mostly a Guava-exclusion release since several of its used features
+has been incorporated to Java 8+.
+
+Additionally, although not expected to cause any issues, the `com.fasterxml.jackson.module:jackson-module-jaxb-annotations`
+has been excluded and it stopped being pulled as a transitive dependency of `docker-client`.
+
 ### Breaking changes
 
 * `RegistryConfigs.Builder#addConfig` does not ignore null `RegistryAuth` values anymore
 * `HostConfig.Builder#appendBinds*` methods removed
 * `HostConfig.Builder#binds(final Bind... binds)` method does not ignore null binds anymore
-* `Immutable*` types removed from public getters and builders
+* `Immutable*` types removed from public fields
 * `EventStream` now implements `java.util.Iterator<Event>`
 * `EventStream#close` and `LogStream#close` can now throw `IOException`
 * `LogStream#attach(OutputStream, OutputStream, boolean)` method removed. Methods should
