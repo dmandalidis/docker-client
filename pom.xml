@@ -51,6 +51,17 @@
     <version.plugin.spotbugs>3.1.12.2</version.plugin.spotbugs>
   </properties>
   
+  <dependencyManagement>
+  	<dependencies>
+  		<dependency>
+  			<groupId>com.fasterxml.jackson</groupId>
+        	<artifactId>jackson-bom</artifactId>
+        	<version>${version.jackson}</version>
+        	<scope>import</scope>
+        	<type>pom</type>	
+  		</dependency>
+  	</dependencies>
+  </dependencyManagement>
   <dependencies>
     <!--compile deps-->
     <dependency>
@@ -61,12 +72,16 @@
     <dependency>
       <groupId>com.fasterxml.jackson.jaxrs</groupId>
       <artifactId>jackson-jaxrs-json-provider</artifactId>
-      <version>${version.jackson}</version>
+      <exclusions>
+      	<exclusion>
+      		<groupId>com.fasterxml.jackson.module</groupId>
+      		<artifactId>jackson-module-jaxb-annotations</artifactId>
+      	</exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>${version.jackson}</version>
     </dependency>
     <dependency>
       <groupId>org.glassfish.jersey.core</groupId>
