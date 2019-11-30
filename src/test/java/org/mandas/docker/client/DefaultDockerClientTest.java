@@ -185,7 +185,6 @@ import org.mandas.docker.client.exceptions.ImageNotFoundException;
 import org.mandas.docker.client.exceptions.ImagePushFailedException;
 import org.mandas.docker.client.exceptions.NetworkNotFoundException;
 import org.mandas.docker.client.exceptions.NotFoundException;
-import org.mandas.docker.client.exceptions.TaskNotFoundException;
 import org.mandas.docker.client.exceptions.VolumeNotFoundException;
 import org.mandas.docker.client.messages.AttachedNetwork;
 import org.mandas.docker.client.messages.Container;
@@ -728,7 +727,6 @@ public class DefaultDockerClientTest {
   }
 
   @Test
-  @SuppressWarnings("deprecation")
   public void testInfo() throws Exception {
     final Info info = sut.info();
     assertThat(info.containers(), is(anything()));
@@ -1024,7 +1022,7 @@ public class DefaultDockerClientTest {
   }
 
   @Test
-  public void testBuildNoTimeout() throws Exception {
+  public void testBuild() throws Exception {
     // The Dockerfile specifies a sleep of 10s during the build
     // Returned image id is last piece of output, so this confirms stream did not timeout
     final Path dockerDirectory = getResource("dockerDirectorySleeping");
@@ -1325,7 +1323,6 @@ public class DefaultDockerClientTest {
   }
 
   @Test
-  @SuppressWarnings("deprecation")
   public void integrationTest() throws Exception {
     // Pull image
     sut.pull(BUSYBOX_LATEST);
@@ -2224,7 +2221,6 @@ public class DefaultDockerClientTest {
     }
   }
 
-  @SuppressWarnings("deprecation")
   private void imageEventAssertions(final Event event,
                                     final String imageName,
                                     final String action) throws Exception {
@@ -2235,7 +2231,6 @@ public class DefaultDockerClientTest {
     assertNotNull(event.timeNano());
   }
 
-  @SuppressWarnings("deprecation")
   private void containerEventAssertions(final Event event,
                                         final String containerId,
                                         final String containerName,
@@ -3184,38 +3179,6 @@ public class DefaultDockerClientTest {
   @Test(expected = ImageNotFoundException.class)
   public void testRemoveBadImage() throws Exception {
     sut.removeImage(randomName());
-  }
-
-  // TODO: https://github.com/moby/moby/issues/31421
-  @Test @Ignore
-  public void testExec() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
-
-    final ContainerConfig containerConfig = ContainerConfig.builder()
-        .image(BUSYBOX_LATEST)
-        // make sure the container's busy doing something upon startup
-        .cmd("sh", "-c", "while :; do sleep 1; done")
-        .build();
-    final String containerName = randomName();
-    final ContainerCreation containerCreation = sut.createContainer(containerConfig, containerName);
-    final String containerId = containerCreation.id();
-
-    sut.startContainer(containerId);
-
-    final ExecCreation execCreation = sut.execCreate(
-        containerId,
-        new String[] {"ls", "-la"},
-        ExecCreateParam.attachStdout(),
-        ExecCreateParam.attachStderr());
-    final String execId = execCreation.id();
-
-    log.info("execId = {}", execId);
-
-    try (final LogStream stream = sut.execStart(execId)) {
-      final String output = stream.readFully();
-      log.info("Result:\n{}", output);
-      assertThat(output, containsString("total"));
-    }
   }
 
   @Test
@@ -5211,11 +5174,6 @@ public class DefaultDockerClientTest {
         .collect(Collectors.toList());
   }
 
-  private List<String> imagesToShortIds(final List<Image> images) {
-    return images.stream().map(image -> image.id().substring(0, 12))
-        .collect(Collectors.toList());
-  }
-
   private List<String> imagesToShortIdsAndRemoveSha256(final List<Image> images) {
     return images.stream()
         .map(image -> image.id().replaceFirst("sha256:", "").substring(0, 12))
@@ -5237,17 +5195,6 @@ public class DefaultDockerClientTest {
 
   private Callable<Integer> numberOfTasks(final DockerClient client) {
     return () -> client.listTasks().size();
-  }
-
-  private Callable<String> taskState(final String taskId,
-                                     final DockerClient client) {
-    return () -> {
-      try {
-        return client.inspectTask(taskId).status().state();
-      } catch (final TaskNotFoundException e) {
-        return "not found";
-      }
-    };
   }
 
   private static Matcher<PortConfig> portConfigWith(

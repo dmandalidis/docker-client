@@ -285,7 +285,6 @@ public class DefaultDockerClientUnitTest {
   }
   
   @Test
-  @SuppressWarnings("unchecked")
   public void testGroupAdd() throws Exception {
     final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
 

@@ -47,7 +47,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
 @Produces(MediaType.APPLICATION_JSON)
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({"rawtypes"})
 public class ObjectMapperProvider implements ContextResolver<ObjectMapper> {
 
   private static final Logger log = LoggerFactory.getLogger(ObjectMapperProvider.class);
