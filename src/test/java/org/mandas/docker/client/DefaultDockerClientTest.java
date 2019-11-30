@@ -154,9 +154,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.pool.PoolStats;
-import org.glassfish.jersey.apache.connector.ApacheClientProperties;
 import org.hamcrest.CustomTypeSafeMatcher;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
@@ -182,7 +179,6 @@ import org.mandas.docker.client.exceptions.DockerException;
 import org.mandas.docker.client.exceptions.DockerRequestException;
 import org.mandas.docker.client.exceptions.DockerTimeoutException;
 import org.mandas.docker.client.exceptions.ImageNotFoundException;
-import org.mandas.docker.client.exceptions.ImagePushFailedException;
 import org.mandas.docker.client.exceptions.NetworkNotFoundException;
 import org.mandas.docker.client.exceptions.NotFoundException;
 import org.mandas.docker.client.exceptions.VolumeNotFoundException;
@@ -541,24 +537,6 @@ public class DefaultDockerClientTest {
 
     assertNotNull(containerInfo.state().health());
     assertEquals("starting", containerInfo.state().health().status());
-  }
-
-  @SuppressWarnings("emptyCatchBlock")
-  @Test
-  public void testFailedPullDoesNotLeakConn() throws Exception {
-    log.info("Connection pool stats: " + getClientConnectionPoolStats(sut).toString());
-
-    // Pull a non-existent image 10 times and check that the number of leased connections is still 0
-    // I.e. check that we are not leaking connections.
-    for (int i = 0; i < 10; i++) {
-      try {
-        sut.pull(BUSYBOX + ":" + randomName());
-      } catch (ImageNotFoundException ignored) {
-      }
-      log.info("Connection pool stats: " + getClientConnectionPoolStats(sut).toString());
-    }
-
-    assertThat(getClientConnectionPoolStats(sut).getLeased(), equalTo(0));
   }
 
   @Test
@@ -926,28 +904,6 @@ public class DefaultDockerClientTest {
     });
 
     assertThat(returnedImageId, is(imageIdFromMessage.get()));
-  }
-
-  @SuppressWarnings("EmptyCatchBlock")
-  @Test
-  public void testFailedBuildDoesNotLeakConn() throws Exception {
-    final Path dockerDirectory = getResource("dockerDirectoryNonExistentImage");
-
-    log.info("Connection pool stats: " + getClientConnectionPoolStats(sut).toString());
-
-    // Build an image from a bad Dockerfile 10 times and check that the number of
-    // leased connections is still 0.
-    // I.e. check that we are not leaking connections.
-    for (int i = 0; i < 10; i++) {
-      try {
-        sut.build(dockerDirectory, "test");
-      } catch (DockerException ignored) {
-      }
-
-      log.info("Connection pool stats: " + getClientConnectionPoolStats(sut).toString());
-    }
-
-    assertThat(getClientConnectionPoolStats(sut).getLeased(), equalTo(0));
   }
 
   @Test
@@ -1455,26 +1411,6 @@ public class DefaultDockerClientTest {
 
     // Verify that the thread was interrupted
     assertThat(interrupted.get(), is(true));
-  }
-
-  @SuppressWarnings("EmptyCatchBlock")
-  @Test
-  public void testFailedPushDoesNotLeakConn() throws Exception {
-    log.info("Connection pool stats: " + getClientConnectionPoolStats(sut).toString());
-
-    // Push a non-existent image 10 times and check that the number of
-    // leased connections is still 0.
-    // I.e. check that we are not leaking connections.
-    for (int i = 0; i < 10; i++) {
-      try {
-        sut.push("foobarboooboo" + randomName());
-      } catch (ImagePushFailedException ignored) {
-      }
-
-      log.info("Connection pool stats: " + getClientConnectionPoolStats(sut).toString());
-    }
-
-    assertThat(getClientConnectionPoolStats(sut).getLeased(), equalTo(0));
   }
 
   @Test(expected = DockerException.class)
@@ -5136,11 +5072,6 @@ public class DefaultDockerClientTest {
         Thread.sleep(100);
       }
     }
-  }
-
-  private PoolStats getClientConnectionPoolStats(final DefaultDockerClient client) {
-    return ((PoolingHttpClientConnectionManager) client.getClient().getConfiguration()
-        .getProperty(ApacheClientProperties.CONNECTION_MANAGER)).getTotalStats();
   }
 
   private String createSleepingContainer() throws Exception {
