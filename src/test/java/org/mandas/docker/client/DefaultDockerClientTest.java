@@ -1024,7 +1024,7 @@ public class DefaultDockerClientTest {
   }
 
   @Test
-  public void testBuildNoTimeout() throws Exception {
+  public void testBuild() throws Exception {
     // The Dockerfile specifies a sleep of 10s during the build
     // Returned image id is last piece of output, so this confirms stream did not timeout
     final Path dockerDirectory = getResource("dockerDirectorySleeping");
@@ -3184,38 +3184,6 @@ public class DefaultDockerClientTest {
   @Test(expected = ImageNotFoundException.class)
   public void testRemoveBadImage() throws Exception {
     sut.removeImage(randomName());
-  }
-
-  // TODO: https://github.com/moby/moby/issues/31421
-  @Test @Ignore
-  public void testExec() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
-
-    final ContainerConfig containerConfig = ContainerConfig.builder()
-        .image(BUSYBOX_LATEST)
-        // make sure the container's busy doing something upon startup
-        .cmd("sh", "-c", "while :; do sleep 1; done")
-        .build();
-    final String containerName = randomName();
-    final ContainerCreation containerCreation = sut.createContainer(containerConfig, containerName);
-    final String containerId = containerCreation.id();
-
-    sut.startContainer(containerId);
-
-    final ExecCreation execCreation = sut.execCreate(
-        containerId,
-        new String[] {"ls", "-la"},
-        ExecCreateParam.attachStdout(),
-        ExecCreateParam.attachStderr());
-    final String execId = execCreation.id();
-
-    log.info("execId = {}", execId);
-
-    try (final LogStream stream = sut.execStart(execId)) {
-      final String output = stream.readFully();
-      log.info("Result:\n{}", output);
-      assertThat(output, containsString("total"));
-    }
   }
 
   @Test

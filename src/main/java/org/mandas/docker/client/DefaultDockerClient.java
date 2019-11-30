@@ -378,7 +378,6 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   private static final GenericType<List<Secret>> SECRET_LIST = new GenericType<List<Secret>>() { };
 
   private final Client client;
-  private final Client noTimeoutClient;
 
   private final URI uri;
   private final String apiVersion;
@@ -388,10 +387,6 @@ public class DefaultDockerClient implements DockerClient, Closeable {
 
   Client getClient() {
     return client;
-  }
-
-  Client getNoTimeoutClient() {
-    return noTimeoutClient;
   }
 
   /**
@@ -447,7 +442,6 @@ public class DefaultDockerClient implements DockerClient, Closeable {
     }
 
     final HttpClientConnectionManager cm = getConnectionManager(builder);
-    final HttpClientConnectionManager noTimeoutCm = getConnectionManager(builder);
 
     final RequestConfig requestConfig = RequestConfig.custom()
         .setConnectionRequestTimeout((int) builder.connectTimeoutMillis)
@@ -472,18 +466,6 @@ public class DefaultDockerClient implements DockerClient, Closeable {
 
 	this.client = ClientBuilder.newBuilder()
         .withConfig(config)
-        .build();
-
-    // ApacheConnector doesn't respect per-request timeout settings.
-    // Workaround: instead create a client with infinite read timeout,
-    // and use it for waitContainer, stopContainer, attachContainer, logs, and build
-    final RequestConfig noReadTimeoutRequestConfig = RequestConfig.copy(requestConfig)
-        .setSocketTimeout((int) NO_TIMEOUT)
-        .build();
-    this.noTimeoutClient = ClientBuilder.newBuilder()
-        .withConfig(config)
-        .property(ApacheClientProperties.CONNECTION_MANAGER, noTimeoutCm)
-        .property(ApacheClientProperties.REQUEST_CONFIG, noReadTimeoutRequestConfig)
         .build();
 
     this.headers = new HashMap<>(builder.headers());
@@ -581,7 +563,6 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   @Override
   public void close() {
     client.close();
-    noTimeoutClient.close();
   }
 
   @Override
@@ -848,7 +829,8 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   public void stopContainer(final String containerId, final int secondsToWaitBeforeKilling)
       throws DockerException, InterruptedException {
     try {
-      final WebTarget resource = noTimeoutResource()
+      final WebTarget resource = resource()
+    	  .property(ClientProperties.READ_TIMEOUT, 0)
           .path("containers").path(containerId).path("stop")
           .queryParam("t", String.valueOf(secondsToWaitBeforeKilling));
       request(POST, resource, resource.request());
@@ -868,7 +850,8 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   public ContainerExit waitContainer(final String containerId)
       throws DockerException, InterruptedException {
     try {
-      final WebTarget resource = noTimeoutResource()
+      final WebTarget resource = resource()
+    	  .property(ClientProperties.READ_TIMEOUT, 0)
           .path("containers").path(containerId).path("wait");
       // Wait forever
       return request(POST, ContainerExit.class, resource,
@@ -1413,7 +1396,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       throws DockerException, InterruptedException, IOException {
 	requireNonNull(handler, "handler");
 
-    WebTarget resource = noTimeoutResource().path("build");
+    WebTarget resource = resource().property(ClientProperties.READ_TIMEOUT, 0).path("build");
 
     for (final BuildParam param : params) {
       resource = resource.queryParam(param.name(), param.value());
@@ -1506,7 +1489,8 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   @Override
   public LogStream logs(final String containerId, final LogsParam... params)
       throws DockerException, InterruptedException {
-    WebTarget resource = noTimeoutResource()
+    WebTarget resource = resource()
+    	.property(ClientProperties.READ_TIMEOUT, 0)
         .path("containers").path(containerId)
         .path("logs");
 
@@ -1520,12 +1504,12 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   @Override
   public EventStream events(EventsParam... params)
       throws DockerException, InterruptedException {
-    WebTarget resource = noTimeoutResource().path("events");
+    WebTarget resource = resource().property(ClientProperties.READ_TIMEOUT, 0).path("events");
     resource = addParameters(resource, params);
 
     try {
       final CloseableHttpClient client = (CloseableHttpClient) ApacheConnectorProvider
-          .getHttpClient(noTimeoutClient);
+          .getHttpClient(this.client);
       final CloseableHttpResponse response = client.execute(new HttpGet(resource.getUri()));
       return new EventStream(response, objectMapper());
     } catch (IOException exception) {
@@ -1538,7 +1522,8 @@ public class DefaultDockerClient implements DockerClient, Closeable {
                                    final AttachParameter... params) throws DockerException,
                                                                            InterruptedException {
     requireNonNull(containerId, "containerId");
-    WebTarget resource = noTimeoutResource().path("containers").path(containerId).path("attach");
+    WebTarget resource = resource().property(ClientProperties.READ_TIMEOUT, 0)
+    		.path("containers").path(containerId).path("attach");
 
     for (final AttachParameter param : params) {
       resource = resource.queryParam(param.name().toLowerCase(Locale.ROOT), String.valueOf(true));
@@ -1639,7 +1624,8 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   @Override
   public LogStream execStart(final String execId, final ExecStartParameter... params)
       throws DockerException, InterruptedException {
-    final WebTarget resource = noTimeoutResource().path("exec").path(execId).path("start");
+    final WebTarget resource = resource().property(ClientProperties.READ_TIMEOUT, 0)
+    		.path("exec").path(execId).path("start");
 
     final StringWriter writer = new StringWriter();
     try {
@@ -1974,7 +1960,8 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   public LogStream serviceLogs(String serviceId, LogsParam... params)
           throws DockerException, InterruptedException {
     assertApiVersionIsAbove("1.25");
-    WebTarget resource = noTimeoutResource()
+    WebTarget resource = resource()
+    		.property(ClientProperties.READ_TIMEOUT, 0)
             .path("services").path(serviceId)
             .path("logs");
 
@@ -2620,14 +2607,6 @@ public class DefaultDockerClient implements DockerClient, Closeable {
 
   private WebTarget resource() {
     final WebTarget target = client.target(uri);
-    if (apiVersion != null && !"".equals(apiVersion.trim())) {
-      return target.path(apiVersion);
-    }
-    return target;
-  }
-
-  private WebTarget noTimeoutResource() {
-    final WebTarget target = noTimeoutClient.target(uri);
     if (apiVersion != null && !"".equals(apiVersion.trim())) {
       return target.path(apiVersion);
     }
