@@ -4,6 +4,7 @@
  * --
  * Copyright (C) 2016 Spotify AB
  * Copyright (c) 2015 Jeppe Schou
+ * Copyright (C) 9/2019 - 2020 Dimitris Mandalidis
  * --
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
