@@ -122,7 +122,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -961,72 +960,6 @@ public class DefaultDockerClientTest {
     final ImageInfo info = sut.inspectImage(imageName);
     final String expectedId = "sha256:" + imageId;
     assertThat(info.id(), startsWith(expectedId));
-  }
-
-  @Test
-  public void testBuildInterruption() throws Exception {
-    // Wait for container on a thread
-    final ExecutorService executorService = Executors.newSingleThreadExecutor();
-    final SettableFuture<Boolean> started = SettableFuture.create();
-    final SettableFuture<Boolean> interrupted = SettableFuture.create();
-
-    final String imageName = "test-build-name";
-    
-    final Future<?> buildFuture = executorService.submit((Callable<Void>) () -> {
-      try {
-        try {
-          sut.removeImage(imageName);
-        } catch (DockerException ignored) {
-          log.debug("Ignoring exception removing image", ignored);
-        } catch (Exception e) {
-          log.warn("Unexpected exception", e);
-          throw e;
-        }
-        final URL dockerDirectoryUrl = Resources.getResource("dockerDirectorySleeping");
-        final Path dockerDirectory = Paths.get(dockerDirectoryUrl.toURI());
-
-        sut.build(dockerDirectory, imageName, message -> {
-          log.warn("Received progress {}", message);
-          if (!started.isDone()) {
-        	log.warn("started set");
-            started.set(true);
-          }
-        });
-      } catch (InterruptedException e) {
-    	log.warn("Got interrupted");
-        interrupted.set(true);
-        throw e;
-      } catch (Throwable t) {
-    	log.warn("Error ", t);
-        started.setException(t);
-        throw t;
-      }
-      return null;
-    });
-
-    // Interrupt waiting thread
-    log.warn("started get");
-    started.get();
-    log.warn("started done");
-    executorService.shutdownNow();
-    log.warn("executor down");
-    try {
-      log.warn("future get");
-      buildFuture.get();
-      fail();
-    } catch (ExecutionException e) {
-      assertThat(e.getCause(), instanceOf(InterruptedException.class));
-      log.warn("Task cancelled " + buildFuture.isCancelled());	
-    }
-
-    try {
-      sut.inspectImage(imageName);
-      fail();
-    } catch (ImageNotFoundException e) {
-    }
-    
-    // Verify that the thread was interrupted
-    assertThat(interrupted.get(), is(true));
   }
 
   @Test
