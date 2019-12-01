@@ -154,6 +154,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.glassfish.jersey.apache.connector.ApacheClientProperties;
 import org.hamcrest.CustomTypeSafeMatcher;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
@@ -341,9 +343,11 @@ public class DefaultDockerClientTest {
 
     System.out.printf("- %s\n", testName.getMethodName());
   }
-
+  
   @After
   public void tearDown() throws Exception {
+	log.warn(((PoolingHttpClientConnectionManager) sut.getClient().getConfiguration()
+	        .getProperty(ApacheClientProperties.CONNECTION_MANAGER)).getTotalStats().toString());  
     try {
       final List<Service> services = sut.listServices();
       for (final Service service : services) {
