@@ -452,6 +452,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
     final ClientConfig config = updateProxy(defaultConfig, builder)
         .connectorProvider(new ApacheConnectorProvider())
         .property(ApacheClientProperties.CONNECTION_MANAGER, cm)
+        .property(ApacheClientProperties.CONNECTION_MANAGER_SHARED, "true")
         .property(ApacheClientProperties.REQUEST_CONFIG, requestConfig);
 
     if (builder.registryAuthSupplier == null) {
