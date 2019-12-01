@@ -1,12 +1,21 @@
 # Change Log
 
-## 3.0.0 (unreleased)
+## 3.0.0
 
 This release is mostly a Guava-exclusion release since several of its used features
 has been incorporated to Java 8+.
 
 Additionally, although not expected to cause any issues, the `com.fasterxml.jackson.module:jackson-module-jaxb-annotations`
-has been excluded and it stopped being pulled as a transitive dependency of `docker-client`.
+has been excluded and thus stopped being pulled as a transitive dependency of `docker-client`.
+
+* Create shared connection manager
+* Remove workaround for JERSEY-2698
+* Update Jersey and http-client to latest versions (fixes #45)
+* Exclude jaxb annotations (fixes #96)
+* Drop guava (fixes #74)
+* Add HostConfig.Sysctls support (fixes #86)
+* Bump jnr-unixsocket from 0.23 to 0.24
+* Replace autovalue with immutables
 
 ### Breaking changes
 
