@@ -118,7 +118,8 @@ public interface Event {
     PLUGIN("plugin"),
     NODE("node"),
     SERVICE("service"),
-    SECRET("secret");
+    SECRET("secret"),
+    CONFIG("config");
 
     private final String name;
 
