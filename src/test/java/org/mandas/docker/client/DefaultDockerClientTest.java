@@ -230,6 +230,8 @@ import org.mandas.docker.client.messages.mount.Mount;
 import org.mandas.docker.client.messages.mount.TmpfsOptions;
 import org.mandas.docker.client.messages.mount.VolumeOptions;
 import org.mandas.docker.client.messages.swarm.CaConfig;
+import org.mandas.docker.client.messages.swarm.ConfigCreateResponse;
+import org.mandas.docker.client.messages.swarm.ConfigSpec;
 import org.mandas.docker.client.messages.swarm.ContainerSpec;
 import org.mandas.docker.client.messages.swarm.DispatcherConfig;
 import org.mandas.docker.client.messages.swarm.Driver;
@@ -1998,6 +2000,22 @@ public class DefaultDockerClientTest {
     sut.startContainer(containerId);
     await().until(containerIsRunning(sut, containerId), is(false));
     sut.removeContainer(containerId);
+    
+    SecretCreateResponse secret = sut.createSecret(SecretSpec.builder()
+    		.data(Base64.getEncoder().encodeToString("hello".getBytes(StandardCharsets.UTF_8)))
+    		.name("mysecret")
+    		.build()
+    );
+    sut.deleteSecret(secret.id());
+
+    if (dockerApiVersionAtLeast("1.30")) {
+    	ConfigCreateResponse configCreateResponse = sut.createConfig(ConfigSpec.builder()
+    			.data(Base64.getEncoder().encodeToString("hello_config".getBytes(StandardCharsets.UTF_8)))
+    			.name("myconfig")
+    			.build()
+    	);
+    	sut.deleteConfig(configCreateResponse.id());
+    }
 
     // Wait again to ensure we get back events for everything we did
     Thread.sleep(1000);
@@ -2115,6 +2133,40 @@ public class DefaultDockerClientTest {
       assertThat(networkDisconnect.actor().attributes(), hasEntry("type", "bridge"));
 
       assertFalse("Expect no more network events", stream.hasNext());
+    }
+    
+    // Secret events
+    if (dockerApiVersionAtLeast("1.30")) {
+	    try (final EventStream stream =
+	            sut.events(since(startTime), until(endTime), type(Event.Type.SECRET))) {
+	      assertTrue("Docker did not return any secret events.",
+	      stream.hasNext());
+	      Event createSecret = stream.next();
+	      assertEquals(Event.Type.SECRET, createSecret.type());
+	      assertEquals("create", createSecret.action());
+	      assertTrue("Docker did not return enough secret events."
+	              + "Expected a secret remove event.", stream.hasNext());
+	      Event removeSecret = stream.next();
+	      assertEquals(Event.Type.SECRET, removeSecret.type());
+	      assertEquals("remove", removeSecret.action());
+	    }
+    }
+    
+    // Config events
+    if (dockerApiVersionAtLeast("1.31")) {
+    	try (final EventStream stream =
+            sut.events(since(startTime), until(endTime), type(Event.Type.CONFIG))) {
+    		assertTrue("Docker did not return any config events.",
+    		stream.hasNext());
+    		Event createConfig = stream.next();
+	        assertEquals(Event.Type.CONFIG, createConfig.type());
+	        assertEquals("create", createConfig.action());
+	        assertTrue("Docker did not return enough secret events."
+	              + "Expected a secret remove event.", stream.hasNext());
+	        Event removeConfig = stream.next();
+	        assertEquals(Event.Type.CONFIG, removeConfig.type());
+	        assertEquals("remove", removeConfig.action());
+    	}
     }
   }
 
