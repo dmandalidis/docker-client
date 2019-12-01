@@ -100,7 +100,12 @@
     <dependency>
       <groupId>org.glassfish.jersey.media</groupId>
       <artifactId>jersey-media-json-jackson</artifactId>
-      <version>${version.jersey}</version>
+      <version>${version.jersey}</version><exclusions>
+      	<exclusion>
+      		<groupId>com.fasterxml.jackson.module</groupId>
+      		<artifactId>jackson-module-jaxb-annotations</artifactId>
+      	</exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>javax.activation</groupId>
