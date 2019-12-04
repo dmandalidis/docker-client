@@ -4,7 +4,9 @@
 		depluralize = true,
 		add = "*",
 		put = "add*",
-		jdkOnly = true)
+		jdkOnly = true,
+		allowedClasspathAnnotations = { java.lang.Override.class }
+		)
 package org.mandas.docker;
 
 import org.immutables.value.Value.Style;
