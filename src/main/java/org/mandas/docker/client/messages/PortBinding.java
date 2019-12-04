@@ -49,4 +49,12 @@ public interface PortBinding {
   public static PortBinding randomPort(final String ip) {
     return ImmutablePortBinding.builder().hostIp(ip).hostPort("").build();
   }
+  
+  /**
+   * @deprecated use {@link #of(String, String)} instead
+   */
+  @Deprecated
+  public static PortBinding create(final String hostIp, final String hostPort) {
+	return ImmutablePortBinding.builder().hostIp(hostIp).hostPort(hostPort).build();  
+  }
 }

@@ -53,6 +53,10 @@ public interface IpamConfig {
 	  IpamConfig build();
   }
   
+  static IpamConfig create(final String subnet, final String ipRange, final String gateway) {
+	  return ImmutableIpamConfig.builder().subnet(subnet).ipRange(ipRange).gateway(gateway).build();
+  }
+  
   static Builder builder() {
 	  return ImmutableIpamConfig.builder();
   }

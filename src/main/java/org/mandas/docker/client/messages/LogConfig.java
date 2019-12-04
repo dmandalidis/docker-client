@@ -44,6 +44,10 @@ public interface LogConfig {
     return ImmutableLogConfig.builder().logType(logType).build();
   }
   
+  static LogConfig create(final String logType, final Map<String, String> logOptions) {
+    return ImmutableLogConfig.builder().logType(logType).logOptions(logOptions).build();  
+  }
+  
   interface Builder {
 	  Builder logType(String logType);
 	  Builder logOptions(Map<String, ? extends String> logOptions);
