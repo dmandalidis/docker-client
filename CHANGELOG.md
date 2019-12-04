@@ -1,5 +1,9 @@
 # Change Log
 
+## 3.0.1
+
+* Revert incorrectly removed methods (fixes #111)
+
 ## 3.0.0
 
 This release is mostly a Guava-exclusion release since several of its used features
