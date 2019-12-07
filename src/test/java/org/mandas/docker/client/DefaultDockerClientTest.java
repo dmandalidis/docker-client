@@ -169,7 +169,6 @@ import org.mandas.docker.client.DockerClient.AttachParameter;
 import org.mandas.docker.client.DockerClient.BuildParam;
 import org.mandas.docker.client.DockerClient.EventsParam;
 import org.mandas.docker.client.DockerClient.ExecCreateParam;
-import org.mandas.docker.client.DockerClient.ListContainersParam;
 import org.mandas.docker.client.DockerClient.ListImagesParam;
 import org.mandas.docker.client.DockerClient.ListNetworksParam;
 import org.mandas.docker.client.DockerClient.ListVolumesParam;
@@ -4094,6 +4093,7 @@ public class DefaultDockerClientTest {
         log.warn(warning);
       }
     }
+    assertThat(volumeListByLabel.volumes(), notNullValue());
     assertThat(volume, isIn(volumeListByLabel.volumes()));
     
     final VolumeList volumeListByFooLabel = sut.listVolumes(ListVolumesParam.withLabel("foo"));
@@ -4103,7 +4103,7 @@ public class DefaultDockerClientTest {
         log.warn(warning);
       }
     }
-    assertThat(volumeListByFooLabel.volumes().size(), is(0));
+    assertThat(volumeListByLabel.volumes(), nullValue());
     
     assertEquals("local", volume.scope());
     assertThat(volume.status(), is(anything())); // I don't know what is in the status object - JF
