@@ -2385,6 +2385,17 @@ public interface DockerClient extends Closeable {
     public static ListContainersParam withLabel(final String label, final String value) {
       return value == null || "".equals(value.trim()) ? filter("label", label) : filter("label", label + "=" + value);
     }
+    
+    /**
+     * Show containers without a label value.
+     *
+     * @param label The label to filter out
+     * @param value The value of the label
+     * @return ListContainersParam
+     */
+    public static ListContainersParam withoutLabel(final String label, final String value) {
+      return value == null || "".equals(value.trim()) ? filter("label", label) : filter("label", label + "!=" + value);
+    }
 
     /**
      * Show containers with a label.
@@ -2394,6 +2405,16 @@ public interface DockerClient extends Closeable {
      */
     public static ListContainersParam withLabel(final String label) {
       return withLabel(label, null);
+    }
+    
+    /**
+     * Show containers without a label.
+     *
+     * @param label The label to filter out
+     * @return ListContainersParam
+     */
+    public static ListContainersParam withoutLabel(final String label) {
+      return withoutLabel(label, null);
     }
   }
 

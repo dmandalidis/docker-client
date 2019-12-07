@@ -82,6 +82,7 @@ import static org.mandas.docker.client.DockerClient.ListContainersParam.withStat
 import static org.mandas.docker.client.DockerClient.ListContainersParam.withStatusExited;
 import static org.mandas.docker.client.DockerClient.ListContainersParam.withStatusPaused;
 import static org.mandas.docker.client.DockerClient.ListContainersParam.withStatusRunning;
+import static org.mandas.docker.client.DockerClient.ListContainersParam.withoutLabel;
 import static org.mandas.docker.client.DockerClient.ListImagesParam.allImages;
 import static org.mandas.docker.client.DockerClient.ListImagesParam.byName;
 import static org.mandas.docker.client.DockerClient.ListImagesParam.danglingImages;
@@ -168,6 +169,7 @@ import org.mandas.docker.client.DockerClient.AttachParameter;
 import org.mandas.docker.client.DockerClient.BuildParam;
 import org.mandas.docker.client.DockerClient.EventsParam;
 import org.mandas.docker.client.DockerClient.ExecCreateParam;
+import org.mandas.docker.client.DockerClient.ListContainersParam;
 import org.mandas.docker.client.DockerClient.ListImagesParam;
 import org.mandas.docker.client.DockerClient.ListNetworksParam;
 import org.mandas.docker.client.auth.FixedRegistryAuthSupplier;
@@ -3315,6 +3317,12 @@ public class DefaultDockerClientTest {
     sut.startContainer(containerId);
     final List<Container> running = sut.listContainers(withStatusRunning());
     assertThat(containerId, isIn(containersToIds(running)));
+    for (final Container c : running) {
+      assertThat(c.imageId(), is(notNullValue()));
+      assertThat(c.networkSettings(), is(notNullValue()));
+      assertThat(c.state(), equalTo("running"));
+      assertThat(c.mounts(), is(notNullValue()));
+    } 
 
     // filters={"status":["paused"]}
     sut.pauseContainer(containerId);
@@ -3343,19 +3351,15 @@ public class DefaultDockerClientTest {
         withStatusExited(),
         withLabel(label, labelValue));
     assertThat(containerId, isIn(containersToIds(statusAndLabels)));
-
-    for (final Container c : running) {
-      assertThat(c.imageId(), is(notNullValue()));
-    }
-
-    for (final Container c : running) {
-      assertThat(c.networkSettings(), is(notNullValue()));
-    }
-
-    for (final Container c : running) {
-      assertThat(c.state(), equalTo("running"));
-      assertThat(c.mounts(), is(notNullValue()));
-    }
+    
+    // filters={"status":["exited"],"labels":["foo!=quux"]}
+    // Shows that labels play nicely with other filters
+    final List<Container> statusAndWithoutLabels = sut.listContainers(
+        allContainers(),
+        withStatusExited(),
+        withoutLabel(label, "quux"));
+    
+    assertThat(containerId, isIn(containersToIds(statusAndWithoutLabels)));
   }
 
   @Test
