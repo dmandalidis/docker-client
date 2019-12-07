@@ -3475,10 +3475,21 @@ public class DefaultDockerClientTest {
     final List<String> bazIds = imagesToShortIdsAndRemoveSha256(bazImages);
     assertThat(bazId, isIn(bazIds));
 
-    // Check that no containers are listed when we filter with a "foo=qux" label
+    // Check that no images are listed when we filter with a "foo=qux" label
     final List<Image> quxImages = sut.listImages(
         ListImagesParam.withLabel("foo", "qux"));
     assertThat(quxImages, hasSize(0));
+    
+    // Check that no images are listed when we filter without a "foo" label
+    final List<Image> withoutFooImages = sut.listImages(
+        ListImagesParam.withoutLabel("foo"));
+    assertThat(withoutFooImages, hasSize(0));
+    
+    // Check that only foo=bar image is listed when we filter with a "foo!=baz" label
+    final List<Image> withoutFoobarImages = sut.listImages(
+        ListImagesParam.withoutLabel("foo", "baz"));
+    final List<String> barIdsWithoutBaz = imagesToShortIdsAndRemoveSha256(withoutFoobarImages);
+    assertThat(barId, isIn(barIdsWithoutBaz));
 
     // Clean up test images
     sut.removeImage(barName, true, true);

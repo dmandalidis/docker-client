@@ -2524,6 +2524,27 @@ public interface DockerClient extends Closeable {
     public static ListImagesParam withLabel(final String label) {
       return withLabel(label, null);
     }
+    
+    /**
+     * Show images without a label value.
+     *
+     * @param label The label to filter out
+     * @param value The value of the label
+     * @return ListImagesParam
+     */
+    public static ListImagesParam withoutLabel(final String label, final String value) {
+      return value == null || "".equals(value.trim()) ? filter("label", label) : filter("label", label + "!=" + value);
+    }
+
+    /**
+     * Show images without a label.
+     *
+     * @param label The label to filter out
+     * @return ListImagesParam
+     */
+    public static ListImagesParam withoutLabel(final String label) {
+      return withoutLabel(label, null);
+    }
 
     /**
      * Show images by name. Can use RepoTags or RepoDigests as valid inputs.
