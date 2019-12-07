@@ -3480,11 +3480,6 @@ public class DefaultDockerClientTest {
         ListImagesParam.withLabel("foo", "qux"));
     assertThat(quxImages, hasSize(0));
     
-    // Check that no images are listed when we filter without a "foo" label
-    final List<Image> withoutFooImages = sut.listImages(
-        ListImagesParam.withoutLabel("foo"));
-    assertThat(withoutFooImages, hasSize(0));
-    
     // Check that only foo=bar image is listed when we filter with a "foo!=baz" label
     final List<Image> withoutFoobarImages = sut.listImages(
         ListImagesParam.withoutLabel("foo", "baz"));
@@ -3632,9 +3627,6 @@ public class DefaultDockerClientTest {
     assertThat(networks, hasItem(network2));
     assertThat(networks, not(hasItem(network1)));
     
-    networks = sut.listNetworks(ListNetworksParam.withoutLabel("is-test"));
-    assertThat(networks.size(), is(0));
-      
     networks = sut.listNetworks(ListNetworksParam.withLabel("is-test", "false"));
     assertThat(networks, not(hasItems(network1, network2)));
     
@@ -4086,14 +4078,13 @@ public class DefaultDockerClientTest {
     }
     assertThat(volume, isIn(volumeListByDriver.volumes()));
 
-    final VolumeList volumeListByLabel = sut.listVolumes(ListVolumesParam.withoutLabel("foo"));
+    final VolumeList volumeListByLabel = sut.listVolumes(ListVolumesParam.withoutLabel("foo", "bar"));
     if (volumeListByLabel.warnings() != null
         && !volumeListByName.warnings().isEmpty()) {
       for (final String warning : volumeListByLabel.warnings()) {
         log.warn(warning);
       }
     }
-    assertThat(volumeListByLabel.volumes(), notNullValue());
     assertThat(volume, isIn(volumeListByLabel.volumes()));
     
     final VolumeList volumeListByFooLabel = sut.listVolumes(ListVolumesParam.withLabel("foo"));
