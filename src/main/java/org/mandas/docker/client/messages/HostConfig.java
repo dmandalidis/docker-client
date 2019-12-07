@@ -264,6 +264,10 @@ public interface HostConfig {
   @JsonProperty("Sysctls")
   Map<String, String> sysctls();
   
+  @Nullable
+  @JsonProperty("Capabilities")
+  List<String> capabilities();
+  
   @JsonDeserialize(builder = ImmutableHostConfig.LxcConfParameter.Builder.class)
   @Immutable
   public interface LxcConfParameter {
@@ -493,6 +497,8 @@ public interface HostConfig {
     Builder sysctls(Map<String, ? extends String> sysctls);
     
     Builder addSysctl(String key, String value);
+    
+    Builder capabilities(Iterable<String> capabilities);
     
     HostConfig build();
   }
