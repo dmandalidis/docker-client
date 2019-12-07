@@ -116,6 +116,9 @@ public interface ContainerSpec {
   @Nullable
   @JsonProperty("DNSConfig")
   DnsConfig dnsConfig();
+  
+  @JsonProperty("Sysctls")
+  Map<String, String> sysctls();
 
   /**
    * @since 1.37
@@ -173,6 +176,10 @@ public interface ContainerSpec {
     Builder configs(Iterable<? extends ConfigBind> configs);
     
     Builder init(Boolean init);
+    
+    Builder sysctls(Map<String, ? extends String> sysctls);
+    
+    Builder addSysctl(String key, String value);
 
     ContainerSpec build();
   }
