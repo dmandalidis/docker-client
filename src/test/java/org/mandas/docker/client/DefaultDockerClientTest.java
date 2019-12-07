@@ -233,6 +233,7 @@ import org.mandas.docker.client.messages.swarm.CaConfig;
 import org.mandas.docker.client.messages.swarm.ConfigCreateResponse;
 import org.mandas.docker.client.messages.swarm.ConfigSpec;
 import org.mandas.docker.client.messages.swarm.ContainerSpec;
+import org.mandas.docker.client.messages.swarm.ContainerSpec.Builder;
 import org.mandas.docker.client.messages.swarm.DispatcherConfig;
 import org.mandas.docker.client.messages.swarm.Driver;
 import org.mandas.docker.client.messages.swarm.EncryptionConfig;
@@ -4784,10 +4785,21 @@ public class DefaultDockerClientTest {
   @Test
   public void testInspectService() throws Exception {
     final String[] commandLine = {"ping", "-c4", "localhost"};
-    final TaskSpec taskSpec = TaskSpec
+    
+    Builder containerSpecBuilder = ContainerSpec.builder()
+    					   .image("alpine")
+	                       .command(commandLine);
+    
+    if (dockerApiVersionAtLeast("1.40")) {
+    	containerSpecBuilder.addSysctl("net.ipv4.tcp_syncookies", "1");
+    }
+    
+	final ContainerSpec containerSpec = containerSpecBuilder
+	                       .build();
+    
+	final TaskSpec taskSpec = TaskSpec
         .builder()
-        .containerSpec(ContainerSpec.builder().image("alpine")
-                               .command(commandLine).build())
+        .containerSpec(containerSpec)
         .logDriver(Driver.builder().name("json-file").addOption("max-file", "3")
                            .addOption("max-size", "10M").build())
         .resources(ResourceRequirements.builder()
@@ -4825,6 +4837,10 @@ public class DefaultDockerClientTest {
             latestImageNameMatcher("alpine"));
     assertThat(service.spec().taskTemplate().containerSpec().command(),
                equalTo(Arrays.asList(commandLine)));
+    
+    if (dockerApiVersionAtLeast("1.40")) {
+    	assertThat(service.spec().taskTemplate().containerSpec().sysctls(), equalTo(singletonMap("net.ipv4.tcp_syncookies", "1")));
+    }
   }
 
   @Test
