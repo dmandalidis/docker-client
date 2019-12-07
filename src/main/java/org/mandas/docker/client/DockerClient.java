@@ -1776,6 +1776,16 @@ public interface DockerClient extends Closeable {
     }
 
     /**
+     * Filter dagling networks.
+     * Networks not used by a container/service.
+     * @return The ListNetworksParam for the given type.
+     * @since Docker 19.03, API version 1.40
+     */
+    public static ListNetworksParam dangling() {
+      return filter("dangling", "true");	
+    }
+    
+    /**
      * Return built-in networks only.
      * @return The ListNetworksParam for built-in networks.
      * @see #withType(org.mandas.docker.client.messages.Network.Type)

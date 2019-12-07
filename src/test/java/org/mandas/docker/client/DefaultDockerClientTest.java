@@ -3616,6 +3616,11 @@ public class DefaultDockerClientTest {
     networks = sut.listNetworks(ListNetworksParam.withLabel("is-test", "false"));
     assertThat(networks, not(hasItems(network1, network2)));
     
+    if (dockerApiVersionAtLeast("1.40")) {
+	    networks = sut.listNetworks(ListNetworksParam.dangling());
+	    assertThat(networks, hasItems(network1, network2));
+    }
+    
     sut.removeNetwork(network1.id());
     sut.removeNetwork(network2.id());
   }
