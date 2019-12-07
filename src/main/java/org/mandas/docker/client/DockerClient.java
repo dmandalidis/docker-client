@@ -2870,6 +2870,48 @@ public interface DockerClient extends Closeable {
     public static ListVolumesParam driver(final String driver) {
       return filter("driver", driver);
     }
+    
+    /**
+     * Return volumes with a label value.
+     * @param label The label to filter on
+     * @param value The value of the label
+     * @return ListVolumesParam
+     * @since Docker 1.12, API version 1.24
+     */
+    public static ListVolumesParam withLabel(String label, String value) {
+      return value == null || "".equals(value.trim()) ? filter("label", label) : filter("label", label + "=" + value);
+    }
+
+    /**
+     * Return volumes with a label.
+     * @param label The label to filter on
+     * @return ListVolumesParam
+     * @since Docker 1.12, API version 1.24
+     */
+    public static ListVolumesParam withLabel(String label) {
+      return withLabel(label, null);
+    }
+    
+    /**
+     * Return volumes without a label value.
+     * @param label The label to filter out
+     * @param value The value of the label
+     * @return ListVolumesParam
+     * @since Docker 1.12, API version 1.24
+     */
+    public static ListVolumesParam withoutLabel(String label, String value) {
+      return value == null || "".equals(value.trim()) ? filter("label", label) : filter("label", label + "!=" + value);
+    }
+
+    /**
+     * Return volumes without a label.
+     * @param label The label to filter out
+     * @return ListVolumesParam
+     * @since Docker 1.12, API version 1.24
+     */
+    public static ListVolumesParam withoutLabel(String label) {
+      return withoutLabel(label, null);
+    }
 
   }
 

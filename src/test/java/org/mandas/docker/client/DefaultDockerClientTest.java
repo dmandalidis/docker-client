@@ -172,6 +172,7 @@ import org.mandas.docker.client.DockerClient.ExecCreateParam;
 import org.mandas.docker.client.DockerClient.ListContainersParam;
 import org.mandas.docker.client.DockerClient.ListImagesParam;
 import org.mandas.docker.client.DockerClient.ListNetworksParam;
+import org.mandas.docker.client.DockerClient.ListVolumesParam;
 import org.mandas.docker.client.auth.FixedRegistryAuthSupplier;
 import org.mandas.docker.client.exceptions.BadParamException;
 import org.mandas.docker.client.exceptions.ConflictException;
@@ -4086,6 +4087,24 @@ public class DefaultDockerClientTest {
     }
     assertThat(volume, isIn(volumeListByDriver.volumes()));
 
+    final VolumeList volumeListByLabel = sut.listVolumes(ListVolumesParam.withoutLabel("foo"));
+    if (volumeListByLabel.warnings() != null
+        && !volumeListByName.warnings().isEmpty()) {
+      for (final String warning : volumeListByLabel.warnings()) {
+        log.warn(warning);
+      }
+    }
+    assertThat(volume, isIn(volumeListByLabel.volumes()));
+    
+    final VolumeList volumeListByFooLabel = sut.listVolumes(ListVolumesParam.withLabel("foo"));
+    if (volumeListByFooLabel.warnings() != null
+        && !volumeListByFooLabel.warnings().isEmpty()) {
+      for (final String warning : volumeListByFooLabel.warnings()) {
+        log.warn(warning);
+      }
+    }
+    assertThat(volumeListByFooLabel.volumes().size(), is(0));
+    
     assertEquals("local", volume.scope());
     assertThat(volume.status(), is(anything())); // I don't know what is in the status object - JF
 
