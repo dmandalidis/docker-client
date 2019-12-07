@@ -25,15 +25,6 @@ package org.mandas.docker.client;
 import static org.mandas.docker.client.messages.Network.Type.BUILTIN;
 import static org.mandas.docker.client.messages.Network.Type.CUSTOM;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-
 import org.mandas.docker.client.exceptions.BadParamException;
 import org.mandas.docker.client.exceptions.ConflictException;
 import org.mandas.docker.client.exceptions.ContainerNotFoundException;
@@ -93,6 +84,14 @@ import org.mandas.docker.client.messages.swarm.SwarmJoin;
 import org.mandas.docker.client.messages.swarm.SwarmSpec;
 import org.mandas.docker.client.messages.swarm.Task;
 import org.mandas.docker.client.messages.swarm.UnlockKey;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * A client for interacting with dockerd.
@@ -1837,7 +1836,17 @@ public interface DockerClient extends Closeable {
      * @since Docker 1.12, API version 1.24
      */
     public static ListNetworksParam withoutLabel(String label, String value) {
-      return filter("label", label + "!=" + value);
+      return value == null || "".equals(value.trim()) ? filter("label", label) : filter("label", label + "!=" + value);
+    }
+
+    /**
+     * Return networks without a label.
+     * @param label The label to filter out
+     * @return ListNetworksParam
+     * @since Docker 1.12, API version 1.24
+     */
+    public static ListNetworksParam withoutLabel(String label) {
+      return withoutLabel(label, null);
     }
   }
   
@@ -2406,7 +2415,7 @@ public interface DockerClient extends Closeable {
      * @return ListContainersParam
      */
     public static ListContainersParam withoutLabel(final String label, final String value) {
-      return filter("label", label + "!=" + value);
+      return value == null || "".equals(value.trim()) ? filter("label", label) : filter("label", label + "!=" + value);
     }
 
     /**
@@ -2419,6 +2428,15 @@ public interface DockerClient extends Closeable {
       return withLabel(label, null);
     }
     
+    /**
+     * Show containers without a label.
+     *
+     * @param label The label to filter out
+     * @return ListContainersParam
+     */
+    public static ListContainersParam withoutLabel(final String label) {
+      return withoutLabel(label, null);
+    }
   }
 
   class ListContainersFilterParam extends ListContainersParam implements FilterParam {
@@ -2536,7 +2554,17 @@ public interface DockerClient extends Closeable {
      * @return ListImagesParam
      */
     public static ListImagesParam withoutLabel(final String label, final String value) {
-      return filter("label", label + "!=" + value);
+      return value == null || "".equals(value.trim()) ? filter("label", label) : filter("label", label + "!=" + value);
+    }
+
+    /**
+     * Show images without a label.
+     *
+     * @param label The label to filter out
+     * @return ListImagesParam
+     */
+    public static ListImagesParam withoutLabel(final String label) {
+      return withoutLabel(label, null);
     }
 
     /**
@@ -2872,7 +2900,17 @@ public interface DockerClient extends Closeable {
      * @since Docker 1.12, API version 1.24
      */
     public static ListVolumesParam withoutLabel(String label, String value) {
-      return filter("label", label + "!=" + value);
+      return value == null || "".equals(value.trim()) ? filter("label", label) : filter("label", label + "!=" + value);
+    }
+
+    /**
+     * Return volumes without a label.
+     * @param label The label to filter out
+     * @return ListVolumesParam
+     * @since Docker 1.12, API version 1.24
+     */
+    public static ListVolumesParam withoutLabel(String label) {
+      return withoutLabel(label, null);
     }
 
   }
