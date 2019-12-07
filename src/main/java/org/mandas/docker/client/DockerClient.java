@@ -1827,6 +1827,27 @@ public interface DockerClient extends Closeable {
     public static ListNetworksParam withLabel(String label) {
       return withLabel(label, null);
     }
+    
+    /**
+     * Return networks without a label value.
+     * @param label The label to filter out
+     * @param value The value of the label
+     * @return ListNetworksParam
+     * @since Docker 1.12, API version 1.24
+     */
+    public static ListNetworksParam withoutLabel(String label, String value) {
+      return value == null || "".equals(value.trim()) ? filter("label", label) : filter("label", label + "!=" + value);
+    }
+
+    /**
+     * Return networks without a label.
+     * @param label The label to filter out
+     * @return ListNetworksParam
+     * @since Docker 1.12, API version 1.24
+     */
+    public static ListNetworksParam withoutLabel(String label) {
+      return withoutLabel(label, null);
+    }
   }
   
   /**

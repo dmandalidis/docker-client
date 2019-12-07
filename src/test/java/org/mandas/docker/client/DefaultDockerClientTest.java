@@ -3627,6 +3627,13 @@ public class DefaultDockerClientTest {
     networks = sut.listNetworks(ListNetworksParam.withLabel("is-test", "true"));
     assertThat(networks, hasItem(network1));
     assertThat(networks, not(hasItem(network2)));
+    
+    networks = sut.listNetworks(ListNetworksParam.withoutLabel("is-test", "true"));
+    assertThat(networks, hasItem(network2));
+    assertThat(networks, not(hasItem(network1)));
+    
+    networks = sut.listNetworks(ListNetworksParam.withoutLabel("is-test"));
+    assertThat(networks.size(), is(0));
       
     networks = sut.listNetworks(ListNetworksParam.withLabel("is-test", "false"));
     assertThat(networks, not(hasItems(network1, network2)));
