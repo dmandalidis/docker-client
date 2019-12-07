@@ -2028,20 +2028,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
 
   @Override
   public List<Config> listConfigs() throws DockerException, InterruptedException {
-    assertApiVersionIsAbove("1.30");
-
-    final WebTarget resource = resource().path("configs");
-
-    try {
-      return request(GET, CONFIG_LIST, resource, resource.request(APPLICATION_JSON_TYPE));
-    } catch (DockerRequestException e) {
-      switch (e.status()) {
-        case 503:
-          throw new NonSwarmNodeException("node is not part of a swarm", e);
-        default:
-          throw e;
-      }
-    }
+    return listConfigs(null);
   }
 
   @Override
@@ -2049,20 +2036,23 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       throws DockerException, InterruptedException {
     assertApiVersionIsAbove("1.30");
 
-    final Map<String, List<String>> filters = new HashMap<>();
-
-    if (criteria.configId() != null) {
-      filters.put("id", Collections.singletonList(criteria.configId()));
+    WebTarget resource = resource().path("configs");
+    
+    if (criteria != null) {
+	  final Map<String, List<String>> filters = new HashMap<>();
+	
+	  if (criteria.configId() != null) {
+	    filters.put("id", Collections.singletonList(criteria.configId()));
+	  }
+	  if (criteria.label() != null) {
+	    filters.put("label", Collections.singletonList(criteria.label()));
+	  }
+	  if (criteria.name() != null) {
+	    filters.put("name", Collections.singletonList(criteria.name()));
+	  }
+	
+	  resource = resource.queryParam("filters", urlEncodeFilters(filters));
     }
-    if (criteria.label() != null) {
-      filters.put("label", Collections.singletonList(criteria.label()));
-    }
-    if (criteria.name() != null) {
-      filters.put("name", Collections.singletonList(criteria.name()));
-    }
-
-    final WebTarget resource = resource().path("configs")
-        .queryParam("filters", urlEncodeFilters(filters));
 
     try {
       return request(GET, CONFIG_LIST, resource, resource.request(APPLICATION_JSON_TYPE));
@@ -2543,9 +2533,42 @@ public class DefaultDockerClient implements DockerClient, Closeable {
 
   @Override
   public List<Secret> listSecrets() throws DockerException, InterruptedException {
+    return listSecrets(null);
+  }
+  
+  @Override
+  public List<Secret> listSecrets(final Secret.Criteria criteria)
+      throws DockerException, InterruptedException {
     assertApiVersionIsAbove("1.25");
-    final WebTarget resource = resource().path("secrets");
-    return request(GET, SECRET_LIST, resource, resource.request(APPLICATION_JSON_TYPE));
+
+    WebTarget resource = resource().path("secrets");
+    
+    if (criteria != null) {
+	  final Map<String, List<String>> filters = new HashMap<>();
+	
+	  if (criteria.id() != null) {
+	    filters.put("id", Collections.singletonList(criteria.id()));
+	  }
+	  if (criteria.label() != null) {
+	    filters.put("label", Collections.singletonList(criteria.label()));
+	  }
+	  if (criteria.name() != null) {
+	    filters.put("name", Collections.singletonList(criteria.name()));
+	  }
+	
+	  resource = resource.queryParam("filters", urlEncodeFilters(filters));
+    }
+
+    try {
+      return request(GET, SECRET_LIST, resource, resource.request(APPLICATION_JSON_TYPE));
+    } catch (DockerRequestException e) {
+      switch (e.status()) {
+        case 503:
+          throw new NonSwarmNodeException("node is not part of a swarm", e);
+        default:
+          throw e;
+      }
+    }
   }
 
   @Override

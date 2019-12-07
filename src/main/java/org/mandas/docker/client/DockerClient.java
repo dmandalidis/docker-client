@@ -25,6 +25,15 @@ package org.mandas.docker.client;
 import static org.mandas.docker.client.messages.Network.Type.BUILTIN;
 import static org.mandas.docker.client.messages.Network.Type.CUSTOM;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
 import org.mandas.docker.client.exceptions.BadParamException;
 import org.mandas.docker.client.exceptions.ConflictException;
 import org.mandas.docker.client.exceptions.ContainerNotFoundException;
@@ -84,14 +93,6 @@ import org.mandas.docker.client.messages.swarm.SwarmJoin;
 import org.mandas.docker.client.messages.swarm.SwarmSpec;
 import org.mandas.docker.client.messages.swarm.Task;
 import org.mandas.docker.client.messages.swarm.UnlockKey;
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 
 /**
  * A client for interacting with dockerd.
@@ -2714,6 +2715,15 @@ public interface DockerClient extends Closeable {
    */
   List<Secret> listSecrets() throws DockerException, InterruptedException;
 
+  /**
+   * List secrets with criteria.
+   * @param criteria Config listing and filtering options
+   * @return A list of {@link Secret}s
+   * @throws DockerException if a server error occurred (500)
+   * @since Docker 1.13, API version 1.25
+   */
+  List<Secret> listSecrets(final Secret.Criteria criteria) throws DockerException, InterruptedException;
+  
   /**
    * Create a secret.
    * @param secret The spec for the secret.

@@ -23,13 +23,16 @@ package org.mandas.docker.client.messages.swarm;
 
 import java.util.Date;
 
+import org.immutables.value.Value.Enclosing;
 import org.immutables.value.Value.Immutable;
+import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonDeserialize(builder = ImmutableSecret.Builder.class)
 @Immutable
+@Enclosing
 public interface Secret {
 
   @JsonProperty("ID")
@@ -46,4 +49,39 @@ public interface Secret {
 
   @JsonProperty("Spec")
   SecretSpec secretSpec();
+  
+  @Immutable
+  public interface Criteria {
+    /**
+     * Filter by secret id.
+     */
+    @Nullable
+    String id();
+
+    /**
+     * Filter by label.
+     */
+    @Nullable
+    String label();
+
+    /**
+     * Filter by secret name.
+     */
+    @Nullable
+    String name();
+    
+    public static Criteria.Builder builder() {
+      return ImmutableSecret.Criteria.builder();
+    }
+
+    interface Builder {
+      Builder id(String id);
+
+      Builder label(String label);
+
+      Builder name(String name);
+      
+      Criteria build();
+    }
+  }
 }

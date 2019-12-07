@@ -50,7 +50,6 @@ public interface Config {
   @JsonProperty("Spec")
   ConfigSpec configSpec();
 
-  @JsonDeserialize(builder = ImmutableConfig.Criteria.Builder.class)
   @Immutable
   public interface Criteria {
     /**

@@ -230,6 +230,7 @@ import org.mandas.docker.client.messages.mount.Mount;
 import org.mandas.docker.client.messages.mount.TmpfsOptions;
 import org.mandas.docker.client.messages.mount.VolumeOptions;
 import org.mandas.docker.client.messages.swarm.CaConfig;
+import org.mandas.docker.client.messages.swarm.Config;
 import org.mandas.docker.client.messages.swarm.ConfigCreateResponse;
 import org.mandas.docker.client.messages.swarm.ConfigSpec;
 import org.mandas.docker.client.messages.swarm.ContainerSpec;
@@ -4594,9 +4595,17 @@ public class DefaultDockerClientTest {
 
     final Secret secret = sut.inspectSecret(secretId);
 
-    final List<Secret> secrets = sut.listSecrets();
+    List<Secret> secrets = sut.listSecrets();
     assertThat(secrets.size(), equalTo(1));
     assertThat(secrets, hasItem(secret));
+    
+    secrets = sut.listSecrets(Secret.Criteria.builder().name(secretName).build());
+    assertThat(secrets.size(), is(1));
+    assertThat(secrets.get(0).id(), is(secretId));
+    
+    secrets = sut.listSecrets(Secret.Criteria.builder().label("foo=bar").build());
+    assertThat(secrets.size(), is(1));
+    assertThat(secrets.get(0).id(), is(secretId));
 
     sut.deleteSecret(secretId);
     assertThat(sut.listSecrets().size(), equalTo(0));
@@ -4611,6 +4620,90 @@ public class DefaultDockerClientTest {
     try {
       sut.deleteSecret(secretId);
       fail("Should fail because of non-existant secret ID");
+    } catch (DockerRequestException | NotFoundException ex) {
+      // Ignored; Docker should return status code 404,
+      // but it doesn't for some reason in versions < 17.04.
+      // So we catch 2 different exceptions here.
+    }
+  }
+  
+  @Test
+  public void testConfigOperations() throws Exception {
+	requireDockerApiVersionAtLeast("1.30", "Configs are supported from API version 1.30 onwards");
+    assertThat(sut.listConfigs().size(), equalTo(0));
+
+    final String configData = Base64.getEncoder().encodeToString("testdata".getBytes(StandardCharsets.UTF_8));
+    
+    final Map<String, String> labels = new HashMap<>();
+    labels.put("foo", "bar");
+    labels.put("1", "a");
+
+    String configName = randomName();
+	final ConfigSpec configSpec = ConfigSpec.builder()
+        .name(configName)
+        .data(configData)
+        .labels(labels)
+        .build();
+    
+    final ConfigCreateResponse response = sut.createConfig(configSpec);
+    final String configId = response.id();
+    assertThat(configId, is(notNullValue()));
+    
+    final ConfigSpec configSpecConflict = ConfigSpec.builder()
+        .name(configName)
+        .data(configData)
+        .labels(labels)
+        .build();
+
+    try {
+      sut.createConfig(configSpecConflict);
+      fail("Should fail due to config name conflict");
+    } catch (ConflictException | DockerRequestException ex) {
+      // Ignored; Docker should return status code 409 but doesn't in some earlier versions.
+      // Recent versions return 409 which translates into ConflictException.
+    }
+
+    String configName2 = randomName();
+	final ConfigSpec configSpecInvalidData = ConfigSpec.builder()
+        .name(configName2)
+        .data("plainData")
+        .labels(labels)
+        .build();
+
+    try {
+      sut.createConfig(configSpecInvalidData);
+      fail("Should fail due to non base64 data");
+    } catch (DockerException ex) {
+      // Ignored
+    }
+
+    final Config config = sut.inspectConfig(configId);
+
+    List<Config> configs = sut.listConfigs();
+    assertThat(configs.size(), equalTo(1));
+    assertThat(configs, hasItem(config));
+    
+    configs = sut.listConfigs(Config.Criteria.builder().name(configName).build());
+    assertThat(configs.size(), is(1));
+    assertThat(configs.get(0).id(), is(configId));
+    
+    configs = sut.listConfigs(Config.Criteria.builder().label("foo=bar").build());
+    assertThat(configs.size(), is(1));
+    assertThat(configs.get(0).id(), is(configId));
+    
+    sut.deleteConfig(configId);
+    assertThat(sut.listConfigs().size(), equalTo(0));
+
+    try {
+      sut.inspectConfig(configId);
+      fail("Should fail because of non-existant config ID");
+    } catch (NotFoundException ex) {
+      // Ignored
+    }
+
+    try {
+      sut.deleteConfig(configId);
+      fail("Should fail because of non-existant config ID");
     } catch (DockerRequestException | NotFoundException ex) {
       // Ignored; Docker should return status code 404,
       // but it doesn't for some reason in versions < 17.04.
