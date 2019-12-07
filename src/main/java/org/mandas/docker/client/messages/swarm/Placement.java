@@ -40,12 +40,20 @@ public interface Placement {
   @Nullable
   @JsonProperty("Preferences")
   List<Preference> preferences();
+  
+  @Nullable
+  @JsonProperty("MaxReplicas")
+  Integer maxReplicas();
 
   public static Placement create(final List<String> constraints) {
-    return create(constraints, null);
+    return create(constraints, null, null);
   }
   
   public static Placement create(final List<String> constraints, final List<Preference> preferences) {
-    return ImmutablePlacement.builder().constraints(constraints).preferences(preferences).build();
+	return create(constraints, preferences, null);
+  }
+  
+  public static Placement create(final List<String> constraints, final List<Preference> preferences, final Integer maxReplicas) {
+    return ImmutablePlacement.builder().constraints(constraints).preferences(preferences).maxReplicas(maxReplicas).build();
   }
 }
