@@ -1,5 +1,14 @@
 # Change Log
 
+## 3.1.0
+
+* Support secret list filtering (fixes #120)
+* Support capabilities in HostConfig (fixes #105)
+* Support max replicas per node (fixes #103)
+* Support filtering dangling networks (fixes #104)
+* Support sysctl for services (fixes #101)
+* Support config events (fixes #108)
+
 ## 3.0.1
 
 * Revert incorrectly removed methods (fixes #111)
