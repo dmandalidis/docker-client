@@ -336,14 +336,22 @@ public class DefaultDockerClientTest {
     } else {
       builder.readTimeoutMillis(120000);
     }
+    
+    dockerApiVersion = System.getProperty("docker.api");
+
+    if (dockerApiVersion != null && !"".equals(dockerApiVersion.trim())) {
+    	builder.apiVersion("v" + dockerApiVersion);
+    } 
 
     dockerEndpoint = builder.uri();
 
     sut = builder.build();
+    
+    if (dockerApiVersion == null) {
+    	dockerApiVersion = sut.version().apiVersion();
+    }
 
-    dockerApiVersion = sut.version().apiVersion();
-
-    System.out.printf("- %s\n", testName.getMethodName());
+    System.out.printf("%s - %s\n", dockerApiVersion, testName.getMethodName());
   }
 
   @After

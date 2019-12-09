@@ -47,7 +47,9 @@
   	<version.jackson>2.10.1</version.jackson>
     <version.jersey>2.29.1</version.jersey>
     <version.immutables>2.8.2</version.immutables>
+    
     <version.plugin.spotbugs>3.1.12.2</version.plugin.spotbugs>
+    <version.plugin.surefire>3.0.0-M4</version.plugin.surefire>
   </properties>
   
   <dependencyManagement>
@@ -431,6 +433,130 @@
 			</configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+      	<groupId>org.apache.maven.plugins</groupId>
+      	<artifactId>maven-surefire-plugin</artifactId>
+      	<version>${version.plugin.surefire}</version>
+      	<executions>
+      		<execution>
+      			<id>generic-tests</id>
+      			<phase>test</phase>
+      			<goals>
+      				<goal>test</goal>
+      			</goals>
+      			<configuration>
+      				<excludes>
+      					<exclude>DefaultDockerClientTest.java</exclude>
+      				</excludes>
+      			</configuration>
+      		</execution>
+      		<execution>
+      			<id>v1.26-tests</id>
+      			<phase>test</phase>
+      			<goals>
+      				<goal>test</goal>
+      			</goals>
+      			<configuration>
+      				<includes>
+      					<include>DefaultDockerClientTest.java</include>
+      				</includes>
+      				<systemPropertyVariables>
+      					<docker.api>1.26</docker.api>
+      				</systemPropertyVariables>
+      			</configuration>
+      		</execution>
+      		<execution>
+      			<id>v1.30-tests</id>
+      			<phase>test</phase>
+      			<goals>
+      				<goal>test</goal>
+      			</goals>
+      			<configuration>
+      				<includes>
+      					<include>DefaultDockerClientTest.java</include>
+      				</includes>
+      				<systemPropertyVariables>
+      					<docker.api>1.30</docker.api>
+      				</systemPropertyVariables>
+      			</configuration>
+      		</execution>
+      		<execution>
+      			<id>v1.32-tests</id>
+      			<phase>test</phase>
+      			<goals>
+      				<goal>test</goal>
+      			</goals>
+      			<configuration>
+      				<includes>
+      					<include>DefaultDockerClientTest.java</include>
+      				</includes>
+      				<systemPropertyVariables>
+      					<docker.api>1.32</docker.api>
+      				</systemPropertyVariables>
+      			</configuration>
+      		</execution>
+      		<execution>
+      			<id>v1.35-tests</id>
+      			<phase>test</phase>
+      			<goals>
+      				<goal>test</goal>
+      			</goals>
+      			<configuration>
+      				<includes>
+      					<include>DefaultDockerClientTest.java</include>
+      				</includes>
+      				<systemPropertyVariables>
+      					<docker.api>1.35</docker.api>
+      				</systemPropertyVariables>
+      			</configuration>
+      		</execution>
+      		<execution>
+      			<id>v1.37-tests</id>
+      			<phase>test</phase>
+      			<goals>
+      				<goal>test</goal>
+      			</goals>
+      			<configuration>
+      				<includes>
+      					<include>DefaultDockerClientTest.java</include>
+      				</includes>
+      				<systemPropertyVariables>
+      					<docker.api>1.37</docker.api>
+      				</systemPropertyVariables>
+      			</configuration>
+      		</execution>
+      		<execution>
+      			<id>v1.38-tests</id>
+      			<phase>test</phase>
+      			<goals>
+      				<goal>test</goal>
+      			</goals>
+      			<configuration>
+      				<includes>
+      					<include>DefaultDockerClientTest.java</include>
+      				</includes>
+      				<systemPropertyVariables>
+      					<docker.api>1.38</docker.api>
+      				</systemPropertyVariables>
+      			</configuration>
+      		</execution>
+      		<execution>
+      			<id>v1.40-tests</id>
+      			<phase>test</phase>
+      			<goals>
+      				<goal>test</goal>
+      			</goals>
+      			<configuration>
+      				<includes>
+      					<include>DefaultDockerClientTest.java</include>
+      				</includes>
+      				<systemPropertyVariables>
+      					<docker.api>1.40</docker.api>
+      				</systemPropertyVariables>
+      			</configuration>
+      		</execution>
+      	</executions>
       </plugin>
     </plugins>
   </build>
