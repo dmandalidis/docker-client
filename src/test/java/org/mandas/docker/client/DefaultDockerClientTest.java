@@ -159,7 +159,6 @@ import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -443,9 +442,9 @@ public class DefaultDockerClientTest {
   }
 
   // TODO: Docker < 17.12 returns 200 for this (!)
-  @Test(expected = ImageNotFoundException.class) @Ignore 
+  @Test(expected = ImageNotFoundException.class) 
   public void testPullBadImage() throws Exception {
-    sut.pull(randomName());
+	sut.pull(randomName());
   }
 
   @Test(expected = ImageNotFoundException.class)
