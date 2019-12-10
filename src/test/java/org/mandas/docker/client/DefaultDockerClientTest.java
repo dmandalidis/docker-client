@@ -442,55 +442,6 @@ public class DefaultDockerClientTest {
     sut.pull(BUSYBOX_BUILDROOT_2013_08_1);
   }
 
-  @Test
-  public void testPullInterruption() throws Exception {
-    // Wait for container on a thread
-    final ExecutorService executorService = Executors.newSingleThreadExecutor();
-    final SettableFuture<Boolean> started = SettableFuture.create();
-    final SettableFuture<Boolean> interrupted = SettableFuture.create();
-
-    final Future<?> exitFuture = executorService.submit(new Callable<ContainerExit>() {
-      @Override
-      public ContainerExit call() throws Exception {
-        try {
-          try {
-            sut.removeImage(BUSYBOX_BUILDROOT_2013_08_1);
-          } catch (DockerException ignored) {
-        	log.debug("Ignoring error removing image", ignored);
-          } catch (Exception e) {
-        	log.warn("Unexpected exception", e);
-        	throw e;
-          }
-          sut.pull(BUSYBOX_BUILDROOT_2013_08_1, message -> {
-            if (!started.isDone()) {
-              started.set(true);
-            }
-          });
-          return null;
-        } catch (InterruptedException e) {
-          interrupted.set(true);
-          throw e;
-        } catch (Exception e) {
-          log.warn("Error pulling image", e);
-          throw e;
-        }
-      }
-    });
-
-    // Interrupt waiting thread
-    started.get();
-    executorService.shutdownNow();
-    try {
-      exitFuture.get();
-      fail();
-    } catch (ExecutionException e) {
-      assertThat(e.getCause(), instanceOf(InterruptedException.class));
-    }
-
-    // Verify that the thread was interrupted
-    assertThat(interrupted.get(), is(true));
-  }
-
   // TODO: Docker < 17.12 returns 200 for this (!)
   @Test(expected = ImageNotFoundException.class) @Ignore 
   public void testPullBadImage() throws Exception {
