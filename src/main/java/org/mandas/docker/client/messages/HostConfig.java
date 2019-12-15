@@ -268,6 +268,10 @@ public interface HostConfig {
   @JsonProperty("Capabilities")
   List<String> capabilities();
   
+  @Nullable
+  @JsonProperty("DeviceRequests")
+  List<DeviceRequest> deviceRequests();
+  
   @JsonDeserialize(builder = ImmutableHostConfig.LxcConfParameter.Builder.class)
   @Immutable
   public interface LxcConfParameter {
@@ -500,6 +504,8 @@ public interface HostConfig {
     
     Builder capabilities(Iterable<String> capabilities);
     
+    Builder deviceRequests(Iterable<? extends DeviceRequest> deviceRequests);
+    
     HostConfig build();
   }
 
@@ -656,6 +662,44 @@ public interface HostConfig {
       Builder rate(final Integer rate);
 
       BlkioDeviceRate build();
+    }
+  }
+  
+  @JsonDeserialize(builder = ImmutableHostConfig.DeviceRequest.Builder.class)
+  @Immutable
+  public interface DeviceRequest {
+	  
+	  @JsonProperty("Driver")
+	  String driver();
+	  
+	  @JsonProperty("Count")
+	  Integer count();
+	  
+	  @JsonProperty("DeviceIDs")
+	  List<String> deviceIds();
+	  
+	  @JsonProperty("Capabilities")
+	  List<String> capabilities();
+	  
+	  @JsonProperty("Options")
+	  Map<String, String> options();
+	  
+	  public static Builder builder() {
+	    return ImmutableHostConfig.DeviceRequest.builder();
+      }
+
+      interface Builder {
+        Builder driver(final String driver);
+
+        Builder count(final Integer count);
+
+        Builder deviceIds(final Iterable<String> deviceIds);
+        
+        Builder capabilities(final Iterable<String> capabilities);
+        
+        Builder options(final Map<String, ? extends String> options);
+        
+        DeviceRequest build();
     }
   }
 }
