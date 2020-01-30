@@ -46,7 +46,7 @@
   <properties>
     <maven.compiler.release>8</maven.compiler.release>
 
-  	<version.jackson>2.10.2</version.jackson>
+  	<version.jackson>2.10.2.20200130</version.jackson>
     <version.jersey>2.30</version.jersey>
     <version.immutables>2.8.3</version.immutables>
     <version.plugin.spotbugs>3.1.12.2</version.plugin.spotbugs>
