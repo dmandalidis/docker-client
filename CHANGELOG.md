@@ -1,5 +1,15 @@
 # Change Log
 
+## 3.2.0
+
+* Bump google-auth-library-oauth2-http from 0.18.0 to 0.20.0
+* Bump version.jersey from 2.29.1 to 2.30
+* Bump jnr-unixsocket from 0.24 to 0.25
+* Bump jackson-bom from 2.10.1 to 2.10.2
+* Support device requests (fixes #75)
+* Bump slf4j-api from 1.7.29 to 1.7.30
+* Fix javadoc reporting
+
 ## 3.1.0
 
 * Support secret list filtering (fixes #120)
