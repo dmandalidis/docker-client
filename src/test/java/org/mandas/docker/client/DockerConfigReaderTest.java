@@ -39,9 +39,7 @@ import org.hamcrest.CustomTypeSafeMatcher;
 import org.hamcrest.Matcher;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mandas.docker.client.DockerCredentialHelper.CredentialHelperDelegate;
 import org.mandas.docker.client.messages.DockerCredentialHelperAuth;
 import org.mandas.docker.client.messages.RegistryAuth;
@@ -71,9 +69,6 @@ public class DockerConfigReaderTest {
       .serverAddress("docker.customdomain.com")
       .identityToken("52ce5fd5-eb60-42bf-931f-5eeec128211a")
       .build();
-
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
 
   private final DockerConfigReader reader = new DockerConfigReader();
 
@@ -147,10 +142,9 @@ public class DockerConfigReaderTest {
     };
   }
 
-  @Test
+  @Test(expected = FileNotFoundException.class)
   public void testFromDockerConfig_MissingConfigFile() throws Exception {
     final Path randomPath = Paths.get(RandomStringUtils.randomAlphanumeric(16) + ".json");
-    expectedException.expect(FileNotFoundException.class);
     reader.anyRegistryAuth(randomPath);
   }
 

@@ -23,7 +23,7 @@ package org.mandas.docker.client.messages.swarm;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.mandas.docker.client.ObjectMapperProvider;

@@ -21,23 +21,20 @@
 
 package org.mandas.docker.client.messages;
 
-import static org.mandas.docker.FixtureUtil.fixture;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mandas.docker.FixtureUtil.fixture;
+
+import java.util.Date;
+
+import org.junit.Test;
+import org.mandas.docker.client.ObjectMapperProvider;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.mandas.docker.client.ObjectMapperProvider;
-import java.util.Date;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class ContainerStateTest {
-
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
 
   private ObjectMapper objectMapper = ObjectMapperProvider.objectMapper();
 
@@ -74,16 +71,14 @@ public class ContainerStateTest {
                            ContainerState.class);
   }
 
-  @Test
+  @Test(expected = JsonMappingException.class)
   public void testLoadInvalidConatainerStateJson() throws Exception {
-    expectedException.expect(JsonMappingException.class);
     objectMapper.readValue(fixture("fixtures/container-state-invalid.json"), ContainerState.class);
 
   }
 
-  @Test
+  @Test(expected = JsonParseException.class)
   public void testLoadInvalidJson() throws Exception {
-    expectedException.expect(JsonParseException.class);
     objectMapper.readValue(fixture("fixtures/invalid.json"), ContainerState.class);
   }
 }

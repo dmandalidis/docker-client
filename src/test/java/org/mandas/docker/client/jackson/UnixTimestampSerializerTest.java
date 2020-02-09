@@ -22,7 +22,7 @@
 package org.mandas.docker.client.jackson;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
