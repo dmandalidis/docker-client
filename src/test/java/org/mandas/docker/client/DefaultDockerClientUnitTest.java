@@ -29,6 +29,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.unmodifiableList;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -42,7 +43,6 @@ import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
 import static org.mandas.docker.FixtureUtil.fixture;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -66,9 +66,7 @@ import java.util.concurrent.TimeUnit;
 import org.glassfish.jersey.client.RequestEntityProcessing;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mandas.docker.client.DockerClient.Signal;
 import org.mandas.docker.client.auth.RegistryAuthSupplier;
 import org.mandas.docker.client.exceptions.ConflictException;
@@ -144,9 +142,6 @@ public class DefaultDockerClientUnitTest {
   private final MockWebServer server = new MockWebServer();
 
   private DefaultDockerClient.Builder builder;
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   @Before
   public void setup() throws Exception {

@@ -26,7 +26,8 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.unmodifiableList;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.hamcrest.CoreMatchers.isA;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThrows;
 
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -36,12 +37,12 @@ import java.util.concurrent.Callable;
 
 import javax.ws.rs.NotAuthorizedException;
 
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.TestName;
 import org.mandas.docker.Polling;
 import org.mandas.docker.client.DefaultDockerClient;
@@ -107,9 +108,6 @@ public class PushPullIT {
   @Rule
   public final TestName testName = new TestName();
 
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
-
   @BeforeClass
   public static void before() throws Exception {
     // Pull the registry image down once before any test methods in this class run
@@ -152,8 +150,7 @@ public class PushPullIT {
     final String dockerDirectory = Resources.getResource("dockerDirectory").getPath();
     client.build(Paths.get(dockerDirectory), LOCAL_IMAGE);
 
-    exception.expect(ImagePushFailedException.class);
-    client.push(LOCAL_IMAGE);
+    assertThrows(ImagePushFailedException.class, () -> client.push(LOCAL_IMAGE));
   }
 
   @Test
@@ -276,9 +273,9 @@ public class PushPullIT {
         .username(HUB_AUTH_USERNAME2)
         .password("foobar")
         .build();
-    exception.expect(DockerException.class);
-    exception.expectCause(isA(NotAuthorizedException.class));
-    client.pull(CIRROS_PRIVATE_LATEST, badRegistryAuth);
+
+    DockerException exception = assertThrows(DockerException.class, () -> client.pull(CIRROS_PRIVATE_LATEST, badRegistryAuth));
+    assertThat(exception.getCause().getClass(), Matchers.equalTo(NotAuthorizedException.class));
   }
 
   @Test

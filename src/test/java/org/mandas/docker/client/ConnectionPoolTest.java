@@ -23,8 +23,6 @@ package org.mandas.docker.client;
 
 import static java.lang.Long.toHexString;
 
-import org.mandas.docker.client.exceptions.DockerCertificateException;
-import org.mandas.docker.client.exceptions.DockerException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -33,12 +31,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.TestName;
+import org.mandas.docker.client.exceptions.DockerCertificateException;
+import org.mandas.docker.client.exceptions.DockerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,9 +54,6 @@ public class ConnectionPoolTest {
   private static final String BUSYBOX_BUILDROOT_2013_08_1 = BUSYBOX + ":buildroot-2013.08.1";
 
   private static final Logger log = LoggerFactory.getLogger(ConnectionPoolTest.class);
-
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
 
   @Rule
   public final TestName testName = new TestName();

@@ -24,7 +24,7 @@ package org.mandas.docker.client.messages;
 import static org.mandas.docker.FixtureUtil.fixture;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.mandas.docker.client.ObjectMapperProvider;

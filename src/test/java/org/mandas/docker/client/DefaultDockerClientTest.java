@@ -35,6 +35,7 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.containsIgnoreCase;
 import static org.awaitility.Awaitility.await;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.anyOf;
@@ -67,7 +68,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeFalse;
@@ -156,13 +157,13 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.hamcrest.CustomTypeSafeMatcher;
 import org.hamcrest.Matcher;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.TestName;
 import org.mandas.docker.client.DockerClient.AttachParameter;
 import org.mandas.docker.client.DockerClient.BuildParam;
@@ -305,9 +306,6 @@ public class DefaultDockerClientTest {
   private static final String AUTH_PASSWORD = System.getenv("HUB_DXIA2_PASSWORD");
 
   private static final Logger log = LoggerFactory.getLogger(DefaultDockerClientTest.class);
-
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
 
   @Rule
   public final TestName testName = new TestName();
@@ -1313,8 +1311,7 @@ public class DefaultDockerClientTest {
       sut.removeContainer(id);
     } catch (DockerRequestException e) {
       // Verify that the container is gone
-      exception.expect(ContainerNotFoundException.class);
-      sut.inspectContainer(id);
+      assertThrows(ContainerNotFoundException.class, () -> sut.inspectContainer(id));
     }
   }
 
@@ -3078,16 +3075,16 @@ public class DefaultDockerClientTest {
 
     // Bad names
     final String oneCharacter = "a";
-    exception.expect(invalidContainerNameException(oneCharacter));
-    sut.createContainer(config, oneCharacter);
-
+    IllegalArgumentException exception1 = assertThrows(IllegalArgumentException.class, () -> sut.createContainer(config, oneCharacter));
+    assertThat(exception1, invalidContainerNameException(oneCharacter));
+    
     final String invalidCharacter = "abc~";
-    exception.expect(invalidContainerNameException(invalidCharacter));
-    sut.createContainer(config, invalidCharacter);
+    IllegalArgumentException exception2 = assertThrows(IllegalArgumentException.class, () -> sut.createContainer(config, invalidCharacter));
+    assertThat(exception2, invalidContainerNameException(invalidCharacter));
 
     final String invalidFirstCharacter = ".a";
-    exception.expect(invalidContainerNameException(invalidFirstCharacter));
-    sut.createContainer(config, invalidFirstCharacter);
+    IllegalArgumentException exception3 = assertThrows(IllegalArgumentException.class, () -> sut.createContainer(config, invalidFirstCharacter));
+    assertThat(exception3, invalidContainerNameException(invalidFirstCharacter));
   }
 
   private static Matcher<IllegalArgumentException>
@@ -3157,14 +3154,14 @@ public class DefaultDockerClientTest {
         .build();
     final ContainerCreation container = sut.createContainer(containerConfig, randomName());
 
-    exception.expect(IllegalStateException.class);
-    exception.expectMessage(containsString("is not running"));
-    sut.execCreate(container.id(), new String[] {"ls", "-la"});
+    IllegalStateException exception1 = assertThrows(IllegalStateException.class, () -> sut.execCreate(container.id(), new String[] {"ls", "-la"}));
+    assertThat(exception1.getMessage(), Matchers.containsString("is not running"));
 
     sut.startContainer(container.id());
     await().until(containerIsRunning(sut, container.id()), is(false));
 
-    sut.execCreate(container.id(), new String[] {"ls", "-la"});
+    IllegalStateException exception2 = assertThrows(IllegalStateException.class, () -> sut.execCreate(container.id(), new String[] {"ls", "-la"}));
+    assertThat(exception2.getMessage(), Matchers.containsString("is not running"));
   }
 
   @Test
@@ -3491,7 +3488,7 @@ public class DefaultDockerClientTest {
     assertThat(stats.networks(), notNullValue());
   }
 
-  @Test
+  @Test(expected = NetworkNotFoundException.class)
   public void testNetworks() throws Exception {
     final String networkName = randomName();
     final IpamConfig ipamConfig =
@@ -3533,9 +3530,7 @@ public class DefaultDockerClientTest {
 
     sut.removeNetwork(network.id());
 
-    exception.expect(NetworkNotFoundException.class);
     sut.inspectNetwork(network.id());
-
   }
   
   @Test
@@ -3984,9 +3979,8 @@ public class DefaultDockerClientTest {
 
     final String badVolumeName = "this-is-a-very-unlikely-volume-name";
 
-    exception.expect(VolumeNotFoundException.class);
-    exception.expect(volumeNotFoundExceptionWithName(badVolumeName));
-    sut.inspectVolume(badVolumeName);
+    VolumeNotFoundException exception = assertThrows(VolumeNotFoundException.class, () -> sut.inspectVolume(badVolumeName));
+    MatcherAssert.assertThat(exception, volumeNotFoundExceptionWithName(badVolumeName));
   }
 
   private static Matcher<VolumeNotFoundException> volumeNotFoundExceptionWithName(
@@ -4054,9 +4048,8 @@ public class DefaultDockerClientTest {
     sut.removeVolume(volume1);
 
     // Remove non-existent volume
-    exception.expect(VolumeNotFoundException.class);
-    exception.expect(volumeNotFoundExceptionWithName(volume1.name()));
-    sut.removeVolume(volume1);
+    VolumeNotFoundException exception = assertThrows(VolumeNotFoundException.class, () -> sut.removeVolume(volume1));
+    assertThat(exception, volumeNotFoundExceptionWithName(volume1.name()));
 
     // Create a volume, assign it to a container, and try to remove it.
     // Should get a ConflictException.
@@ -4070,8 +4063,7 @@ public class DefaultDockerClientTest {
         .build();
     final ContainerCreation container = sut.createContainer(config, randomName());
 
-    exception.expect(ConflictException.class);
-    sut.removeVolume(volume2);
+    assertThrows(ConflictException.class, () -> sut.removeVolume(volume2));
 
     // Clean up
     sut.removeContainer(container.id());
@@ -4279,7 +4271,7 @@ public class DefaultDockerClientTest {
     assertThat(info.hostConfig().storageOpt().get("size"), is("20G"));
   }
 
-  @Test
+  @Test(expected = ContainerNotFoundException.class)
   public void testAutoRemoveWhenSetToTrue() throws Exception {
     // Container should be removed after it is stopped (new since API v.1.25)
     // Pull image
@@ -4301,7 +4293,6 @@ public class DefaultDockerClientTest {
     await().until(containerIsRunning(sut, container.id()), is(false));
 
     // A ContainerNotFoundException should be thrown since the container is removed when it stops
-    exception.expect(ContainerNotFoundException.class);
     sut.inspectContainer(container.id());
   }
   

@@ -21,22 +21,17 @@
 
 package org.mandas.docker.client.messages;
 
-import static org.mandas.docker.FixtureUtil.fixture;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mandas.docker.FixtureUtil.fixture;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Test;
 import org.mandas.docker.client.ObjectMapperProvider;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ContainerConfigTest {
-
-  @Rule
-  public ExpectedException expectedException = ExpectedException.none();
 
   private ObjectMapper objectMapper = ObjectMapperProvider.objectMapper();
 

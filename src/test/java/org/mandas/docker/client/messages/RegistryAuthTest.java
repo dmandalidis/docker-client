@@ -24,7 +24,7 @@ package org.mandas.docker.client.messages;
 import static org.mandas.docker.FixtureUtil.fixture;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Base64;
 

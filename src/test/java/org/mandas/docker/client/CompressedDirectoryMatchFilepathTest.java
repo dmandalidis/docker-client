@@ -21,12 +21,10 @@
 
 package org.mandas.docker.client;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.describedAs;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-
-import com.google.common.jimfs.Configuration;
-import com.google.common.jimfs.Jimfs;
+import static org.junit.Assert.assertThrows;
 
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
@@ -35,13 +33,14 @@ import java.util.Arrays;
 import java.util.regex.PatternSyntaxException;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+
+import com.google.common.jimfs.Configuration;
+import com.google.common.jimfs.Jimfs;
 
 @RunWith(Parameterized.class)
 public class CompressedDirectoryMatchFilepathTest {
@@ -109,9 +108,6 @@ public class CompressedDirectoryMatchFilepathTest {
         });
   }
 
-  @Rule
-  public final ExpectedException expectedException = ExpectedException.none();
-
   @Parameter(0)
   public String pattern;
 
@@ -133,21 +129,21 @@ public class CompressedDirectoryMatchFilepathTest {
 
   @Test
   public void testMatchFilepath() {
-    if (exception != null) {
-      expectedException.expect(exception);
-    }
-
     final Path path = fs.getPath(pathString);
-    final boolean result = CompressedDirectory.goPathMatcher(fs, pattern).matches(path);
-
-    final String description;
-    if (matched) {
-      description = MessageFormat.format("the pattern {0} to match {1}", pattern, pathString);
+    if (exception != null) {
+    	assertThrows(exception, () -> CompressedDirectory.goPathMatcher(fs, pattern).matches(path)); 
     } else {
-      description = MessageFormat.format("the pattern {0} not to match {1}", pattern, pathString);
+	    final boolean result = CompressedDirectory.goPathMatcher(fs, pattern).matches(path);
+	
+	    final String description;
+	    if (matched) {
+	      description = MessageFormat.format("the pattern {0} to match {1}", pattern, pathString);
+	    } else {
+	      description = MessageFormat.format("the pattern {0} not to match {1}", pattern, pathString);
+	    }
+	
+	    assertThat(result, describedAs(description, is(matched)));
     }
-
-    assertThat(result, describedAs(description, is(matched)));
   }
 
 }
