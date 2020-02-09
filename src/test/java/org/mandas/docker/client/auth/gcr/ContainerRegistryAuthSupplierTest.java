@@ -21,24 +21,20 @@
 
 package org.mandas.docker.client.auth.gcr;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import com.google.auth.oauth2.AccessToken;
-import com.google.auth.oauth2.GoogleCredentials;
-import org.mandas.docker.client.exceptions.DockerException;
-import org.mandas.docker.client.messages.RegistryAuth;
-import org.mandas.docker.client.messages.RegistryConfigs;
 
 import java.io.IOException;
 import java.time.Clock;
@@ -47,14 +43,15 @@ import java.util.concurrent.TimeUnit;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 import org.joda.time.DateTime;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.mandas.docker.client.exceptions.DockerException;
+import org.mandas.docker.client.messages.RegistryAuth;
+import org.mandas.docker.client.messages.RegistryConfigs;
+
+import com.google.auth.oauth2.AccessToken;
+import com.google.auth.oauth2.GoogleCredentials;
 
 public class ContainerRegistryAuthSupplierTest {
-
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
 
   private final DateTime expiration = new DateTime(2017, 5, 23, 16, 25);
   private final String tokenValue = "abc123.foobar";
@@ -152,10 +149,8 @@ public class ContainerRegistryAuthSupplierTest {
     doThrow(ex).when(refresher).refresh(credentials);
 
     // the exception should propagate up
-    exception.expect(DockerException.class);
-    exception.expectCause(is(ex));
-
-    supplier.authFor("gcr.io/example/foobar:1.2.3");
+    DockerException exception = assertThrows(DockerException.class, () -> supplier.authFor("gcr.io/example/foobar:1.2.3"));
+    assertThat(exception.getCause(), equalTo(ex));
   }
 
   @Test

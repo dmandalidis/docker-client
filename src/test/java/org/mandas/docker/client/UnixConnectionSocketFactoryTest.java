@@ -31,20 +31,18 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URI;
 import java.nio.channels.SocketChannel;
+
 import javax.net.ssl.SSLSocket;
-import jnr.unixsocket.UnixSocket;
+
 import org.apache.http.HttpHost;
 import org.apache.http.protocol.HttpContext;
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+
+import jnr.unixsocket.UnixSocket;
 
 public class UnixConnectionSocketFactoryTest {
-
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
 
   private UnixConnectionSocketFactory sut;
 
