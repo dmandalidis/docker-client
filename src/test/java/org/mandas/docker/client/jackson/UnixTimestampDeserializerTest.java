@@ -21,23 +21,24 @@
 
 package org.mandas.docker.client.jackson;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+
+import org.junit.Test;
+import org.mandas.docker.client.ObjectMapperProvider;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import org.mandas.docker.client.ObjectMapperProvider;
-import java.util.Date;
-
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.junit.Test;
-
 public class UnixTimestampDeserializerTest {
 
-  private final DateTime referenceDateTime = new DateTime(2013, 7, 17, 9, 32, 4, DateTimeZone.UTC);
+  private final Instant referenceDateTime = LocalDateTime.of(2013, 7, 17, 9, 32, 4).atZone(ZoneId.of("UTC")).toInstant();
   private static final ObjectMapper OBJECT_MAPPER = ObjectMapperProvider.objectMapper();
 
   private static class TestClass {
@@ -53,7 +54,7 @@ public class UnixTimestampDeserializerTest {
   }
 
   private String toJson(String format) {
-    return String.format(format, referenceDateTime.getMillis() / 1000);
+    return String.format(format, referenceDateTime.toEpochMilli() / 1000);
   }
 
   @Test
@@ -61,7 +62,7 @@ public class UnixTimestampDeserializerTest {
     final String json = toJson("{\"date\": \"%s\"}");
 
     final TestClass value = OBJECT_MAPPER.readValue(json, TestClass.class);
-    assertThat(value.getDate(), equalTo(referenceDateTime.toDate()));
+    assertThat(value.getDate(), equalTo(Date.from(referenceDateTime)));
   }
 
   @Test
@@ -69,7 +70,7 @@ public class UnixTimestampDeserializerTest {
     final String json = toJson("{\"date\": %s}");
 
     final TestClass value = OBJECT_MAPPER.readValue(json, TestClass.class);
-    assertThat(value.getDate(), equalTo(referenceDateTime.toDate()));
+    assertThat(value.getDate(), equalTo(Date.from(referenceDateTime)));
   }
 
 }
