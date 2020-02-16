@@ -46,10 +46,37 @@
   <properties>
     <maven.compiler.release>8</maven.compiler.release>
 
+    <version.slf4j>1.7.30</version.slf4j>
   	<version.jackson>2.10.2</version.jackson>
     <version.jersey>2.30</version.jersey>
     <version.immutables>2.8.3</version.immutables>
+    <version.apache.compress>1.19</version.apache.compress>
+    <version.unixsocket>0.26</version.unixsocket>
+    <version.apache.lang>2.6</version.apache.lang>
+    <version.bcpkix>1.64</version.bcpkix>
+
+    <version.google.oauth2>0.20.0</version.google.oauth2>
+
+    <version.junit>4.13</version.junit>
+    <version.mockito>3.2.4</version.mockito>
+    <version.logback>1.2.3</version.logback>
+    <version.jimfs>1.1</version.jimfs>
+    <version.awaitility>4.0.2</version.awaitility>
+    <version.mockwebserver>4.3.1</version.mockwebserver>
+    <version.spotify.hamcrest>1.1.5</version.spotify.hamcrest>
+
     <version.plugin.spotbugs>3.1.12.2</version.plugin.spotbugs>
+    <version.plugin.compiler>3.8.1</version.plugin.compiler>
+    <version.plugin.checkstyle>3.1.0</version.plugin.checkstyle>
+    <version.plugin.enforcer>3.0.0-M3</version.plugin.enforcer>
+    <version.plugin.projectinfo>3.0.0</version.plugin.projectinfo>
+    <version.plugin.source>3.2.1</version.plugin.source>
+    <version.plugin.shade>3.2.1</version.plugin.shade>
+    <version.plugin.failsafe>3.0.0-M4</version.plugin.failsafe>
+    <version.plugin.javadoc>3.1.1</version.plugin.javadoc>
+    <version.plugin.jacoco>0.8.5</version.plugin.jacoco>
+    <version.plugin.staging>1.6.8</version.plugin.staging>
+    <version.plugin.gpg>1.6</version.plugin.gpg>
   </properties>
   
   <dependencyManagement>
@@ -68,7 +95,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.7.30</version>
+      <version>${version.slf4j}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.jaxrs</groupId>
@@ -112,22 +139,22 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-compress</artifactId>
-      <version>1.19</version>
+      <version>${version.apache.compress}</version>
     </dependency>
     <dependency>
       <groupId>com.github.jnr</groupId>
       <artifactId>jnr-unixsocket</artifactId>
-      <version>0.26</version>
+      <version>${version.unixsocket}</version>
     </dependency>
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
-      <version>2.6</version>
+      <version>${version.apache.lang}</version>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcpkix-jdk15on</artifactId>
-      <version>1.64</version>
+      <version>${version.bcpkix}</version>
     </dependency>
     <dependency>
       <groupId>org.immutables</groupId>
@@ -139,7 +166,7 @@
     <dependency>
       <groupId>com.google.auth</groupId>
       <artifactId>google-auth-library-oauth2-http</artifactId>
-      <version>0.20.0</version>
+      <version>${version.google.oauth2}</version>
       <optional>true</optional>
     </dependency>
 
@@ -147,49 +174,49 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.13</version>
+      <version>${version.junit}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>3.2.4</version>
+      <version>${version.mockito}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.2.3</version>
+      <version>${version.logback}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.google.jimfs</groupId>
       <artifactId>jimfs</artifactId>
-      <version>1.1</version>
+      <version>${version.jimfs}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.awaitility</groupId>
       <artifactId>awaitility</artifactId>
-      <version>4.0.2</version>
+      <version>${version.awaitility}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.squareup.okhttp3</groupId>
       <artifactId>mockwebserver</artifactId>
-      <version>4.3.1</version>
+      <version>${version.mockwebserver}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.spotify</groupId>
       <artifactId>hamcrest-jackson</artifactId>
-      <version>1.1.5</version>
+      <version>${version.spotify.hamcrest}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.spotify</groupId>
       <artifactId>hamcrest-pojo</artifactId>
-      <version>1.1.5</version>
+      <version>${version.spotify.hamcrest}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -203,14 +230,14 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>${version.plugin.compiler}</version>
         <configuration>
           <release>${maven.compiler.release}</release>
         </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>${version.plugin.checkstyle}</version>
         <configuration>
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
           <violationSeverity>warning</violationSeverity>
@@ -219,12 +246,12 @@
       </plugin>
       <plugin>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.0.0-M3</version>
+        <version>${version.plugin.enforcer}</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>${version.plugin.projectinfo}</version>
       </plugin>
       <plugin>
         <groupId>com.github.spotbugs</groupId>
@@ -247,7 +274,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>3.2.1</version>
+        <version>${version.plugin.source}</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -260,7 +287,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.2.1</version>
+        <version>${version.plugin.shade}</version>
         <configuration>
           <createSourcesJar>true</createSourcesJar>
           <artifactSet>
@@ -361,12 +388,12 @@
       </plugin>
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>3.0.0-M4</version>
+        <version>${version.plugin.failsafe}</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.1.1</version>
+        <version>${version.plugin.javadoc}</version>
         <executions>
           <execution>
             <id>attach-javadocs</id>
@@ -386,7 +413,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.5</version>
+        <version>${version.plugin.jacoco}</version>
         <configuration>
         	<excludes>
             <exclude>org/mandas/**/Immutable*</exclude>
@@ -422,7 +449,7 @@
 					<plugin>
 						<groupId>org.sonatype.plugins</groupId>
 						<artifactId>nexus-staging-maven-plugin</artifactId>
-						<version>1.6.8</version>
+						<version>${version.plugin.staging}</version>
 						<extensions>true</extensions>
 						<configuration>
 							<serverId>ossrh</serverId>
@@ -433,7 +460,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.6</version>
+						<version>${version.plugin.gpg}</version>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>
