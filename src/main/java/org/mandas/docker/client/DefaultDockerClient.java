@@ -1582,8 +1582,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
     final WebTarget resource = resource().path("containers").path(containerId).path("exec");
 
     final StringWriter writer = new StringWriter();
-    try {
-      final JsonGenerator generator = objectMapper().getFactory().createGenerator(writer);
+    try (final JsonGenerator generator = objectMapper().getFactory().createGenerator(writer)) {
       generator.writeStartObject();
 
       for (final ExecCreateParam param : params) {
@@ -1601,7 +1600,6 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       generator.writeEndArray();
 
       generator.writeEndObject();
-      generator.close();
     } catch (IOException e) {
       throw new DockerException(e);
     }
@@ -1629,8 +1627,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
     		.path("exec").path(execId).path("start");
 
     final StringWriter writer = new StringWriter();
-    try {
-      final JsonGenerator generator = objectMapper().getFactory().createGenerator(writer);
+    try (final JsonGenerator generator = objectMapper().getFactory().createGenerator(writer)) {
       generator.writeStartObject();
 
       for (final ExecStartParameter param : params) {
@@ -1638,7 +1635,6 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       }
 
       generator.writeEndObject();
-      generator.close();
     } catch (IOException e) {
       throw new DockerException(e);
     }
