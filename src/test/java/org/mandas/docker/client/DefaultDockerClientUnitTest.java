@@ -39,7 +39,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -214,17 +214,17 @@ public class DefaultDockerClientUnitTest {
                 .uri("https://192.168.53.103:2375").build();
         assertThat((String) client.getClient().getConfiguration()
                         .getProperty("jersey.config.client.proxy.uri"),
-                isEmptyOrNullString());
+                emptyOrNullString());
         final DefaultDockerClient client1 = DefaultDockerClient.builder()
                 .uri("https://127.0.0.1:2375").build();
         assertThat((String) client1.getClient().getConfiguration()
                         .getProperty("jersey.config.client.proxy.uri"),
-                isEmptyOrNullString());
+                emptyOrNullString());
         final DefaultDockerClient client2 = DefaultDockerClient.builder()
                 .uri("https://localhost:2375").build();
         assertThat((String) client2.getClient().getConfiguration()
                         .getProperty("jersey.config.client.proxy.uri"),
-                isEmptyOrNullString());
+                emptyOrNullString());
       }
     } finally {
       System.clearProperty("http.proxyHost");
