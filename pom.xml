@@ -51,7 +51,7 @@
     <version.jersey>2.30</version.jersey>
     <version.immutables>2.8.3</version.immutables>
     <version.apache.compress>1.19</version.apache.compress>
-    <version.unixsocket>0.26</version.unixsocket>
+    <version.unixsocket>0.27</version.unixsocket>
     <version.apache.lang>2.6</version.apache.lang>
     <version.bcpkix>1.64</version.bcpkix>
 
