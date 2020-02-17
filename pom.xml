@@ -62,7 +62,7 @@
     <version.logback>1.2.3</version.logback>
     <version.jimfs>1.1</version.jimfs>
     <version.awaitility>4.0.2</version.awaitility>
-    <version.mockwebserver>4.3.1</version.mockwebserver>
+    <version.mockwebserver>4.4.0</version.mockwebserver>
     <version.spotify.hamcrest>1.1.5</version.spotify.hamcrest>
 
     <version.plugin.spotbugs>3.1.12.2</version.plugin.spotbugs>
