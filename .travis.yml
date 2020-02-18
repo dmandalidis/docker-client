@@ -32,10 +32,10 @@ before_install:
 - docker info
 script:
 - if [ $TRAVIS_PULL_REQUEST == "false" -a x$UPLOAD_SONATYPE == x1 ]; then mvn --settings
-  sonatype-settings.xml -Pdeploy-artifacts clean deploy -Dsurefire.rerunFailingTestsCount=1;
+  custom-settings.xml -Pdeploy-artifacts clean deploy -Dsurefire.rerunFailingTestsCount=1;
   fi
-- if [ $TRAVIS_PULL_REQUEST != "false" -o x$UPLOAD_SONATYPE != x1 ]; then mvn clean
-  test -Dsurefire.rerunFailingTestsCount=1; fi
+- if [ $TRAVIS_PULL_REQUEST != "false" -o x$UPLOAD_SONATYPE != x1 ]; then mvn --settings
+  custom-settings.xml clean test -Dsurefire.rerunFailingTestsCount=1; fi
 after_success:
 - bash <(curl -s https://codecov.io/bash)
 after_failure:
