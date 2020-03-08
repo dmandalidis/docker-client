@@ -1276,7 +1276,7 @@ public class DefaultDockerClientUnitTest {
                 .where("limits",
                     is(pojo(org.mandas.docker.client.messages.swarm.Resources.class)))
                 .where("reservations",
-                    is(pojo(org.mandas.docker.client.messages.swarm.Resources.class)))
+                    is(pojo(org.mandas.docker.client.messages.swarm.Reservations.class)))
             ))
         ))
     ));
