@@ -28,16 +28,16 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 
-import jnr.unixsocket.UnixSocket;
-import jnr.unixsocket.UnixSocketAddress;
-import jnr.unixsocket.UnixSocketChannel;
-
 import org.apache.http.HttpHost;
 import org.apache.http.annotation.Contract;
 import org.apache.http.annotation.ThreadingBehavior;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.protocol.HttpContext;
+
+import jnr.unixsocket.UnixSocket;
+import jnr.unixsocket.UnixSocketAddress;
+import jnr.unixsocket.UnixSocketChannel;
 
 /**
  * Provides a ConnectionSocketFactory for connecting Apache HTTP clients to Unix sockets.

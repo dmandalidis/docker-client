@@ -34,12 +34,12 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -141,13 +141,13 @@ public class DefaultDockerClientUnitTest {
 
   private final MockWebServer server = new MockWebServer();
 
-  private DefaultDockerClient.Builder builder;
+  private DockerClientBuilder builder;
 
   @Before
   public void setup() throws Exception {
     server.start();
 
-    builder = DefaultDockerClient.builder();
+    builder = DockerClientBuilder.builder();
     builder.uri(server.url("/").uri());
   }
 
@@ -158,28 +158,28 @@ public class DefaultDockerClientUnitTest {
 
   @Test
   public void testHostForUnixSocket() {
-    final DefaultDockerClient client = DefaultDockerClient.builder()
+    final DefaultDockerClient client = DockerClientBuilder.builder()
         .uri("unix:///var/run/docker.sock").build();
     assertThat(client.getHost(), equalTo("localhost"));
   }
 
   @Test
   public void testHostForLocalHttps() {
-    final DefaultDockerClient client = DefaultDockerClient.builder()
+    final DefaultDockerClient client = DockerClientBuilder.builder()
         .uri("https://localhost:2375").build();
     assertThat(client.getHost(), equalTo("localhost"));
   }
 
   @Test
   public void testHostForFqdnHttps() {
-    final DefaultDockerClient client = DefaultDockerClient.builder()
+    final DefaultDockerClient client = DockerClientBuilder.builder()
         .uri("https://perdu.com:2375").build();
     assertThat(client.getHost(), equalTo("perdu.com"));
   }
 
   @Test
   public void testHostForIpHttps() {
-    final DefaultDockerClient client = DefaultDockerClient.builder()
+    final DefaultDockerClient client = DockerClientBuilder.builder()
         .uri("https://192.168.53.103:2375").build();
     assertThat(client.getHost(), equalTo("192.168.53.103"));
   }
@@ -189,7 +189,7 @@ public class DefaultDockerClientUnitTest {
     try {
       System.setProperty("http.proxyHost", "gmodules.com");
       System.setProperty("http.proxyPort", "80");
-      final DefaultDockerClient client = DefaultDockerClient.builder()
+      final DefaultDockerClient client = DockerClientBuilder.builder()
               .uri("https://192.168.53.103:2375").build();
       assertThat(client.getClient().getConfiguration()
                       .getProperty("jersey.config.client.proxy.uri"),
@@ -210,17 +210,17 @@ public class DefaultDockerClientUnitTest {
               nonProxyHostsPropertyValue, "\"" + nonProxyHostsPropertyValue + "\"");
       for (String value : nonProxyHostsPropertyValues) {
         System.setProperty("http.nonProxyHosts", value);
-        final DefaultDockerClient client = DefaultDockerClient.builder()
+        final DefaultDockerClient client = DockerClientBuilder.builder()
                 .uri("https://192.168.53.103:2375").build();
         assertThat((String) client.getClient().getConfiguration()
                         .getProperty("jersey.config.client.proxy.uri"),
                 emptyOrNullString());
-        final DefaultDockerClient client1 = DefaultDockerClient.builder()
+        final DefaultDockerClient client1 = DockerClientBuilder.builder()
                 .uri("https://127.0.0.1:2375").build();
         assertThat((String) client1.getClient().getConfiguration()
                         .getProperty("jersey.config.client.proxy.uri"),
                 emptyOrNullString());
-        final DefaultDockerClient client2 = DefaultDockerClient.builder()
+        final DefaultDockerClient client2 = DockerClientBuilder.builder()
                 .uri("https://localhost:2375").build();
         assertThat((String) client2.getClient().getConfiguration()
                         .getProperty("jersey.config.client.proxy.uri"),
@@ -245,7 +245,7 @@ public class DefaultDockerClientUnitTest {
 
     server.enqueue(new MockResponse());
 
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
     dockerClient.info();
 
     final RecordedRequest recordedRequest = takeRequestImmediately();
@@ -281,7 +281,7 @@ public class DefaultDockerClientUnitTest {
   
   @Test
   public void testGroupAdd() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     final HostConfig hostConfig = HostConfig.builder()
         .groupAdd("63", "65")
@@ -306,7 +306,7 @@ public class DefaultDockerClientUnitTest {
   @Test
   @SuppressWarnings("unchecked")
   public void testCapAddAndDrop() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     final HostConfig hostConfig = HostConfig.builder()
         .capAdd(unmodifiableList(asList("foo", "bar")))
@@ -405,7 +405,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test
   public void testNanoCpus() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     final HostConfig hostConfig = HostConfig.builder()
         .nanoCpus(2_000_000_000L)
@@ -429,7 +429,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test
   public void testInspectNode() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     // build() calls /version to check what format of header to send
     enqueueServerApiVersion("1.28");
@@ -449,7 +449,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test
   public void testInspectNonLeaderNode() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.27");
 
@@ -474,7 +474,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test
   public void testInspectNodeNonManager() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.27");
 
@@ -496,7 +496,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test(expected = NodeNotFoundException.class)
   public void testInspectMissingNode() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     // build() calls /version to check what format of header to send
     enqueueServerApiVersion("1.28");
@@ -507,7 +507,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test(expected = NonSwarmNodeException.class)
   public void testInspectNonSwarmNode() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     // build() calls /version to check what format of header to send
     enqueueServerApiVersion("1.28");
@@ -518,7 +518,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test
   public void testUpdateNode() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.28");
     enqueueServerApiResponse(200, "fixtures/1.28/listNodes.json");
@@ -548,7 +548,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test(expected = DockerException.class)
   public void testUpdateNodeWithInvalidVersion() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.28");
 
@@ -569,7 +569,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test(expected = NodeNotFoundException.class)
   public void testUpdateMissingNode() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.28");
     enqueueServerApiError(404, "Error updating node: '24ifsmvkjbyhk'");
@@ -586,7 +586,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test(expected = NonSwarmNodeException.class)
   public void testUpdateNonSwarmNode() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.28");
     enqueueServerApiError(503, "Error updating node: '24ifsmvkjbyhk'");
@@ -603,7 +603,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test
   public void testJoinSwarm() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.24");
     enqueueServerApiEmptyResponse(200);
@@ -626,7 +626,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test
   public void testDeleteNode() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.24");
     enqueueServerApiEmptyResponse(200);
@@ -636,7 +636,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test(expected = NodeNotFoundException.class)
   public void testDeleteNode_NodeNotFound() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.24");
     enqueueServerApiEmptyResponse(404);
@@ -646,7 +646,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test(expected = NonSwarmNodeException.class)
   public void testDeleteNode_NodeNotPartOfSwarm() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.24");
     enqueueServerApiEmptyResponse(503);
@@ -656,7 +656,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test
   public void testCreateServiceWithWarnings() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     // build() calls /version to check what format of header to send
     enqueueServerApiVersion("1.25");
@@ -682,7 +682,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test
   public void testServiceLogs() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.25");
 
@@ -708,7 +708,7 @@ public class DefaultDockerClientUnitTest {
   @Test
   public void testCreateServiceWithPlacementPreference()
       throws IOException, DockerException, InterruptedException {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     final List<Preference> prefs = Collections.singletonList(
         Preference.create(
@@ -746,7 +746,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test
   public void testCreateServiceWithConfig() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     // build() calls /version to check what format of header to send
     enqueueServerApiVersion("1.30");
@@ -793,7 +793,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test
   public void testListConfigs() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.30");
 
@@ -820,7 +820,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test
   public void testCreateConfig() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.30");
 
@@ -845,7 +845,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test(expected = ConflictException.class)
   public void testCreateConfig_ConflictingName() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.30");
 
@@ -865,7 +865,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test(expected = NonSwarmNodeException.class)
   public void testCreateConfig_NonSwarmNode() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.30");
 
@@ -885,7 +885,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test
   public void testInspectConfig() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.30");
 
@@ -909,7 +909,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test(expected = NotFoundException.class)
   public void testInspectConfig_NotFound() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.30");
 
@@ -923,7 +923,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test(expected = NonSwarmNodeException.class)
   public void testInspectConfig_NonSwarmNode() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.30");
 
@@ -937,7 +937,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test
   public void testDeleteConfig() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.30");
 
@@ -951,7 +951,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test(expected = NotFoundException.class)
   public void testDeleteConfig_NotFound() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.30");
 
@@ -965,7 +965,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test(expected = NonSwarmNodeException.class)
   public void testDeleteConfig_NonSwarmNode() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.30");
 
@@ -979,7 +979,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test(expected = NotFoundException.class)
   public void testUpdateConfig_NotFound() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.30");
 
@@ -999,7 +999,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test(expected = NonSwarmNodeException.class)
   public void testUpdateConfig_NonSwarmNode() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.30");
 
@@ -1019,7 +1019,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test
   public void testListNodes() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.28");
 
@@ -1068,7 +1068,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test(expected = DockerException.class)
   public void testListNodesWithServerError() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.28");
 
@@ -1082,7 +1082,7 @@ public class DefaultDockerClientUnitTest {
   
   @Test
   public void testBindBuilderSelinuxLabeling() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     final Bind bindNoSelinuxLabel = HostConfig.Bind.builder()
         .from("noselinux")
@@ -1133,7 +1133,7 @@ public class DefaultDockerClientUnitTest {
   
   @Test
   public void testKillContainer() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     server.enqueue(new MockResponse());
 
@@ -1148,7 +1148,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test
   public void testInspectVolume() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     server.enqueue(new MockResponse()
         .setResponseCode(200)
@@ -1178,7 +1178,7 @@ public class DefaultDockerClientUnitTest {
   @Test
   public void testBufferedRequestEntityProcessing() throws Exception {
     builder.useRequestEntityProcessing(RequestEntityProcessing.BUFFERED);
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
     
     final HostConfig hostConfig = HostConfig.builder().build();
 
@@ -1199,7 +1199,7 @@ public class DefaultDockerClientUnitTest {
   @Test
   public void testChunkedRequestEntityProcessing() throws Exception {
     builder.useRequestEntityProcessing(RequestEntityProcessing.CHUNKED);
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
     
     final HostConfig hostConfig = HostConfig.builder().build();
 
@@ -1219,7 +1219,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test
   public void testGetDistribution() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     server.enqueue(new MockResponse()
         .setResponseCode(200)
@@ -1254,7 +1254,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test
   public void testInspectTask() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.24");
     enqueueServerApiResponse(200, "fixtures/1.24/task.json");
@@ -1285,7 +1285,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test
   public void testListTaskWithCriteria() throws Exception {
-    final DefaultDockerClient dockerClient = new DefaultDockerClient(builder);
+    final DefaultDockerClient dockerClient = builder.build();
 
     enqueueServerApiVersion("1.24");
     enqueueServerApiResponse(200, "fixtures/1.24/tasks.json");

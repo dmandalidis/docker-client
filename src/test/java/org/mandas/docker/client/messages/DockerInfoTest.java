@@ -21,17 +21,17 @@
 
 package org.mandas.docker.client.messages;
 
-import static org.mandas.docker.FixtureUtil.fixture;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mandas.docker.FixtureUtil.fixture;
 
+import org.junit.Test;
+import org.mandas.docker.client.ObjectMapperProvider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.mandas.docker.client.ObjectMapperProvider;
-import org.junit.Test;
 
 /**
  * Test cases around the deserialization of the docker info object.

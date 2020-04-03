@@ -75,7 +75,7 @@ public class ConnectionPoolTest {
               new Callable<Exception>() {
                 @Override
                 public Exception call() throws Exception {
-                  try (DockerClient docker = DefaultDockerClient.fromEnv().build()) {
+                  try (DockerClient docker = DockerClientBuilder.fromEnv().build()) {
                     docker.pull(ConnectionPoolTest.BUSYBOX_LATEST);
                     docker.pull(ConnectionPoolTest.BUSYBOX_BUILDROOT_2013_08_1);
                   } catch (InterruptedException | DockerException | DockerCertificateException e) {

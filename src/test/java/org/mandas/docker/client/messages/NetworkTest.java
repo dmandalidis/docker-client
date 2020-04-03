@@ -23,10 +23,10 @@ package org.mandas.docker.client.messages;
 
 import static org.mandas.docker.FixtureUtil.fixture;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Test;
 import org.mandas.docker.client.ObjectMapperProvider;
 
-import org.junit.Test;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class NetworkTest {
 

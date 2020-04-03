@@ -21,9 +21,10 @@
 
 package org.mandas.docker;
 
+import java.io.IOException;
+
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
-import java.io.IOException;
 
 public class FixtureUtil {
 

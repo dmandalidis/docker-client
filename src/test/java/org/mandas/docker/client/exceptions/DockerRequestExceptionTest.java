@@ -41,6 +41,7 @@ package org.mandas.docker.client.exceptions;
 import static org.junit.Assert.assertEquals;
 
 import java.net.URI;
+
 import org.junit.Test;
 
 public class DockerRequestExceptionTest {

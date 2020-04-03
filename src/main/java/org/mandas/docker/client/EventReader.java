@@ -21,29 +21,29 @@
 
 package org.mandas.docker.client;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.mandas.docker.client.messages.Event;
-
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
+import org.mandas.docker.client.messages.Event;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class EventReader implements Closeable {
 
   private final ObjectMapper objectMapper;
-  private final CloseableHttpResponse response;
   private JsonParser parser;
+  private final InputStream stream;
 
-  public EventReader(final CloseableHttpResponse response, final ObjectMapper objectMapper) {
-    this.response = response;
+  public EventReader(final InputStream stream, final ObjectMapper objectMapper) {
+    this.stream = stream;
     this.objectMapper = objectMapper;
   }
 
   public Event nextMessage() throws IOException {
     if (this.parser == null) {
-      this.parser = objectMapper.getFactory().createParser(response.getEntity().getContent());
+      this.parser = objectMapper.getFactory().createParser(stream);
     }
 
     // If the parser is closed, there's no new event
@@ -58,10 +58,9 @@ public class EventReader implements Closeable {
 
     return parser.readValueAs(Event.class);
   }
-
+  
   @Override
   public void close() throws IOException {
-    response.close();
+    stream.close();
   }
-
 }

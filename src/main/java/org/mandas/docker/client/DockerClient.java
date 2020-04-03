@@ -102,6 +102,8 @@ import org.mandas.docker.client.messages.swarm.UnlockKey;
 @SuppressWarnings("JavadocMethod")
 public interface DockerClient extends Closeable {
 
+  URI uri();
+  
   /**
    * Ping the docker daemon. Returns "OK" if all is well, though that it simply returns a 200 status
    * is probably sufficient information.

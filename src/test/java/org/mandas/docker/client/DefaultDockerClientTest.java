@@ -56,7 +56,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.in;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isIn;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.not;
@@ -74,7 +73,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
-import static org.mandas.docker.client.DefaultDockerClient.NO_TIMEOUT;
 import static org.mandas.docker.client.DockerClient.EventsParam.since;
 import static org.mandas.docker.client.DockerClient.EventsParam.type;
 import static org.mandas.docker.client.DockerClient.EventsParam.until;
@@ -98,6 +96,7 @@ import static org.mandas.docker.client.DockerClient.LogsParam.stdout;
 import static org.mandas.docker.client.DockerClient.LogsParam.tail;
 import static org.mandas.docker.client.DockerClient.LogsParam.timestamps;
 import static org.mandas.docker.client.DockerClient.RemoveContainerParam.forceKill;
+import static org.mandas.docker.client.DockerClientBuilder.NO_TIMEOUT;
 import static org.mandas.docker.client.VersionCompare.compareVersion;
 import static org.mandas.docker.client.messages.Event.Type.CONTAINER;
 import static org.mandas.docker.client.messages.Event.Type.IMAGE;
@@ -327,7 +326,7 @@ public class DefaultDockerClientTest {
 
   @Before
   public void setup() throws Exception {
-    final DefaultDockerClient.Builder builder = DefaultDockerClient.fromEnv();
+    final DockerClientBuilder builder = DockerClientBuilder.fromEnv();
     // Make it easier to test no read timeout occurs by using a smaller value
     // Such test methods should end in 'NoTimeout'
     if (testName.getMethodName().endsWith("NoTimeout")) {
@@ -336,9 +335,9 @@ public class DefaultDockerClientTest {
       builder.readTimeoutMillis(120000);
     }
 
-    dockerEndpoint = builder.uri();
-
     sut = builder.build();
+    
+    dockerEndpoint = sut.uri();
 
     dockerApiVersion = sut.version().apiVersion();
 
@@ -845,7 +844,7 @@ public class DefaultDockerClientTest {
         .username(AUTH_USERNAME)
         .password(AUTH_PASSWORD)
         .build();
-    final DockerClient sut2 = DefaultDockerClient.fromEnv()
+    final DockerClient sut2 = DockerClientBuilder.fromEnv()
         .registryAuthSupplier(new FixedRegistryAuthSupplier(
             registryAuth, RegistryConfigs.create(singletonMap("", registryAuth))))
         .build();
@@ -1369,7 +1368,7 @@ public class DefaultDockerClientTest {
   @Test(expected = DockerException.class)
   public void testConnectTimeout() throws Exception {
     // Attempt to connect to reserved IP -> should timeout
-    try (final DefaultDockerClient connectTimeoutClient = DefaultDockerClient.builder()
+    try (final DefaultDockerClient connectTimeoutClient = DockerClientBuilder.builder()
         .uri("http://240.0.0.1:2375")
         .connectTimeoutMillis(100)
         .readTimeoutMillis(NO_TIMEOUT)
@@ -1384,7 +1383,7 @@ public class DefaultDockerClientTest {
       // Bind and listen but do not accept -> read will time out.
       socket.bind(new InetSocketAddress("127.0.0.1", 0));
       awaitConnectable(socket.getInetAddress(), socket.getLocalPort());
-      final DockerClient connectTimeoutClient = DefaultDockerClient.builder()
+      final DockerClient connectTimeoutClient = DockerClientBuilder.builder()
           .uri("http://127.0.0.1:" + socket.getLocalPort())
           .connectTimeoutMillis(NO_TIMEOUT)
           .readTimeoutMillis(100)
@@ -1404,7 +1403,7 @@ public class DefaultDockerClientTest {
     // Spawn and wait on many more containers than the connection pool size.
     // This should cause a timeout once the connection pool is exhausted.
 
-    try (final DockerClient dockerClient = DefaultDockerClient.fromEnv()
+    try (final DockerClient dockerClient = DockerClientBuilder.fromEnv()
         .connectionPoolSize(connectionPoolSize)
         .build()) {
       // Create container
@@ -2322,8 +2321,7 @@ public class DefaultDockerClientTest {
 
     // Try to connect using SSL and our known cert/key
     final DockerCertificates certs = new DockerCertificates(dockerDirectory);
-    final DockerClient c = new DefaultDockerClient(URI.create(format("https://%s:%s", host, port)),
-                                                   certs);
+    final DockerClient c = DockerClientBuilder.newClient(URI.create(format("https://%s:%s", host, port)), certs);
 
     // We need to wait for the docker process inside the docker container to be ready to accept
     // connections on the port. Otherwise, this test will fail.
@@ -2828,57 +2826,6 @@ public class DefaultDockerClientTest {
         log.info(e.getMessage());
       }
     }
-    verifyNoTimeoutContainer(volumeContainer, result);
-  }
-
-  @Test
-  public void testAttachLogNoTimeout() throws Exception {
-    final String volumeContainer = createSleepingContainer();
-    final StringBuffer result = new StringBuffer();
-    try (final LogStream stream = sut.attachContainer(
-        volumeContainer, AttachParameter.STDOUT, AttachParameter.STDERR,
-        AttachParameter.STREAM, AttachParameter.STDIN)) {
-      try {
-        while (stream.hasNext()) {
-          final String r = UTF_8.decode(stream.next().content()).toString();
-          log.info(r);
-          result.append(r);
-        }
-      } catch (Exception e) {
-        log.info(e.getMessage());
-      }
-    }
-    verifyNoTimeoutContainer(volumeContainer, result);
-  }
-
-  @Test
-  public void testExecNoTimeout() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
-    final String volumeContainer = randomName();
-    final ContainerConfig volumeConfig = ContainerConfig.builder().image(BUSYBOX_LATEST)
-        .cmd("sh", "-c", "sleep 15")
-        .build();
-    sut.createContainer(volumeConfig, volumeContainer);
-    sut.startContainer(volumeContainer);
-
-    final StringBuffer result = new StringBuffer();
-    final String [] cmd = new String [] { "sh", "-c",
-        "sleep 10 ;"
-        + "echo Finished ;" };
-    final ExecCreation execCreation = sut.execCreate(volumeContainer, cmd,
-        ExecCreateParam.attachStdout(),
-        ExecCreateParam.attachStderr());
-    final LogStream stream = sut.execStart(execCreation.id());
-    try {
-      while (stream.hasNext()) {
-        final String r = UTF_8.decode(stream.next().content()).toString();
-        log.info(r);
-        result.append(r);
-      }
-    } catch (Exception e) {
-      log.info(e.getMessage());
-    }
-
     verifyNoTimeoutContainer(volumeContainer, result);
   }
 

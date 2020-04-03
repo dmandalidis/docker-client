@@ -21,17 +21,17 @@
 
 package org.mandas.docker.client.messages;
 
-import static org.mandas.docker.FixtureUtil.fixture;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mandas.docker.FixtureUtil.fixture;
 
 import java.util.Base64;
 
 import org.junit.Test;
+import org.mandas.docker.client.ObjectMapperProvider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.mandas.docker.client.ObjectMapperProvider;
 
 public class RegistryAuthTest {
 

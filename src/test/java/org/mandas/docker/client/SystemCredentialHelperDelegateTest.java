@@ -21,19 +21,21 @@
 
 package org.mandas.docker.client;
 
-import static org.mandas.docker.client.SystemCredentialHelperDelegate.readServerAuthDetails;
 import static com.spotify.hamcrest.pojo.IsPojo.pojo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mandas.docker.client.SystemCredentialHelperDelegate.readServerAuthDetails;
+
+import java.io.BufferedReader;
+import java.io.StringReader;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.mandas.docker.client.messages.DockerCredentialHelperAuth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.mandas.docker.client.messages.DockerCredentialHelperAuth;
-import java.io.BufferedReader;
-import java.io.StringReader;
-import org.junit.Before;
-import org.junit.Test;
 
 public class SystemCredentialHelperDelegateTest {
 

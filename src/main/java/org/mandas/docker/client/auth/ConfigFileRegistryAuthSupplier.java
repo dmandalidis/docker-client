@@ -21,14 +21,15 @@
 
 package org.mandas.docker.client.auth;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+
 import org.mandas.docker.client.DockerConfigReader;
 import org.mandas.docker.client.ImageRef;
 import org.mandas.docker.client.exceptions.DockerException;
 import org.mandas.docker.client.messages.RegistryAuth;
 import org.mandas.docker.client.messages.RegistryConfigs;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

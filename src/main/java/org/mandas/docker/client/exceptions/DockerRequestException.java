@@ -22,6 +22,7 @@
 package org.mandas.docker.client.exceptions;
 
 import java.net.URI;
+
 import org.mandas.docker.Nullable;
 
 public class DockerRequestException extends DockerException {

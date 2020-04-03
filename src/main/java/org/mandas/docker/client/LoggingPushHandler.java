@@ -24,7 +24,6 @@ package org.mandas.docker.client;
 import org.mandas.docker.client.exceptions.DockerException;
 import org.mandas.docker.client.exceptions.ImagePushFailedException;
 import org.mandas.docker.client.messages.ProgressMessage;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

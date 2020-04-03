@@ -25,7 +25,6 @@ import org.mandas.docker.client.exceptions.DockerException;
 import org.mandas.docker.client.exceptions.ImageNotFoundException;
 import org.mandas.docker.client.exceptions.ImagePullFailedException;
 import org.mandas.docker.client.messages.ProgressMessage;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

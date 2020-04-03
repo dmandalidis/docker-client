@@ -23,10 +23,10 @@ package org.mandas.docker.client;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.mandas.docker.client.messages.Event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,15 +37,15 @@ public class EventStream implements Iterator<Event>, Closeable {
 
   private Event next;
   
-  EventStream(final CloseableHttpResponse response, final ObjectMapper objectMapper) {
-    this.reader = new EventReader(response, objectMapper);
+  EventStream(InputStream stream, ObjectMapper objectMapper) {
+    this.reader = new EventReader(stream, objectMapper);
   }
 
   @Override
   public void close() throws IOException {
     reader.close();
   }
-
+  
   @Override
   public boolean hasNext() {
 	if (next != null) {

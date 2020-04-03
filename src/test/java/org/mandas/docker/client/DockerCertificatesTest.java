@@ -22,16 +22,13 @@
 package org.mandas.docker.client;
 
 import static java.lang.System.getenv;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assume.assumeFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.io.Resources;
-import org.mandas.docker.client.DockerCertificates.SslContextFactory;
-import org.mandas.docker.client.exceptions.DockerCertificateException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -39,7 +36,11 @@ import java.security.KeyStore;
 import java.util.Optional;
 
 import org.junit.Test;
+import org.mandas.docker.client.DockerCertificates.SslContextFactory;
+import org.mandas.docker.client.exceptions.DockerCertificateException;
 import org.mockito.ArgumentCaptor;
+
+import com.google.common.io.Resources;
 
 public class DockerCertificatesTest {
 

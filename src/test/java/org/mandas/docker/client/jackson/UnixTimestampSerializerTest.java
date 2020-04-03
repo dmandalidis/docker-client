@@ -21,17 +21,17 @@
 
 package org.mandas.docker.client.jackson;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.mandas.docker.client.ObjectMapperProvider;
+import static org.hamcrest.Matchers.equalTo;
 
 import java.util.Date;
 
 import org.junit.Test;
+import org.mandas.docker.client.ObjectMapperProvider;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public class UnixTimestampSerializerTest {
 

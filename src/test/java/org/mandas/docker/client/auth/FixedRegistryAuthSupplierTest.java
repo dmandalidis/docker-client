@@ -25,9 +25,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 
+import org.junit.Test;
 import org.mandas.docker.client.exceptions.DockerException;
 import org.mandas.docker.client.messages.RegistryAuth;
-import org.junit.Test;
 
 public class FixedRegistryAuthSupplierTest {
 

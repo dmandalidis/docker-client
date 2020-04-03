@@ -21,12 +21,10 @@
 
 package org.mandas.docker.client;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-
-import com.google.common.io.Resources;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -41,6 +39,8 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.junit.Test;
+
+import com.google.common.io.Resources;
 
 public class CompressedDirectoryTest {
 

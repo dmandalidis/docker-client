@@ -24,12 +24,12 @@ package org.mandas.docker.client.messages;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.mandas.docker.client.ObjectMapperProvider;
-
 import java.io.IOException;
 
 import org.junit.Test;
+import org.mandas.docker.client.ObjectMapperProvider;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ProgressMessageTest {
 
