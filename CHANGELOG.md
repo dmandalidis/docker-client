@@ -1,5 +1,22 @@
 # Change Log
 
+## 4.0.0 (UNRELEASED)
+
+### Breaking changes
+
+* `ResourceRequirements#reservations` changed type from `Resources` to the newly-introduced
+`Reservations`. The reasoning behind this change is that the `Resources` type cannot
+hold the necessary data for supporting swarm generic resources.
+
+* Swarm support for generic resources (fixes #155)
+* Bump jackson-bom from 2.10.2 to 2.10.3
+* Bump version.jersey from 2.30 to 2.30.1
+* Bump jnr-unixsocket from 0.27 to 0.28
+* Bump jnr-unixsocket from 0.26 to 0.27
+* Auto-close json generator
+* Remove commons-io and javax.activation dependencies
+* Bump jnr-unixsocket from 0.25 to 0.26
+
 ## 3.2.0
 
 * Bump google-auth-library-oauth2-http from 0.18.0 to 0.20.0
