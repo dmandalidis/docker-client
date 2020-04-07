@@ -284,43 +284,41 @@ public class DockerClientBuilder {
         .setSocketTimeout((int) readTimeoutMillis)
         .build();
 
-    ClientConfig config = new ClientConfig(
-        ObjectMapperProvider.class,
-        JacksonFeature.class,
-        LogsResponseReader.class,
-        ProgressResponseReader.class);
+    ClientConfig extraConfig = new ClientConfig().connectorProvider(new ApacheConnectorProvider());
+    
+    ClientBuilder clientBuilder = ClientBuilder.newBuilder()
+      .withConfig(extraConfig)
+      .register(ObjectMapperProvider.class)
+      .register(JacksonFeature.class)
+      .register(LogsResponseReader.class)
+      .register(ProgressResponseReader.class)
+      .property(ApacheClientProperties.CONNECTION_MANAGER, cm)
+      .property(ApacheClientProperties.CONNECTION_MANAGER_SHARED, "true")
+      .property(ApacheClientProperties.REQUEST_CONFIG, requestConfig);
     
     ProxyConfiguration proxyConfiguration = getProxyConfigurationFor(Optional.ofNullable(dockerEngineUri.getHost()).orElse("localhost"));
     if (this.useProxy && proxyConfiguration != null) {
-      config.property(ClientProperties.PROXY_URI, "http://" + proxyConfiguration.proxyHost() + ":" + proxyConfiguration.proxyPort());
-      config.property(ClientProperties.PROXY_USERNAME, proxyConfiguration.proxyUser());
-      config.property(ClientProperties.PROXY_PASSWORD, proxyConfiguration.proxyPassword());
+      clientBuilder.property(ClientProperties.PROXY_URI, "http://" + proxyConfiguration.proxyHost() + ":" + proxyConfiguration.proxyPort());
+      clientBuilder.property(ClientProperties.PROXY_USERNAME, proxyConfiguration.proxyUser());
+      clientBuilder.property(ClientProperties.PROXY_PASSWORD, proxyConfiguration.proxyPassword());
       //ensure Content-Length is populated before sending request via proxy.
-      config.property(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.BUFFERED);
+      clientBuilder.property(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.BUFFERED);
     }
     
-    config = config
-        .connectorProvider(new ApacheConnectorProvider())
-        .property(ApacheClientProperties.CONNECTION_MANAGER, cm)
-        .property(ApacheClientProperties.CONNECTION_MANAGER_SHARED, "true")
-        .property(ApacheClientProperties.REQUEST_CONFIG, requestConfig);
-
     if (requestEntityProcessing != null) {
       switch (requestEntityProcessing) {
         case BUFFERED:
-          config.property(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.BUFFERED);
+          clientBuilder.property(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.BUFFERED);
           break;
         case CHUNKED:
-          config.property(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.CHUNKED);
+          clientBuilder.property(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.CHUNKED);
           break;
         default:
           throw new IllegalStateException("Invalid processing mode " + requestEntityProcessing);
       }
     }
 
-    return ClientBuilder.newBuilder()
-        .withConfig(config)
-        .build();
+    return clientBuilder.build();
   }
   
   public DefaultDockerClient build() {
