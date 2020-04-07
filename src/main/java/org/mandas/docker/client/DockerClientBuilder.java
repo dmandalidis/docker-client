@@ -275,35 +275,26 @@ public class DockerClientBuilder {
     return hostnameWithWildcards.replace(".", "\\.").replace("*", ".*");
   }
   
-  Client client(URI dockerEngineUri) {
-    Registry<ConnectionSocketFactory> schemeRegistry = getSchemeRegistry(this);
-    final HttpClientConnectionManager cm = getConnectionManager(schemeRegistry, this);
-    
-    //
+  ClientBuilder newBaseBuilderJersey(HttpClientConnectionManager cm, ProxyConfiguration proxy, RequestProcessingMode requestEntityProcessing) {
     final RequestConfig requestConfig = RequestConfig.custom()
         .setConnectionRequestTimeout((int) connectTimeoutMillis)
         .build();
-
-    ClientConfig extraConfig = new ClientConfig().connectorProvider(new ApacheConnectorProvider());
-
-    ClientBuilder clientBuilder = ClientBuilder.newBuilder()
-      .withConfig(extraConfig)
-      .register(ObjectMapperProvider.class)
-      .register(JacksonFeature.class)
-      .register(LogsResponseReader.class)
-      .register(ProgressResponseReader.class)
-      .property(ApacheClientProperties.CONNECTION_MANAGER, cm)
-      .property(ApacheClientProperties.CONNECTION_MANAGER_SHARED, "true")
-      .property(ApacheClientProperties.REQUEST_CONFIG, requestConfig)
-      .connectTimeout(connectTimeoutMillis, TimeUnit.MILLISECONDS)
-      .readTimeout(readTimeoutMillis, TimeUnit.MILLISECONDS)
-      ;
     
-    ProxyConfiguration proxyConfiguration = getProxyConfigurationFor(Optional.ofNullable(dockerEngineUri.getHost()).orElse("localhost"));
-    if (this.useProxy && proxyConfiguration != null) {
-      clientBuilder.property(ClientProperties.PROXY_URI, "http://" + proxyConfiguration.proxyHost() + ":" + proxyConfiguration.proxyPort());
-      clientBuilder.property(ClientProperties.PROXY_USERNAME, proxyConfiguration.proxyUser());
-      clientBuilder.property(ClientProperties.PROXY_PASSWORD, proxyConfiguration.proxyPassword());
+    ClientConfig extraConfig = new ClientConfig()
+        .connectorProvider(new ApacheConnectorProvider())
+        .property(ApacheClientProperties.REQUEST_CONFIG, requestConfig)
+        ;
+    
+    ClientBuilder clientBuilder = ClientBuilder.newBuilder()
+        .withConfig(extraConfig)
+        .register(JacksonFeature.class)
+        .property(ApacheClientProperties.CONNECTION_MANAGER, cm)
+        .property(ApacheClientProperties.CONNECTION_MANAGER_SHARED, "true");
+    
+    if (proxy != null) {
+      clientBuilder.property(ClientProperties.PROXY_URI, "http://" + proxy.proxyHost() + ":" + proxy.proxyPort());
+      clientBuilder.property(ClientProperties.PROXY_USERNAME, proxy.proxyUser());
+      clientBuilder.property(ClientProperties.PROXY_PASSWORD, proxy.proxyPassword());
       //ensure Content-Length is populated before sending request via proxy.
       clientBuilder.property(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.BUFFERED);
     }
@@ -320,6 +311,21 @@ public class DockerClientBuilder {
           throw new IllegalStateException("Invalid processing mode " + requestEntityProcessing);
       }
     }
+    
+    return clientBuilder;
+  }
+  
+  Client client(URI dockerEngineUri) {
+    Registry<ConnectionSocketFactory> schemeRegistry = getSchemeRegistry(this);
+    final HttpClientConnectionManager cm = getConnectionManager(schemeRegistry, this);
+    ProxyConfiguration proxyConfiguration = getProxyConfigurationFor(Optional.ofNullable(dockerEngineUri.getHost()).orElse("localhost"));
+    
+    ClientBuilder clientBuilder = newBaseBuilderJersey(cm, useProxy && proxyConfiguration != null? proxyConfiguration: null, requestEntityProcessing)
+      .register(ObjectMapperProvider.class)
+      .register(LogsResponseReader.class)
+      .register(ProgressResponseReader.class)
+      .connectTimeout(connectTimeoutMillis, TimeUnit.MILLISECONDS)
+      .readTimeout(readTimeoutMillis, TimeUnit.MILLISECONDS);
 
     return clientBuilder.build();
   }
