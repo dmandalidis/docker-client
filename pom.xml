@@ -120,13 +120,13 @@
 	    <version>${version.httpclient}</version>
   	</dependency>
   
-  	<!-- dependency>
+  	<dependency>
 		<groupId>org.jboss.resteasy</groupId>
 		<artifactId>resteasy-client</artifactId>
 		<version>${version.resteasy}</version>
-	</dependency-->
+	</dependency>
 	
-    <dependency>
+    <!-- dependency>
       <groupId>org.glassfish.jersey.core</groupId>
       <artifactId>jersey-client</artifactId>
       <version>${version.jersey}</version>
@@ -151,7 +151,7 @@
       <groupId>org.glassfish.jersey.inject</groupId>
       <artifactId>jersey-hk2</artifactId>
       <version>${version.jersey}</version>
-    </dependency>
+    </dependency-->
     
     <dependency>
       <groupId>org.apache.commons</groupId>

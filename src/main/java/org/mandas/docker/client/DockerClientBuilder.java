@@ -40,6 +40,11 @@ import java.util.concurrent.TimeUnit;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 
+import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
@@ -47,18 +52,21 @@ import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.ProxyAuthenticationStrategy;
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.glassfish.jersey.apache.connector.ApacheClientProperties;
-import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
-import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.client.ClientProperties;
-import org.glassfish.jersey.client.RequestEntityProcessing;
-import org.glassfish.jersey.jackson.JacksonFeature;
+import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient43Engine;
+import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
 import org.mandas.docker.client.auth.ConfigFileRegistryAuthSupplier;
 import org.mandas.docker.client.auth.RegistryAuthSupplier;
 import org.mandas.docker.client.exceptions.DockerCertificateException;
 import org.mandas.docker.client.npipe.NpipeConnectionSocketFactory;
+
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 public class DockerClientBuilder {
   enum RequestProcessingMode {
@@ -275,52 +283,91 @@ public class DockerClientBuilder {
     return hostnameWithWildcards.replace(".", "\\.").replace("*", ".*");
   }
   
-  ClientBuilder newBaseBuilderJersey(HttpClientConnectionManager cm, ProxyConfiguration proxy, RequestProcessingMode requestEntityProcessing) {
-    final RequestConfig requestConfig = RequestConfig.custom()
-        .setConnectionRequestTimeout((int) connectTimeoutMillis)
-        .build();
-    
-    ClientConfig extraConfig = new ClientConfig()
-        .connectorProvider(new ApacheConnectorProvider())
-        .property(ApacheClientProperties.REQUEST_CONFIG, requestConfig)
-        ;
-    
-    ClientBuilder clientBuilder = ClientBuilder.newBuilder()
-        .withConfig(extraConfig)
-        .register(JacksonFeature.class)
-        .property(ApacheClientProperties.CONNECTION_MANAGER, cm)
-        .property(ApacheClientProperties.CONNECTION_MANAGER_SHARED, "true");
-    
+  @SuppressWarnings("resource")
+  ClientBuilder newBaseBuilderResteasy(HttpClientConnectionManager cm, ProxyConfiguration proxy, RequestConfig requestConfig, RequestProcessingMode requestEntityProcessing) {
+    HttpClientBuilder clientBuilder = HttpClients.custom().setConnectionManager(cm);
     if (proxy != null) {
-      clientBuilder.property(ClientProperties.PROXY_URI, "http://" + proxy.proxyHost() + ":" + proxy.proxyPort());
-      clientBuilder.property(ClientProperties.PROXY_USERNAME, proxy.proxyUser());
-      clientBuilder.property(ClientProperties.PROXY_PASSWORD, proxy.proxyPassword());
-      //ensure Content-Length is populated before sending request via proxy.
-      clientBuilder.property(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.BUFFERED);
+      Credentials credentials = new UsernamePasswordCredentials(proxy.proxyUser(), proxy.proxyPassword());
+      CredentialsProvider credProvider = new BasicCredentialsProvider();
+      credProvider.setCredentials(new AuthScope(proxy.proxyHost(), proxy.proxyPort()), credentials);
+      clientBuilder
+        .setProxy(new HttpHost(proxy.proxyHost(), proxy.proxyPort()))
+        .setDefaultCredentialsProvider(credProvider)
+        .setProxyAuthenticationStrategy(new ProxyAuthenticationStrategy());
     }
     
-    if (requestEntityProcessing != null) {
+    CloseableHttpClient httpClient = clientBuilder
+        .setDefaultRequestConfig(requestConfig)
+        .build();
+    
+    ApacheHttpClient43Engine engine = new ApacheHttpClient43Engine(httpClient);
+    if (proxy == null && requestEntityProcessing != null) {
       switch (requestEntityProcessing) {
         case BUFFERED:
-          clientBuilder.property(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.BUFFERED);
+          engine.setChunked(false);
           break;
         case CHUNKED:
-          clientBuilder.property(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.CHUNKED);
+          engine.setChunked(true);
           break;
         default:
           throw new IllegalStateException("Invalid processing mode " + requestEntityProcessing);
       }
+    } else {
+      engine.setChunked(true);
     }
-    
-    return clientBuilder;
+
+    return new ResteasyClientBuilderImpl()
+      .httpEngine(engine)
+      .register(JacksonJsonProvider.class);
   }
+  
+//  ClientBuilder newBaseBuilderJersey(HttpClientConnectionManager cm, ProxyConfiguration proxy, RequestConfig requestConfig, RequestProcessingMode requestEntityProcessing) {
+//    ClientConfig extraConfig = new ClientConfig()
+//        .connectorProvider(new ApacheConnectorProvider())
+//        .property(ApacheClientProperties.REQUEST_CONFIG, requestConfig)
+//        ;
+//    
+//    ClientBuilder clientBuilder = ClientBuilder.newBuilder()
+//        .withConfig(extraConfig)
+//        .register(JacksonFeature.class)
+//        .property(ApacheClientProperties.CONNECTION_MANAGER, cm)
+//        .property(ApacheClientProperties.CONNECTION_MANAGER_SHARED, "true");
+//    
+//    if (proxy != null) {
+//      clientBuilder.property(ClientProperties.PROXY_URI, "http://" + proxy.proxyHost() + ":" + proxy.proxyPort());
+//      clientBuilder.property(ClientProperties.PROXY_USERNAME, proxy.proxyUser());
+//      clientBuilder.property(ClientProperties.PROXY_PASSWORD, proxy.proxyPassword());
+//      //ensure Content-Length is populated before sending request via proxy.
+//      clientBuilder.property(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.BUFFERED);
+//    }
+//    
+//    if (requestEntityProcessing != null) {
+//      switch (requestEntityProcessing) {
+//        case BUFFERED:
+//          clientBuilder.property(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.BUFFERED);
+//          break;
+//        case CHUNKED:
+//          clientBuilder.property(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.CHUNKED);
+//          break;
+//        default:
+//          throw new IllegalStateException("Invalid processing mode " + requestEntityProcessing);
+//      }
+//    }
+//    
+//    return clientBuilder;
+//  }
   
   Client client(URI dockerEngineUri) {
     Registry<ConnectionSocketFactory> schemeRegistry = getSchemeRegistry(this);
     final HttpClientConnectionManager cm = getConnectionManager(schemeRegistry, this);
     ProxyConfiguration proxyConfiguration = getProxyConfigurationFor(Optional.ofNullable(dockerEngineUri.getHost()).orElse("localhost"));
+    RequestConfig requestConfig = RequestConfig.custom()
+      .setConnectionRequestTimeout((int) connectTimeoutMillis)
+      .setConnectTimeout((int) connectTimeoutMillis)
+      .setSocketTimeout((int) readTimeoutMillis)
+      .build();
     
-    ClientBuilder clientBuilder = newBaseBuilderJersey(cm, useProxy && proxyConfiguration != null? proxyConfiguration: null, requestEntityProcessing)
+    ClientBuilder clientBuilder = newBaseBuilderResteasy(cm, useProxy && proxyConfiguration != null? proxyConfiguration: null, requestConfig, requestEntityProcessing)
       .register(ObjectMapperProvider.class)
       .register(LogsResponseReader.class)
       .register(ProgressResponseReader.class)
