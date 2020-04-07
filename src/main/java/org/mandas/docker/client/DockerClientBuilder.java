@@ -280,11 +280,7 @@ public class DockerClientBuilder {
         .setSocketTimeout((int) readTimeoutMillis)
         .build();
 
-    ClientConfig config = new ClientConfig(
-        ObjectMapperProvider.class,
-        JacksonFeature.class,
-        LogsResponseReader.class,
-        ProgressResponseReader.class);
+    ClientConfig config = new ClientConfig();
     
     ProxyConfiguration proxyConfiguration = getProxyConfigurationFor(Optional.ofNullable(dockerEngineUri.getHost()).orElse("localhost"));
     if (this.useProxy && proxyConfiguration != null) {
@@ -306,6 +302,10 @@ public class DockerClientBuilder {
     }
 
     return ClientBuilder.newBuilder()
+        .register(ObjectMapperProvider.class)
+        .register(JacksonFeature.class)
+        .register(LogsResponseReader.class)
+        .register(ProgressResponseReader.class)
         .withConfig(config)
         .build();
   }
