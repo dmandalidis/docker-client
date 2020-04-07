@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -277,15 +278,14 @@ public class DockerClientBuilder {
   Client client(URI dockerEngineUri) {
     Registry<ConnectionSocketFactory> schemeRegistry = getSchemeRegistry(this);
     final HttpClientConnectionManager cm = getConnectionManager(schemeRegistry, this);
-
+    
+    //
     final RequestConfig requestConfig = RequestConfig.custom()
         .setConnectionRequestTimeout((int) connectTimeoutMillis)
-        .setConnectTimeout((int) connectTimeoutMillis)
-        .setSocketTimeout((int) readTimeoutMillis)
         .build();
 
     ClientConfig extraConfig = new ClientConfig().connectorProvider(new ApacheConnectorProvider());
-    
+
     ClientBuilder clientBuilder = ClientBuilder.newBuilder()
       .withConfig(extraConfig)
       .register(ObjectMapperProvider.class)
@@ -294,7 +294,10 @@ public class DockerClientBuilder {
       .register(ProgressResponseReader.class)
       .property(ApacheClientProperties.CONNECTION_MANAGER, cm)
       .property(ApacheClientProperties.CONNECTION_MANAGER_SHARED, "true")
-      .property(ApacheClientProperties.REQUEST_CONFIG, requestConfig);
+      .property(ApacheClientProperties.REQUEST_CONFIG, requestConfig)
+      .connectTimeout(connectTimeoutMillis, TimeUnit.MILLISECONDS)
+      .readTimeout(readTimeoutMillis, TimeUnit.MILLISECONDS)
+      ;
     
     ProxyConfiguration proxyConfiguration = getProxyConfigurationFor(Optional.ofNullable(dockerEngineUri.getHost()).orElse("localhost"));
     if (this.useProxy && proxyConfiguration != null) {
