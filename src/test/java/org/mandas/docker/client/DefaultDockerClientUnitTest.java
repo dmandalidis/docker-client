@@ -68,6 +68,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mandas.docker.client.DockerClient.Signal;
+import org.mandas.docker.client.DockerClientBuilder.RequestProcessingMode;
 import org.mandas.docker.client.auth.RegistryAuthSupplier;
 import org.mandas.docker.client.exceptions.ConflictException;
 import org.mandas.docker.client.exceptions.DockerException;
@@ -1177,7 +1178,7 @@ public class DefaultDockerClientUnitTest {
   
   @Test
   public void testBufferedRequestEntityProcessing() throws Exception {
-    builder.useRequestEntityProcessing(RequestEntityProcessing.BUFFERED);
+    builder.useRequestEntityProcessing(RequestProcessingMode.BUFFERED);
     final DefaultDockerClient dockerClient = builder.build();
     
     final HostConfig hostConfig = HostConfig.builder().build();
@@ -1198,7 +1199,7 @@ public class DefaultDockerClientUnitTest {
   
   @Test
   public void testChunkedRequestEntityProcessing() throws Exception {
-    builder.useRequestEntityProcessing(RequestEntityProcessing.CHUNKED);
+    builder.useRequestEntityProcessing(RequestProcessingMode.CHUNKED);
     final DefaultDockerClient dockerClient = builder.build();
     
     final HostConfig hostConfig = HostConfig.builder().build();

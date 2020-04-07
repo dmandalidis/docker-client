@@ -60,7 +60,11 @@ import org.mandas.docker.client.exceptions.DockerCertificateException;
 import org.mandas.docker.client.npipe.NpipeConnectionSocketFactory;
 
 public class DockerClientBuilder {
-
+  enum RequestProcessingMode {
+    CHUNKED,
+    BUFFERED
+  }
+  
   static final String UNIX_SCHEME = "unix";
   static final String NPIPE_SCHEME = "npipe";
   static final long NO_TIMEOUT = 0;
@@ -81,7 +85,7 @@ public class DockerClientBuilder {
   private boolean useProxy = true;
   private RegistryAuthSupplier registryAuthSupplier;
   private Map<String, Object> headers = new HashMap<>();
-  private RequestEntityProcessing requestEntityProcessing;
+  private RequestProcessingMode requestEntityProcessing;
 
   public DockerClientBuilder uri(final URI uri) {
     this.uri = uri;
@@ -197,7 +201,7 @@ public class DockerClientBuilder {
    * @return Builder
    */
   public DockerClientBuilder useRequestEntityProcessing(
-      final RequestEntityProcessing requestEntityProcessing) {
+      final RequestProcessingMode requestEntityProcessing) {
     this.requestEntityProcessing = requestEntityProcessing;
     return this;
   }
@@ -280,7 +284,11 @@ public class DockerClientBuilder {
         .setSocketTimeout((int) readTimeoutMillis)
         .build();
 
-    ClientConfig config = new ClientConfig();
+    ClientConfig config = new ClientConfig(
+        ObjectMapperProvider.class,
+        JacksonFeature.class,
+        LogsResponseReader.class,
+        ProgressResponseReader.class);
     
     ProxyConfiguration proxyConfiguration = getProxyConfigurationFor(Optional.ofNullable(dockerEngineUri.getHost()).orElse("localhost"));
     if (this.useProxy && proxyConfiguration != null) {
@@ -298,14 +306,19 @@ public class DockerClientBuilder {
         .property(ApacheClientProperties.REQUEST_CONFIG, requestConfig);
 
     if (requestEntityProcessing != null) {
-      config.property(ClientProperties.REQUEST_ENTITY_PROCESSING, requestEntityProcessing);
+      switch (requestEntityProcessing) {
+        case BUFFERED:
+          config.property(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.BUFFERED);
+          break;
+        case CHUNKED:
+          config.property(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.CHUNKED);
+          break;
+        default:
+          throw new IllegalStateException("Invalid processing mode " + requestEntityProcessing);
+      }
     }
 
     return ClientBuilder.newBuilder()
-        .register(ObjectMapperProvider.class)
-        .register(JacksonFeature.class)
-        .register(LogsResponseReader.class)
-        .register(ProgressResponseReader.class)
         .withConfig(config)
         .build();
   }
