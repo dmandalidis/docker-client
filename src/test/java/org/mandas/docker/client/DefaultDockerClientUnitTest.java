@@ -63,7 +63,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.glassfish.jersey.client.RequestEntityProcessing;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
