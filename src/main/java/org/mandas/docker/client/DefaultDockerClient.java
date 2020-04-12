@@ -2486,7 +2486,8 @@ public class DefaultDockerClient implements DockerClient, Closeable {
         throws DockerException, InterruptedException {
     final ExecutorService executor = Executors.newSingleThreadExecutor();
     try {
-      final ProgressStream stream = response.readEntity(ProgressStream.class);
+      InputStream inputStream = response.readEntity(InputStream.class);
+      final ProgressStream stream = new ProgressStream(inputStream);
       final Future<?> future = executor.submit(
               new ResponseTailReader(stream, handler, method, resource));
       future.get();
@@ -2497,6 +2498,8 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       } else {
         throw new DockerException(cause);
       }
+    } catch (IOException e) {
+      throw new DockerException(e);
     } finally {
       executor.shutdownNow();
       try {
