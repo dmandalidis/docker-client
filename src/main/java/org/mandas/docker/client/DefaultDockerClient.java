@@ -93,7 +93,6 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.compress.utils.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -480,10 +479,13 @@ public class DefaultDockerClient implements DockerClient, Closeable {
         String nonProxyHosts = System.getProperty("http.nonProxyHosts");
         if (nonProxyHosts != null) {
           // Remove quotes, if any. Refer to https://docs.oracle.com/javase/8/docs/technotes/guides/net/proxies.html
-          nonProxyHosts = StringUtils.strip(nonProxyHosts, "\"");
+          String[] nonProxy = nonProxyHosts
+              .replaceAll("^\\s*\"", "")
+              .replaceAll("\\s*\"$", "")
+              .split("\\|");
           String host = getHost();
-          for (String nonProxyHost : nonProxyHosts.split("\\|")) {
-            if (host.matches(toRegExp(nonProxyHost))) {
+          for (String h: nonProxy) {
+            if (host.matches(toRegExp(h))) {
               skipProxy = true;
               break;
             }

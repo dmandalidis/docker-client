@@ -147,11 +147,6 @@
       <version>${version.unixsocket}</version>
     </dependency>
     <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-      <version>${version.apache.lang}</version>
-    </dependency>
-    <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcpkix-jdk15on</artifactId>
       <version>${version.bcpkix}</version>
@@ -171,6 +166,12 @@
     </dependency>
 
     <!--test deps-->
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+      <version>${version.apache.lang}</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
