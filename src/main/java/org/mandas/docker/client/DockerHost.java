@@ -191,7 +191,7 @@ public class DockerHost {
     }
   }
 
-  static String endpointFromEnv() {
+  public static String endpointFromEnv() {
 	String endPointFromEnv = systemDelegate.getenv("DOCKER_HOST");
 	if (endPointFromEnv != null) {
 	  return endPointFromEnv;
@@ -228,16 +228,16 @@ public class DockerHost {
     }
   }
 
-  static String defaultCertPath() {
+  public static String defaultCertPath() {
     final String userHome = systemDelegate.getProperty("user.home");
     return Paths.get(userHome, ".docker").toString();
   }
 
-  static String certPathFromEnv() {
+  public static String certPathFromEnv() {
     return systemDelegate.getenv("DOCKER_CERT_PATH");
   }
 
-  static String configPathFromEnv() {
+  public static String configPathFromEnv() {
     return systemDelegate.getenv("DOCKER_CONFIG");
   }
 

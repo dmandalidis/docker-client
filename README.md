@@ -37,7 +37,9 @@ uploaded to maven central.
 
 ## Download
 
-Download the latest JAR or grab [via Maven][maven-search].
+Download the latest JAR or grab [via Maven][maven-search] and accompany it 
+with the necessary Jersey dependencies if you plan to use the provided 
+`JerseyDockerClientBuilder`
 
 ```xml
 <dependency>
@@ -45,14 +47,33 @@ Download the latest JAR or grab [via Maven][maven-search].
   <artifactId>docker-client</artifactId>
   <version>LATEST-VERSION</version>
 </dependency>
+<dependency>
+  <groupId>org.glassfish.jersey.core</groupId>
+  <artifactId>jersey-client</artifactId>
+  <version>2.30.1</version>
+</dependency>
+<dependency>
+  <groupId>org.glassfish.jersey.inject</groupId>
+  <artifactId>jersey-hk2</artifactId>
+  <version>2.30.1</version>
+</dependency>
+<dependency>
+  <groupId>org.glassfish.jersey.connectors</groupId>
+  <artifactId>jersey-apache-connector</artifactId>
+  <version>2.30.1</version>
+</dependency>
+<dependency>
+  <groupId>org.glassfish.jersey.media</groupId>
+  <artifactId>jersey-media-json-jackson</artifactId>
+  <version>2.30.1</version>
+</dependency>
 ```
-
 
 ## Usage Example
 
 ```java
 // Create a client based on DOCKER_HOST and DOCKER_CERT_PATH env vars
-final DockerClient docker = DefaultDockerClient.fromEnv().build();
+final DockerClient docker = new JerseyDockerClientBuilder().fromEnv().build();
 
 // Pull an image
 docker.pull("busybox");
@@ -146,35 +167,6 @@ you can also build and release locally by running the below.
 ```sh
 mvn clean [-DskipTests -Darguments=-DskipTests] -Dgpg.keyname=<key ID used for signing artifacts> release:prepare release:perform
 ```
-
-## A note on shading
-
-Please note that there is also a shaded variant.
-
-Standard:
-
-```xml
-<dependency>
-  <groupId>org.mandas</groupId>
-  <artifactId>docker-client</artifactId>
-  <version>1.0.0</version>
-</dependency>
-```
-
-Shaded:
-
-```xml
-<dependency>
-  <groupId>org.mandas</groupId>
-  <artifactId>docker-client</artifactId>
-  <classifier>shaded</classifier>
-  <version>1.0.0</version>
-</dependency>
-```
-
-**This is particularly important if you use Jersey 1.x in your project. To avoid conflicts with
-docker-client and Jersey 2.x, you will need to explicitly specify the shaded version above.**
-
 
   [1]: https://travis-ci.org/dmandalidis/docker-client
   [2]: docs/user_manual.md

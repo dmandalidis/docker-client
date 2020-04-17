@@ -8,6 +8,60 @@
 `Reservations`. The reasoning behind this change is that the `Resources` type cannot
 hold the necessary data for supporting swarm generic resources.
 
+* Support for providing any JAX-RS 2.1 client implementation has been added to avoid 
+conflicts in flat classpath environments where another JAX-RS implementations (e.g. RESTeasy)
+are unavoidably present or where an externally-managed `Client` needs to be shared. This led
+all Jersey dependencies to become optional and clients projects must define them explicitly
+if they need to use the bundled `JerseyDockerClientBuilder`. More specifically, client 
+projects are affected in the following ways:
+    * They must include the necessary Jersey dependencies in their `pom.xml` as follows
+    ```xml
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>2.30.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+            <version>2.30.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.connectors</groupId>
+            <artifactId>jersey-apache-connector</artifactId>
+            <version>2.30.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
+            <version>2.30.1</version>
+        </dependency>
+    ```
+    * Public constructors of `DefaultDockerClient` have been dropped in favour of clear 
+    responsibilities between the builder and the client itself:
+        * If you were using `DefaultDockerClient#DefaultDockerClient(URI)` use `new JerseyDockerClientBuilder().uri(uri).build()` instead
+        * If you were using `DefaultDockerClient#DefaultDockerClient(String)` use `new JerseyDockerClientBuilder().uri(uri).build()` instead
+        * If you were using `DefaultDockerClient#DefaultDockerClient(URI, DockerCertificatesStore)` use `new JerseyDockerClientBuilder().uri(uri).dockerCertificates(dockerCertificatesStore).build()` instead
+    * `DefaultDockerClient#fromEnv` has been moved to `JerseyDockerClientBuilder`
+        * If you were using `DefaultDockerClient#fromEnv` use `new JerseyDockerClientBuilder().fromEnv` instead
+
+    * `DefaultDockerClient#builder` has been removed
+        * If you were using `DefaultDockerClient#builder` use `new JerseyDockerClientBuilder()` instead
+
+    * `DockerClient#events` no longer throws a `DockerException` wrapping an `IOException`
+
+    * Builder `requestEntityProcessing` has changed to use a new enum shipped by the DockerClient and renamed to `entityProcessing`
+
+    * Selective per-request unlimited read timeout has been dropped. The reason for this is that there's no standard way to 
+    do it and we didn't want to create a new `Client` in such methods
+
+    * `InterruptedIOException` is now always wrapped to `DockerTimeoutException`
+
+* Shading support has been dropped as a side-effect of providing API consistency between
+different client builders.
+
+### Changes
+
 * Swarm support for generic resources (fixes #155)
 
 ## 3.2.1

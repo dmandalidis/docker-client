@@ -25,11 +25,9 @@
 package org.mandas.docker.client;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.ws.rs.HttpMethod.DELETE;
 import static javax.ws.rs.HttpMethod.GET;
 import static javax.ws.rs.HttpMethod.POST;
@@ -38,11 +36,6 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static javax.ws.rs.core.MediaType.APPLICATION_OCTET_STREAM;
 import static javax.ws.rs.core.MediaType.APPLICATION_OCTET_STREAM_TYPE;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN_TYPE;
-import static org.mandas.docker.client.DockerHost.certPathFromEnv;
-import static org.mandas.docker.client.DockerHost.configPathFromEnv;
-import static org.mandas.docker.client.DockerHost.defaultAddress;
-import static org.mandas.docker.client.DockerHost.defaultCertPath;
-import static org.mandas.docker.client.DockerHost.defaultPort;
 import static org.mandas.docker.client.ObjectMapperProvider.objectMapper;
 import static org.mandas.docker.client.VersionCompare.compareVersion;
 
@@ -58,7 +51,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -67,8 +59,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -81,46 +71,24 @@ import java.util.regex.Pattern;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.compress.utils.IOUtils;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.ConnectTimeoutException;
-import org.apache.http.conn.HttpClientConnectionManager;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.glassfish.hk2.api.MultiException;
-import org.glassfish.jersey.apache.connector.ApacheClientProperties;
-import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
-import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.client.ClientProperties;
-import org.glassfish.jersey.client.RequestEntityProcessing;
-import org.glassfish.jersey.jackson.JacksonFeature;
-import org.mandas.docker.client.auth.ConfigFileRegistryAuthSupplier;
-import org.mandas.docker.client.auth.FixedRegistryAuthSupplier;
 import org.mandas.docker.client.auth.RegistryAuthSupplier;
+import org.mandas.docker.client.builder.DockerClientBuilder;
 import org.mandas.docker.client.exceptions.BadParamException;
 import org.mandas.docker.client.exceptions.ConflictException;
 import org.mandas.docker.client.exceptions.ContainerNotFoundException;
 import org.mandas.docker.client.exceptions.ContainerRenameConflictException;
-import org.mandas.docker.client.exceptions.DockerCertificateException;
 import org.mandas.docker.client.exceptions.DockerException;
 import org.mandas.docker.client.exceptions.DockerRequestException;
 import org.mandas.docker.client.exceptions.DockerTimeoutException;
@@ -184,7 +152,6 @@ import org.mandas.docker.client.messages.swarm.SwarmJoin;
 import org.mandas.docker.client.messages.swarm.SwarmSpec;
 import org.mandas.docker.client.messages.swarm.Task;
 import org.mandas.docker.client.messages.swarm.UnlockKey;
-import org.mandas.docker.client.npipe.NpipeConnectionSocketFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -312,22 +279,10 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   }
   // ==========================================================================
 
-  private static final String UNIX_SCHEME = "unix";
-  private static final String NPIPE_SCHEME = "npipe";
 
   private static final Logger log = LoggerFactory.getLogger(DefaultDockerClient.class);
 
   static final long NO_TIMEOUT = 0;
-
-  private static final long DEFAULT_CONNECT_TIMEOUT_MILLIS = SECONDS.toMillis(5);
-  private static final long DEFAULT_READ_TIMEOUT_MILLIS = SECONDS.toMillis(30);
-  private static final int DEFAULT_CONNECTION_POOL_SIZE = 100;
-
-  private final ClientConfig defaultConfig = new ClientConfig(
-      ObjectMapperProvider.class,
-      JacksonFeature.class,
-      LogsResponseReader.class,
-      ProgressResponseReader.class);
 
   private static final Pattern CONTAINER_NAME_PATTERN =
           Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9_.-]+$");
@@ -389,178 +344,21 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   }
 
   /**
-   * Create a new client with default configuration.
-   *
-   * @param uri The docker rest api uri.
-   */
-  public DefaultDockerClient(final String uri) {
-    this(URI.create(uri.replaceAll("^unix:///", "unix://localhost/")));
-  }
-
-  /**
-   * Create a new client with default configuration.
-   *
-   * @param uri The docker rest api uri.
-   */
-  public DefaultDockerClient(final URI uri) {
-    this(new Builder().uri(uri));
-  }
-
-  /**
-   * Create a new client with default configuration.
-   *
-   * @param uri                The docker rest api uri.
-   * @param dockerCertificatesStore The certificates to use for HTTPS.
-   */
-  public DefaultDockerClient(final URI uri, final DockerCertificatesStore dockerCertificatesStore) {
-    this(new Builder().uri(uri).dockerCertificates(dockerCertificatesStore));
-  }
-
-  /**
    * Create a new client using the configuration of the builder.
    *
    * @param builder DefaultDockerClient builder
    */
-  protected DefaultDockerClient(final Builder builder) {
-    requireNonNull(builder.uri, "uri");
-    final URI originalUri = builder.uri;
-    requireNonNull(originalUri.getScheme(), "url has null scheme");
+  public DefaultDockerClient(final DockerClientBuilder builder) {
     this.apiVersion = builder.apiVersion();
-
-    if ((builder.dockerCertificatesStore != null) && !originalUri.getScheme().equals("https")) {
-      throw new IllegalArgumentException(
-          "An HTTPS URI for DOCKER_HOST must be provided to use Docker client certificates");
-    }
-
-    if (originalUri.getScheme().equals(UNIX_SCHEME)) {
-      this.uri = UnixConnectionSocketFactory.sanitizeUri(originalUri);
-    } else if (originalUri.getScheme().equals(NPIPE_SCHEME)) {
-      this.uri = NpipeConnectionSocketFactory.sanitizeUri(originalUri);
-    } else {
-      this.uri = originalUri;
-    }
-
-    final HttpClientConnectionManager cm = getConnectionManager(builder);
-
-    final RequestConfig requestConfig = RequestConfig.custom()
-        .setConnectionRequestTimeout((int) builder.connectTimeoutMillis)
-        .setConnectTimeout((int) builder.connectTimeoutMillis)
-        .setSocketTimeout((int) builder.readTimeoutMillis)
-        .build();
-
-    final ClientConfig config = updateProxy(defaultConfig, builder)
-        .connectorProvider(new ApacheConnectorProvider())
-        .property(ApacheClientProperties.CONNECTION_MANAGER, cm)
-        .property(ApacheClientProperties.CONNECTION_MANAGER_SHARED, "true")
-        .property(ApacheClientProperties.REQUEST_CONFIG, requestConfig);
-
-    if (builder.registryAuthSupplier == null) {
-      this.registryAuthSupplier = new FixedRegistryAuthSupplier();
-    } else {
-      this.registryAuthSupplier = builder.registryAuthSupplier;
-    }
-    
-    if (builder.getRequestEntityProcessing() != null) {
-      config.property(ClientProperties.REQUEST_ENTITY_PROCESSING, builder.requestEntityProcessing);
-    }
-
-	this.client = ClientBuilder.newBuilder()
-        .withConfig(config)
-        .build();
-
+    this.registryAuthSupplier = builder.registryAuthSupplier();
+    this.uri = builder.uri();
+    this.client = builder.client();
     this.headers = new HashMap<>(builder.headers());
-  }
-
-  private ClientConfig updateProxy(ClientConfig config, Builder builder) {
-    if (builder.useProxy()) {
-      final String proxyHost = System.getProperty("http.proxyHost");
-      if (proxyHost != null) {
-        boolean skipProxy = false;
-        String nonProxyHosts = System.getProperty("http.nonProxyHosts");
-        if (nonProxyHosts != null) {
-          // Remove quotes, if any. Refer to https://docs.oracle.com/javase/8/docs/technotes/guides/net/proxies.html
-          String[] nonProxy = nonProxyHosts
-              .replaceAll("^\\s*\"", "")
-              .replaceAll("\\s*\"$", "")
-              .split("\\|");
-          String host = getHost();
-          for (String h: nonProxy) {
-            if (host.matches(toRegExp(h))) {
-              skipProxy = true;
-              break;
-            }
-          }
-        }
-        if (!skipProxy) {
-          String proxyPort = System.getProperty("http.proxyPort");
-          requireNonNull(proxyPort, "http.proxyPort");
-          config.property(ClientProperties.PROXY_URI, (!proxyHost.startsWith("http") ? "http://" : "")
-                  + proxyHost + ":" + proxyPort);
-          final String proxyUser = System.getProperty("http.proxyUser");
-          if (proxyUser != null) {
-            config.property(ClientProperties.PROXY_USERNAME, proxyUser);
-          }
-          final String proxyPassword = System.getProperty("http.proxyPassword");
-          if (proxyPassword != null) {
-            config.property(ClientProperties.PROXY_PASSWORD, proxyPassword);
-          }
-
-          //ensure Content-Length is populated before sending request via proxy.
-          config.property(ClientProperties.REQUEST_ENTITY_PROCESSING,
-                  RequestEntityProcessing.BUFFERED);
-        }
-      }
-    }
-    return config;
-  }
-
-  private String toRegExp(String hostnameWithWildcards) {
-    return hostnameWithWildcards.replace(".", "\\.").replace("*", ".*");
   }
 
   @Override
   public String getHost() {
     return ofNullable(uri.getHost()).orElse("localhost");
-  }
-
-  private HttpClientConnectionManager getConnectionManager(Builder builder) {
-    if (builder.uri.getScheme().equals(NPIPE_SCHEME)) {
-      final BasicHttpClientConnectionManager bm = 
-          new BasicHttpClientConnectionManager(getSchemeRegistry(builder));
-      return bm;
-    } else {
-      final PoolingHttpClientConnectionManager cm =
-          new PoolingHttpClientConnectionManager(getSchemeRegistry(builder));
-      // Use all available connections instead of artificially limiting ourselves to 2 per server.
-      cm.setMaxTotal(builder.connectionPoolSize);
-      cm.setDefaultMaxPerRoute(cm.getMaxTotal());
-      return cm;
-    }
-  }
-
-  private Registry<ConnectionSocketFactory> getSchemeRegistry(final Builder builder) {
-    final SSLConnectionSocketFactory https;
-    if (builder.dockerCertificatesStore == null) {
-      https = SSLConnectionSocketFactory.getSocketFactory();
-    } else {
-      https = new SSLConnectionSocketFactory(builder.dockerCertificatesStore.sslContext(),
-                                             builder.dockerCertificatesStore.hostnameVerifier());
-    }
-
-    final RegistryBuilder<ConnectionSocketFactory> registryBuilder = RegistryBuilder
-        .<ConnectionSocketFactory>create()
-        .register("https", https)
-        .register("http", PlainConnectionSocketFactory.getSocketFactory());
-
-    if (builder.uri.getScheme().equals(UNIX_SCHEME)) {
-      registryBuilder.register(UNIX_SCHEME, new UnixConnectionSocketFactory(builder.uri));
-    }
-    
-    if (builder.uri.getScheme().equals(NPIPE_SCHEME)) {
-      registryBuilder.register(NPIPE_SCHEME, new NpipeConnectionSocketFactory(builder.uri));
-    }
-
-    return registryBuilder.build();
   }
 
   @Override
@@ -831,9 +629,9 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   @Override
   public void stopContainer(final String containerId, final int secondsToWaitBeforeKilling)
       throws DockerException, InterruptedException {
+    
     try {
       final WebTarget resource = resource()
-    	  .property(ClientProperties.READ_TIMEOUT, 0)
           .path("containers").path(containerId).path("stop")
           .queryParam("t", String.valueOf(secondsToWaitBeforeKilling));
       request(POST, resource, resource.request());
@@ -854,7 +652,6 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       throws DockerException, InterruptedException {
     try {
       final WebTarget resource = resource()
-    	  .property(ClientProperties.READ_TIMEOUT, 0)
           .path("containers").path(containerId).path("wait");
       // Wait forever
       return request(POST, ContainerExit.class, resource,
@@ -1399,7 +1196,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       throws DockerException, InterruptedException, IOException {
 	requireNonNull(handler, "handler");
 
-    WebTarget resource = resource().property(ClientProperties.READ_TIMEOUT, 0).path("build");
+    WebTarget resource = resource().path("build");
 
     for (final BuildParam param : params) {
       resource = resource.queryParam(param.name(), param.value());
@@ -1493,7 +1290,6 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   public LogStream logs(final String containerId, final LogsParam... params)
       throws DockerException, InterruptedException {
     WebTarget resource = resource()
-    	.property(ClientProperties.READ_TIMEOUT, 0)
         .path("containers").path(containerId)
         .path("logs");
 
@@ -1507,17 +1303,10 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   @Override
   public EventStream events(EventsParam... params)
       throws DockerException, InterruptedException {
-    WebTarget resource = resource().property(ClientProperties.READ_TIMEOUT, 0).path("events");
+    WebTarget resource = resource().path("events");
     resource = addParameters(resource, params);
-
-    try {
-      final CloseableHttpClient client = (CloseableHttpClient) ApacheConnectorProvider
-          .getHttpClient(this.client);
-      final CloseableHttpResponse response = client.execute(new HttpGet(resource.getUri()));
-      return new EventStream(response, objectMapper());
-    } catch (IOException exception) {
-      throw new DockerException(exception);
-    }
+    InputStream stream = resource.request(MediaType.APPLICATION_JSON).get(InputStream.class);
+    return new EventStream(stream, objectMapper());
   }
 
   @Override
@@ -1525,7 +1314,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
                                    final AttachParameter... params) throws DockerException,
                                                                            InterruptedException {
     requireNonNull(containerId, "containerId");
-    WebTarget resource = resource().property(ClientProperties.READ_TIMEOUT, 0)
+    WebTarget resource = resource()
     		.path("containers").path(containerId).path("attach");
 
     for (final AttachParameter param : params) {
@@ -1625,7 +1414,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   @Override
   public LogStream execStart(final String execId, final ExecStartParameter... params)
       throws DockerException, InterruptedException {
-    final WebTarget resource = resource().property(ClientProperties.READ_TIMEOUT, 0)
+    final WebTarget resource = resource()
     		.path("exec").path(execId).path("start");
 
     final StringWriter writer = new StringWriter();
@@ -1960,7 +1749,6 @@ public class DefaultDockerClient implements DockerClient, Closeable {
           throws DockerException, InterruptedException {
     assertApiVersionIsAbove("1.25");
     WebTarget resource = resource()
-    		.property(ClientProperties.READ_TIMEOUT, 0)
             .path("services").path(serviceId)
             .path("logs");
 
@@ -2628,6 +2416,10 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   }
 
   private WebTarget resource() {
+    return resource(client);
+  }
+  
+  private WebTarget resource(Client client) {
     final WebTarget target = client.target(uri);
     if (apiVersion != null && !"".equals(apiVersion.trim())) {
       return target.path(apiVersion);
@@ -2640,7 +2432,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       throws DockerException, InterruptedException {
     try {
       return headers(request).async().method(method, type).get();
-    } catch (ExecutionException | MultiException e) {
+    } catch (ExecutionException e) {
       throw propagate(method, resource, e);
     }
   }
@@ -2650,7 +2442,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       throws DockerException, InterruptedException {
     try {
       return headers(request).async().method(method, clazz).get();
-    } catch (ExecutionException | MultiException e) {
+    } catch (ExecutionException e) {
       throw propagate(method, resource, e);
     }
   }
@@ -2661,7 +2453,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       throws DockerException, InterruptedException {
     try {
       return headers(request).async().method(method, entity, clazz).get();
-    } catch (ExecutionException | MultiException e) {
+    } catch (ExecutionException e) {
       throw propagate(method, resource, e);
     }
   }
@@ -2672,7 +2464,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       throws DockerException, InterruptedException {
     try {
       headers(request).async().method(method, String.class).get();
-    } catch (ExecutionException | MultiException e) {
+    } catch (ExecutionException e) {
       throw propagate(method, resource, e);
     }
   }
@@ -2759,13 +2551,6 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       throws DockerException, InterruptedException {
     Throwable cause = ex.getCause();
 
-    // Sometimes e is a org.glassfish.hk2.api.MultiException
-    // which contains the cause we're actually interested in.
-    // So we unpack it here.
-    if (ex instanceof MultiException) {
-      cause = cause.getCause();
-    }
-
     Response response = null;
     if (cause instanceof ResponseProcessingException) {
       response = ((ResponseProcessingException) cause).getResponse();
@@ -2780,11 +2565,9 @@ public class DefaultDockerClient implements DockerClient, Closeable {
     if (response != null) {
       throw new DockerRequestException(method, resource.getUri(), response.getStatus(),
     		  	response.readEntity(String.class), cause);
-    } else if ((cause instanceof SocketTimeoutException)
-               || (cause instanceof ConnectTimeoutException)) {
+    } else if (cause instanceof InterruptedIOException) {
       throw new DockerTimeoutException(method, resource.getUri(), ex);
-    } else if ((cause instanceof InterruptedIOException)
-               || (cause instanceof InterruptedException)) {
+    } else if (cause instanceof InterruptedException) {
       throw new InterruptedException("Interrupted: " + method + " " + resource);
     } else {
       throw new DockerException(ex);
@@ -2840,242 +2623,6 @@ public class DefaultDockerClient implements DockerClient, Closeable {
     // Version above minimumVersion
     if (versionComparison < 0) {
       throw new UnsupportedApiVersionException(apiVersion);
-    }
-  }
-
-  /**
-   * Create a new {@link DefaultDockerClient} builder.
-   *
-   * @return Returns a builder that can be used to further customize and then build the client.
-   */
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  /**
-   * Create a new {@link DefaultDockerClient} builder prepopulated with values loaded from the
-   * DOCKER_HOST and DOCKER_CERT_PATH environment variables.
-   *
-   * @return Returns a builder that can be used to further customize and then build the client.
-   * @throws DockerCertificateException if we could not build a DockerCertificates object
-   */
-  public static Builder fromEnv() throws DockerCertificateException {
-    final String endpoint = DockerHost.endpointFromEnv();
-    final Path dockerCertPath = Paths.get(asList(certPathFromEnv(), configPathFromEnv(), defaultCertPath())
-    	.stream()
-    	.filter(cert -> cert != null)
-    	.findFirst()
-    	.orElseThrow(() -> new NoSuchElementException("Cannot find docker certificated path")));
-
-    final Builder builder = new Builder();
-
-    final Optional<DockerCertificatesStore> certs = DockerCertificates.builder()
-        .dockerCertPath(dockerCertPath).build();
-
-    if (endpoint.startsWith(UNIX_SCHEME + "://")) {
-      builder.uri(endpoint);
-    } else if (endpoint.startsWith(NPIPE_SCHEME + "://")) {
-      builder.uri(endpoint);
-    } else {
-      final String stripped = endpoint.replaceAll(".*://", "");
-      final String scheme = certs.isPresent() ? "https" : "http";
-      URI initialUri = URI.create(scheme + "://" + stripped);
-      if (initialUri.getPort() == -1 && initialUri.getHost() == null) {
-    	  initialUri = URI.create(scheme + "://" + defaultAddress() + ":" + defaultPort());
-      } else if (initialUri.getHost() == null) {
-    	  initialUri = URI.create(scheme + "://" + defaultAddress()+ ":" + initialUri.getPort());
-      } else if (initialUri.getPort() == -1) {
-    	  initialUri = URI.create(scheme + "://" + initialUri.getHost() + ":" + defaultPort());
-      }
-      builder.uri(initialUri);
-    }
-
-    if (certs.isPresent()) {
-      builder.dockerCertificates(certs.get());
-    }
-
-    return builder;
-  }
-
-  public static class Builder {
-
-    public static final String ERROR_MESSAGE =
-        "LOGIC ERROR: DefaultDockerClient does not support being built "
-        + "with both `registryAuth` and `registryAuthSupplier`. "
-        + "Please build with at most one of these options.";
-    private URI uri;
-    private String apiVersion;
-    private long connectTimeoutMillis = DEFAULT_CONNECT_TIMEOUT_MILLIS;
-    private long readTimeoutMillis = DEFAULT_READ_TIMEOUT_MILLIS;
-    private int connectionPoolSize = DEFAULT_CONNECTION_POOL_SIZE;
-    private DockerCertificatesStore dockerCertificatesStore;
-    private boolean useProxy = true;
-    private RegistryAuthSupplier registryAuthSupplier;
-    private Map<String, Object> headers = new HashMap<>();
-    private RequestEntityProcessing requestEntityProcessing;
-
-    public URI uri() {
-      return uri;
-    }
-
-    public Builder uri(final URI uri) {
-      this.uri = uri;
-      return this;
-    }
-
-    /**
-     * Set the URI for connections to Docker.
-     *
-     * @param uri URI String for connections to Docker
-     * @return Builder
-     */
-    public Builder uri(final String uri) {
-      return uri(URI.create(uri));
-    }
-
-    /**
-     * Set the Docker API version that will be used in the HTTP requests to Docker daemon.
-     *
-     * @param apiVersion String for Docker API version
-     * @return Builder
-     */
-    public Builder apiVersion(final String apiVersion) {
-      this.apiVersion = apiVersion;
-      return this;
-    }
-
-    public String apiVersion() {
-      return apiVersion;
-    }
-
-    public long connectTimeoutMillis() {
-      return connectTimeoutMillis;
-    }
-
-    /**
-     * Set the timeout in milliseconds until a connection to Docker is established. A timeout value
-     * of zero is interpreted as an infinite timeout.
-     *
-     * @param connectTimeoutMillis connection timeout to Docker daemon in milliseconds
-     * @return Builder
-     */
-    public Builder connectTimeoutMillis(final long connectTimeoutMillis) {
-      this.connectTimeoutMillis = connectTimeoutMillis;
-      return this;
-    }
-
-    public long readTimeoutMillis() {
-      return readTimeoutMillis;
-    }
-
-    /**
-     * Set the SO_TIMEOUT in milliseconds. This is the maximum period of inactivity between
-     * receiving two consecutive data packets from Docker.
-     *
-     * @param readTimeoutMillis read timeout to Docker daemon in milliseconds
-     * @return Builder
-     */
-    public Builder readTimeoutMillis(final long readTimeoutMillis) {
-      this.readTimeoutMillis = readTimeoutMillis;
-      return this;
-    }
-
-    public DockerCertificatesStore dockerCertificates() {
-      return dockerCertificatesStore;
-    }
-
-    /**
-     * Provide certificates to secure the connection to Docker.
-     *
-     * @param dockerCertificatesStore DockerCertificatesStore object
-     * @return Builder
-     */
-    public Builder dockerCertificates(final DockerCertificatesStore dockerCertificatesStore) {
-      this.dockerCertificatesStore = dockerCertificatesStore;
-      return this;
-    }
-
-    public int connectionPoolSize() {
-      return connectionPoolSize;
-    }
-
-    /**
-     * Set the size of the connection pool for connections to Docker. Note that due to a known
-     * issue, DefaultDockerClient maintains two separate connection pools, each of which is capped
-     * at this size. Therefore, the maximum number of concurrent connections to Docker may be up to
-     * 2 * connectionPoolSize.
-     *
-     * @param connectionPoolSize connection pool size
-     * @return Builder
-     */
-    public Builder connectionPoolSize(final int connectionPoolSize) {
-      this.connectionPoolSize = connectionPoolSize;
-      return this;
-    }
-
-    public boolean useProxy() {
-      return useProxy;
-    }
-
-    /**
-     * Allows connecting to Docker Daemon using HTTP proxy.
-     *
-     * @param useProxy tells if Docker Client has to connect to docker daemon using HTTP Proxy
-     * @return Builder
-     */
-    public Builder useProxy(final boolean useProxy) {
-      this.useProxy = useProxy;
-      return this;
-    }
-
-    public Builder registryAuthSupplier(final RegistryAuthSupplier registryAuthSupplier) {
-      if (this.registryAuthSupplier != null) {
-        throw new IllegalStateException(ERROR_MESSAGE);
-      }
-      this.registryAuthSupplier = registryAuthSupplier;
-      return this;
-    }
-
-    /**
-     * Adds additional headers to be sent in all requests to the Docker Remote API.
-     */
-    public Builder header(String name, Object value) {
-      headers.put(name, value);
-      return this;
-    }
-
-    public Map<String, Object> headers() {
-      return headers;
-    }
-    
-    /**
-     * Allows setting transfer encoding. CHUNKED does not send the content-length header 
-     * while BUFFERED does.
-     * 
-     * <p>By default ApacheConnectorProvider uses CHUNKED mode. Some Docker API end-points 
-     * seems to fail when no content-length is specified but a body is sent.
-     * 
-     * @param requestEntityProcessing is the requested entity processing to use when calling docker
-     *     daemon (tcp protocol).
-     * @return Builder
-     */
-    public Builder useRequestEntityProcessing(
-        final RequestEntityProcessing requestEntityProcessing) {
-      this.requestEntityProcessing = requestEntityProcessing;
-      return this;
-    }
-    
-    public RequestEntityProcessing getRequestEntityProcessing() {
-      return this.requestEntityProcessing;
-    }
-
-    public DefaultDockerClient build() {
-      // read the docker config file for auth info if nothing else was specified
-      if (registryAuthSupplier == null) {
-        registryAuthSupplier(new ConfigFileRegistryAuthSupplier());
-      }
-
-      return new DefaultDockerClient(this);
     }
   }
 }
