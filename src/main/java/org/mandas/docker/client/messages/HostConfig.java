@@ -311,7 +311,7 @@ public interface HostConfig {
   @Derived
   @Auxiliary
   default Builder toBuilder() {
-	return ImmutableHostConfig.builder(); 
+	return ImmutableHostConfig.builder().from(this);
   }
 
   public static Builder builder() {
