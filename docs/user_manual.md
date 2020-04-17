@@ -63,15 +63,15 @@ This user manual is made to correspond to Docker's [API docs][1] (e.g. [API 1.18
 
 ```java
 // Create a client based on DOCKER_HOST and DOCKER_CERT_PATH env vars
-final DockerClient docker = DefaultDockerClient.fromEnv().build();
+final DockerClient docker = new JerseyDockerClientBuilder().fromEnv().build();
 
 // or use the builder
-final DockerClient docker = DefaultDockerClient.builder()
+final DockerClient docker = new JerseyDockerClientBuilder
   // Set various options
   .build();
 ```
 
-Both `DefaultDockerClient.builder()` and `DefaultDockerClient.fromEnv()` return a
+Both `new JerseyDockerClientBuilder` and `new JerseyDockerClientBuilder().fromEnv()` return a
 `DefaultDockerClient.Builder`. The builder can be used to configure and build clients with custom
 timeouts, connection pool sizes, and other parameters.
 
@@ -80,7 +80,7 @@ timeouts, connection pool sizes, and other parameters.
 Unix socket support is available on Linux since v2.5.0:
 
 ```java
-final DockerClient docker = new DefaultDockerClient("unix:///var/run/docker.sock");
+final DockerClient docker = new JerseyDockerClientBuilder().uri("unix:///var/run/docker.sock");
 ```
 
 ### HTTPS support
@@ -90,7 +90,7 @@ with client-server authentication. The semantics are similar to using [the `DOCK
 environment variable](https://docs.docker.com/articles/https/#client-modes):
 
 ```java
-final DockerClient docker = DefaultDockerClient.builder()
+final DockerClient docker = new JerseyDockerClientBuilder
     .uri(URI.create("https://boot2docker:2376"))
     .dockerCertificates(new DockerCertificates(Paths.get("/Users/rohan/.docker/boot2docker-vm/")))
     .build();
@@ -106,7 +106,7 @@ If you plan on waiting on more than 100 containers at a time (`DockerClient.wait
 otherwise need a higher number of concurrent requests, you can modify the connection pool size:
 
 ```java
-final DockerClient docker = DefaultDockerClient.fromEnv()
+final DockerClient docker = new JerseyDockerClientBuilder().fromEnv()
     .connectionPoolSize(SOME_LARGE_NUMBER)
     .build()
 ```

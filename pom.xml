@@ -54,7 +54,7 @@
     <version.unixsocket>0.28</version.unixsocket>
     <version.apache.lang>2.6</version.apache.lang>
     <version.bcpkix>1.65</version.bcpkix>
-
+	  <version.jaxrs>2.1.6</version.jaxrs>
     <version.google.oauth2>0.20.0</version.google.oauth2>
 
     <version.junit>4.13</version.junit>
@@ -71,7 +71,6 @@
     <version.plugin.enforcer>3.0.0-M3</version.plugin.enforcer>
     <version.plugin.projectinfo>3.0.0</version.plugin.projectinfo>
     <version.plugin.source>3.2.1</version.plugin.source>
-    <version.plugin.shade>3.2.3</version.plugin.shade>
     <version.plugin.failsafe>3.0.0-M4</version.plugin.failsafe>
     <version.plugin.javadoc>3.2.0</version.plugin.javadoc>
     <version.plugin.jacoco>0.8.5</version.plugin.jacoco>
@@ -98,6 +97,11 @@
       <version>${version.slf4j}</version>
     </dependency>
     <dependency>
+	  <groupId>jakarta.ws.rs</groupId>
+	  <artifactId>jakarta.ws.rs-api</artifactId>
+	  <version>${version.jaxrs}</version>
+	</dependency>
+    <dependency>
       <groupId>com.fasterxml.jackson.jaxrs</groupId>
       <artifactId>jackson-jaxrs-json-provider</artifactId>
       <exclusions>
@@ -110,31 +114,6 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.glassfish.jersey.core</groupId>
-      <artifactId>jersey-client</artifactId>
-      <version>${version.jersey}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.glassfish.jersey.inject</groupId>
-      <artifactId>jersey-hk2</artifactId>
-      <version>${version.jersey}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.glassfish.jersey.connectors</groupId>
-      <artifactId>jersey-apache-connector</artifactId>
-      <version>${version.jersey}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.glassfish.jersey.media</groupId>
-      <artifactId>jersey-media-json-jackson</artifactId>
-      <version>${version.jersey}</version><exclusions>
-      	<exclusion>
-      		<groupId>com.fasterxml.jackson.module</groupId>
-      		<artifactId>jackson-module-jaxb-annotations</artifactId>
-      	</exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -164,6 +143,38 @@
       <version>${version.google.oauth2}</version>
       <optional>true</optional>
     </dependency>
+
+	<!--optional deps-->
+	<dependency>
+    <groupId>org.glassfish.jersey.core</groupId>
+    <artifactId>jersey-client</artifactId>
+    <version>${version.jersey}</version>
+    <optional>true</optional>
+  </dependency>
+  <dependency>
+    <groupId>org.glassfish.jersey.inject</groupId>
+    <artifactId>jersey-hk2</artifactId>
+    <version>${version.jersey}</version>
+    <optional>true</optional>
+  </dependency>
+  <dependency>
+    <groupId>org.glassfish.jersey.connectors</groupId>
+    <artifactId>jersey-apache-connector</artifactId>
+    <version>${version.jersey}</version>
+    <optional>true</optional>
+  </dependency>
+  <dependency>
+    <groupId>org.glassfish.jersey.media</groupId>
+    <artifactId>jersey-media-json-jackson</artifactId>
+    <version>${version.jersey}</version>
+    <optional>true</optional>
+    <exclusions>
+      <exclusion>
+        <groupId>com.fasterxml.jackson.module</groupId>
+        <artifactId>jackson-module-jaxb-annotations</artifactId>
+      </exclusion>
+    </exclusions>
+  </dependency>
 
     <!--test deps-->
     <dependency>
@@ -281,108 +292,6 @@
             <id>attach-sources</id>
             <goals>
               <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>${version.plugin.shade}</version>
-        <configuration>
-          <createSourcesJar>true</createSourcesJar>
-          <artifactSet>
-            <includes>
-              <include>com.fasterxml.jackson.**</include>
-              <include>jakarta.ws.rs:*</include>
-              <include>org.glassfish.**</include>
-              <include>org.jvnet.hk2.**</include>
-              <include>com.github.jnr:*</include>
-              <include>org.ow2.asm:*</include>
-              <include>org.apache.httpcomponents:httpclient</include>
-              <include>org.apache.httpcomponents:httpcore</include>
-              <include>asm:asm</include>
-            </includes>
-            <excludes>
-              <exclude>com.github.jnr:jffi</exclude>
-            </excludes>
-          </artifactSet>
-          <relocations>
-            <relocation>
-              <pattern>javax.inject</pattern>
-              <shadedPattern>org.mandas.docker.client.shaded.javax.inject</shadedPattern>
-            </relocation>
-            <relocation>
-              <pattern>javax.ws.rs</pattern>
-              <shadedPattern>org.mandas.docker.client.shaded.javax.ws.rs</shadedPattern>
-            </relocation>
-            <relocation>
-              <pattern>org.glassfish</pattern>
-              <shadedPattern>org.mandas.docker.client.shaded.org.glassfish</shadedPattern>
-            </relocation>
-            <relocation>
-              <pattern>org.jvnet.hk2</pattern>
-              <shadedPattern>org.mandas.docker.client.shaded.org.jvnet.hk2</shadedPattern>
-            </relocation>
-            <relocation>
-              <pattern>com.fasterxml.jackson</pattern>
-              <shadedPattern>org.mandas.docker.client.shaded.com.fasterxml.jackson</shadedPattern>
-            </relocation>
-            <relocation>
-              <pattern>com.google.common</pattern>
-              <shadedPattern>org.mandas.docker.client.shaded.com.google.common</shadedPattern>
-            </relocation>
-            <relocation>
-              <pattern>com.google.thirdparty</pattern>
-              <shadedPattern>org.mandas.docker.client.shaded.com.google.thirdparty</shadedPattern>
-            </relocation>
-            <relocation>
-              <pattern>org.apache.http</pattern>
-              <shadedPattern>org.mandas.docker.client.shaded.org.apache.http</shadedPattern>
-            </relocation>
-            <relocation>
-              <pattern>org.objectweb.asm</pattern>
-              <shadedPattern>org.mandas.docker.client.shaded.org.objectweb.asm</shadedPattern>
-            </relocation>
-            <relocation>
-              <pattern>org.aopalliance</pattern>
-              <shadedPattern>org.mandas.docker.client.shaded.org.aopalliance</shadedPattern>
-            </relocation>
-            <relocation>
-              <pattern>org.jvnet</pattern>
-              <shadedPattern>org.mandas.docker.client.shaded.org.jvnet</shadedPattern>
-            </relocation>
-            <relocation>
-              <pattern>com.kenai.constantine</pattern>
-              <shadedPattern>org.mandas.docker.client.shaded.com.kenai.constantine</shadedPattern>
-            </relocation>
-            <relocation>
-              <pattern>com.kenai.jnr</pattern>
-              <shadedPattern>org.mandas.docker.client.shaded.com.kenai.jnr</shadedPattern>
-            </relocation>
-            <relocation>
-              <pattern>mozilla</pattern>
-              <shadedPattern>org.mandas.docker.client.shaded.mozilla</shadedPattern>
-            </relocation>
-            <relocation>
-              <pattern>jnr</pattern>
-              <shadedPattern>org.mandas.docker.client.shaded.jnr</shadedPattern>
-            </relocation>
-            <relocation>
-              <pattern>jni</pattern>
-              <shadedPattern>org.mandas.docker.client.shaded.jni</shadedPattern>
-             </relocation>
-          </relocations>
-          <shadedArtifactAttached>true</shadedArtifactAttached>
-          <transformers>
-            <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-          </transformers>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
             </goals>
           </execution>
         </executions>
