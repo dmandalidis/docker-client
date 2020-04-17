@@ -9,13 +9,16 @@
 hold the necessary data for supporting swarm generic resources.
 
 * Swarm support for generic resources (fixes #155)
+
+## 3.2.1
+
+* HostConfig.toBuilder fix to use existing values (fixes #166)(thanks [@ko-mueller](https://github.com/ko-mueller))
+* Bump bcpkix-jdk15on from 1.64 to 1.65
 * Bump jackson-bom from 2.10.2 to 2.10.3
 * Bump version.jersey from 2.30 to 2.30.1
-* Bump jnr-unixsocket from 0.27 to 0.28
-* Bump jnr-unixsocket from 0.26 to 0.27
 * Auto-close json generator
 * Remove commons-io and javax.activation dependencies
-* Bump jnr-unixsocket from 0.25 to 0.26
+* Bump jnr-unixsocket from 0.25 to 0.28
 
 ## 3.2.0
 
