@@ -62,6 +62,8 @@ different client builders.
 
 ### Changes
 
+* Rationalize DefaultDockerClient and Builder responsibilities (fixes #161, #91)
+* Drop commons-lang dependency
 * Swarm support for generic resources (fixes #155)
 
 ## 3.2.1
