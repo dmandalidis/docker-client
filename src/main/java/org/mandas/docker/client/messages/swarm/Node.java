@@ -64,31 +64,31 @@ public interface Node {
   @Immutable
   public interface Criteria {
     /**
-     * Filter by node id.
+     * @return Filter by node id.
      */
     @Nullable
     String nodeId();
 
     /**
-     * Filter by label.
+     * @return Filter by label.
      */
     @Nullable
     String label();
 
     /**
-     * Filter by membership {accepted | pending}.
+     * @return Filter by membership {accepted | pending}.
      */
     @Nullable
     String membership();
 
     /**
-     * Filter by node name.
+     * @return Filter by node name.
      */
     @Nullable
     String nodeName();
 
     /**
-     * Filter by node role {manager | worker}.
+     * @return Filter by node role {manager | worker}.
      */
     @Nullable
     String nodeRole();

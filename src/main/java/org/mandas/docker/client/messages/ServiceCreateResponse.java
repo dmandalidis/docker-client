@@ -38,6 +38,7 @@ public interface ServiceCreateResponse {
   String id();
 
   /**
+   * @return any warnings produced during creating the service
    * @since API 1.25
    */
   @Nullable

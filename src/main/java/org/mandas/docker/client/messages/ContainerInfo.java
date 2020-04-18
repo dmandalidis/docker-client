@@ -110,6 +110,7 @@ public interface ContainerInfo {
   /**
    * This field is an extension defined by the Docker Swarm API, therefore it will only be populated
    * when communicating with a Swarm cluster.
+   * @return the node information where the container is placed
    */
   @Nullable
   @JsonProperty("Node")

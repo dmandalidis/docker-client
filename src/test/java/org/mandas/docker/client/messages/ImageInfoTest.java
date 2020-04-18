@@ -39,9 +39,6 @@ public class ImageInfoTest {
     objectMapper.readValue(fixture("fixtures/1.24/imageInfo.json"), ImageInfo.class);
   }
 
-  /**
-   * Test that an ImageInfo message from 1.22 - before RootFs was introduced - can be deserialized.
-   */
   @Test
   public void test1_22() throws Exception {
     final ImageInfo imageInfo =

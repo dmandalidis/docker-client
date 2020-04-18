@@ -63,19 +63,19 @@ public interface Service {
   public interface Criteria {
 
     /**
-     * Filter by service id.
+     * @return Filter by service id.
      */
     @Nullable
     String serviceId();
 
     /**
-     * Filter by service name.
+     * @return Filter by service name.
      */
     @Nullable
     String serviceName();
 
     /**
-     * Filter by label.
+     * @return Filter by label.
      */
     Map<String, String> labels();
     

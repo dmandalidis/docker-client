@@ -53,19 +53,19 @@ public interface Secret {
   @Immutable
   public interface Criteria {
     /**
-     * Filter by secret id.
+     * @return Filter by secret id.
      */
     @Nullable
     String id();
 
     /**
-     * Filter by label.
+     * @return Filter by label.
      */
     @Nullable
     String label();
 
     /**
-     * Filter by secret name.
+     * @return Filter by secret name.
      */
     @Nullable
     String name();

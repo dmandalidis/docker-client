@@ -89,6 +89,9 @@ public class ContainerRegistryAuthSupplier implements RegistryAuthSupplier {
 
   /**
    * Constructs a ContainerRegistryAuthSupplier for the account with the given credentials.
+   * @param credentialsStream the credentials stream
+   * @return a new {@link Builder}
+   * @throws IOException when an error occured when reading from stream
    *
    * @see Builder
    */
@@ -99,7 +102,8 @@ public class ContainerRegistryAuthSupplier implements RegistryAuthSupplier {
 
   /**
    * Constructs a ContainerRegistryAuthSupplier using the Application Default Credentials.
-   *
+   * @return a new {@link Builder}
+   * @throws IOException when an error occured when reading from stream
    * @see Builder
    */
   public static Builder forApplicationDefaultCredentials() throws IOException {
@@ -108,6 +112,8 @@ public class ContainerRegistryAuthSupplier implements RegistryAuthSupplier {
 
   /**
    * Constructs a ContainerRegistryAuthSupplier using the specified credentials.
+   * @param credentials the google credentials
+   * @return a new {@link Builder}
    *
    * @see Builder
    */
@@ -148,6 +154,8 @@ public class ContainerRegistryAuthSupplier implements RegistryAuthSupplier {
      * To allow the application using ContainerRegistryAuthSupplier to pull but not push images,
      * change the scope to contain only devstorage.read_only.
      * only</p>
+     * @param scopes a list of scopes
+     * @return this
      */
     public Builder withScopes(Collection<String> scopes) {
       this.scopes = scopes;
@@ -157,6 +165,9 @@ public class ContainerRegistryAuthSupplier implements RegistryAuthSupplier {
     /**
      * Changes the minimum expiry time used to refresh AccessTokens before they expire. The
      * default value is one minute.
+     * @param duration the expiry duration value
+     * @param timeUnit the expiry duration time unit
+     * @return this
      */
     public Builder withMinimumExpiry(long duration, TimeUnit timeUnit) {
       this.minimumExpiryMillis = TimeUnit.MILLISECONDS.convert(duration, timeUnit);

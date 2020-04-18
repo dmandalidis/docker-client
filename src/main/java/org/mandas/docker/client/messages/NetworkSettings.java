@@ -74,7 +74,7 @@ public interface NetworkSettings {
   }
   
   /**
-   * Only used for deserialization and clients should not call that method
+   * @return Only used for deserialization and clients should not call that method
    */
   @Nullable @AllowNulls
   @JsonProperty("Ports")

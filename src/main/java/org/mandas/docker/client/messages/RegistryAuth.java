@@ -61,7 +61,7 @@ public interface RegistryAuth {
   String password();
 
   /**
-   * Unused but must be a well-formed email address (e.g. 1234@5678.com).
+   * @return Unused but must be a well-formed email address (e.g. 1234@5678.com).
    */
   @Nullable
   @Redacted
@@ -121,7 +121,10 @@ public interface RegistryAuth {
         .build();
   }
 
-  /** Construct a Builder based upon the "auth" field of the docker client config file. */
+  /** 
+   * @param auth the "auth" field of the docker client config file.
+   * @return Construct a Builder based upon the "auth" field of the docker client config file. 
+   */
   public static Builder forAuth(final String auth) {
     // split with limit=2 to catch case where password contains a colon
 	byte[] authByteValue = Base64.getDecoder().decode(auth);

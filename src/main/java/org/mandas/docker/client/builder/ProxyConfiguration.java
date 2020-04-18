@@ -86,7 +86,7 @@ public interface ProxyConfiguration {
   
   /**
    * Get a {@link ProxyConfiguration} builder
-   * @return
+   * @return a new builder
    */
   static Builder builder() {
     return ImmutableProxyConfiguration.builder();

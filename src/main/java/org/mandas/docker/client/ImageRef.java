@@ -68,17 +68,17 @@ public class ImageRef {
     return image;
   }
 
-  /** The image tag, or null if not set. */
+  /** @return The image tag, or null if not set. */
   public String getTag() {
     return tag;
   }
 
-  /** Hostname/ip address and port of the registry. */
+  /** @return Hostname/ip address and port of the registry. */
   public String getRegistryName() {
     return registry;
   }
 
-  /** Registry URL. */
+  /** @return Registry URL. */
   public String getRegistryUrl() {
     return registryUrl;
   }

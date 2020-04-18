@@ -92,6 +92,7 @@ import org.mandas.docker.client.messages.swarm.SwarmInit;
 import org.mandas.docker.client.messages.swarm.SwarmJoin;
 import org.mandas.docker.client.messages.swarm.SwarmSpec;
 import org.mandas.docker.client.messages.swarm.Task;
+import org.mandas.docker.client.messages.swarm.Task.Criteria;
 import org.mandas.docker.client.messages.swarm.UnlockKey;
 
 /**
@@ -99,7 +100,6 @@ import org.mandas.docker.client.messages.swarm.UnlockKey;
  *
  * <p>Note: All methods throw DockerException on unexpected docker response status codes.
  */
-@SuppressWarnings("JavadocMethod")
 public interface DockerClient extends Closeable {
 
   /**
@@ -822,6 +822,7 @@ public interface DockerClient extends Closeable {
    *
    * @param containerId the identifier of the container
    * @param config the new container host config
+   * @return the updated container
    * @throws DockerException      if a server error occurred (500)
    * @throws InterruptedException If the thread is interrupted
    */
@@ -939,6 +940,7 @@ public interface DockerClient extends Closeable {
   /**
    * Get the distribution of a container.
    * @param imageName The name of the container.
+   * @return the container's distribution
    * @throws ContainerNotFoundException
    *                              if container is not found (404)
    * @throws DockerException      if a server error occurred (500)
@@ -1372,6 +1374,7 @@ public interface DockerClient extends Closeable {
 
   /**
    * Initialize a new swarm. Only available in Docker API &gt;= 1.24.
+   * @param swarmInit 
    *
    * @return Node ID
    * @throws DockerException      If a server error occurred (500)
@@ -1381,6 +1384,7 @@ public interface DockerClient extends Closeable {
 
   /**
    * Join an existing swarm. Only available in Docker API &gt;= 1.24.
+   * @param swarmJoin the swarm
    *
    * @throws DockerException      If a server error occurred (500)
    * @throws InterruptedException If the thread is interrupted
@@ -1613,7 +1617,7 @@ public interface DockerClient extends Closeable {
   /**
    * List tasks that match the given criteria. Only available in Docker API &gt;= 1.24.
    *
-   * @param criteria {@link Task.Criteria}
+   * @param criteria {@link Criteria}
    * @return A list of tasks.
    * @throws DockerException      if a server error occurred (500)
    * @throws InterruptedException If the thread is interrupted
@@ -1703,7 +1707,7 @@ public interface DockerClient extends Closeable {
   /**
    * List all or a subset of the networks.
    * Filters were added in Docker 1.10, API version 1.22.
-   *
+   * @param params the list network parameters 
    * @return networks
    * @throws DockerException      if a server error occurred (500)
    * @throws InterruptedException If the thread is interrupted
@@ -2711,6 +2715,7 @@ public interface DockerClient extends Closeable {
    * List secrets.
    * @return A list of {@link Secret}s
    * @throws DockerException if a server error occurred (500)
+   * @throws InterruptedException 
    * @since Docker 1.13, API version 1.25
    */
   List<Secret> listSecrets() throws DockerException, InterruptedException;
@@ -2720,6 +2725,7 @@ public interface DockerClient extends Closeable {
    * @param criteria Config listing and filtering options
    * @return A list of {@link Secret}s
    * @throws DockerException if a server error occurred (500)
+   * @throws InterruptedException 
    * @since Docker 1.13, API version 1.25
    */
   List<Secret> listSecrets(final Secret.Criteria criteria) throws DockerException, InterruptedException;
@@ -2730,6 +2736,7 @@ public interface DockerClient extends Closeable {
    * @return {@link SecretCreateResponse}
    * @throws ConflictException conflict (409)
    * @throws DockerException if node is not part of a swarm (406) or a server error occurred (500)
+   * @throws InterruptedException 
    * @since Docker 1.13, API version 1.25
    */
   SecretCreateResponse createSecret(SecretSpec secret) throws DockerException, InterruptedException;
@@ -2740,6 +2747,7 @@ public interface DockerClient extends Closeable {
    * @return {@link Secret}
    * @throws NotFoundException secret not found (404)
    * @throws DockerException if node is not part of a swarm (406) or a server error occurred (500)
+   * @throws InterruptedException 
    * @since Docker 1.13, API version 1.25
    */
   Secret inspectSecret(String secretId) throws DockerException, InterruptedException;
@@ -2749,6 +2757,7 @@ public interface DockerClient extends Closeable {
    * @param secretId The id of the secret.
    * @throws NotFoundException not found (404)
    * @throws DockerException if a server error occurred (500)
+   * @throws InterruptedException 
    * @since Docker 1.13, API version 1.25
    */
   void deleteSecret(String secretId) throws DockerException, InterruptedException;
@@ -2860,6 +2869,7 @@ public interface DockerClient extends Closeable {
    * @return {@link ConfigCreateResponse}
    * @throws ConflictException conflict (409)
    * @throws DockerException if node is not part of a swarm (503) or a server error occurred (500)
+   * @throws InterruptedException 
    * @since Docker 1.13, API version 1.30
    */
   ConfigCreateResponse createConfig(final ConfigSpec config)
@@ -2872,6 +2882,7 @@ public interface DockerClient extends Closeable {
    * @return {@link Config}
    * @throws NotFoundException config not found (404)
    * @throws DockerException if node is not part of a swarm (503) or a server error occurred (500)
+   * @throws InterruptedException 
    * @since Docker 1.13, API version 1.30
    */
   Config inspectConfig(final String configId) throws DockerException, InterruptedException;
@@ -2883,6 +2894,7 @@ public interface DockerClient extends Closeable {
    *
    * @throws NotFoundException config not found (404)
    * @throws DockerException if node is not part of a swarm (503) or a server error occurred (500)
+   * @throws InterruptedException 
    * @since Docker 1.13, API version 1.30
    */
   void deleteConfig(final String configId) throws DockerException, InterruptedException;
@@ -2893,13 +2905,14 @@ public interface DockerClient extends Closeable {
    * @param configId The id of the config to update
    * @param version The version number of the config object being updated.
    *                This is required to avoid conflicting writes
+   * @param configSpec the config specification
    * @throws NodeNotFoundException If the config doesn't exist (404)
    * @throws NonSwarmNodeException If the config is not part of a swarm (503)
    * @throws DockerException If a server error occurred (500)
    * @throws InterruptedException If the thread is interrupted
    * @since Docker 1.13, API version 1.30
    */
-  void updateConfig(final String configId, final Long version, final ConfigSpec nodeSpec)
+  void updateConfig(final String configId, final Long version, final ConfigSpec configSpec)
       throws DockerException, InterruptedException;
 
   /**
@@ -2944,6 +2957,7 @@ public interface DockerClient extends Closeable {
    * @param nodeId The id of the node to update
    * @param version The version number of the node object being updated.
    *                This is required to avoid conflicting writes
+   * @param nodeSpec the node specification
    * @throws NodeNotFoundException If the node doesn't exist (404)
    * @throws NonSwarmNodeException If the node is not part of a swarm (503)
    * @throws DockerException If a server error occurred (500)
@@ -2956,6 +2970,8 @@ public interface DockerClient extends Closeable {
   /**
    * Remove a node from the swarm.
    * @param nodeId The id of the node to remove.
+   * @throws DockerException 
+   * @throws InterruptedException 
    */
   void deleteNode(final String nodeId) throws DockerException, InterruptedException;
 
@@ -2963,6 +2979,8 @@ public interface DockerClient extends Closeable {
    * Remove a node from the swarm.
    * @param nodeId The id of the node to remove.
    * @param force  Forcefully remove the node.
+   * @throws DockerException 
+   * @throws InterruptedException 
    */
   void deleteNode(final String nodeId, final boolean force) throws DockerException,
                                                                    InterruptedException;

@@ -54,18 +54,21 @@ public interface Config {
   public interface Criteria {
     /**
      * Filter by config id.
+     * @return an optional config id
      */
     @Nullable
     String configId();
 
     /**
      * Filter by label.
+     * @return an optional label
      */
     @Nullable
     String label();
 
     /**
      * Filter by config name.
+     * @return an optional name
      */
     @Nullable
     String name();

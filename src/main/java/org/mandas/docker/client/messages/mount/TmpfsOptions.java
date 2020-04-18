@@ -36,7 +36,7 @@ public interface TmpfsOptions {
   Long sizeBytes();
 
   /**
-   * The mode and permission bits.
+   * @return The mode and permission bits.
    */
   @Nullable
   @JsonProperty("Mode")

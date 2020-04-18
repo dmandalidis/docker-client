@@ -244,14 +244,14 @@ public interface ContainerConfig {
     List<String> test();
 
     /**
-     * In nanoseconds.
+     * @return interval in nanoseconds.
      */
     @Nullable
     @JsonProperty("Interval")
     Long interval();
 
     /**
-     * In nanoseconds.
+     * @return timeout in nanoseconds.
      */
     @Nullable
     @JsonProperty("Timeout")
@@ -262,7 +262,7 @@ public interface ContainerConfig {
     Integer retries();
 
     /**
-     * In nanoseconds.
+     * @return start period in nanoseconds.
      * @since API 1.29
      */
     @Nullable

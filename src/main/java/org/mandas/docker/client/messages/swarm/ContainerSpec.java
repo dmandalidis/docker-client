@@ -40,6 +40,7 @@ public interface ContainerSpec {
   String image();
 
   /**
+   * @return an optional hostname
    * @since API 1.26
    */
   @Nullable
@@ -86,6 +87,7 @@ public interface ContainerSpec {
   Long stopGracePeriod();
 
   /**
+   * @return an optional healthcheck
    * @since API 1.26
    */
   @Nullable
@@ -93,6 +95,7 @@ public interface ContainerSpec {
   ContainerConfig.Healthcheck healthcheck();
 
   /**
+   * @return a lits of hosts
    * @since API 1.26
    */
   @Nullable
@@ -100,6 +103,7 @@ public interface ContainerSpec {
   List<String> hosts();
 
   /**
+   * @return a list of secrets
    * @since API 1.26
    */
   @Nullable
@@ -107,6 +111,7 @@ public interface ContainerSpec {
   List<SecretBind> secrets();
 
   /**
+   * @return a list of configs
    * @since API 1.30
    */
   @Nullable
@@ -121,6 +126,7 @@ public interface ContainerSpec {
   Map<String, String> sysctls();
 
   /**
+   * @return a init property in container specification
    * @since 1.37
    */
   @Nullable

@@ -128,9 +128,6 @@ public class MultiRegistryAuthSupplierTest {
     ));
   }
 
-  /**
-   * Test what happens if one of the Suppliers returns null for authForBuild().
-   */
   @Test
   public void testAuthForBuild_ReturnsNull() throws Exception {
 

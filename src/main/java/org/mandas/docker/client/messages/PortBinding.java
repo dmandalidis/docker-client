@@ -51,6 +51,9 @@ public interface PortBinding {
   }
   
   /**
+   * @param hostIp the host IP
+   * @param hostPort the host port
+   * @return a new PortBinding
    * @deprecated use {@link #of(String, String)} instead
    */
   @Deprecated

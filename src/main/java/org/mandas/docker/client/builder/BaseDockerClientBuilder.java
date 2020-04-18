@@ -80,7 +80,7 @@ public abstract class BaseDockerClientBuilder<B extends BaseDockerClientBuilder<
   protected EntityProcessing entityProcessing;
 
   /**
-   * Sets or overwrites {@link #uri()} and {@link #dockerCertificates()} according to the values
+   * Sets or overwrites {@link #uri()} and {@link #dockerCertificates(DockerCertificatesStore)} according to the values
    * present in DOCKER_HOST and DOCKER_CERT_PATH environment variables.
    *
    * @return Modifies a builder that can be used to further customize and then build the client.
@@ -222,6 +222,9 @@ public abstract class BaseDockerClientBuilder<B extends BaseDockerClientBuilder<
 
   /**
    * Adds additional headers to be sent in all requests to the Docker Remote API.
+   * @param name the header name
+   * @param value the header value
+   * @return this
    */
   public BaseDockerClientBuilder<B> header(String name, Object value) {
     headers.put(name, value);
@@ -255,7 +258,7 @@ public abstract class BaseDockerClientBuilder<B extends BaseDockerClientBuilder<
    * <p>By default ApacheConnectorProvider uses CHUNKED mode. Some Docker API end-points 
    * seems to fail when no content-length is specified but a body is sent.
    * 
-   * @param requestEntityProcessing is the requested entity processing to use when calling docker
+   * @param entityProcessing is the requested entity processing to use when calling docker
    *     daemon (tcp protocol).
    * @return Builder
    */

@@ -87,36 +87,42 @@ public interface Task {
 
     /**
      * Filter by task id.
+     * @return an optional task id
      */
     @Nullable
     String taskId();
 
     /**
      * Filter by task name.
+     * @return an optional task name
      */
     @Nullable
     String taskName();
 
     /**
      * Filter by service name.
+     * @return an optional service name
      */
     @Nullable
     String serviceName();
 
     /**
      * Filter by node id.
+     * @return an optional node id
      */
     @Nullable
     String nodeId();
 
     /**
      * Filter by label.
+     * @return an optional label
      */
     @Nullable
     String label();
 
     /**
      * Filter by desired state.
+     * @return an optional desired state
      */
     @Nullable
     String desiredState();

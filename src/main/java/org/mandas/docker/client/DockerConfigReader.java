@@ -53,6 +53,7 @@ public class DockerConfigReader {
    * If there is only one, it'll be that one.
    *
    * @return Some registry auth value.
+   * @throws IOException when an error occured during reading for docker configuration
    */
   public RegistryAuth anyRegistryAuth() throws IOException {
     return anyRegistryAuth(defaultConfigPath());
@@ -173,6 +174,7 @@ public class DockerConfigReader {
    * @param configPath Path to the docker config file
    * @param registry Docker registry for which to generate auth
    * @return The generated authentication object
+   * @throws IOException when an error occured while reading the docker configuration 
    */
   public RegistryAuth authForRegistry(final Path configPath, final String registry)
       throws IOException {

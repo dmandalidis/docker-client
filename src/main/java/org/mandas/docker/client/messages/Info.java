@@ -200,7 +200,7 @@ public interface Info {
     List<String> volumes();
 
     /**
-     * Return the value of the `network` json path.
+     * @return the value of the `network` json path.
      * todo this method should be renamed to network
      */
     @JsonProperty("Network")

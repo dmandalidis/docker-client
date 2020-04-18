@@ -29,9 +29,11 @@ public interface RegistryAuthSupplier {
 
   /**
    * Returns a RegistryAuth object that works with a given registry's API [e.g. GCR].
+   * @param imageName 
    *
    * @return the RegistryAuth to use when working with the image, or else {@code null} if no
    *         authentication info applies for this image
+   * @throws DockerException 
    */
   RegistryAuth authFor(String imageName) throws DockerException;
 
@@ -41,9 +43,12 @@ public interface RegistryAuthSupplier {
    * images for Swarm.
    *
    * @return the RegistryAuth to use in Swarn, or else {@code null} for no authentication info
+   * @throws DockerException 
    */
   RegistryAuth authForSwarm() throws DockerException;
 
-  /** Authentication info to pass in the X-Registry-Config header when building an image. */
+  /** Authentication info to pass in the X-Registry-Config header when building an image. 
+   * @return the registry configs
+   * @throws DockerException */
   RegistryConfigs authForBuild() throws DockerException;
 }
