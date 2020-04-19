@@ -138,6 +138,8 @@
 			<version>${version.immutables}</version>
 			<scope>provided</scope>
 		</dependency>
+
+		<!--optional deps -->
 		<!-- TODO we should pull out the Google Cloud support to a new library -->
 		<dependency>
 			<groupId>com.google.auth</groupId>
@@ -145,8 +147,6 @@
 			<version>${version.google.oauth2}</version>
 			<optional>true</optional>
 		</dependency>
-
-		<!--optional deps -->
 		<dependency>
 			<groupId>org.glassfish.jersey.core</groupId>
 			<artifactId>jersey-client</artifactId>
