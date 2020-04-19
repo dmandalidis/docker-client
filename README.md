@@ -17,7 +17,6 @@ It was used in many critical production systems at Spotify until its
 * [Prerequisites](#prerequisites)
 * [Testing](#testing)
 * [Releasing](#releasing)
-* [A Note on Shading](#a-note-on-shading)
 * [User Manual](https://github.com/dmandalidis/docker-client/blob/master/docs/user_manual.md)
 
 ## Version compatibility
