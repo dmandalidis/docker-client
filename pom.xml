@@ -51,6 +51,7 @@
 		<version.slf4j>1.7.30</version.slf4j>
 		<version.jackson>2.11.0</version.jackson>
 		<version.jersey>2.30.1</version.jersey>
+		<version.resteasy>4.5.3.Final</version.resteasy>
 		<version.immutables>2.8.8</version.immutables>
 		<version.apache.compress>1.19</version.apache.compress>
 		<version.unixsocket>0.32</version.unixsocket>
@@ -78,6 +79,7 @@
 		<version.plugin.jacoco>0.8.5</version.plugin.jacoco>
 		<version.plugin.staging>1.6.8</version.plugin.staging>
 		<version.plugin.gpg>1.6</version.plugin.gpg>
+		<version.plugin.surefire>3.0.0-M4</version.plugin.surefire>
 	</properties>
 
 	<dependencyManagement>
@@ -176,6 +178,18 @@
 					<artifactId>jackson-module-jaxb-annotations</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+        	<groupId>org.jboss.resteasy</groupId>
+        	<artifactId>resteasy-client</artifactId>
+        	<version>${version.resteasy}</version>
+        	<optional>true</optional>
+		</dependency>
+		<dependency>
+    		<groupId>org.jboss.resteasy</groupId>
+    		<artifactId>resteasy-core</artifactId>
+    		<version>${version.resteasy}</version>
+    		<optional>true</optional>
 		</dependency>
 
 		<!--test deps -->
@@ -299,8 +313,102 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${version.plugin.surefire}</version>
+				<executions>
+					<execution>
+		                <id>default-test</id>
+		                <configuration>
+		                    <skip>true</skip>
+		                </configuration>
+		            </execution>
+					<execution>
+						<id>jersey-unit-tests</id>
+						<phase>test</phase>
+						<goals>
+							<goal>test</goal>
+						</goals>
+						<configuration>
+							<classpathDependencyExcludes>
+								<classpathDependencyExclude>org.jboss.resteasy:resteasy-client</classpathDependencyExclude>
+								<classpathDependencyExclude>org.jboss.resteasy:resteasy-core</classpathDependencyExclude>
+							</classpathDependencyExcludes>
+							<!-- systemPropertyVariables>
+								<jaxrs.client>jersey</jaxrs.client>
+							</systemPropertyVariables-->
+							<trimStackTrace>false</trimStackTrace>
+						</configuration>
+					</execution>
+					<!-- execution>
+						<id>resteasy-unit-tests</id>
+						<phase>test</phase>
+						<goals>
+							<goal>test</goal>
+						</goals>
+						<configuration>
+							<classpathDependencyExcludes>
+								<classpathDependencyExclude>org.glassfish.jersey.core:jersey-client</classpathDependencyExclude>
+								<classpathDependencyExclude>org.glassfish.jersey.inject:jersey-hk2</classpathDependencyExclude>
+								<classpathDependencyExclude>org.glassfish.jersey.connectors:jersey-apache-connector</classpathDependencyExclude>
+								<classpathDependencyExclude>org.glassfish.jersey.media:jersey-media-json-jackson</classpathDependencyExclude>
+							</classpathDependencyExcludes>
+							<trimStackTrace>false</trimStackTrace>
+							<systemPropertyVariables>
+								<jaxrs.client>resteasy</jaxrs.client>
+							</systemPropertyVariables>
+						</configuration>
+					</execution-->
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>${version.plugin.failsafe}</version>
+				<executions>
+					<execution>
+		                <id>default-test</id>
+		                <configuration>
+		                    <skip>true</skip>
+		                </configuration>
+		            </execution>
+					<execution>
+						<id>jersey-integration-tests</id>
+						<phase>integration-test</phase>
+						<goals>
+							<goal>integration-test</goal>
+						</goals>
+						<configuration>
+							<classpathDependencyExcludes>
+								<classpathDependencyExclude>org.jboss.resteasy:resteasy-client</classpathDependencyExclude>
+								<classpathDependencyExclude>org.jboss.resteasy:resteasy-core</classpathDependencyExclude>
+							</classpathDependencyExcludes>
+							<!-- systemPropertyVariables>
+								<jaxrs.client>jersey</jaxrs.client>
+							</systemPropertyVariables-->
+							<trimStackTrace>false</trimStackTrace>
+						</configuration>
+					</execution>
+					<!-- execution>
+						<id>resteasy-integration-tests</id>
+						<phase>integration-test</phase>
+						<goals>
+							<goal>integration-test</goal>
+						</goals>
+						<configuration>
+							<classpathDependencyExcludes>
+								<classpathDependencyExclude>org.glassfish.jersey.core:jersey-client</classpathDependencyExclude>
+								<classpathDependencyExclude>org.glassfish.jersey.inject:jersey-hk2</classpathDependencyExclude>
+								<classpathDependencyExclude>org.glassfish.jersey.connectors:jersey-apache-connector</classpathDependencyExclude>
+								<classpathDependencyExclude>org.glassfish.jersey.media:jersey-media-json-jackson</classpathDependencyExclude>
+							</classpathDependencyExcludes>
+							<systemPropertyVariables>
+								<jaxrs.client>resteasy</jaxrs.client>
+							</systemPropertyVariables>
+							<trimStackTrace>false</trimStackTrace>
+						</configuration>
+					</execution-->
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
