@@ -39,6 +39,14 @@ import java.util.Optional;
 
 import javax.ws.rs.client.Client;
 
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.mandas.docker.client.DefaultDockerClient;
 import org.mandas.docker.client.DockerCertificates;
 import org.mandas.docker.client.DockerCertificatesStore;
@@ -57,7 +65,7 @@ import org.mandas.docker.client.npipe.NpipeConnectionSocketFactory;
  * @author Dimitris Mandalidis
  * @param <B> the type of the builder
  */
-public abstract class BaseDockerClientBuilder<B extends BaseDockerClientBuilder<B>> implements DockerClientBuilder {
+public abstract class BaseDockerClientBuilder<B extends BaseDockerClientBuilder<B>> implements DockerClientBuilder<B> {
 
   protected String UNIX_SCHEME = "unix";
   protected String NPIPE_SCHEME = "npipe";
@@ -79,6 +87,10 @@ public abstract class BaseDockerClientBuilder<B extends BaseDockerClientBuilder<
   protected Client client;
   protected EntityProcessing entityProcessing;
 
+  private B self() {
+    return (B) this;
+  }
+  
   /**
    * Sets or overwrites {@link #uri()} and {@link #dockerCertificates(DockerCertificatesStore)} according to the values
    * present in DOCKER_HOST and DOCKER_CERT_PATH environment variables.
@@ -86,7 +98,8 @@ public abstract class BaseDockerClientBuilder<B extends BaseDockerClientBuilder<
    * @return Modifies a builder that can be used to further customize and then build the client.
    * @throws DockerCertificateException if we could not build a DockerCertificates object
    */
-  public BaseDockerClientBuilder<B> fromEnv() throws DockerCertificateException {
+  @Override
+  public B fromEnv() throws DockerCertificateException {
     final String endpoint = DockerHost.endpointFromEnv();
     final Path dockerCertPath = Paths.get(asList(certPathFromEnv(), configPathFromEnv(), defaultCertPath())
         .stream()
@@ -118,12 +131,13 @@ public abstract class BaseDockerClientBuilder<B extends BaseDockerClientBuilder<
       this.dockerCertificates(certs.get());
     }
   
-    return this;
+    return self();
   }
 
-  public BaseDockerClientBuilder<B> uri(final URI uri) {
+  @Override
+  public B uri(final URI uri) {
     this.uri = uri;
-    return this;
+    return self();
   }
 
   /**
@@ -132,7 +146,7 @@ public abstract class BaseDockerClientBuilder<B extends BaseDockerClientBuilder<
    * @param uri URI String for connections to Docker
    * @return Builder
    */
-  public BaseDockerClientBuilder<B> uri(final String uri) {
+  public B uri(final String uri) {
     return uri(URI.create(uri));
   }
 
@@ -142,98 +156,55 @@ public abstract class BaseDockerClientBuilder<B extends BaseDockerClientBuilder<
    * @param apiVersion String for Docker API version
    * @return Builder
    */
-  public BaseDockerClientBuilder<B> apiVersion(final String apiVersion) {
+  @Override
+  public B apiVersion(final String apiVersion) {
     this.apiVersion = apiVersion;
-    return this;
+    return self();
   }
 
   @Override
-  public String apiVersion() {
-    return apiVersion;
-  }
-
-  /**
-   * Set the timeout in milliseconds until a connection to Docker is established. A timeout value
-   * of zero is interpreted as an infinite timeout.
-   *
-   * @param connectTimeoutMillis connection timeout to Docker daemon in milliseconds
-   * @return Builder
-   */
-  public BaseDockerClientBuilder<B> connectTimeoutMillis(final long connectTimeoutMillis) {
+  public B connectTimeoutMillis(final long connectTimeoutMillis) {
     this.connectTimeoutMillis = connectTimeoutMillis;
-    return this;
+    return self();
   }
 
-  /**
-   * Set the SO_TIMEOUT in milliseconds. This is the maximum period of inactivity between
-   * receiving two consecutive data packets from Docker.
-   *
-   * @param readTimeoutMillis read timeout to Docker daemon in milliseconds
-   * @return Builder
-   */
-  public BaseDockerClientBuilder<B> readTimeoutMillis(final long readTimeoutMillis) {
+  @Override
+  public B readTimeoutMillis(final long readTimeoutMillis) {
     this.readTimeoutMillis = readTimeoutMillis;
-    return this;
+    return self();
   }
 
-  /**
-   * Provide certificates to secure the connection to Docker.
-   *
-   * @param dockerCertificatesStore DockerCertificatesStore object
-   * @return Builder
-   */
-  public BaseDockerClientBuilder<B> dockerCertificates(final DockerCertificatesStore dockerCertificatesStore) {
+  @Override
+  public B dockerCertificates(final DockerCertificatesStore dockerCertificatesStore) {
     this.dockerCertificatesStore = dockerCertificatesStore;
-    return this;
+    return self();
   }
 
-  /**
-   * Set the size of the connection pool for connections to Docker. Note that due to a known
-   * issue, DefaultDockerClient maintains two separate connection pools, each of which is capped
-   * at this size. Therefore, the maximum number of concurrent connections to Docker may be up to
-   * 2 * connectionPoolSize.
-   *
-   * @param connectionPoolSize connection pool size
-   * @return Builder
-   */
-  public BaseDockerClientBuilder<B> connectionPoolSize(final int connectionPoolSize) {
+  @Override
+  public B connectionPoolSize(final int connectionPoolSize) {
     this.connectionPoolSize = connectionPoolSize;
-    return this;
+    return self();
   }
 
-  /**
-   * Allows connecting to Docker Daemon using HTTP proxy.
-   *
-   * @param useProxy tells if Docker Client has to connect to docker daemon using HTTP Proxy
-   * @return Builder
-   */
-  public BaseDockerClientBuilder<B> useProxy(final boolean useProxy) {
+  @Override
+  public B useProxy(final boolean useProxy) {
     this.useProxy = useProxy;
-    return this;
+    return self();
   }
 
-  public BaseDockerClientBuilder<B> registryAuthSupplier(final RegistryAuthSupplier registryAuthSupplier) {
+  @Override
+  public B registryAuthSupplier(final RegistryAuthSupplier registryAuthSupplier) {
     if (this.registryAuthSupplier != null) {
       throw new IllegalStateException(ERROR_MESSAGE);
     }
     this.registryAuthSupplier = registryAuthSupplier;
-    return this;
-  }
-
-  /**
-   * Adds additional headers to be sent in all requests to the Docker Remote API.
-   * @param name the header name
-   * @param value the header value
-   * @return this
-   */
-  public BaseDockerClientBuilder<B> header(String name, Object value) {
-    headers.put(name, value);
-    return this;
+    return self();
   }
 
   @Override
-  public Map<String, Object> headers() {
-    return headers;
+  public B header(String name, Object value) {
+    headers.put(name, value);
+    return self();
   }
 
   @Override
@@ -242,29 +213,9 @@ public abstract class BaseDockerClientBuilder<B extends BaseDockerClientBuilder<
   }
 
   @Override
-  public Client client() {
-    return client;
-  }
-
-  @Override
-  public RegistryAuthSupplier registryAuthSupplier() {
-    return registryAuthSupplier;
-  }
-
-  /**
-   * Allows setting transfer encoding. CHUNKED does not send the content-length header 
-   * while BUFFERED does.
-   * 
-   * <p>By default ApacheConnectorProvider uses CHUNKED mode. Some Docker API end-points 
-   * seems to fail when no content-length is specified but a body is sent.
-   * 
-   * @param entityProcessing is the requested entity processing to use when calling docker
-   *     daemon (tcp protocol).
-   * @return Builder
-   */
-  public BaseDockerClientBuilder<B> entityProcessing(final EntityProcessing entityProcessing) {
+  public B entityProcessing(final EntityProcessing entityProcessing) {
     this.entityProcessing = entityProcessing;
-    return this;
+    return self();
   }
   
   private String toRegExp(String hostnameWithWildcards) {
@@ -302,6 +253,7 @@ public abstract class BaseDockerClientBuilder<B extends BaseDockerClientBuilder<
       .build();
   }
 
+  @Override
   public DefaultDockerClient build() {
     requireNonNull(uri, "uri");
     requireNonNull(uri.getScheme(), "url has null scheme");
@@ -327,6 +279,44 @@ public abstract class BaseDockerClientBuilder<B extends BaseDockerClientBuilder<
       registryAuthSupplier(new ConfigFileRegistryAuthSupplier());
     }
     
-    return new DefaultDockerClient(this);
+    return new DefaultDockerClient(apiVersion, registryAuthSupplier, uri, client, headers);
+  }
+
+  protected HttpClientConnectionManager getConnectionManager(URI uri, Registry<ConnectionSocketFactory> schemeRegistry, int connectionPoolSize) {
+    if (uri.getScheme().equals(NPIPE_SCHEME)) {
+      final BasicHttpClientConnectionManager bm = 
+          new BasicHttpClientConnectionManager(schemeRegistry);
+      return bm;
+    }
+    final PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(schemeRegistry);
+    // Use all available connections instead of artificially limiting ourselves to 2 per server.
+    cm.setMaxTotal(connectionPoolSize);
+    cm.setDefaultMaxPerRoute(cm.getMaxTotal());
+    return cm;
+  }
+
+  protected Registry<ConnectionSocketFactory> getSchemeRegistry(URI uri, DockerCertificatesStore certificateStore) {
+    final SSLConnectionSocketFactory https;
+    if (dockerCertificatesStore == null) {
+      https = SSLConnectionSocketFactory.getSocketFactory();
+    } else {
+      https = new SSLConnectionSocketFactory(dockerCertificatesStore.sslContext(),
+                                             dockerCertificatesStore.hostnameVerifier());
+    }
+  
+    final RegistryBuilder<ConnectionSocketFactory> registryBuilder = RegistryBuilder
+        .<ConnectionSocketFactory>create()
+        .register("https", https)
+        .register("http", PlainConnectionSocketFactory.getSocketFactory());
+  
+    if (uri.getScheme().equals(UNIX_SCHEME)) {
+      registryBuilder.register(UNIX_SCHEME, new UnixConnectionSocketFactory(uri));
+    }
+    
+    if (uri.getScheme().equals(NPIPE_SCHEME)) {
+      registryBuilder.register(NPIPE_SCHEME, new NpipeConnectionSocketFactory(uri));
+    }
+  
+    return registryBuilder.build();
   }
 }

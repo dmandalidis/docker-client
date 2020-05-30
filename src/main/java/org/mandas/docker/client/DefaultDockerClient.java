@@ -45,7 +45,6 @@ import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -84,7 +83,6 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.compress.utils.IOUtils;
 import org.mandas.docker.client.auth.RegistryAuthSupplier;
-import org.mandas.docker.client.builder.DockerClientBuilder;
 import org.mandas.docker.client.exceptions.BadParamException;
 import org.mandas.docker.client.exceptions.ConflictException;
 import org.mandas.docker.client.exceptions.ContainerNotFoundException;
@@ -345,15 +343,18 @@ public class DefaultDockerClient implements DockerClient, Closeable {
 
   /**
    * Create a new client using the configuration of the builder.
-   *
-   * @param builder DefaultDockerClient builder
+   * @param apiVersion the specific API version of the Docker engine 
+   * @param authSupplier credentials supplier for the docker registry
+   * @param uri the Docker engine URI
+   * @param client the JAX-RS client for issuing the calls to the docker engine
+   * @param headers a custom set of HTTP headers
    */
-  public DefaultDockerClient(final DockerClientBuilder builder) {
-    this.apiVersion = builder.apiVersion();
-    this.registryAuthSupplier = builder.registryAuthSupplier();
-    this.uri = builder.uri();
-    this.client = builder.client();
-    this.headers = new HashMap<>(builder.headers());
+  public DefaultDockerClient(String apiVersion, RegistryAuthSupplier authSupplier, URI uri, Client client, Map<String, Object> headers) {
+    this.apiVersion = apiVersion;
+    this.registryAuthSupplier = authSupplier;
+    this.uri = uri;
+    this.client = client;
+    this.headers = new HashMap<>(headers);
   }
 
   @Override

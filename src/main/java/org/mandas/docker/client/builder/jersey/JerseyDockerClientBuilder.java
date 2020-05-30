@@ -19,72 +19,24 @@
 */
 package org.mandas.docker.client.builder.jersey;
 
-import java.net.URI;
-
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.glassfish.jersey.apache.connector.ApacheClientProperties;
 import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.RequestEntityProcessing;
 import org.glassfish.jersey.jackson.JacksonFeature;
-import org.mandas.docker.client.DockerCertificatesStore;
-import org.mandas.docker.client.UnixConnectionSocketFactory;
 import org.mandas.docker.client.builder.BaseDockerClientBuilder;
 import org.mandas.docker.client.builder.ProxyConfiguration;
-import org.mandas.docker.client.npipe.NpipeConnectionSocketFactory;
 
 public class JerseyDockerClientBuilder extends BaseDockerClientBuilder<JerseyDockerClientBuilder> {
 
-  private Registry<ConnectionSocketFactory> getSchemeRegistry(URI uri, DockerCertificatesStore certificateStore) {
-    final SSLConnectionSocketFactory https;
-    if (dockerCertificatesStore == null) {
-      https = SSLConnectionSocketFactory.getSocketFactory();
-    } else {
-      https = new SSLConnectionSocketFactory(dockerCertificatesStore.sslContext(),
-                                             dockerCertificatesStore.hostnameVerifier());
-    }
-
-    final RegistryBuilder<ConnectionSocketFactory> registryBuilder = RegistryBuilder
-        .<ConnectionSocketFactory>create()
-        .register("https", https)
-        .register("http", PlainConnectionSocketFactory.getSocketFactory());
-
-    if (uri.getScheme().equals(UNIX_SCHEME)) {
-      registryBuilder.register(UNIX_SCHEME, new UnixConnectionSocketFactory(uri));
-    }
-    
-    if (uri.getScheme().equals(NPIPE_SCHEME)) {
-      registryBuilder.register(NPIPE_SCHEME, new NpipeConnectionSocketFactory(uri));
-    }
-
-    return registryBuilder.build();
-  }
-  
-  private HttpClientConnectionManager getConnectionManager(URI uri, Registry<ConnectionSocketFactory> schemeRegistry, int connectionPoolSize) {
-    if (uri.getScheme().equals(NPIPE_SCHEME)) {
-      final BasicHttpClientConnectionManager bm = 
-          new BasicHttpClientConnectionManager(schemeRegistry);
-      return bm;
-    }
-    final PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(schemeRegistry);
-    // Use all available connections instead of artificially limiting ourselves to 2 per server.
-    cm.setMaxTotal(connectionPoolSize);
-    cm.setDefaultMaxPerRoute(cm.getMaxTotal());
-    return cm;
-  }
-  
   private ClientConfig updateProxy(ClientConfig config) {
     ProxyConfiguration proxyConfiguration = proxyFromEnv();
     if (proxyConfiguration == null) {
