@@ -20,12 +20,7 @@ It was used in many critical production systems at Spotify until its
 * [User Manual](https://github.com/dmandalidis/docker-client/blob/master/docs/user_manual.md)
 
 ## Version compatibility
-docker-client is built and tested against the most recent releases of `docker-ce` (actually 
-those that can be found in Ubuntu xenial). The plan is to eventually align with the 
-respective Docker support cycle for each version (7 months).
-
-This doesn't mean that we will break everything on every `docker-ce` release, but bugs 
-that cannot be reproduced using the supported docker versions will not be fixed. 
+docker-client is built and tested against the two most recent major releases of `docker-ce` 
 
 For a list the currently supported docker versions you can take a look [here][1], while the API
 version compatibility matrix can be found at the *API version matrix* section on 
