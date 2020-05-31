@@ -1205,6 +1205,7 @@ public class DefaultDockerClientUnitTest {
   
   @Test
   public void testChunkedRequestEntityProcessing() throws Exception {
+    Assume.assumeTrue("jersey".equals(System.getProperty(DockerClientBuilderFactory.JAXRS_CLIENT_PROPERTY)));
     builder.entityProcessing(EntityProcessing.CHUNKED);
     final DefaultDockerClient dockerClient = builder.build();
     
