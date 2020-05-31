@@ -51,9 +51,7 @@ import org.mandas.docker.client.DefaultDockerClient;
 import org.mandas.docker.client.DockerCertificates;
 import org.mandas.docker.client.DockerCertificatesStore;
 import org.mandas.docker.client.DockerHost;
-import org.mandas.docker.client.LogsResponseReader;
 import org.mandas.docker.client.ObjectMapperProvider;
-import org.mandas.docker.client.ProgressResponseReader;
 import org.mandas.docker.client.UnixConnectionSocketFactory;
 import org.mandas.docker.client.auth.ConfigFileRegistryAuthSupplier;
 import org.mandas.docker.client.auth.RegistryAuthSupplier;
@@ -264,9 +262,7 @@ public abstract class BaseDockerClientBuilder<B extends BaseDockerClientBuilder<
     }
     
     this.client = createClient()
-        .register(ObjectMapperProvider.class)
-        .register(LogsResponseReader.class)
-        .register(ProgressResponseReader.class);
+        .register(ObjectMapperProvider.class);
     
     if (uri.getScheme().equals(UNIX_SCHEME)) {
       this.uri = UnixConnectionSocketFactory.sanitizeUri(uri);

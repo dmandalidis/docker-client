@@ -37,6 +37,7 @@ import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
+import org.mandas.docker.DockerClientBuilderFactory;
 import org.mandas.docker.client.builder.jersey.JerseyDockerClientBuilder;
 import org.mandas.docker.client.exceptions.DockerCertificateException;
 import org.mandas.docker.client.exceptions.DockerException;
@@ -76,7 +77,7 @@ public class ConnectionPoolTest {
               new Callable<Exception>() {
                 @Override
                 public Exception call() throws Exception {
-                  try (DockerClient docker = new JerseyDockerClientBuilder().fromEnv().build()) {
+                  try (DockerClient docker = DockerClientBuilderFactory.newInstance().fromEnv().build()) {
                     docker.pull(ConnectionPoolTest.BUSYBOX_LATEST);
                     docker.pull(ConnectionPoolTest.BUSYBOX_BUILDROOT_2013_08_1);
                   } catch (InterruptedException | DockerException | DockerCertificateException e) {

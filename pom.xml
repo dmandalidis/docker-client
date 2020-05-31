@@ -334,13 +334,13 @@
 								<classpathDependencyExclude>org.jboss.resteasy:resteasy-client</classpathDependencyExclude>
 								<classpathDependencyExclude>org.jboss.resteasy:resteasy-core</classpathDependencyExclude>
 							</classpathDependencyExcludes>
-							<!-- systemPropertyVariables>
+							<systemPropertyVariables>
 								<jaxrs.client>jersey</jaxrs.client>
-							</systemPropertyVariables-->
+							</systemPropertyVariables>
 							<trimStackTrace>false</trimStackTrace>
 						</configuration>
 					</execution>
-					<!-- execution>
+					<execution>
 						<id>resteasy-unit-tests</id>
 						<phase>test</phase>
 						<goals>
@@ -358,7 +358,7 @@
 								<jaxrs.client>resteasy</jaxrs.client>
 							</systemPropertyVariables>
 						</configuration>
-					</execution-->
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>
@@ -383,13 +383,13 @@
 								<classpathDependencyExclude>org.jboss.resteasy:resteasy-client</classpathDependencyExclude>
 								<classpathDependencyExclude>org.jboss.resteasy:resteasy-core</classpathDependencyExclude>
 							</classpathDependencyExcludes>
-							<!-- systemPropertyVariables>
+							<systemPropertyVariables>
 								<jaxrs.client>jersey</jaxrs.client>
-							</systemPropertyVariables-->
+							</systemPropertyVariables>
 							<trimStackTrace>false</trimStackTrace>
 						</configuration>
 					</execution>
-					<!-- execution>
+					<execution>
 						<id>resteasy-integration-tests</id>
 						<phase>integration-test</phase>
 						<goals>
@@ -407,7 +407,7 @@
 							</systemPropertyVariables>
 							<trimStackTrace>false</trimStackTrace>
 						</configuration>
-					</execution-->
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>

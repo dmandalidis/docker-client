@@ -39,12 +39,11 @@ import com.fasterxml.jackson.databind.MappingIterator;
 
 class ProgressStream implements Closeable {
 
-  private final InputStream stream;
   private final MappingIterator<ProgressMessage> iterator;
+  private final JsonParser parser;
 
   ProgressStream(final InputStream stream) throws IOException {
-    this.stream = stream;
-    final JsonParser parser = objectMapper().getFactory().createParser(stream);
+    parser = objectMapper().getFactory().createParser(stream);
     iterator = objectMapper().readValues(parser, ProgressMessage.class);
   }
 
@@ -80,6 +79,6 @@ class ProgressStream implements Closeable {
 
   @Override
   public void close() throws IOException {
-	stream.close();
+	parser.close();
   }
 }
