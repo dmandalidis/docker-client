@@ -2432,8 +2432,8 @@ public class DefaultDockerClient implements DockerClient, Closeable {
                         final WebTarget resource, final Invocation.Builder request)
       throws DockerException, InterruptedException {
     try {
-      return headers(request).async().method(method, type).get();
-    } catch (ExecutionException e) {
+      return headers(request).method(method, type);
+    } catch (Exception e) {
       throw propagate(method, resource, e);
     }
   }
@@ -2442,8 +2442,8 @@ public class DefaultDockerClient implements DockerClient, Closeable {
                         final WebTarget resource, final Invocation.Builder request)
       throws DockerException, InterruptedException {
     try {
-      return headers(request).async().method(method, clazz).get();
-    } catch (ExecutionException e) {
+      return headers(request).method(method, clazz);
+    } catch (Exception e) {
       throw propagate(method, resource, e);
     }
   }
@@ -2453,8 +2453,8 @@ public class DefaultDockerClient implements DockerClient, Closeable {
                         final Entity<?> entity)
       throws DockerException, InterruptedException {
     try {
-      return headers(request).async().method(method, entity, clazz).get();
-    } catch (ExecutionException e) {
+      return headers(request).method(method, entity, clazz);
+    } catch (Exception e) {
       throw propagate(method, resource, e);
     }
   }
@@ -2464,8 +2464,8 @@ public class DefaultDockerClient implements DockerClient, Closeable {
                        final Invocation.Builder request)
       throws DockerException, InterruptedException {
     try {
-      headers(request).async().method(method, String.class).get();
-    } catch (ExecutionException e) {
+      headers(request).method(method, String.class);
+    } catch (Exception e) {
       throw propagate(method, resource, e);
     }
   }
@@ -2550,7 +2550,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   private RuntimeException propagate(final String method, final WebTarget resource,
                                      final Exception ex)
       throws DockerException, InterruptedException {
-    Throwable cause = ex.getCause();
+    Throwable cause = ex;
 
     Response response = null;
     if (cause instanceof ResponseProcessingException) {
