@@ -160,6 +160,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -1317,9 +1318,9 @@ public class DefaultDockerClientTest {
     }
   }
 
-  @Test @Ignore
+  @Test
   public void interruptTest() throws Exception {
-
+    Assume.assumeTrue("jersey".equals(System.getProperty(DockerClientBuilderFactory.JAXRS_CLIENT_PROPERTY)));
     // Pull image
     sut.pull(BUSYBOX_LATEST);
 
@@ -1840,11 +1841,10 @@ public class DefaultDockerClientTest {
     assertThat(newContainerInfo.hostConfig().cpuShares(), is(512L));
   }
 
-  @Test(timeout = 10000) @Ignore
+  @Test @Ignore
   public void testEventStream() throws Exception {
     // In this test we open an event stream, do stuff, and check that
     // the events for the stuff we did got pushed over the stream
-
     Thread.sleep(2000); // Waiting to ensure event stream has no events from prior tests
     try (final EventStream eventStream = getImageAndContainerEventStream()) {
 
