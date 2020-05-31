@@ -31,9 +31,7 @@ uploaded to maven central.
 
 ## Download
 
-Download the latest JAR or grab [via Maven][maven-search] and accompany it 
-with the necessary Jersey dependencies if you plan to use the provided 
-`JerseyDockerClientBuilder`
+Download the latest JAR or grab [via Maven][maven-search]
 
 ```xml
 <dependency>
@@ -41,6 +39,17 @@ with the necessary Jersey dependencies if you plan to use the provided
   <artifactId>docker-client</artifactId>
   <version>LATEST-VERSION</version>
 </dependency>
+```
+
+Since multiple JAX-RS client implementations cannot coexist in a flat classpath, 
+you need to choose either one of Jersey or RESTeasy, or create your implementation
+of `DockerClientBuilder` for something completely different. 
+
+### Jersey
+
+For using Jersey, you will have to pull the following dependencies:
+
+```xml
 <dependency>
   <groupId>org.glassfish.jersey.core</groupId>
   <artifactId>jersey-client</artifactId>
@@ -63,11 +72,28 @@ with the necessary Jersey dependencies if you plan to use the provided
 </dependency>
 ```
 
+### RESTeasy
+
+For using RESTeasy, you will have to pull the following dependencies:
+```xml
+<dependency>
+  <groupId>org.jboss.resteasy</groupId>
+  <artifactId>resteasy-client</artifactId>
+  <version>4.5.3.Final</version>
+</dependency>
+<dependency>
+  <groupId>org.jboss.resteasy</groupId>
+  <artifactId>resteasy-core</artifactId>
+  <version>4.5.3.Final</version>
+</dependency>
+```
+
 ## Usage Example
 
 ```java
 // Create a client based on DOCKER_HOST and DOCKER_CERT_PATH env vars
-final DockerClient docker = new JerseyDockerClientBuilder().fromEnv().build();
+final DockerClient docker = new JerseyDockerClientBuilder().fromEnv().build(); // For Jersey
+final DockerClient docker = new ResteasyDockerClientBuilder().fromEnv().build(); // For RESTeasy
 
 // Pull an image
 docker.pull("busybox");
