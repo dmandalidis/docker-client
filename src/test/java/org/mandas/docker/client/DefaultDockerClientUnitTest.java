@@ -64,11 +64,14 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
+import org.mandas.docker.DockerClientBuilderFactory;
 import org.mandas.docker.client.DockerClient.Signal;
 import org.mandas.docker.client.auth.RegistryAuthSupplier;
 import org.mandas.docker.client.builder.BaseDockerClientBuilder;
+import org.mandas.docker.client.builder.DockerClientBuilder;
 import org.mandas.docker.client.builder.DockerClientBuilder.EntityProcessing;
 import org.mandas.docker.client.builder.jersey.JerseyDockerClientBuilder;
 import org.mandas.docker.client.exceptions.ConflictException;
@@ -143,13 +146,13 @@ public class DefaultDockerClientUnitTest {
 
   private final MockWebServer server = new MockWebServer();
 
-  private BaseDockerClientBuilder builder;
+  private DockerClientBuilder<?> builder;
 
   @Before
   public void setup() throws Exception {
     server.start();
 
-    builder = new JerseyDockerClientBuilder();
+    builder = DockerClientBuilderFactory.newInstance();
     builder.uri(server.url("/").uri());
   }
 
@@ -160,38 +163,39 @@ public class DefaultDockerClientUnitTest {
 
   @Test
   public void testHostForUnixSocket() {
-    final DefaultDockerClient client = new JerseyDockerClientBuilder()
+    final DefaultDockerClient client = DockerClientBuilderFactory.newInstance()
         .uri("unix:///var/run/docker.sock").build();
     assertThat(client.getHost(), equalTo("localhost"));
   }
 
   @Test
   public void testHostForLocalHttps() {
-    final DefaultDockerClient client = new JerseyDockerClientBuilder()
+    final DefaultDockerClient client = DockerClientBuilderFactory.newInstance()
         .uri("https://localhost:2375").build();
     assertThat(client.getHost(), equalTo("localhost"));
   }
 
   @Test
   public void testHostForFqdnHttps() {
-    final DefaultDockerClient client = new JerseyDockerClientBuilder()
+    final DefaultDockerClient client = DockerClientBuilderFactory.newInstance()
         .uri("https://perdu.com:2375").build();
     assertThat(client.getHost(), equalTo("perdu.com"));
   }
 
   @Test
   public void testHostForIpHttps() {
-    final DefaultDockerClient client = new JerseyDockerClientBuilder()
+    final DefaultDockerClient client = DockerClientBuilderFactory.newInstance()
         .uri("https://192.168.53.103:2375").build();
     assertThat(client.getHost(), equalTo("192.168.53.103"));
   }
 
   @Test
   public void testHostWithProxy() {
+    Assume.assumeTrue("jersey".equals(System.getProperty(DockerClientBuilderFactory.JAXRS_CLIENT_PROPERTY)));
     try {
       System.setProperty("http.proxyHost", "gmodules.com");
       System.setProperty("http.proxyPort", "80");
-      final DefaultDockerClient client = new JerseyDockerClientBuilder()
+      final DefaultDockerClient client = DockerClientBuilderFactory.newInstance()
               .uri("https://192.168.53.103:2375").build();
       assertThat(client.getClient().getConfiguration()
                       .getProperty("jersey.config.client.proxy.uri"),
@@ -204,6 +208,7 @@ public class DefaultDockerClientUnitTest {
 
   @Test
   public void testHostWithNonProxyHost() {
+    Assume.assumeTrue("jersey".equals(System.getProperty(DockerClientBuilderFactory.JAXRS_CLIENT_PROPERTY)));
     try {
       System.setProperty("http.proxyHost", "gmodules.com");
       System.setProperty("http.proxyPort", "80");
@@ -212,17 +217,17 @@ public class DefaultDockerClientUnitTest {
               nonProxyHostsPropertyValue, "\"" + nonProxyHostsPropertyValue + "\"");
       for (String value : nonProxyHostsPropertyValues) {
         System.setProperty("http.nonProxyHosts", value);
-        final DefaultDockerClient client = new JerseyDockerClientBuilder()
+        final DefaultDockerClient client = DockerClientBuilderFactory.newInstance()
                 .uri("https://192.168.53.103:2375").build();
         assertThat((String) client.getClient().getConfiguration()
                         .getProperty("jersey.config.client.proxy.uri"),
                 emptyOrNullString());
-        final DefaultDockerClient client1 = new JerseyDockerClientBuilder()
+        final DefaultDockerClient client1 = DockerClientBuilderFactory.newInstance()
                 .uri("https://127.0.0.1:2375").build();
         assertThat((String) client1.getClient().getConfiguration()
                         .getProperty("jersey.config.client.proxy.uri"),
                 emptyOrNullString());
-        final DefaultDockerClient client2 = new JerseyDockerClientBuilder()
+        final DefaultDockerClient client2 = DockerClientBuilderFactory.newInstance()
                 .uri("https://localhost:2375").build();
         assertThat((String) client2.getClient().getConfiguration()
                         .getProperty("jersey.config.client.proxy.uri"),

@@ -56,7 +56,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.in;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isIn;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.not;
@@ -162,10 +161,10 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
+import org.mandas.docker.DockerClientBuilderFactory;
 import org.mandas.docker.client.DockerClient.AttachParameter;
 import org.mandas.docker.client.DockerClient.BuildParam;
 import org.mandas.docker.client.DockerClient.EventsParam;
@@ -173,8 +172,7 @@ import org.mandas.docker.client.DockerClient.ExecCreateParam;
 import org.mandas.docker.client.DockerClient.ListImagesParam;
 import org.mandas.docker.client.DockerClient.ListNetworksParam;
 import org.mandas.docker.client.auth.FixedRegistryAuthSupplier;
-import org.mandas.docker.client.builder.BaseDockerClientBuilder;
-import org.mandas.docker.client.builder.jersey.JerseyDockerClientBuilder;
+import org.mandas.docker.client.builder.DockerClientBuilder;
 import org.mandas.docker.client.exceptions.BadParamException;
 import org.mandas.docker.client.exceptions.ConflictException;
 import org.mandas.docker.client.exceptions.ContainerNotFoundException;
@@ -329,7 +327,7 @@ public class DefaultDockerClientTest {
 
   @Before
   public void setup() throws Exception {
-    final BaseDockerClientBuilder builder = new JerseyDockerClientBuilder().fromEnv();
+    final DockerClientBuilder<?> builder = DockerClientBuilderFactory.newInstance().fromEnv();
     // Make it easier to test no read timeout occurs by using a smaller value
     // Such test methods should end in 'NoTimeout'
     if (testName.getMethodName().endsWith("NoTimeout")) {
@@ -443,8 +441,7 @@ public class DefaultDockerClientTest {
     sut.pull(BUSYBOX_BUILDROOT_2013_08_1);
   }
 
-  // TODO: Docker < 17.12 returns 200 for this (!)
-  @Test(expected = ImageNotFoundException.class) @Ignore 
+  @Test(expected = ImageNotFoundException.class) 
   public void testPullBadImage() throws Exception {
     sut.pull(randomName());
   }
@@ -847,7 +844,7 @@ public class DefaultDockerClientTest {
         .username(AUTH_USERNAME)
         .password(AUTH_PASSWORD)
         .build();
-    final DockerClient sut2 = new JerseyDockerClientBuilder().fromEnv()
+    final DockerClient sut2 = DockerClientBuilderFactory.newInstance().fromEnv()
         .registryAuthSupplier(new FixedRegistryAuthSupplier(
             registryAuth, RegistryConfigs.create(singletonMap("", registryAuth))))
         .build();
@@ -1371,7 +1368,7 @@ public class DefaultDockerClientTest {
   @Test(expected = DockerException.class)
   public void testConnectTimeout() throws Exception {
     // Attempt to connect to reserved IP -> should timeout
-    try (final DefaultDockerClient connectTimeoutClient = new JerseyDockerClientBuilder()
+    try (final DefaultDockerClient connectTimeoutClient = DockerClientBuilderFactory.newInstance()
         .uri("http://240.0.0.1:2375")
         .connectTimeoutMillis(100)
         .readTimeoutMillis(NO_TIMEOUT)
@@ -1386,7 +1383,7 @@ public class DefaultDockerClientTest {
       // Bind and listen but do not accept -> read will time out.
       socket.bind(new InetSocketAddress("127.0.0.1", 0));
       awaitConnectable(socket.getInetAddress(), socket.getLocalPort());
-      final DockerClient connectTimeoutClient = new JerseyDockerClientBuilder()
+      final DockerClient connectTimeoutClient = DockerClientBuilderFactory.newInstance()
           .uri("http://127.0.0.1:" + socket.getLocalPort())
           .connectTimeoutMillis(NO_TIMEOUT)
           .readTimeoutMillis(100)
@@ -1406,7 +1403,7 @@ public class DefaultDockerClientTest {
     // Spawn and wait on many more containers than the connection pool size.
     // This should cause a timeout once the connection pool is exhausted.
 
-    try (final DockerClient dockerClient = new JerseyDockerClientBuilder().fromEnv()
+    try (final DockerClient dockerClient = DockerClientBuilderFactory.newInstance().fromEnv()
         .connectionPoolSize(connectionPoolSize)
         .build()) {
       // Create container
@@ -2324,7 +2321,7 @@ public class DefaultDockerClientTest {
 
     // Try to connect using SSL and our known cert/key
     final DockerCertificates certs = new DockerCertificates(dockerDirectory);
-    final DockerClient c = new JerseyDockerClientBuilder().uri(URI.create(format("https://%s:%s", host, port))).dockerCertificates(certs).build();
+    final DockerClient c = DockerClientBuilderFactory.newInstance().uri(URI.create(format("https://%s:%s", host, port))).dockerCertificates(certs).build();
 
     // We need to wait for the docker process inside the docker container to be ready to accept
     // connections on the port. Otherwise, this test will fail.

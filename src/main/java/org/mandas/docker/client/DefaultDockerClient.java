@@ -956,9 +956,8 @@ public class DefaultDockerClient implements DockerClient, Closeable {
     final LoadProgressHandler loadProgressHandler = new LoadProgressHandler(handler);
     final Entity<InputStream> entity = Entity.entity(imagePayload, APPLICATION_OCTET_STREAM);
 
-    try (final ProgressStream load =
-            request(POST, ProgressStream.class, resource,
-                    resource.request(APPLICATION_JSON_TYPE), entity)) {
+    try (final InputStream inputStream = request(POST, InputStream.class, resource, resource.request(APPLICATION_JSON_TYPE), entity);
+        ProgressStream load = new ProgressStream(inputStream)) {
       load.tail(loadProgressHandler, POST, resource.getUri());
       return loadProgressHandler.getImageNames();
     } catch (IOException e) {
@@ -1330,7 +1329,9 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       throws DockerException, InterruptedException {
     try {
       final Invocation.Builder request = resource.request("application/vnd.docker.raw-stream");
-      return request(method, LogStream.class, resource, request);
+      Response response = request(method, Response.class, resource, request);
+      InputStream inputStream = response.readEntity(InputStream.class);
+      return DefaultLogStream.create(inputStream);
     } catch (DockerRequestException e) {
       switch (e.status()) {
         case 400:
@@ -1348,7 +1349,9 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       throws DockerException, InterruptedException {
     try {
       final Invocation.Builder request = resource.request("application/vnd.docker.raw-stream");
-      return request(method, LogStream.class, resource, request);
+      Response response = request(method, Response.class, resource, request);
+      InputStream inputStream = response.readEntity(InputStream.class);
+      return DefaultLogStream.create(inputStream);
     } catch (DockerRequestException e) {
       switch (e.status()) {
         case 400:
@@ -1432,9 +1435,11 @@ public class DefaultDockerClient implements DockerClient, Closeable {
     }
 
     try {
-      return request(POST, LogStream.class, resource,
+      Response response = request(POST, Response.class, resource,
                      resource.request("application/vnd.docker.raw-stream"),
                      Entity.json(writer.toString()));
+      InputStream inputStream = response.readEntity(InputStream.class);
+      return DefaultLogStream.create(inputStream);
     } catch (DockerRequestException e) {
       switch (e.status()) {
         case 404:
@@ -2495,10 +2500,9 @@ public class DefaultDockerClient implements DockerClient, Closeable {
                             final ProgressHandler handler, final WebTarget resource)
         throws DockerException, InterruptedException {
     final ExecutorService executor = Executors.newSingleThreadExecutor();
-    try {
-      final ProgressStream stream = response.readEntity(ProgressStream.class);
-      final Future<?> future = executor.submit(
-              new ResponseTailReader(stream, handler, method, resource));
+    try (InputStream inputStream = response.readEntity(InputStream.class);
+        ProgressStream stream = new ProgressStream(inputStream)) {
+      final Future<?> future = executor.submit(new ResponseTailReader(stream, handler, method, resource));
       future.get();
     } catch (ExecutionException e) {
       final Throwable cause = e.getCause();
@@ -2507,6 +2511,8 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       } else {
         throw new DockerException(cause);
       }
+    } catch (IOException e) {
+      throw new DockerException(e);
     } finally {
       executor.shutdownNow();
       try {

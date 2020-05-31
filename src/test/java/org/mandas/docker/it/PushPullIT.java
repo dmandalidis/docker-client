@@ -44,6 +44,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
+import org.mandas.docker.DockerClientBuilderFactory;
 import org.mandas.docker.Polling;
 import org.mandas.docker.client.DefaultDockerClient;
 import org.mandas.docker.client.DockerClient;
@@ -112,7 +113,7 @@ public class PushPullIT {
   @BeforeClass
   public static void before() throws Exception {
     // Pull the registry image down once before any test methods in this class run
-    new JerseyDockerClientBuilder().fromEnv().build().pull(REGISTRY_IMAGE);
+    DockerClientBuilderFactory.newInstance().fromEnv().build().pull(REGISTRY_IMAGE);
   }
 
   @Before
@@ -121,7 +122,7 @@ public class PushPullIT {
         .username(LOCAL_AUTH_USERNAME)
         .password(LOCAL_AUTH_PASSWORD)
         .build();
-    client = new JerseyDockerClientBuilder()
+    client = DockerClientBuilderFactory.newInstance()
         .fromEnv()
         .registryAuthSupplier(new FixedRegistryAuthSupplier(
             registryAuth, RegistryConfigs.create(singletonMap(HUB_NAME, registryAuth))))
@@ -145,7 +146,7 @@ public class PushPullIT {
     registryContainerId = startAuthedRegistry(client);
 
     // Make a DockerClient without RegistryAuth
-    final DefaultDockerClient client = new JerseyDockerClientBuilder().fromEnv().build();
+    final DefaultDockerClient client = DockerClientBuilderFactory.newInstance().fromEnv().build();
 
     // Push an image to the private registry and check it fails
     final String dockerDirectory = Resources.getResource("dockerDirectory").getPath();
@@ -181,7 +182,7 @@ public class PushPullIT {
     registryContainerId = startUnauthedRegistry(client);
 
     // Make a DockerClient without RegistryAuth
-    final DefaultDockerClient client = new JerseyDockerClientBuilder().fromEnv().build();
+    final DefaultDockerClient client = DockerClientBuilderFactory.newInstance().fromEnv().build();
 
     // Push an image to the private registry and check it succeeds
     final String dockerDirectory = Resources.getResource("dockerDirectory").getPath();
@@ -225,7 +226,7 @@ public class PushPullIT {
         .username(HUB_AUTH_USERNAME)
         .password(HUB_AUTH_PASSWORD)
         .build();
-    final DockerClient client = new JerseyDockerClientBuilder()
+    final DockerClient client = DockerClientBuilderFactory.newInstance()
         .fromEnv()
         .registryAuthSupplier(new FixedRegistryAuthSupplier(
             registryAuth, RegistryConfigs.create(singletonMap(HUB_NAME, registryAuth))))
@@ -239,7 +240,7 @@ public class PushPullIT {
   public void testPushHubPublicImageWithAuthFromConfig() throws Exception {
     // Push an image to a public repo on Docker Hub and check it succeeds
     final String dockerDirectory = Resources.getResource("dockerDirectory").getPath();
-    final DockerClient client = new JerseyDockerClientBuilder()
+    final DockerClient client = DockerClientBuilderFactory.newInstance()
         .fromEnv()
         .registryAuthSupplier(new ConfigFileRegistryAuthSupplier(
             new DockerConfigReader(),
@@ -258,7 +259,7 @@ public class PushPullIT {
         .username(HUB_AUTH_USERNAME)
         .password(HUB_AUTH_PASSWORD)
         .build();
-    final DockerClient client = new JerseyDockerClientBuilder()
+    final DockerClient client = DockerClientBuilderFactory.newInstance()
         .fromEnv()
         .registryAuthSupplier(new FixedRegistryAuthSupplier(
             registryAuth, RegistryConfigs.create(singletonMap(HUB_NAME, registryAuth))))
@@ -286,7 +287,7 @@ public class PushPullIT {
         .username(HUB_AUTH_USERNAME2)
         .password(HUB_AUTH_PASSWORD2)
         .build();
-    final DockerClient client = new JerseyDockerClientBuilder()
+    final DockerClient client = DockerClientBuilderFactory.newInstance()
         .fromEnv()
         .registryAuthSupplier(new FixedRegistryAuthSupplier(
             registryAuth, RegistryConfigs.create(singletonMap(HUB_NAME, registryAuth))))
