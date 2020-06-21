@@ -163,30 +163,34 @@ public class DefaultDockerClientUnitTest {
 
   @Test
   public void testHostForUnixSocket() {
-    final DefaultDockerClient client = DockerClientBuilderFactory.newInstance()
-        .uri("unix:///var/run/docker.sock").build();
-    assertThat(client.getHost(), equalTo("localhost"));
+    try (final DefaultDockerClient client = DockerClientBuilderFactory.newInstance()
+        .uri("unix:///var/run/docker.sock").build()) {
+      assertThat(client.getHost(), equalTo("localhost"));
+    }
   }
 
   @Test
   public void testHostForLocalHttps() {
-    final DefaultDockerClient client = DockerClientBuilderFactory.newInstance()
-        .uri("https://localhost:2375").build();
-    assertThat(client.getHost(), equalTo("localhost"));
+    try (final DefaultDockerClient client = DockerClientBuilderFactory.newInstance()
+        .uri("https://localhost:2375").build()) {
+      assertThat(client.getHost(), equalTo("localhost"));
+    }
   }
 
   @Test
   public void testHostForFqdnHttps() {
-    final DefaultDockerClient client = DockerClientBuilderFactory.newInstance()
-        .uri("https://perdu.com:2375").build();
-    assertThat(client.getHost(), equalTo("perdu.com"));
+    try (final DefaultDockerClient client = DockerClientBuilderFactory.newInstance()
+        .uri("https://perdu.com:2375").build()) {
+      assertThat(client.getHost(), equalTo("perdu.com"));
+    }
   }
 
   @Test
   public void testHostForIpHttps() {
-    final DefaultDockerClient client = DockerClientBuilderFactory.newInstance()
-        .uri("https://192.168.53.103:2375").build();
-    assertThat(client.getHost(), equalTo("192.168.53.103"));
+    try (final DefaultDockerClient client = DockerClientBuilderFactory.newInstance()
+        .uri("https://192.168.53.103:2375").build()) {
+      assertThat(client.getHost(), equalTo("192.168.53.103"));
+    }
   }
 
   @Test
@@ -195,11 +199,12 @@ public class DefaultDockerClientUnitTest {
     try {
       System.setProperty("http.proxyHost", "gmodules.com");
       System.setProperty("http.proxyPort", "80");
-      final DefaultDockerClient client = DockerClientBuilderFactory.newInstance()
-              .uri("https://192.168.53.103:2375").build();
-      assertThat(client.getClient().getConfiguration()
-                      .getProperty("jersey.config.client.proxy.uri"),
-              equalTo("http://gmodules.com:80"));
+      try (final DefaultDockerClient client = DockerClientBuilderFactory.newInstance()
+              .uri("https://192.168.53.103:2375").build()) {
+        assertThat(client.getClient().getConfiguration()
+                        .getProperty("jersey.config.client.proxy.uri"),
+                equalTo("http://gmodules.com:80"));
+      }
     } finally {
       System.clearProperty("http.proxyHost");
       System.clearProperty("http.proxyPort");
@@ -217,21 +222,24 @@ public class DefaultDockerClientUnitTest {
               nonProxyHostsPropertyValue, "\"" + nonProxyHostsPropertyValue + "\"");
       for (String value : nonProxyHostsPropertyValues) {
         System.setProperty("http.nonProxyHosts", value);
-        final DefaultDockerClient client = DockerClientBuilderFactory.newInstance()
-                .uri("https://192.168.53.103:2375").build();
-        assertThat((String) client.getClient().getConfiguration()
-                        .getProperty("jersey.config.client.proxy.uri"),
-                emptyOrNullString());
-        final DefaultDockerClient client1 = DockerClientBuilderFactory.newInstance()
-                .uri("https://127.0.0.1:2375").build();
-        assertThat((String) client1.getClient().getConfiguration()
-                        .getProperty("jersey.config.client.proxy.uri"),
-                emptyOrNullString());
-        final DefaultDockerClient client2 = DockerClientBuilderFactory.newInstance()
-                .uri("https://localhost:2375").build();
-        assertThat((String) client2.getClient().getConfiguration()
-                        .getProperty("jersey.config.client.proxy.uri"),
-                emptyOrNullString());
+        try (final DefaultDockerClient client = DockerClientBuilderFactory.newInstance()
+                .uri("https://192.168.53.103:2375").build()) {
+          assertThat((String) client.getClient().getConfiguration()
+                          .getProperty("jersey.config.client.proxy.uri"),
+                  emptyOrNullString());
+        }
+        try (final DefaultDockerClient client1 = DockerClientBuilderFactory.newInstance()
+                .uri("https://127.0.0.1:2375").build()) {
+          assertThat((String) client1.getClient().getConfiguration()
+                          .getProperty("jersey.config.client.proxy.uri"),
+                  emptyOrNullString());
+        }
+        try (final DefaultDockerClient client2 = DockerClientBuilderFactory.newInstance()
+                .uri("https://localhost:2375").build()) {
+          assertThat((String) client2.getClient().getConfiguration()
+                          .getProperty("jersey.config.client.proxy.uri"),
+                  emptyOrNullString());
+        }
       }
     } finally {
       System.clearProperty("http.proxyHost");
@@ -1207,22 +1215,24 @@ public class DefaultDockerClientUnitTest {
   public void testChunkedRequestEntityProcessing() throws Exception {
     Assume.assumeTrue("jersey".equals(System.getProperty(DockerClientBuilderFactory.JAXRS_CLIENT_PROPERTY)));
     builder.entityProcessing(EntityProcessing.CHUNKED);
-    final DefaultDockerClient dockerClient = builder.build();
     
-    final HostConfig hostConfig = HostConfig.builder().build();
-
-    final ContainerConfig containerConfig = ContainerConfig.builder()
-        .hostConfig(hostConfig)
-        .build();
-
-    server.enqueue(new MockResponse());
-
-    dockerClient.createContainer(containerConfig);
-
-    final RecordedRequest recordedRequest = takeRequestImmediately();
-
-    assertThat(recordedRequest.getHeader("Content-Length"), nullValue());
-    assertThat(recordedRequest.getHeader("Transfer-Encoding"), is("chunked"));
+    try (final DefaultDockerClient dockerClient = builder.build()) {
+    
+      final HostConfig hostConfig = HostConfig.builder().build();
+  
+      final ContainerConfig containerConfig = ContainerConfig.builder()
+          .hostConfig(hostConfig)
+          .build();
+  
+      server.enqueue(new MockResponse());
+  
+      dockerClient.createContainer(containerConfig);
+  
+      final RecordedRequest recordedRequest = takeRequestImmediately();
+  
+      assertThat(recordedRequest.getHeader("Content-Length"), nullValue());
+      assertThat(recordedRequest.getHeader("Transfer-Encoding"), is("chunked"));
+    }
   }
 
   @Test

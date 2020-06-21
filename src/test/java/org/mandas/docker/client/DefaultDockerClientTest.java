@@ -845,19 +845,20 @@ public class DefaultDockerClientTest {
         .username(AUTH_USERNAME)
         .password(AUTH_PASSWORD)
         .build();
-    final DockerClient sut2 = DockerClientBuilderFactory.newInstance().fromEnv()
+    try (final DockerClient sut2 = DockerClientBuilderFactory.newInstance().fromEnv()
         .registryAuthSupplier(new FixedRegistryAuthSupplier(
             registryAuth, RegistryConfigs.create(singletonMap("", registryAuth))))
-        .build();
+        .build()) {
 
-    final String returnedImageId = sut2.build(dockerDirectory, "test", message -> {
-      final String imageId = message.buildImageId();
-      if (imageId != null) {
-        imageIdFromMessage.set(imageId);
-      }
-    });
-
-    assertThat(returnedImageId, is(imageIdFromMessage.get()));
+      final String returnedImageId = sut2.build(dockerDirectory, "test", message -> {
+        final String imageId = message.buildImageId();
+        if (imageId != null) {
+          imageIdFromMessage.set(imageId);
+        }
+      });
+  
+      assertThat(returnedImageId, is(imageIdFromMessage.get()));
+    }
   }
 
   @Test
@@ -1384,12 +1385,13 @@ public class DefaultDockerClientTest {
       // Bind and listen but do not accept -> read will time out.
       socket.bind(new InetSocketAddress("127.0.0.1", 0));
       awaitConnectable(socket.getInetAddress(), socket.getLocalPort());
-      final DockerClient connectTimeoutClient = DockerClientBuilderFactory.newInstance()
+      try (final DockerClient connectTimeoutClient = DockerClientBuilderFactory.newInstance()
           .uri("http://127.0.0.1:" + socket.getLocalPort())
           .connectTimeoutMillis(NO_TIMEOUT)
           .readTimeoutMillis(100)
-          .build();
-      connectTimeoutClient.version();
+          .build()) {
+        connectTimeoutClient.version();
+      }
     }
   }
 
@@ -2322,25 +2324,26 @@ public class DefaultDockerClientTest {
 
     // Try to connect using SSL and our known cert/key
     final DockerCertificates certs = new DockerCertificates(dockerDirectory);
-    final DockerClient c = DockerClientBuilderFactory.newInstance().uri(URI.create(format("https://%s:%s", host, port))).dockerCertificates(certs).build();
+    try (final DockerClient c = DockerClientBuilderFactory.newInstance().uri(URI.create(format("https://%s:%s", host, port))).dockerCertificates(certs).build()) {
 
-    // We need to wait for the docker process inside the docker container to be ready to accept
-    // connections on the port. Otherwise, this test will fail.
-    // Even though we've checked that the container is running, this doesn't mean the process
-    // inside the container is ready.
-    final long deadline =
-        System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(TimeUnit.MINUTES.toMillis(1));
-    while (System.nanoTime() < deadline) {
-      try (final Socket ignored = new Socket(host, Integer.parseInt(port))) {
-        break;
-      } catch (IOException ignored) {
+      // We need to wait for the docker process inside the docker container to be ready to accept
+      // connections on the port. Otherwise, this test will fail.
+      // Even though we've checked that the container is running, this doesn't mean the process
+      // inside the container is ready.
+      final long deadline =
+          System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(TimeUnit.MINUTES.toMillis(1));
+      while (System.nanoTime() < deadline) {
+        try (final Socket ignored = new Socket(host, Integer.parseInt(port))) {
+          break;
+        } catch (IOException ignored) {
+        }
+        Thread.sleep(500);
       }
-      Thread.sleep(500);
+  
+      assertThat(c.ping(), equalTo("OK"));
+  
+      sut.stopContainer(containerId, 10);
     }
-
-    assertThat(c.ping(), equalTo("OK"));
-
-    sut.stopContainer(containerId, 10);
   }
 
   @Test
