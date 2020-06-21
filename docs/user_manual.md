@@ -25,7 +25,6 @@ This user manual is made to correspond to Docker's [API docs][1] (e.g. [API 1.18
   * [Pause a container](#pause-a-container)
   * [Unpause a container](#unpause-a-container)
   * [Attach to a container](#attach-to-a-container)
-  * [Attach to a container (websocket)](#attach-to-a-container-websocket)
   * [Wait a container](#wait-a-container)
   * [Remove a container](#remove-a-container)
   * [Copy files or folders from a container](#copy-files-or-folders-from-a-container)
@@ -41,6 +40,12 @@ This user manual is made to correspond to Docker's [API docs][1] (e.g. [API 1.18
   * [Tag an image into a repository](#tag-an-image-into-a-repository)
   * [Remove an image](#remove-an-image)
   * [Search images](#search-images)
+* [Volumes](#volumes)
+  * [List volumes](#list-volumes)
+  * [Create a volume](#create-a-volume)
+  * [Inspect a volume](#inspect-a-volume)
+  * [Remove a volume](#remove-a-volume)
+  * [Binds](#binds)
 * [Miscellaneous](#miscellaneous)
   * [Check auth configuration](#check-auth-configuration)
   * [Display system-wide information](#display-system-wide-information)
@@ -270,10 +275,6 @@ try (LogStream stream = docker.attachContainer(volumeContainer,
 }
 ```
 
-### Attach to a container (websocket)
-
-Not implemented. PRs welcome.
-
 ### Wait a container
 
 ```java
@@ -300,10 +301,6 @@ try (TarArchiveInputStream tarStream =
   }
 }
 ```
-
-### Retrieving information about files and folders in a container
-
-Not implemented. PRs welcome.
 
 ### Get an archive of a filesystem resource in a container
 
@@ -456,6 +453,96 @@ docker.removeImage("imageID");
 
 ```java
 final List<ImageSearchResult> searchResult = docker.searchImages("busybox");
+```
+
+## Volumes
+
+### List volumes
+
+```java
+final VolumeList volumeList = docker.listVolumes();
+final List<String> warnings = volumeList.warnings();
+final List<Volume> volumes = volumeList.volumes();
+```
+
+### Create a volume
+Create a volume with specified properties:
+```java
+final Volume toCreate = Volume.builder()
+  .name("volumeName")
+  .driver("local")
+  .labels(ImmutableMap.of("foo", "bar"))
+  .build();
+final Volume created = docker.createVolume(toCreate);
+```
+
+Or create an anonymous volume:
+```java
+final Volume created = docker.createVolume();
+```
+
+### Inspect a volume
+
+```java
+final Volume volume = docker.inspectVolume("volumeName");
+```
+
+### Remove a volume
+By name
+```java
+docker.removeVolume("volumeName");
+```
+
+Or by object reference
+```java
+docker.removeVolume(volume);
+```
+
+### Binds
+
+To mount a host directory into a container, create the container with a `HostConfig`.
+You can set the local path and remote path in the `binds()` method on the 
+`HostConfig.Builder`.
+
+There are two ways to make a bind:
+
+1. Pass `binds()` a set of strings of the form `"local_path:container_path"` 
+for read/write or `"local_path:container_path:ro"` for read only.
+2. Create a `Bind` object and pass it to `binds()`
+
+When you create a `Bind`, you are making a connection from outside the container 
+to inside; as such, you must give a `Bind` object a `from` and a `to`. `from` 
+can be given either by a `String` containing the path to a local file or directory, 
+or a pre-existing `Volume` object. `to` must be a `String` containing the path to 
+be bound inside the container.
+
+If you only need to create a volume to be mounted in a container, but you don't 
+need it to be bound to any particular directory on the host, you can use the 
+`ContainerConfig.Builder.volumes("/path")` method. The path you give to this 
+method will be created inside the container, but does not correspond to anything 
+outside.
+
+```java
+Bind bindA = Bind.from("/another/local/path")
+      .to("/another/remote/path")
+      .readOnly(true)
+      .build();
+Bind bindB = Bind.from(aVolume)
+      .to("/yet/another/remote/path")
+      .readOnly(false)
+      .build();
+Bind bindC = Bind.builder().from("/local/path").to("/remote/path").build();
+
+final HostConfig hostConfig =
+  HostConfig.builder()
+    .binds(bindA, bindB, bindC)
+    .build();
+final ContainerConfig volumeConfig =
+  ContainerConfig.builder()
+    .image("busybox:latest")
+    .volumes("/foo")   // This volume will not mount any host directory
+    .hostConfig(hostConfig)
+    .build();
 ```
 
 ## Miscellaneous
@@ -619,91 +706,6 @@ docker.execResizeTty("execID", height, width);
 
 See [example above](#exec-create).
 
-## Volumes
-
-### List volumes
-
-```java
-final VolumeList volumeList = docker.listVolumes();
-final List<String> warnings = volumeList.warnings();
-final List<Volume> volumes = volumeList.volumes();
-```
-
-### Create a volume
-Create a volume with specified properties:
-```java
-final Volume toCreate = Volume.builder()
-  .name("volumeName")
-  .driver("local")
-  .labels(ImmutableMap.of("foo", "bar"))
-  .build();
-final Volume created = docker.createVolume(toCreate);
-```
-
-Or create an anonymous volume:
-```java
-final Volume created = docker.createVolume();
-```
-
-### Inspect a volume
-
-```java
-final Volume volume = docker.inspectVolume("volumeName");
-```
-
-### Remove a volume
-By name
-```java
-docker.removeVolume("volumeName");
-```
-
-Or by object reference
-```java
-docker.removeVolume(volume);
-```
-
-# Going Further
-## Mounting directories in a container
-To mount a host directory into a container, create the container with a `HostConfig`.
-You can set the local path and remote path in the `binds()` method on the `HostConfig.Builder`.
-There are two ways to make a bind:
-1. Pass `binds()` a set of strings of the form `"local_path:container_path"` for read/write or `"local_path:container_path:ro"` for read only.
-2. Create a `Bind` object and pass it to `binds()` (or `appendBinds()` if you want to incrementally add multiple `Bind`s).
-
-When you create a `Bind`, you are making a connection from outside the container to inside; as such, you must give a `Bind` object a `from` and a `to`. `from` can be given either by a `String` containing the path to a local file or directory, or a pre-existing `Volume` object. `to` must be a `String` containing the path to be bound inside the container.
-
-If you only need to create a volume to be mounted in a container, but you don't need it to be bound to any particular directory on the host, you can use the `ContainerConfig.Builder.volumes("/path")` method. The path you give to this method will be created inside the container, but does not correspond to anything outside.
-
-```java
-final HostConfig hostConfig =
-  HostConfig.builder()
-    .appendBinds("/local/path:/remote/path")
-    .appendBinds(Bind.from("/another/local/path")
-               .to("/another/remote/path")
-               .readOnly(true)
-               .build())
-    .appendBinds(Bind.from(aVolume)
-               .to("/yet/another/remote/path")
-               .readOnly(false)
-               .build())
-    .build();
-final ContainerConfig volumeConfig =
-  ContainerConfig.builder()
-    .image("busybox:latest")
-    .volumes("/foo")   // This volume will not mount any host directory
-    .hostConfig(hostConfig)
-    .build();
-```
-
-### A note on mounts
-Be aware that, starting with API version 1.20 (docker version 1.8.x), information
-about a container's volumes is returned with the key `"Mounts"`, not `"Volumes"`.
-As such, the `ContainerInfo.volumes()` method is deprecated. Instead, use
-`ContainerInfo.mounts()`.
-
-  [1]: https://docs.docker.com/engine/reference/api/docker_remote_api/
-  [2]: https://docs.docker.com/engine/reference/api/docker_remote_api_v1.18/
-  
 # Troubleshooting
 
 ## HTTP 500 errors returned from the Docker Remote API
