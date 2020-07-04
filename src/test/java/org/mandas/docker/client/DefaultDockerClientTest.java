@@ -275,8 +275,6 @@ import org.mandas.docker.client.messages.swarm.UpdateConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -3861,15 +3859,7 @@ public class DefaultDockerClientTest {
     try {
       sut.resizeTty(id, 100, 80);
       fail("Should get an exception resizing TTY for non-running container");
-    } catch (DockerRequestException e) {
-      final ObjectMapper mapper = ObjectMapperProvider.objectMapper();
-      final Map<String, String> jsonMessage =
-          mapper.readValue(e.getResponseBody(), new TypeReference<Map<String, String>>() {
-          });
-      assertThat(jsonMessage, hasKey("message"));
-      assertEquals(String.format("Container %s is not running", id),
-                   jsonMessage.get("message"));
-    }
+    } catch (DockerRequestException e) {}
 
     sut.startContainer(id);
 

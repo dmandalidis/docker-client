@@ -60,6 +60,12 @@ projects are affected in the following ways:
 * Shading support has been dropped as a side-effect of providing API consistency between
 different client builders.
 
+* `DockerRequestException` has stopped holding the response body at all cases. This 
+is because RESTeasy (compared to Jersey) closes the response when an exception is thrown, 
+hiding the actual error when trying to read it. The specification is still 
+[unclear](https://github.com/eclipse-ee4j/jaxrs-api/issues/736) about whether JAXRS 
+implementations must close the response or not.
+
 ### Changes
 
 * Rationalize DefaultDockerClient and Builder responsibilities (fixes #161, #91)
