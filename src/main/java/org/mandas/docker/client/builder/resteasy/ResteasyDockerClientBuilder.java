@@ -39,6 +39,8 @@ import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient43Engine;
 import org.mandas.docker.client.builder.BaseDockerClientBuilder;
 import org.mandas.docker.client.builder.ProxyConfiguration;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+
 public class ResteasyDockerClientBuilder extends BaseDockerClientBuilder<ResteasyDockerClientBuilder> {
 
   @Override
@@ -99,7 +101,7 @@ public class ResteasyDockerClientBuilder extends BaseDockerClientBuilder<Resteas
           throw new IllegalArgumentException("Invalid entity processing mode " + entityProcessing);
       }
     }
-    builder.httpEngine(engine);
+    builder.httpEngine(engine).register(new JacksonJsonProvider());
     
     return builder.build();
   }

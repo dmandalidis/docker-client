@@ -47,7 +47,7 @@ of `DockerClientBuilder` for something completely different.
 
 ### Jersey
 
-For using Jersey, you will have to pull the following dependencies:
+For using Jersey, you will have to pull the following dependencies (versions are indicative):
 
 ```xml
 <dependency>
@@ -74,7 +74,7 @@ For using Jersey, you will have to pull the following dependencies:
 
 ### RESTeasy
 
-For using RESTeasy, you will have to pull the following dependencies:
+For using RESTeasy, you will have to pull the following dependencies (versions are indicative):
 ```xml
 <dependency>
   <groupId>org.jboss.resteasy</groupId>
@@ -85,6 +85,11 @@ For using RESTeasy, you will have to pull the following dependencies:
   <groupId>org.jboss.resteasy</groupId>
   <artifactId>resteasy-core</artifactId>
   <version>4.5.3.Final</version>
+</dependency>
+<dependency>
+  <groupId>com.fasterxml.jackson.jaxrs</groupId>
+  <artifactId>jackson-jaxrs-json-provider</artifactId>
+  <version>2.11.0</version>
 </dependency>
 ```
 
