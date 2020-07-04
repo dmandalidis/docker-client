@@ -36,6 +36,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.client.ProxyAuthenticationStrategy;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient43Engine;
+import org.jboss.resteasy.plugins.providers.DefaultTextPlain;
 import org.mandas.docker.client.builder.BaseDockerClientBuilder;
 import org.mandas.docker.client.builder.ProxyConfiguration;
 
@@ -101,7 +102,9 @@ public class ResteasyDockerClientBuilder extends BaseDockerClientBuilder<Resteas
           throw new IllegalArgumentException("Invalid entity processing mode " + entityProcessing);
       }
     }
-    builder.httpEngine(engine).register(new JacksonJsonProvider());
+    builder.httpEngine(engine)
+      .register(new JacksonJsonProvider())
+      .register(new DefaultTextPlain());
     
     return builder.build();
   }
