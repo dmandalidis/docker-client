@@ -1,6 +1,6 @@
 # Change Log
 
-## 4.0.0 (UNRELEASED)
+## 4.0.0
 
 ### Breaking changes
 
@@ -68,9 +68,21 @@ implementations must close the response or not.
 
 ### Changes
 
-* Rationalize DefaultDockerClient and Builder responsibilities (fixes #161, #91)
+* Avoid reading response entity on exceptions
+* Bump jackson-bom from 2.10.2 to 2.11.1
+* [documentation] appendBinds and TOC fix (fixes #192)
+* Bump google-auth-library-oauth2-http from 0.20.0 to 0.21.0
+* Drop async() invocations
+* Bump jnr-unixsocket from 0.25 to 0.32
+* README TOC fix (fixes #170)
+* Rationalize DefaultDockerClient and Builder responsibities (fixes #161, #91)
 * Drop commons-lang dependency
+* HostConfig.toBuilder fix to use existing values (fixes #166)
+* Bump bcpkix-jdk15on from 1.64 to 1.65
 * Swarm support for generic resources (fixes #155)
+* Bump version.jersey from 2.30 to 2.30.1
+* Auto-close json generator
+* Remove commons-io and javax.activation dependencies
 
 ## 3.2.1
 
