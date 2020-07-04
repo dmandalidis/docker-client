@@ -2571,7 +2571,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
 
     if (response != null) {
       throw new DockerRequestException(method, resource.getUri(), response.getStatus(),
-    		  	response.readEntity(String.class), cause);
+    		  	null, cause);
     } else if (cause instanceof InterruptedIOException) {
       throw new DockerTimeoutException(method, resource.getUri(), ex);
     } else if (cause instanceof InterruptedException) {
