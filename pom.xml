@@ -66,7 +66,7 @@
 		<version.jimfs>1.1</version.jimfs>
 		<version.awaitility>4.0.3</version.awaitility>
 		<version.mockwebserver>4.7.2</version.mockwebserver>
-		<version.spotify.hamcrest>1.1.5</version.spotify.hamcrest>
+		<version.spotify.hamcrest>1.2.0</version.spotify.hamcrest>
 
 		<version.plugin.spotbugs>4.0.4</version.plugin.spotbugs>
 		<version.plugin.compiler>3.8.1</version.plugin.compiler>
