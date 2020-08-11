@@ -80,7 +80,7 @@
 		<version.plugin.staging>1.6.8</version.plugin.staging>
 		<version.plugin.gpg>1.6</version.plugin.gpg>
 		<version.plugin.surefire>3.0.0-M5</version.plugin.surefire>
-		<version.plugin.bundle>2.5.0</version.plugin.bundle>
+		<version.plugin.bundle>5.1.1</version.plugin.bundle>
 	</properties>
 
 	<dependencyManagement>
