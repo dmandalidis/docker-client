@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.0.1
+
+* Bump version.jersey from 2.30.1 to 2.31
+* Generate proper MANIFEST.MF
+* Bump jackson-bom from 2.11.1 to 2.11.2
+* Bump version.resteasy from 4.5.5.Final to 4.5.6.Final
+* Bump jnr-unixsocket from 0.32 to 0.33
+* Bump bcpkix-jdk15on from 1.65 to 1.66
+* Bump google-auth-library-oauth2-http from 0.21.0 to 0.21.1
+
 ## 4.0.0
 
 ### Breaking changes
