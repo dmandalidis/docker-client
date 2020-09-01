@@ -330,7 +330,8 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   private static final GenericType<List<Secret>> SECRET_LIST = new GenericType<List<Secret>>() { };
 
   private final Client client;
-
+  private final Client notimeoutClient;
+  
   private final URI uri;
   private final String apiVersion;
   private final RegistryAuthSupplier registryAuthSupplier;
@@ -340,6 +341,10 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   Client getClient() {
     return client;
   }
+  
+  Client getNotimeoutClient() {
+    return notimeoutClient;
+  }
 
   /**
    * Create a new client using the configuration of the builder.
@@ -347,13 +352,15 @@ public class DefaultDockerClient implements DockerClient, Closeable {
    * @param authSupplier credentials supplier for the docker registry
    * @param uri the Docker engine URI
    * @param client the JAX-RS client for issuing the calls to the docker engine
+   * @param notimeoutClient the JAX-RS client for issuing the calls to the docker engine (without timeout)
    * @param headers a custom set of HTTP headers
    */
-  public DefaultDockerClient(String apiVersion, RegistryAuthSupplier authSupplier, URI uri, Client client, Map<String, Object> headers) {
+  public DefaultDockerClient(String apiVersion, RegistryAuthSupplier authSupplier, URI uri, Client client, Client notimeoutClient, Map<String, Object> headers) {
     this.apiVersion = apiVersion;
     this.registryAuthSupplier = authSupplier;
     this.uri = uri;
     this.client = client;
+    this.notimeoutClient = notimeoutClient;
     this.headers = new HashMap<>(headers);
   }
 
@@ -527,6 +534,8 @@ public class DefaultDockerClient implements DockerClient, Closeable {
           throw new ImageNotFoundException(config.image(), e);
         case 406:
           throw new DockerException("Impossible to attach. Container not running.", e);
+        case 409:
+          throw new ConflictException(String.format("Container %s already exists", name), e);
         default:
           throw e;
       }
@@ -632,7 +641,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       throws DockerException, InterruptedException {
     
     try {
-      final WebTarget resource = resource()
+      final WebTarget resource = noTimeoutResource()
           .path("containers").path(containerId).path("stop")
           .queryParam("t", String.valueOf(secondsToWaitBeforeKilling));
       request(POST, resource, resource.request());
@@ -652,7 +661,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   public ContainerExit waitContainer(final String containerId)
       throws DockerException, InterruptedException {
     try {
-      final WebTarget resource = resource()
+      final WebTarget resource = noTimeoutResource()
           .path("containers").path(containerId).path("wait");
       // Wait forever
       return request(POST, ContainerExit.class, resource,
@@ -690,6 +699,8 @@ public class DefaultDockerClient implements DockerClient, Closeable {
           throw new BadParamException(getQueryParamMap(resource()), e);
         case 404:
           throw new ContainerNotFoundException(containerId, e);
+        case 409:
+          throw new ConflictException(String.format("Container %s is still runnning", containerId), e);
         default:
           throw e;
       }
@@ -1196,7 +1207,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       throws DockerException, InterruptedException, IOException {
 	requireNonNull(handler, "handler");
 
-    WebTarget resource = resource().path("build");
+    WebTarget resource = noTimeoutResource().path("build");
 
     for (final BuildParam param : params) {
       resource = resource.queryParam(param.name(), param.value());
@@ -1289,7 +1300,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   @Override
   public LogStream logs(final String containerId, final LogsParam... params)
       throws DockerException, InterruptedException {
-    WebTarget resource = resource()
+    WebTarget resource = noTimeoutResource()
         .path("containers").path(containerId)
         .path("logs");
 
@@ -1303,7 +1314,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   @Override
   public EventStream events(EventsParam... params)
       throws DockerException, InterruptedException {
-    WebTarget resource = resource().path("events");
+    WebTarget resource = noTimeoutResource().path("events");
     resource = addParameters(resource, params);
     InputStream stream = resource.request(MediaType.APPLICATION_JSON).get(InputStream.class);
     return new EventStream(stream, objectMapper());
@@ -1314,7 +1325,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
                                    final AttachParameter... params) throws DockerException,
                                                                            InterruptedException {
     requireNonNull(containerId, "containerId");
-    WebTarget resource = resource()
+    WebTarget resource = noTimeoutResource()
     		.path("containers").path(containerId).path("attach");
 
     for (final AttachParameter param : params) {
@@ -1418,7 +1429,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   @Override
   public LogStream execStart(final String execId, final ExecStartParameter... params)
       throws DockerException, InterruptedException {
-    final WebTarget resource = resource()
+    final WebTarget resource = noTimeoutResource()
     		.path("exec").path(execId).path("start");
 
     final StringWriter writer = new StringWriter();
@@ -1754,7 +1765,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   public LogStream serviceLogs(String serviceId, LogsParam... params)
           throws DockerException, InterruptedException {
     assertApiVersionIsAbove("1.25");
-    WebTarget resource = resource()
+    WebTarget resource = noTimeoutResource()
             .path("services").path(serviceId)
             .path("logs");
 
@@ -2421,6 +2432,10 @@ public class DefaultDockerClient implements DockerClient, Closeable {
     }
   }
 
+  private WebTarget noTimeoutResource() {
+    return resource(notimeoutClient);
+  }
+  
   private WebTarget resource() {
     return resource(client);
   }
