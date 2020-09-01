@@ -1,5 +1,10 @@
 # Change Log
 
+## 4.0.2
+
+* Selective blocking I/O calls and handle missing HTTP statuses (fixes #229)(fixes #231)
+* Bump jnr-unixsocket from 0.33 to 0.34
+
 ## 4.0.1
 
 * Bump version.jersey from 2.30.1 to 2.31
