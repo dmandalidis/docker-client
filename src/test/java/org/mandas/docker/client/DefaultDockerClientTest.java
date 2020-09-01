@@ -194,6 +194,7 @@ import org.mandas.docker.client.messages.ContainerCreation;
 import org.mandas.docker.client.messages.ContainerExit;
 import org.mandas.docker.client.messages.ContainerInfo;
 import org.mandas.docker.client.messages.ContainerMount;
+import org.mandas.docker.client.messages.ContainerState;
 import org.mandas.docker.client.messages.ContainerStats;
 import org.mandas.docker.client.messages.ContainerUpdate;
 import org.mandas.docker.client.messages.Device;
@@ -1439,6 +1440,14 @@ public class DefaultDockerClientTest {
     }
   }
 
+  @Test
+  public void testWaitRunningContainer() throws Exception {
+    String container = createSleepingContainer();
+    sut.waitContainer(container);
+    ContainerInfo info = sut.inspectContainer(container);
+    assertThat(info.state().exitCode(), is(0L));
+  }
+  
   @Test
   public void testWaitContainer() throws Exception {
     sut.pull(BUSYBOX_LATEST);
@@ -3010,6 +3019,18 @@ public class DefaultDockerClientTest {
     sut.createContainer(config, name);
   }
 
+  @Test(expected = ConflictException.class)
+  public void testCreateConflictingContainer() throws Exception {
+    final ContainerConfig config = ContainerConfig.builder()
+        .image(BUSYBOX_LATEST)
+        .cmd("sh", "-c", "echo hello world")
+        .build();
+
+    String containerName = randomName();
+    sut.createContainer(config, containerName);
+    sut.createContainer(config, containerName);
+  }
+  
   @Test
   public void testCreateContainerNameMatcher() throws Exception {
     final ContainerConfig config = ContainerConfig.builder()
@@ -3067,6 +3088,12 @@ public class DefaultDockerClientTest {
   @Test(expected = ContainerNotFoundException.class)
   public void testRemoveBadContainer() throws Exception {
     sut.removeContainer(randomName());
+  }
+  
+  @Test(expected = ConflictException.class)
+  public void testRemoveRunningContainer() throws Exception {
+    String container = createSleepingContainer();
+    sut.removeContainer(container);
   }
 
   @Test(expected = ContainerNotFoundException.class)
