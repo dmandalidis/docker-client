@@ -27,7 +27,6 @@ import java.io.InputStream;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.mandas.docker.client.messages.Event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;

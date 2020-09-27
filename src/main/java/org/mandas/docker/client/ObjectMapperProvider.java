@@ -62,7 +62,7 @@ public class ObjectMapperProvider implements ContextResolver<ObjectMapper> {
       OBJECT_MAPPER.registerModule(MODULE);
       OBJECT_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
       OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-    } catch (Throwable t) {
+    } catch (Exception t) {
       log.error("Failure during static initialization", t);
       throw t;
     }

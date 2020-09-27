@@ -145,6 +145,7 @@ public abstract class BaseDockerClientBuilder<B extends BaseDockerClientBuilder<
    * @param uri URI String for connections to Docker
    * @return Builder
    */
+  @Override
   public B uri(final String uri) {
     return uri(URI.create(uri));
   }
@@ -286,9 +287,7 @@ public abstract class BaseDockerClientBuilder<B extends BaseDockerClientBuilder<
 
   protected HttpClientConnectionManager getConnectionManager(URI uri, Registry<ConnectionSocketFactory> schemeRegistry, int connectionPoolSize) {
     if (uri.getScheme().equals(NPIPE_SCHEME)) {
-      final BasicHttpClientConnectionManager bm = 
-          new BasicHttpClientConnectionManager(schemeRegistry);
-      return bm;
+      return new BasicHttpClientConnectionManager(schemeRegistry);
     }
     final PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(schemeRegistry);
     // Use all available connections instead of artificially limiting ourselves to 2 per server.

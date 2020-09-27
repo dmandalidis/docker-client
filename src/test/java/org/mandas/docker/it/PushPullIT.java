@@ -53,7 +53,6 @@ import org.mandas.docker.client.DockerClient.RemoveContainerParam;
 import org.mandas.docker.client.DockerConfigReader;
 import org.mandas.docker.client.auth.ConfigFileRegistryAuthSupplier;
 import org.mandas.docker.client.auth.FixedRegistryAuthSupplier;
-import org.mandas.docker.client.builder.jersey.JerseyDockerClientBuilder;
 import org.mandas.docker.client.exceptions.ContainerNotFoundException;
 import org.mandas.docker.client.exceptions.DockerException;
 import org.mandas.docker.client.exceptions.ImagePushFailedException;
