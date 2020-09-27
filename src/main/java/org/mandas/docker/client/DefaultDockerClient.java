@@ -422,6 +422,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
 
   private WebTarget addParameters(WebTarget resource, final Param... params)
       throws DockerException {
+    WebTarget target = resource;
     final Map<String, List<String>> filters = new HashMap<>();
     for (final Param param : params) {
       if (param instanceof FilterParam) {
@@ -434,7 +435,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
         filterValueList.add(param.value());
         filters.put(param.name(), filterValueList);
       } else {
-        resource = resource.queryParam(urlEncode(param.name()), urlEncode(param.value()));
+        target = target.queryParam(urlEncode(param.name()), urlEncode(param.value()));
       }
     }
 
@@ -442,9 +443,9 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       // If filters were specified, we must put them in a JSON object and pass them using the
       // 'filters' query param like this: filters={"dangling":["true"]}. If filters is an empty map,
       // urlEncodeFilters will return null and queryParam() will remove that query parameter.
-      resource = resource.queryParam("filters", urlEncodeFilters(filters));
+      target = target.queryParam("filters", urlEncodeFilters(filters));
     }
-    return resource;
+    return target;
   }
 
   private Map<String, String> getQueryParamMap(final WebTarget resource) {
@@ -2535,6 +2536,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       } catch (ProcessingException e) {
         // ignore, thrown by jnr-unixsocket when httpcomponent try to read after close
         // the socket is closed before this exception
+        log.error("Error", e);
       }
     }
   }
@@ -2625,10 +2627,10 @@ public class DefaultDockerClient implements DockerClient, Closeable {
 
       // Version below 1.19
       if (versionComparison < 0) {
-        authRegistryJson = "{\"configs\":" + authRegistryJson + "}";
+        authRegistryJson = new StringBuilder("{\"configs\":").append(authRegistryJson).append('}').toString();
       } else if (versionComparison == 0) {
         // Version equal 1.19
-        authRegistryJson = "{\"auths\":" + authRegistryJson + "}";
+        authRegistryJson = new StringBuilder("{\"auths\":").append(authRegistryJson).append('}').toString();
       }
 
       return Base64.encodeBase64String(authRegistryJson.getBytes(StandardCharsets.UTF_8));

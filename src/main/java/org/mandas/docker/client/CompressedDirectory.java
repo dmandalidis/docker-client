@@ -118,7 +118,7 @@ class CompressedDirectory implements Closeable {
                          Integer.MAX_VALUE,
                          new Visitor(directory, ignoreMatchers, tarOut));
 
-    } catch (Throwable t) {
+    } catch (IOException t) {
       // If an error occurs, delete temporary file before rethrowing exclude.
       try {
         Files.delete(file);
@@ -149,7 +149,7 @@ class CompressedDirectory implements Closeable {
           log.debug("Will skip '{}' - because it's empty after trimming or it's a comment", line);
           continue;
         }
-        if (pattern.startsWith("!")) {
+        if (!pattern.isEmpty() && pattern.charAt(0) == '!') {
           matchersBuilder
               .add(new DockerIgnorePathMatcher(dockerIgnorePath.getFileSystem(), pattern, false));
         } else {
@@ -164,7 +164,7 @@ class CompressedDirectory implements Closeable {
 
   private static String createPattern(String line) {
     final String pattern = line.trim();
-    if (pattern.startsWith("#")) {
+    if (!pattern.isEmpty() && pattern.charAt(0) == '#') {
       return null;
     }
     if (OsUtils.isLinux() || OsUtils.isOsX()) {
@@ -220,7 +220,7 @@ class CompressedDirectory implements Closeable {
               patternBuilder.append(notSeparatorPattern);
               break;
             case '[':
-              patternBuilder.append("[");
+              patternBuilder.append('[');
               inCharRange = true;
               break;
             case '\\':
@@ -431,7 +431,7 @@ class CompressedDirectory implements Closeable {
       try {
         startsWith = path.startsWith(this.pattern);
       } catch (InvalidPathException e) {
-        // thrown "If the path string cannot be converted to a Path"
+        log.error("invalid path", e);
       }
       return startsWith || this.matcher.matches(path);
     }

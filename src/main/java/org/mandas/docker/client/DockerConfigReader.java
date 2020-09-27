@@ -204,7 +204,7 @@ public class DockerConfigReader {
         }
       }
     } catch (URISyntaxException e) {
-      // Nothing to do, just let this fall through below
+      LOG.error("Invalid URI", e);
     }
 
     throw new IllegalArgumentException(

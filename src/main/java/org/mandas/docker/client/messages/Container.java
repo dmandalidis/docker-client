@@ -110,14 +110,14 @@ public interface Container {
           sb.append(", ");
         }
         if (port.ip() != null) {
-          sb.append(port.ip()).append(":");
+          sb.append(port.ip()).append(':');
         }
         if (port.publicPort() > 0) {
           sb.append(port.privatePort()).append("->").append(port.publicPort());
         } else {
           sb.append(port.privatePort());
         }
-        sb.append("/").append(port.type());
+        sb.append('/').append(port.type());
       }
     }
 
