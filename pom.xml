@@ -57,7 +57,7 @@
 		<version.apache.lang>2.6</version.apache.lang>
 		<version.bcpkix>1.66</version.bcpkix>
 		<version.jaxrs>2.1.6</version.jaxrs>
-		<version.google.oauth2>0.21.1</version.google.oauth2>
+		<version.google.oauth2>0.22.0</version.google.oauth2>
 
 		<version.junit>4.13.1</version.junit>
 		<version.mockito>3.5.13</version.mockito>
