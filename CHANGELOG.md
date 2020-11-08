@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.0.3
+
+* Bump bcpkix-jdk15on from 1.66 to 1.67
+* Bump google-auth-library-oauth2-http from 0.21.1 to 0.22.0
+* Bump jackson-bom from 2.11.2 to 2.11.3
+* Bump version.jersey from 2.31 to 2.32
+* Bump version.resteasy from 4.5.6.Final to 4.5.8.Final
+* Bump jnr-unixsocket from 0.34 to 0.38.3
+
 ## 4.0.2
 
 * Selective blocking I/O calls and handle missing HTTP statuses (fixes #229)(fixes #231)
