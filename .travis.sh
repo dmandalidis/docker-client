@@ -34,7 +34,7 @@ case "$1" in
     sudo apt-get -q -y install docker-ce=$PACKAGE_VERSION
     sudo docker info
     sudo docker swarm init --advertise-addr 127.0.0.1
-
+    sudo echo ${DOCKER_PASSWORD} | docker login --username ${DOCKER_USER} --password-stdin
     ;;
 
   dump_docker_config)
