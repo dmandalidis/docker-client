@@ -154,6 +154,7 @@ public interface HostConfig {
 
   @Nullable
   @JsonProperty("KernelMemory")
+  @Deprecated // as of 20.10.0
   Long kernelMemory();
 
   @Nullable
@@ -415,7 +416,8 @@ public interface HostConfig {
     Builder memorySwap(Long memorySwap);
 
     Builder memorySwappiness(Integer memorySwappiness);
-
+    
+    @Deprecated // as of 20.10.0
     Builder kernelMemory(Long kernelMemory);
 
     Builder memoryReservation(Long memoryReservation);

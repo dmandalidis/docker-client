@@ -1711,8 +1711,7 @@ public class DefaultDockerClientTest {
 
     final HostConfig.Builder hostConfigBuilder = HostConfig.builder()
         .memory(16777216L) // Do not set this lower: https://github.com/moby/moby/issues/38921
-        .memorySwap(33554432L)
-        .kernelMemory(5000000L);
+        .memorySwap(33554432L);
 
     hostConfigBuilder.memorySwappiness(42);
 
@@ -1733,7 +1732,6 @@ public class DefaultDockerClientTest {
     assertThat(actual.memory(), equalTo(expected.memory()));
     assertThat(actual.memorySwap(), equalTo(expected.memorySwap()));
     assertThat(actual.memorySwappiness(), equalTo(expected.memorySwappiness()));
-    assertThat(actual.kernelMemory(), equalTo(expected.kernelMemory()));
   }
 
   @Test

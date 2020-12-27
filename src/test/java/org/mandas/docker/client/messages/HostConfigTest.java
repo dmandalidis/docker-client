@@ -57,12 +57,4 @@ public class HostConfigTest {
                    HostConfig.class);
     assertThat(hostConfig.restartPolicy(), is(HostConfig.RestartPolicy.onFailure(5)));
   }
-
-  @Test
-  public void testKernelMemory() throws Exception {
-    final HostConfig hostConfig = objectMapper
-        .readValue(fixture("fixtures/1.21/hostConfigKernelMemory.json"),
-            HostConfig.class);
-    assertThat(hostConfig.kernelMemory(), is(0L));
-  }
 }
