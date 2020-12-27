@@ -266,10 +266,6 @@ public interface HostConfig {
   Map<String, String> sysctls();
   
   @Nullable
-  @JsonProperty("Capabilities")
-  List<String> capabilities();
-  
-  @Nullable
   @JsonProperty("DeviceRequests")
   List<DeviceRequest> deviceRequests();
   
@@ -503,8 +499,6 @@ public interface HostConfig {
     Builder sysctls(Map<String, ? extends String> sysctls);
     
     Builder addSysctl(String key, String value);
-    
-    Builder capabilities(Iterable<String> capabilities);
     
     Builder deviceRequests(Iterable<? extends DeviceRequest> deviceRequests);
     
