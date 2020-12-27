@@ -1652,7 +1652,7 @@ public class DefaultDockerClientTest {
 
     List<String> capabilities = asList("CAP_CHOWN", "CAP_FOWNER");
 	final HostConfig expected = HostConfig.builder()
-    	.capabilities(capabilities)
+    	.capAdd(capabilities)
         .build();
 
     final ContainerConfig config = ContainerConfig.builder()
@@ -1667,7 +1667,7 @@ public class DefaultDockerClientTest {
 
     final HostConfig actual = sut.inspectContainer(id).hostConfig();
 
-    assertThat(actual.capabilities(), equalTo(capabilities));
+    assertThat(actual.capAdd(), equalTo(capabilities));
   }
 
   @Test
