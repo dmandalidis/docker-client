@@ -1530,7 +1530,7 @@ public class DefaultDockerClientTest {
                 .build()
         );
     final Device expectedDevice = Device.builder()
-        .pathOnHost(".")
+        .pathOnHost("/dev/null")
         .pathInContainer("/foo")
         .cgroupPermissions("mrw")
         .build();
