@@ -1,5 +1,16 @@
 # Change Log
 
+## 5.0.0
+
+* Drop full list of capabilities
+* HostConfig#kernelMemory deprecated in 20.10.0
+* Bump google-auth-library-oauth2-http from 0.22.1 to 0.22.2
+* Bump jnr-unixsocket from 0.38.3 to 0.38.5
+* Bump bcpkix-jdk15on from 1.67 to 1.68
+* Bump jakarta.ws.rs-api from 2.1.6 to 3.0.0
+* Bump google-auth-library-oauth2-http from 0.22.0 to 0.22.1
+* Bump jackson-bom from 2.11.3 to 2.12.0
+
 ## 4.0.3
 
 * Bump bcpkix-jdk15on from 1.66 to 1.67
