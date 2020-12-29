@@ -22,7 +22,7 @@ install: true
 before_install:
 - if [ $TRAVIS_PULL_REQUEST == "false" ]; then openssl aes-256-cbc -K $encrypted_7a129298b602_key
   -iv $encrypted_7a129298b602_iv -in secret.asc.enc -out secret.asc -d; fi
-- if [ $TRAVIS_PULL_REQUEST == "false" ]; then gpg --import secret.asc; fi
+- if [ $TRAVIS_PULL_REQUEST == "false" ]; then gpg --batch --import secret.asc; fi
 - dpkg -l | grep docker
 - "./.travis.sh install_docker"
 - docker version
