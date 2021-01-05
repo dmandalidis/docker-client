@@ -62,7 +62,7 @@
 		<version.junit>4.13.1</version.junit>
 		<version.mockito>3.6.28</version.mockito>
 		<version.logback>1.2.3</version.logback>
-		<version.jimfs>1.1</version.jimfs>
+		<version.jimfs>1.2</version.jimfs>
 		<version.awaitility>4.0.3</version.awaitility>
 		<version.mockwebserver>4.9.0</version.mockwebserver>
 		<version.spotify.hamcrest>1.2.0</version.spotify.hamcrest>
