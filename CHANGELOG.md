@@ -1,5 +1,12 @@
 # Change Log
 
+## 5.0.1
+
+* Bump google-auth-library-oauth2-http from 0.22.2 to 0.25.2
+* Bump jnr-unixsocket from 0.38.5 to 0.38.6
+* Bump jackson-bom from 2.12.0 to 2.12.2
+* Bump version.resteasy from 4.5.8.Final to 4.6.0.Final
+
 ## 5.0.0
 
 * Drop full list of capabilities
