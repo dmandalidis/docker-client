@@ -68,7 +68,7 @@
 		<version.spotify.hamcrest>1.2.0</version.spotify.hamcrest>
 
 		<version.spotbugs>4.2.3</version.spotbugs>
-		<version.plugin.spotbugs>4.2.2</version.plugin.spotbugs>
+		<version.plugin.spotbugs>4.2.3</version.plugin.spotbugs>
 		<version.plugin.compiler>3.8.1</version.plugin.compiler>
 		<version.plugin.checkstyle>3.1.2</version.plugin.checkstyle>
 		<version.plugin.enforcer>3.0.0-M3</version.plugin.enforcer>
