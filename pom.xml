@@ -59,7 +59,7 @@
 		<version.jaxrs>3.0.0</version.jaxrs>
 		<version.google.oauth2>0.25.5</version.google.oauth2>
 
-		<version.junit>4.13.1</version.junit>
+		<version.junit>4.13.2</version.junit>
 		<version.mockito>3.9.0</version.mockito>
 		<version.logback>1.2.3</version.logback>
 		<version.jimfs>1.2</version.jimfs>
