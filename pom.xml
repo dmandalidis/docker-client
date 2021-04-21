@@ -52,7 +52,7 @@
 		<version.jersey>2.33</version.jersey>
 		<version.resteasy>4.6.0.Final</version.resteasy>
 		<version.immutables>2.8.8</version.immutables>
-		<version.apache.compress>1.19</version.apache.compress>
+		<version.apache.compress>1.20</version.apache.compress>
 		<version.unixsocket>0.38.6</version.unixsocket>
 		<version.apache.lang>2.6</version.apache.lang>
 		<version.bcpkix>1.68</version.bcpkix>
