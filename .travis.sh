@@ -23,9 +23,10 @@ case "$1" in
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
     sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 
-    sudo apt-get -qq update
+    sudo mv /var/lib/dpkg/info/docker-ce* /tmp
     sudo apt-get -q -y purge docker-ce docker-ce-cli containerd.io
-    sudo rm -Rf /etc/docker
+    sudo apt-get remove docker docker-engine docker.io containerd runc
+    sudo apt-get -qq update
     PACKAGE_VERSION=$(sudo apt-cache madison docker-ce | grep $DOCKER_VERSION | cut -f2 -d"|" | tr -d '[:space:]')
     if [[ -z $PACKAGE_VERSION ]]; then
       echo "No candidate package with $DOCKER_VERSION was found";
