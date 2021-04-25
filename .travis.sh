@@ -25,6 +25,7 @@ case "$1" in
 
     sudo apt-get -qq update
     sudo apt-get -q -y purge docker-ce docker-ce-cli containerd.io
+    sudo rm -Rf /etc/docker
     PACKAGE_VERSION=$(sudo apt-cache madison docker-ce | grep $DOCKER_VERSION | cut -f2 -d"|" | tr -d '[:space:]')
     if [[ -z $PACKAGE_VERSION ]]; then
       echo "No candidate package with $DOCKER_VERSION was found";
