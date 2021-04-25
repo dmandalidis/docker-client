@@ -24,7 +24,7 @@ case "$1" in
     sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 
     sudo apt-get -qq update
-    sudo apt-get -q -y purge docker-ce
+    sudo apt-get -q -y purge docker-ce docker-ce-cli containerd.io
     PACKAGE_VERSION=$(sudo apt-cache madison docker-ce | grep $DOCKER_VERSION | cut -f2 -d"|" | tr -d '[:space:]')
     if [[ -z $PACKAGE_VERSION ]]; then
       echo "No candidate package with $DOCKER_VERSION was found";
