@@ -31,7 +31,7 @@ case "$1" in
       exit 1;
     fi
 
-    sudo apt-get -q -y install docker-ce=$PACKAGE_VERSION
+    sudo apt-get -q -y -o Dpkg::Options::="--force-confnew" install docker-ce=$PACKAGE_VERSION
     sudo docker info
     sudo docker swarm init --advertise-addr 127.0.0.1
     sudo echo ${DOCKER_PASSWORD} | docker login --username ${DOCKER_USER} --password-stdin
