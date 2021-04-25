@@ -24,7 +24,7 @@ before_install:
   -iv $encrypted_7a129298b602_iv -in secret.asc.enc -out secret.asc -d; fi
 - if [ $TRAVIS_PULL_REQUEST == "false" ]; then gpg --batch --import secret.asc; fi
 - dpkg -l | grep docker
-- "./.travis.sh install_docker"
+- "./.travis.sh install_docker || ./.travis.sh dump_docker_config"
 - docker version
 - docker info
 script:
