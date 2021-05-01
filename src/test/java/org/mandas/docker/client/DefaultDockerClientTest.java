@@ -382,6 +382,14 @@ public class DefaultDockerClientTest {
     sut.close();
   }
 
+  private void pull(String image) throws DockerException, InterruptedException {
+    try {
+      sut.inspectImage(image);
+    } catch (ImageNotFoundException infe) {
+      sut.pull(image);
+    }
+  }
+  
   private void requireDockerApiVersionAtLeast(final String required, final String functionality)
       throws Exception {
 
@@ -501,7 +509,7 @@ public class DefaultDockerClientTest {
   @Test
   public void testSave() throws Exception {
     // Ensure the local Docker instance has the busybox image so that save() will work
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
     final File imageFile = save(BUSYBOX);
     assertTrue(imageFile.length() > 0);
   }
@@ -509,7 +517,7 @@ public class DefaultDockerClientTest {
   @Test
   public void testLoad() throws Exception {
     // Ensure the local Docker instance has the busybox image so that save() will work
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     // duplicate busybox with another name
     final String image1 = BUSYBOX + "test1" + System.nanoTime() + ":latest";
@@ -602,7 +610,7 @@ public class DefaultDockerClientTest {
   @Test
   public void testCreate() throws Exception {
     // Ensure the local Docker instance has the busybox image so that save() will work
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
     final File imageFile = save(BUSYBOX);
     final String image = BUSYBOX + "test" + System.nanoTime();
 
@@ -707,8 +715,8 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testRemoveImage() throws Exception {
-    sut.pull("dxia/cirros:latest");
-    sut.pull("dxia/cirros:0.3.0");
+    pull("dxia/cirros:latest");
+    pull("dxia/cirros:0.3.0");
     final String imageLatest = "dxia/cirros:latest";
     final String imageVersion = "dxia/cirros:0.3.0";
 
@@ -732,7 +740,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testTag() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     // Tag image
     final String newImageName = "test-repo:testTag";
@@ -745,8 +753,8 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testTagForce() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
-    sut.pull(BUSYBOX_BUILDROOT_2013_08_1);
+    pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_BUILDROOT_2013_08_1);
 
     final String name = "test-repo/tag-force:sometag";
     // Assign name to first image
@@ -762,7 +770,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testInspectImage() throws Exception {
-    sut.pull(BUSYBOX_BUILDROOT_2013_08_1);
+    pull(BUSYBOX_BUILDROOT_2013_08_1);
     final ImageInfo info = sut.inspectImage(BUSYBOX_BUILDROOT_2013_08_1);
     assertThat(info, notNullValue());
     assertThat(info.architecture(), not(emptyOrNullString()));
@@ -971,7 +979,7 @@ public class DefaultDockerClientTest {
   @Test
   public void testExportContainer() throws Exception {
     // Pull image
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     // Create container
     final ContainerConfig config = ContainerConfig.builder()
@@ -996,7 +1004,7 @@ public class DefaultDockerClientTest {
   @Test
   public void testArchiveContainer() throws Exception {
     // Pull image
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     // Create container
     final ContainerConfig config = ContainerConfig.builder()
@@ -1022,7 +1030,7 @@ public class DefaultDockerClientTest {
   @Test
   public void testCopyToContainer() throws Exception {
     // Pull image
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     // Create container
     final ContainerConfig config = ContainerConfig.builder().image(BUSYBOX_LATEST).build();
@@ -1041,7 +1049,7 @@ public class DefaultDockerClientTest {
   @Test
   public void testCopyToContainerWithTarInputStream() throws Exception {
     // Pull image
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     // Create container
     final ContainerConfig config = ContainerConfig.builder().image(BUSYBOX_LATEST).build();
@@ -1060,7 +1068,7 @@ public class DefaultDockerClientTest {
   @Test
   public void testCommitContainer() throws Exception {
     // Pull image
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     // Create container
     final ContainerConfig config = ContainerConfig.builder()
@@ -1083,7 +1091,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testStopContainer() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final ContainerConfig containerConfig = ContainerConfig.builder()
         .image(BUSYBOX_LATEST)
@@ -1113,7 +1121,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testTopProcessesOfContainer() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final ContainerConfig containerConfig = ContainerConfig.builder()
         .image(BUSYBOX_LATEST)
@@ -1147,7 +1155,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testRestartContainer() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final ContainerConfig containerConfig = ContainerConfig.builder()
         .image(BUSYBOX_LATEST)
@@ -1181,7 +1189,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testKillContainer() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final ContainerConfig containerConfig = ContainerConfig.builder()
             .image(BUSYBOX_LATEST)
@@ -1207,7 +1215,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testKillContainerWithSignals() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final ContainerConfig containerConfig = ContainerConfig.builder()
             .image(BUSYBOX_LATEST)
@@ -1235,7 +1243,7 @@ public class DefaultDockerClientTest {
   @Test
   public void integrationTest() throws Exception {
     // Pull image
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     // Create container
     final ContainerConfig config = ContainerConfig.builder()
@@ -1320,7 +1328,7 @@ public class DefaultDockerClientTest {
   public void interruptTest() throws Exception {
 
     // Pull image
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     // Create container
     final ContainerConfig config = ContainerConfig.builder()
@@ -1450,7 +1458,7 @@ public class DefaultDockerClientTest {
   
   @Test
   public void testWaitContainer() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     // Create container
     final ContainerConfig config = ContainerConfig.builder()
@@ -1478,7 +1486,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testInspectContainerWithExposedPorts() throws Exception {
-    sut.pull(MEMCACHED_LATEST);
+    pull(MEMCACHED_LATEST);
     final ContainerConfig config = ContainerConfig.builder()
         .image(MEMCACHED_LATEST)
         .build();
@@ -1497,7 +1505,7 @@ public class DefaultDockerClientTest {
     final String typeLabel = "label:type:bar";
     final String levelLabel = "label:level:9001";
 
-    sut.pull(MEMCACHED_LATEST);
+    pull(MEMCACHED_LATEST);
     final HostConfig hostConfig = HostConfig.builder()
         .securityOpt(userLabel, roleLabel, typeLabel, levelLabel)
         .build();
@@ -1516,7 +1524,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testContainerWithHostConfig() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final boolean privileged = true;
     final boolean publishAllPorts = true;
@@ -1569,7 +1577,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testContainerWithCpuOptions() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final HostConfig expected = HostConfig.builder()
         .cpuShares(4096L)
@@ -1594,7 +1602,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testContainerWithMoreCpuOptions() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final HostConfig expected = HostConfig.builder()
         .cpuShares(4096L)
@@ -1624,7 +1632,7 @@ public class DefaultDockerClientTest {
   
   @Test
   public void testContainerWithSysctls() throws Exception {
-	sut.pull(BUSYBOX_LATEST);
+	pull(BUSYBOX_LATEST);
 
     final HostConfig expected = HostConfig.builder()
     	.addSysctl("net.ipv4.tcp_syncookies", "1")
@@ -1648,7 +1656,7 @@ public class DefaultDockerClientTest {
   @Test
   public void testContainerWithCapabilities() throws Exception {
 	requireDockerApiVersionAtLeast("1.40", "HostConfig.Capabilities");
-	sut.pull(BUSYBOX_LATEST);
+	pull(BUSYBOX_LATEST);
 
     List<String> capabilities = asList("CAP_CHOWN", "CAP_FOWNER");
 	final HostConfig expected = HostConfig.builder()
@@ -1672,7 +1680,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testContainerWithBlkioOptions() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final HostConfig.Builder hostConfigBuilder = HostConfig.builder();
 
@@ -1707,7 +1715,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testContainerWithMemoryOptions() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final HostConfig.Builder hostConfigBuilder = HostConfig.builder()
         .memory(16777216L) // Do not set this lower: https://github.com/moby/moby/issues/38921
@@ -1736,7 +1744,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testContainerWithAppArmorLogs() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final boolean privileged = true;
     final boolean publishAllPorts = true;
@@ -1786,7 +1794,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testContainerWithCpuQuota() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final boolean privileged = true;
     final boolean publishAllPorts = true;
@@ -1827,7 +1835,7 @@ public class DefaultDockerClientTest {
             .image(BUSYBOX_LATEST)
             .build();
 
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
     final ContainerCreation container = sut.createContainer(config, containerName);
 
     final ContainerInfo containerInfo = sut.inspectContainer(container.id());
@@ -1859,7 +1867,7 @@ public class DefaultDockerClientTest {
               .build();
 
       // Image pull
-      sut.pull(BUSYBOX_LATEST);
+      pull(BUSYBOX_LATEST);
       assertTrue("Docker did not return any events. "
                       + "Expected to see an event for pulling an image.",
               eventStream.hasNext());
@@ -2223,7 +2231,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testListImages() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
     final List<Image> images = sut.listImages();
     assertThat(images.size(), greaterThan(0));
 
@@ -2282,7 +2290,7 @@ public class DefaultDockerClientTest {
     final Date expected = new StdDateFormat().parse("2015-09-18T17:44:28.145Z");
 
     // Verify the formatter works when used with the client
-    sut.pull(BUSYBOX_BUILDROOT_2013_08_1);
+    pull(BUSYBOX_BUILDROOT_2013_08_1);
     final ImageInfo imageInfo = sut.inspectImage(BUSYBOX_BUILDROOT_2013_08_1);
     assertThat(imageInfo.created(), equalTo(expected));
   }
@@ -2353,7 +2361,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testPauseContainer() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final ContainerConfig containerConfig = ContainerConfig.builder()
         .image(BUSYBOX_LATEST)
@@ -2391,7 +2399,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testExtraHosts() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final HostConfig expected = HostConfig.builder()
         .extraHosts("extrahost:1.2.3.4")
@@ -2428,7 +2436,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testLogDriver() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
     final String name = randomName();
 
     final Map<String, String> logOptions = new HashMap<>();
@@ -2460,7 +2468,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testContainerVolumeNoCopy() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final String aVolumeName = "avolume";
     final String aVolumeTo = "/some/path";
@@ -2523,7 +2531,7 @@ public class DefaultDockerClientTest {
 	  requireDockerApiVersionAtLeast(
 	            "1.30", "Creating a container with mounts and inspecting mounts");
 	  
-	  sut.pull(BUSYBOX_LATEST);
+	  pull(BUSYBOX_LATEST);
 	  
 	  String volumeName = randomName();
 	  final HostConfig hostConfig = HostConfig.builder()
@@ -2563,7 +2571,7 @@ public class DefaultDockerClientTest {
 	  requireDockerApiVersionAtLeast(
 	            "1.30", "Creating a container with mounts and inspecting mounts");
 	  
-	  sut.pull(BUSYBOX_LATEST);
+	  pull(BUSYBOX_LATEST);
 	  
 	  final HostConfig hostConfig = HostConfig.builder()
 			.mounts(Mount.builder()
@@ -2589,7 +2597,7 @@ public class DefaultDockerClientTest {
   
   @Test
   public void testContainerVolumes() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final String namedVolumeName = "aVolume";
     final String namedVolumeFrom = "/a/host/path";
@@ -2750,7 +2758,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testVolumesFrom() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final String volumeContainer = randomName();
     final String mountContainer = randomName();
@@ -2790,7 +2798,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testAttachContainer() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final String volumeContainer = randomName();
 
@@ -2840,7 +2848,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testLogsNoStdOut() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final String container = randomName();
 
@@ -2867,7 +2875,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testLogsNoStdErr() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final String container = randomName();
 
@@ -2894,7 +2902,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testLogsTimestamps() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final String container = randomName();
 
@@ -2923,7 +2931,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testLogsTail() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final String container = randomName();
 
@@ -2952,7 +2960,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testLogsSince() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final String container = randomName();
 
@@ -3121,7 +3129,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testExecCreateOnNonRunningContainer() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final ContainerConfig containerConfig = ContainerConfig.builder()
         .image(BUSYBOX_LATEST)
@@ -3141,7 +3149,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testExecInspect() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final ContainerConfig containerConfig = ContainerConfig.builder()
         .image(BUSYBOX_LATEST)
@@ -3199,7 +3207,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testExecInspectNoUser() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final ContainerConfig containerConfig = ContainerConfig.builder()
         .image(BUSYBOX_LATEST)
@@ -3236,7 +3244,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testListContainers() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final String label = "foo";
     final String labelValue = "bar";
@@ -3309,7 +3317,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testContainerLabels() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     Map<String, String> labels = new HashMap<>();
     labels.put("name", "starship");
@@ -3432,7 +3440,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testMacAddress() throws Exception {
-    sut.pull(MEMCACHED_LATEST);
+    pull(MEMCACHED_LATEST);
     final ContainerConfig config = ContainerConfig.builder()
         .image(BUSYBOX_LATEST)
         .cmd("sleep", "1000")
@@ -3622,7 +3630,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testNetworksConnectContainer() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
     final String networkName = randomName();
     final String containerName = randomName();
     final NetworkCreation networkCreation =
@@ -3764,7 +3772,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testRenameContainer() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final String originalName = randomName();
     final String newName = randomName();
@@ -3846,7 +3854,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testInspectContainerChanges() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final ContainerConfig config = ContainerConfig.builder()
         .image(BUSYBOX_LATEST)
@@ -3863,7 +3871,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testResizeTty() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final ContainerConfig config = ContainerConfig.builder()
         .image(BUSYBOX_LATEST)
@@ -3895,7 +3903,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testHistory() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
     final List<ImageHistory> imageHistoryList = sut.history(BUSYBOX_LATEST);
     assertThat(imageHistoryList, hasSize(2));
 
@@ -4050,7 +4058,7 @@ public class DefaultDockerClientTest {
   }
 
   private void testRestartPolicy(HostConfig.RestartPolicy restartPolicy) throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final HostConfig hostConfig = HostConfig.builder()
         .restartPolicy(restartPolicy)
@@ -4100,7 +4108,7 @@ public class DefaultDockerClientTest {
   @Test
   public void testShmSize() throws Exception {
     // Pull image
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final ContainerConfig config = ContainerConfig.builder()
         .image(BUSYBOX_LATEST)
@@ -4118,7 +4126,7 @@ public class DefaultDockerClientTest {
   @Test
   public void testOomKillDisable() throws Exception {
     // Pull image
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final ContainerConfig config = ContainerConfig.builder()
         .image(BUSYBOX_LATEST)
@@ -4136,7 +4144,7 @@ public class DefaultDockerClientTest {
   @Test
   public void testOomScoreAdj() throws Exception {
     // Pull image
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final ContainerConfig config = ContainerConfig.builder()
         .image(BUSYBOX_LATEST)
@@ -4159,7 +4167,7 @@ public class DefaultDockerClientTest {
     }
 
     // Pull image
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final ContainerConfig config = ContainerConfig.builder()
         .image(BUSYBOX_LATEST)
@@ -4177,7 +4185,7 @@ public class DefaultDockerClientTest {
   @Test
   public void testTmpfs() throws Exception {
     // Pull image
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final Map<String, String> tmpfs = Collections.singletonMap("/tmp", "rw,noexec,nosuid,size=50m");
 
@@ -4197,7 +4205,7 @@ public class DefaultDockerClientTest {
   @Test
   public void testReadonlyRootfs() throws Exception {
     // Pull image
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final ContainerConfig config = ContainerConfig.builder()
         .image(BUSYBOX_LATEST)
@@ -4220,7 +4228,7 @@ public class DefaultDockerClientTest {
     // mount option enabled.
     assumeFalse(dockerApiVersionAtLeast("1.32") && TRAVIS);
     // Pull image
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final Map<String, String> storageOpt = Collections.singletonMap("size", "20G");
 
@@ -4242,7 +4250,7 @@ public class DefaultDockerClientTest {
   public void testAutoRemoveWhenSetToTrue() throws Exception {
     // Container should be removed after it is stopped (new since API v.1.25)
     // Pull image
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final ContainerConfig config = ContainerConfig.builder()
         .image(BUSYBOX_LATEST)
@@ -4265,7 +4273,7 @@ public class DefaultDockerClientTest {
   
   @Test
   public void testInitWhenSetToTrue() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
 
     final ContainerConfig config = ContainerConfig.builder()
         .image(BUSYBOX_LATEST)
@@ -5175,7 +5183,7 @@ public class DefaultDockerClientTest {
   }
 
   private String createSleepingContainer() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
+    pull(BUSYBOX_LATEST);
     final String volumeContainer = randomName();
     final ContainerConfig volumeConfig = ContainerConfig.builder().image(BUSYBOX_LATEST)
         .cmd("sh", "-c",
