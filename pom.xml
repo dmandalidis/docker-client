@@ -76,7 +76,7 @@
 		<version.plugin.projectinfo>3.1.2</version.plugin.projectinfo>
 		<version.plugin.source>3.2.1</version.plugin.source>
 		<version.plugin.failsafe>3.0.0-M5</version.plugin.failsafe>
-		<version.plugin.javadoc>3.2.0</version.plugin.javadoc>
+		<version.plugin.javadoc>3.3.0</version.plugin.javadoc>
 		<version.plugin.jacoco>0.8.7</version.plugin.jacoco>
 		<version.plugin.staging>1.6.8</version.plugin.staging>
 		<version.plugin.gpg>3.0.1</version.plugin.gpg>
