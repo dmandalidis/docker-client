@@ -193,7 +193,6 @@ public class DefaultDockerClientUnitTest {
 
   @Test
   public void testHostWithProxy() {
-    Assume.assumeTrue("jersey".equals(System.getProperty(DockerClientBuilderFactory.JAXRS_CLIENT_PROPERTY)));
     try {
       System.setProperty("http.proxyHost", "gmodules.com");
       System.setProperty("http.proxyPort", "80");
@@ -211,7 +210,6 @@ public class DefaultDockerClientUnitTest {
 
   @Test
   public void testHostWithNonProxyHost() {
-    Assume.assumeTrue("jersey".equals(System.getProperty(DockerClientBuilderFactory.JAXRS_CLIENT_PROPERTY)));
     try {
       System.setProperty("http.proxyHost", "gmodules.com");
       System.setProperty("http.proxyPort", "80");
@@ -1211,7 +1209,6 @@ public class DefaultDockerClientUnitTest {
   
   @Test
   public void testChunkedRequestEntityProcessing() throws Exception {
-    Assume.assumeTrue("jersey".equals(System.getProperty(DockerClientBuilderFactory.JAXRS_CLIENT_PROPERTY)));
     builder.entityProcessing(EntityProcessing.CHUNKED);
     
     try (final DefaultDockerClient dockerClient = builder.build()) {

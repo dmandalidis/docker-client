@@ -1324,7 +1324,7 @@ public class DefaultDockerClientTest {
     }
   }
 
-  @Test @Ignore
+  @Test
   public void interruptTest() throws Exception {
 
     // Pull image
@@ -1853,7 +1853,7 @@ public class DefaultDockerClientTest {
     assertThat(newContainerInfo.hostConfig().cpuShares(), is(512L));
   }
 
-  @Test(timeout = 10000) @Ignore
+  @Test(timeout = 10000)
   public void testEventStream() throws Exception {
     // In this test we open an event stream, do stuff, and check that
     // the events for the stuff we did got pushed over the stream
