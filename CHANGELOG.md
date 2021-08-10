@@ -1,5 +1,17 @@
 # Change Log
 
+## 5.0.2 - notable changes
+
+* Bump version.resteasy from 4.6.0.Final to 4.7.1.Final
+* Bump google-auth-library-oauth2-http from 0.25.2 to 1.0.0
+* Bump logback-classic from 1.2.3 to 1.2.5
+* Bump slf4j-api from 1.7.30 to 1.7.32
+* Bump commons-compress from 1.19 to 1.21
+* Bump jackson-bom from 2.12.2 to 2.12.4
+* Bump bcpkix-jdk15on from 1.68 to 1.69
+* Bump jnr-unixsocket from 0.38.6 to 0.38.8
+* Bump version.jersey from 2.32 to 2.34
+
 ## 5.0.1
 
 * Bump google-auth-library-oauth2-http from 0.22.2 to 0.25.2
