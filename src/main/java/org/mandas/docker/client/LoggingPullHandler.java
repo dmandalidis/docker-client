@@ -44,9 +44,8 @@ public class LoggingPullHandler implements ProgressHandler {
     if (message.error() != null) {
       if (message.error().contains("404") || message.error().contains("not found")) {
         throw new ImageNotFoundException(image, message.toString());
-      } else {
-        throw new ImagePullFailedException(image, message.toString());
       }
+      throw new ImagePullFailedException(image, message.toString());
     }
 
     log.info("pull {}: {}", image, message);

@@ -2524,9 +2524,8 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       final Throwable cause = e.getCause();
       if (cause instanceof DockerException) {
         throw (DockerException)cause;
-      } else {
-        throw new DockerException(cause);
       }
+      throw new DockerException(cause);
     } catch (IOException e) {
       throw new DockerException(e);
     } finally {

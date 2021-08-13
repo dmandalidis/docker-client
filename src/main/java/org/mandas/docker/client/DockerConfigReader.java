@@ -242,10 +242,9 @@ public class DockerConfigReader {
     if (Files.exists(dockerConfig)) {
       LOG.debug("Using configfile: {}", dockerConfig);
       return dockerConfig;
-    } else {
-      LOG.debug("Using configfile: {} ", dockerCfg);
-      return dockerCfg;
     }
+    LOG.debug("Using configfile: {} ", dockerCfg);
+    return dockerCfg;
   }
 
   /**

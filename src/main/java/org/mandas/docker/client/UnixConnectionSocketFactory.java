@@ -60,9 +60,8 @@ public class UnixConnectionSocketFactory implements ConnectionSocketFactory {
   public static URI sanitizeUri(final URI uri) {
     if (uri.getScheme().equals("unix")) {
       return URI.create("unix://localhost:80");
-    } else {
-      return uri;
     }
+    return uri;
   }
 
   @Override

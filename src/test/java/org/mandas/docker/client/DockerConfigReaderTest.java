@@ -47,7 +47,6 @@ import org.mandas.docker.client.messages.RegistryConfigs;
 
 import com.google.common.io.Resources;
 
-@SuppressWarnings("deprecated")
 public class DockerConfigReaderTest {
 
   private static final RegistryAuth DOCKER_AUTH_CONFIG = RegistryAuth.builder()
@@ -179,9 +178,8 @@ public class DockerConfigReaderTest {
   private static Path getTestFilePath(final String path) {
     if (OsUtils.isLinux() || OsUtils.isOsX()) {
       return getLinuxPath(path);
-    } else {
-      return getWindowsPath(path);
     }
+    return getWindowsPath(path);
   }
 
   private static Path getWindowsPath(final String path) {

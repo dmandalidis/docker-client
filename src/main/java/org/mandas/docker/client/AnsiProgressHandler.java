@@ -39,7 +39,6 @@ public class AnsiProgressHandler implements ProgressHandler {
   private final PrintStream out;
   private final Map<String, Integer> idsToLines;
 
-  @SuppressWarnings("UseOfSystemOutOrSystemErr")
   public AnsiProgressHandler() {
     this(System.out);
   }

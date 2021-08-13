@@ -317,7 +317,6 @@ public class DefaultDockerClientUnitTest {
   }
 
   @Test
-  @SuppressWarnings("unchecked")
   public void testCapAddAndDrop() throws Exception {
     final DefaultDockerClient dockerClient = builder.build();
 

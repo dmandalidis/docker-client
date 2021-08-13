@@ -71,7 +71,6 @@ import com.google.common.io.Resources;
  * local container. Some tests in this class also check we can push to and pull from Docker Hub.
  * N.B. Docker Hub rate limits pushes, so they might fail if you run them too often :)
  */
-@SuppressWarnings("AbbreviationAsWordInName")
 public class PushPullIT {
 
   private static final int LONG_WAIT_SECONDS = 400;
@@ -131,7 +130,6 @@ public class PushPullIT {
   }
 
   @After
-  @SuppressWarnings("deprecated")
   public void tearDown() throws Exception {
     if (!isNullOrEmpty(registryContainerId)) {
       client.stopContainer(registryContainerId, SECONDS_TO_WAIT_BEFORE_KILL);

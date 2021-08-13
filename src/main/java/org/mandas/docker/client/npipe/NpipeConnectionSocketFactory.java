@@ -54,9 +54,8 @@ public class NpipeConnectionSocketFactory implements ConnectionSocketFactory {
   public static URI sanitizeUri(final URI uri) {
     if (uri.getScheme().equals("npipe")) {
       return URI.create("npipe://localhost:80");
-    } else {
-      return uri;
     }
+    return uri;
   }
 
   @Override

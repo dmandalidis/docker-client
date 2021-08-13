@@ -194,7 +194,6 @@ import org.mandas.docker.client.messages.ContainerCreation;
 import org.mandas.docker.client.messages.ContainerExit;
 import org.mandas.docker.client.messages.ContainerInfo;
 import org.mandas.docker.client.messages.ContainerMount;
-import org.mandas.docker.client.messages.ContainerState;
 import org.mandas.docker.client.messages.ContainerStats;
 import org.mandas.docker.client.messages.ContainerUpdate;
 import org.mandas.docker.client.messages.Device;
@@ -2295,7 +2294,6 @@ public class DefaultDockerClientTest {
     assertThat(imageInfo.created(), equalTo(expected));
   }
 
-  @SuppressWarnings("EmptyCatchBlock")
   @Test
   public void testSsl() throws Exception {
     assumeFalse(TRAVIS);
@@ -5097,7 +5095,6 @@ public class DefaultDockerClientTest {
     }
   }
 
-  @SuppressWarnings("ConstantConditions")
   @Test
   public void testMountTmpfsOptions() throws Exception {
     final long expectedSizeBytes = 100000L;

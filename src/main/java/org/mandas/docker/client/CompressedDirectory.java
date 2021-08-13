@@ -326,9 +326,8 @@ class CompressedDirectory implements Closeable {
     private static int getFileMode(Path file) throws IOException {
       if (isPosixComplantFs()) {
         return getPosixFileMode(file);
-      } else {
-        return DEFAULT_FILE_MODE;
       }
+      return DEFAULT_FILE_MODE;
     }
 
     private static boolean isPosixComplantFs() {

@@ -54,10 +54,9 @@ public final class VersionCompare {
     if (idx < vals1.length && idx < vals2.length) {
       final int diff = Integer.valueOf(vals1[idx]).compareTo(Integer.valueOf(vals2[idx]));
       return Integer.signum(diff);
-    } else {
-      // the strings are equal or one string is a substring of the other
-      // e.g. "1.2.3" = "1.2.3" or "1.2.3" < "1.2.3.4"
-      return Integer.signum(vals1.length - vals2.length);
     }
+    // the strings are equal or one string is a substring of the other
+    // e.g. "1.2.3" = "1.2.3" or "1.2.3" < "1.2.3.4"
+    return Integer.signum(vals1.length - vals2.length);
   }
 }
