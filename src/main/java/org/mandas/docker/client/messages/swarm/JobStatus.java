@@ -16,40 +16,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * -/-/-
- */
-
+*/
 package org.mandas.docker.client.messages.swarm;
 
+import java.util.Date;
+
 import org.immutables.value.Value.Immutable;
-import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-
-@JsonDeserialize(builder = ImmutableReplicatedJob.Builder.class)
+@JsonDeserialize(builder = ImmutableJobStatus.Builder.class)
 @Immutable
-public interface ReplicatedJob {
+public interface JobStatus {
 
-  @Nullable
-  @JsonProperty("MaxConcurrent")
-  Long maxConcurrent();
+  @JsonProperty("JobIteration")
+  Version jobIteration();
   
-  @Nullable
-  @JsonProperty("TotalCompletions")
-  Long totalCompletions();
-
+  @JsonProperty("LastExecution")
+  Date lastExecution();
+  
   interface Builder {
-
-    Builder maxConcurrent(Long maxConcurrent);
-    
-    Builder totalCompletions(Long totalCompletions);
-
-    ReplicatedJob build();
+    Builder jobIteration(Version iteration);
+    Builder lastExecution(Date lastExecution);
+    JobStatus build();
   }
-
-  public static Builder builder() {
-    return ImmutableReplicatedJob.builder();
+  
+  static Builder builder() {
+    return ImmutableJobStatus.builder();
   }
-
 }

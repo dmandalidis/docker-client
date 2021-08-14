@@ -58,6 +58,10 @@ public interface Service {
   @JsonProperty("UpdateStatus")
   UpdateStatus updateStatus();
 
+  @Nullable
+  @JsonProperty("JobStatus")
+  JobStatus jobStatus();
+  
   @JsonDeserialize(builder = ImmutableService.Criteria.Builder.class)
   @Immutable
   public interface Criteria {

@@ -4331,12 +4331,14 @@ public class DefaultDockerClientTest {
     final ServiceCreateResponse globalResponse = sut.createService(globalSpec);
     assertThat(globalResponse.id(), is(notNullValue()));
     Service globalJob = sut.inspectService(globalResponse.id());
+    assertThat(globalJob.jobStatus(), is(notNullValue()));
     assertThat(globalJob.spec().mode(), is(withGlobalJob()));
     // replicated job
     final ServiceSpec replicatedSpec = createServiceSpec(randomName(), Collections.emptyMap(), withJobReplicas(3));
     final ServiceCreateResponse replicatedResponse = sut.createService(replicatedSpec);
     assertThat(replicatedResponse.id(), is(notNullValue()));
     Service replicatedJob = sut.inspectService(replicatedResponse.id());
+    assertThat(replicatedJob.jobStatus(), is(notNullValue()));
     assertThat(replicatedJob.spec().mode(), is(withJobReplicas(3, 1)));
   }
 
