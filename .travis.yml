@@ -9,8 +9,7 @@ jdk:
 - openjdk11
 env:
   matrix:
-  - DOCKER_VERSION=19.03.15
-  - DOCKER_VERSION=20.10.8 UPLOAD_SONATYPE=1
+  - DOCKER_VERSION=20.10.8
   global:
   - secure: 0RNwMWSnPpUohA8vJY4wn39ZQ/+sYlVqFw05XaTWg5yiSjb4b5ke6htknY/S9njnjMQiigEDuP82omX0zMugE/sssvFZYw4MQ1G9WLG1LlJZ5NhydnUIeCreNT4r805qjqSr3Bgv3jzJSx+fscEs5n6rMvZDwk2N/zmD5e+81YTMs68Auukt7PcCbOr7MflzGqMlnVbBYzxRN45bW13oKhAC6Iz5+UgjkahrSwtYmMs3qlK6zoTr6mrPrLJ+3lVFSArsxcfdKBIQ3sNkIuCYR1Jfs+uOto26yVoOGUziTSHSJ+0YA+HfDk96+hHN1oP4O3w+ba+qzo4X2EhJbyOlieM2qK+/q2XHP9BbSMTf5PaDbbU4owxlVWDK2jOeys1dhYVWWFk3Yji5Uvzhci8Y01PPUgogrpXymXule3T7vAlV60CJbPhm7JIJE2BwJBdGxAG0n8BTsNIuhGCI23RnbldhaiuYRFDGMNEmYXRPm9R/t4N3U4eClam7Ka+G0wCDvGzkPwTiVF/LNquEkOIIMWUt1VVSZN2iy4JRdVcozMeeOqGcTU8n/vH0yAe5Kw5pUoaXxuIuGLhWOhiLHjqFQyNJgTlWgYjJwqywcyjjCJk06zRTAPNNJkxkZpuvGtNHyT1oIIXMmTqH4yDs2fqyx768p7DLKtdDpFO6I1vT2WY=
   - secure: txwtxGvjOwb4L4ckdAvmjTjfR7ySMiS+aMN4aj9HVwZrYp9WTzGYZkt84xvCdHGCNW1Awm4MvRuDooHXmelOUE717ACpSJqnNOeZZxAE1QXLqD35Dun487c6ObIB1NtodJ0j+KL6aNnBX9JTej6ehU1k02jnEGIOio0KxDOpi3LugKUE8xxeUvnCvb4rILs5BLNLbt87igRLiGWHIuGkSqgSQQKuVrNz1v1W32RysAMzAiKXMQRuGc1bli1yqdwycbiFesgRVpN58mvROtA/US6EjbfYjNaYX72Hgx2Q1vKuGzLToJ2nL1TsBiFmKsgDRpPuZ4WSNqncCrgNMaI+cP7x0cFAIPYQ/Gao/+T1kZbU53Y9jAht/QCIUXncZRcWCLYZSJsy+EVAvMgmSYYJiTMtaS8/i1t+fnkfCNSCvFgHQHohXp/fY5Sgke1WujDwhXEQYK/iCzKURThjY9mWbO6LC9pE/Z98vP8qSRF6u6zmhLLAe3z2RpGgc/s6I2JGIZbgn0Pod5Hos1CAWSEyft8mT0sQyUrZVcTCCdhmQQS9o7Y7dFHh+O5gXcSs9fhDM8kIedRK4r8rxu9kTbGP7HIuTmVwISqzURaz0/oK1p/8mtWQScOb9I+QGozf24YC/m8grW8uZqQuk33zS+eTR9odVWU20rd8rZ5pBxopEJo=
@@ -28,10 +27,10 @@ before_install:
 - docker version
 - docker info
 script:
-- if [ $TRAVIS_PULL_REQUEST == "false" -a x$UPLOAD_SONATYPE == x1 ]; then mvn --settings
+- if [ $TRAVIS_PULL_REQUEST == "false" ]; then mvn --settings
   custom-settings.xml -Pdeploy-artifacts clean deploy -Dsurefire.rerunFailingTestsCount=1;
   fi
-- if [ $TRAVIS_PULL_REQUEST != "false" -o x$UPLOAD_SONATYPE != x1 ]; then mvn --settings
+- if [ $TRAVIS_PULL_REQUEST != "false" ]; then mvn --settings
   custom-settings.xml clean verify -Dsurefire.rerunFailingTestsCount=1; fi
 after_success:
 - bash <(curl -s https://codecov.io/bash)

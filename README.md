@@ -4,13 +4,13 @@
 [![codecov](https://codecov.io/github/dmandalidis/docker-client/coverage.svg?branch=master)](https://codecov.io/github/dmandalidis/docker-client?branch=master)
 [![Maven Central](https://img.shields.io/maven-central/v/org.mandas/docker-client.svg)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.mandas%22%20docker-client)
 [![License](https://img.shields.io/github/license/dmandalidis/docker-client.svg)](LICENSE)
-[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=dmandalidis/docker-client)](https://dependabot.com)
 
 This is a [Docker](https://github.com/docker/docker) client written in Java.
 It was used in many critical production systems at Spotify until its 
 [fork](https://github.com/dmandalidis/docker-client/blob/master/FORK.md) on September 2019.
 
-* [Version compatibility](#version-compatibility)
+The `docker-client` is built and tested against the latest `docker-ce` major release.
+
 * [Download](#download)
 * [Usage Example](#usage-example)
 * [Getting Started](#getting-started)
@@ -18,16 +18,6 @@ It was used in many critical production systems at Spotify until its
 * [Testing](#testing)
 * [Releasing](#releasing)
 * [User Manual](https://github.com/dmandalidis/docker-client/blob/master/docs/user_manual.md)
-
-## Version compatibility
-docker-client is built and tested against the two most recent major releases of `docker-ce` 
-
-For a list the currently supported docker versions you can take a look [here][1], while the API
-version compatibility matrix can be found at the *API version matrix* section on 
-[Docker docs on the mapping between Docker version and API version][3].
-
-The artifacts tested against the latest supported Docker version will be the ones
-uploaded to maven central.
 
 ## Download
 
@@ -155,7 +145,7 @@ docker.close();
 
 ## Getting Started
 
-If you're looking for how to use docker-client, see the [User Manual][2].
+If you're looking for how to use docker-client, see the [User Manual][1].
 If you're looking for how to build and develop it, keep reading.
 
 ## Prerequisites
@@ -193,9 +183,7 @@ you can also build and release locally by running the below.
 mvn clean [-DskipTests -Darguments=-DskipTests] -Dgpg.keyname=<key ID used for signing artifacts> release:prepare release:perform
 ```
 
-  [1]: https://travis-ci.org/dmandalidis/docker-client
-  [2]: docs/user_manual.md
-  [3]: https://docs.docker.com/develop/sdk/
+  [1]: docs/user_manual.md
 
 
 [maven-search]: https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.mandas%22%20docker-client
