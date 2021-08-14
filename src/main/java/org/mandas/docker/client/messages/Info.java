@@ -53,6 +53,10 @@ public interface Info {
   @JsonProperty("CgroupDriver")
   String cgroupDriver();
 
+  @Nullable
+  @JsonProperty("CgroupVersion")
+  String cgroupVersion();
+  
   @JsonProperty("Containers")
   Integer containers();
 
