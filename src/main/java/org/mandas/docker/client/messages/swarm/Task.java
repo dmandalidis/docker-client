@@ -81,6 +81,10 @@ public interface Task {
   @JsonProperty("NetworksAttachments")
   List<NetworkAttachment> networkAttachments();
 
+  @Nullable
+  @JsonProperty("JobIteration")
+  Version jobIteration();
+  
   @JsonDeserialize(builder = ImmutableTask.Criteria.Builder.class)
   @Immutable
   public interface Criteria {
