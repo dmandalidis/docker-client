@@ -1,5 +1,9 @@
 # Change Log
 
+## 5.1.0 - notable changes
+
+* Support for swarm jobs (fixes #341)
+
 ## 5.0.2 - notable changes
 
 * Bump version.resteasy from 4.6.0.Final to 4.7.1.Final
