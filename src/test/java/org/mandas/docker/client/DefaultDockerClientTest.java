@@ -106,6 +106,8 @@ import static org.mandas.docker.client.messages.Network.Type.BUILTIN;
 import static org.mandas.docker.client.messages.RemovedImage.Type.UNTAGGED;
 import static org.mandas.docker.client.messages.swarm.PortConfig.PROTOCOL_TCP;
 import static org.mandas.docker.client.messages.swarm.RestartPolicy.RESTART_POLICY_ANY;
+import static org.mandas.docker.client.messages.swarm.ServiceMode.withGlobalJob;
+import static org.mandas.docker.client.messages.swarm.ServiceMode.withJobReplicas;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -4321,6 +4323,22 @@ public class DefaultDockerClientTest {
     final ServiceCreateResponse response = sut.createService(spec);
     assertThat(response.id(), is(notNullValue()));
   }
+  
+  @Test
+  public void testCreateServiceSwarmJobs() throws Exception {
+    // global job
+    final ServiceSpec globalSpec = createServiceSpec(randomName(), Collections.emptyMap(), withGlobalJob());
+    final ServiceCreateResponse globalResponse = sut.createService(globalSpec);
+    assertThat(globalResponse.id(), is(notNullValue()));
+    Service globalJob = sut.inspectService(globalResponse.id());
+    assertThat(globalJob.spec().mode(), is(withGlobalJob()));
+    // replicated job
+    final ServiceSpec replicatedSpec = createServiceSpec(randomName(), Collections.emptyMap(), withJobReplicas(3));
+    final ServiceCreateResponse replicatedResponse = sut.createService(replicatedSpec);
+    assertThat(replicatedResponse.id(), is(notNullValue()));
+    Service replicatedJob = sut.inspectService(replicatedResponse.id());
+    assertThat(replicatedJob.spec().mode(), is(withJobReplicas(3, 1)));
+  }
 
   @Test
   public void testSecretOperations() throws Exception {
@@ -4542,8 +4560,6 @@ public class DefaultDockerClientTest {
 
     final ServiceCreateResponse response = sut.createService(serviceSpec);
     assertThat(response.id(), is(notNullValue()));
-
-    sut.listTasks();
 
     final Service service = sut.inspectService(serviceName);
     final ServiceSpec actualServiceSpec = service.spec();
@@ -4852,7 +4868,7 @@ public class DefaultDockerClientTest {
     Map<String, String> labels = new HashMap<>();
     labels.put("foo", "bar");
     
-    final ServiceSpec spec = createServiceSpec(serviceName, labels);
+    final ServiceSpec spec = createServiceSpec(serviceName, labels, ServiceMode.withReplicas(4));
     sut.createService(spec);
 
     final List<Service> services = sut.listServices(Service.find().addLabel("foo", "bar").build());
@@ -4877,10 +4893,10 @@ public class DefaultDockerClientTest {
   @Test
   public void testListTasks() throws Exception {
     final ServiceSpec spec = createServiceSpec(randomName());
-    assertThat(sut.listTasks().size(), is(0));
+    final int startingNumTasks = sut.listTasks().size();
     sut.createService(spec);
-    await().until(numberOfTasks(sut), is(greaterThan(0)));
-    assertThat(sut.listTasks().size(), is(4));
+    await().until(numberOfTasks(sut), is(greaterThan(startingNumTasks)));
+    assertThat(sut.listTasks().size(), is(startingNumTasks + 4));
   }
 
   @Test
@@ -4987,11 +5003,11 @@ public class DefaultDockerClientTest {
   }
 
   private ServiceSpec createServiceSpec(final String serviceName) {
-    return this.createServiceSpec(serviceName, new HashMap<String, String>());
+    return this.createServiceSpec(serviceName, new HashMap<String, String>(), ServiceMode.withReplicas(4));
   }
   
   private ServiceSpec createServiceSpec(final String serviceName, 
-      final Map<String, String> labels) {
+      final Map<String, String> labels, ServiceMode mode) {
     
     final TaskSpec taskSpec = TaskSpec
         .builder()
@@ -4999,10 +5015,8 @@ public class DefaultDockerClientTest {
             .command("ping", "-c1000", "localhost").build())
         .build();
 
-    final ServiceMode serviceMode = ServiceMode.withReplicas(4);
-
     return ServiceSpec.builder().name(serviceName).taskTemplate(taskSpec)
-        .mode(serviceMode)
+        .mode(mode)
         .labels(labels)
         .build();
   }
