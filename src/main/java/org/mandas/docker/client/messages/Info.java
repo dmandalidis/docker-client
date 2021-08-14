@@ -46,6 +46,7 @@ public interface Info {
 
   @Nullable
   @JsonProperty("ClusterStore")
+  @Deprecated // as of v1.41
   String clusterStore();
 
   @Nullable
@@ -121,6 +122,7 @@ public interface Info {
 
   @Nullable
   @JsonProperty("KernelMemory")
+  @Deprecated // as of v1.41
   Boolean kernelMemory();
 
   @JsonProperty("KernelVersion")

@@ -154,7 +154,7 @@ public interface HostConfig {
 
   @Nullable
   @JsonProperty("KernelMemory")
-  @Deprecated // as of 20.10.0
+  @Deprecated // as of v1.41
   Long kernelMemory();
 
   @Nullable
