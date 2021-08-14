@@ -657,7 +657,6 @@ public class DefaultDockerClientTest {
     assertThat(info.cpuCfsQuota(), is(anything()));
     assertThat(info.experimentalBuild(), is(anything()));
     assertThat(info.oomKillDisable(), is(anything()));
-    assertThat(info.clusterStore(), is(anything()));
     assertEquals(info.serverVersion(), sut.version().version());
     assertThat(info.architecture(), not(emptyOrNullString()));
     assertThat(info.containersRunning(), is(anything()));
@@ -666,7 +665,6 @@ public class DefaultDockerClientTest {
     assertThat(info.osType(), not(emptyOrNullString()));
     assertThat(info.systemStatus(), is(anything()));
     assertThat(info.cgroupDriver(), not(emptyOrNullString()));
-    assertThat(info.kernelMemory(), is(anything()));
   }
 
   @Test
