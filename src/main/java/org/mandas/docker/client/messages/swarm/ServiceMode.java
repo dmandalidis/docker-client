@@ -36,25 +36,59 @@ public interface ServiceMode {
   ReplicatedService replicated();
 
   @Nullable
+  @JsonProperty("ReplicatedJob")
+  ReplicatedJob replicatedJob();
+  
+  @Nullable
   @JsonProperty("Global")
   GlobalService global();
 
+  @Nullable
+  @JsonProperty("GlobalJob")
+  GlobalJob globalJob();
+  
   public static ServiceMode withReplicas(final long replicas) {
     return ImmutableServiceMode.builder()
         .replicated(ReplicatedService.builder().replicas(replicas).build())
+        .build();
+  }
+  
+  public static ServiceMode withReplicas(final long replicas, final long maxConcurrent) {
+    return ImmutableServiceMode.builder()
+        .replicated(ReplicatedService.builder().replicas(replicas).maxConcurrent(maxConcurrent).build())
+        .build();
+  }
+  
+  public static ServiceMode withJobReplicas(final long totalCompletions) {
+    return ImmutableServiceMode.builder()
+        .replicatedJob(ReplicatedJob.builder().totalCompletions(totalCompletions).build())
+        .build();
+  }
+  
+  public static ServiceMode withJobReplicas(final long totalCompletions, final long maxConcurrent) {
+    return ImmutableServiceMode.builder()
+        .replicatedJob(ReplicatedJob.builder().totalCompletions(totalCompletions).maxConcurrent(maxConcurrent).build())
         .build();
   }
 
   public static ServiceMode withGlobal() {
     return ImmutableServiceMode.builder().global(GlobalService.builder().build()).build();
   }
+  
+  public static ServiceMode withGlobalJob() {
+    return ImmutableServiceMode.builder().globalJob(GlobalJob.builder().build()).build();
+  }
 
   interface Builder {
 
     Builder replicated(ReplicatedService replicated);
+    
+    Builder replicatedJob(ReplicatedJob replicated);
 
     Builder global(GlobalService global);
 
+    Builder globalJob(GlobalJob global);
+    
     ServiceMode build();
   }
 

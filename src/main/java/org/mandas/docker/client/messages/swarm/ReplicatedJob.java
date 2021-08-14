@@ -28,29 +28,29 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 
-@JsonDeserialize(builder = ImmutableReplicatedService.Builder.class)
+@JsonDeserialize(builder = ImmutableReplicatedJob.Builder.class)
 @Immutable
-public interface ReplicatedService {
+public interface ReplicatedJob {
 
-  @Nullable
-  @JsonProperty("Replicas")
-  Long replicas();
-  
   @Nullable
   @JsonProperty("MaxConcurrent")
   Long maxConcurrent();
+  
+  @Nullable
+  @JsonProperty("TotalCompletions")
+  Long totalCompletions();
 
   interface Builder {
 
-    Builder replicas(Long replicas);
-    
     Builder maxConcurrent(Long maxConcurrent);
+    
+    Builder totalCompletions(Long totalCompletions);
 
-    ReplicatedService build();
+    ReplicatedJob build();
   }
 
   public static Builder builder() {
-    return ImmutableReplicatedService.builder();
+    return ImmutableReplicatedJob.builder();
   }
 
 }
