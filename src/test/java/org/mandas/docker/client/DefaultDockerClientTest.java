@@ -663,6 +663,7 @@ public class DefaultDockerClientTest {
     assertThat(info.containersStopped(), is(anything()));
     assertThat(info.containersPaused(), is(anything()));
     assertThat(info.osType(), not(emptyOrNullString()));
+    assertThat(info.osVersion(), not(emptyOrNullString()));
     assertThat(info.systemStatus(), is(anything()));
     assertThat(info.cgroupDriver(), not(emptyOrNullString()));
     assertThat(info.cgroupVersion(), not(emptyOrNullString()));

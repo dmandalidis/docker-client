@@ -173,6 +173,10 @@ public interface Info {
   String osType();
 
   @Nullable
+  @JsonProperty("OSVersion")
+  String osVersion();
+  
+  @Nullable
   @JsonProperty("Plugins")
   Plugins plugins();
 
