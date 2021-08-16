@@ -54,7 +54,6 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.in;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
@@ -281,7 +280,6 @@ import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.io.Resources;
-import com.google.common.util.concurrent.SettableFuture;
 
 /**
  * Integration tests for DefaultDockerClient that assume a docker daemon is available to connect to
@@ -1278,56 +1276,6 @@ public class DefaultDockerClientTest {
       // Verify that the container is gone
       assertThrows(ContainerNotFoundException.class, () -> sut.inspectContainer(id));
     }
-  }
-
-  @Test @Ignore
-  public void interruptTest() throws Exception {
-
-    // Pull image
-    pull(BUSYBOX_LATEST);
-
-    // Create container
-    final ContainerConfig config = ContainerConfig.builder()
-        .image(BUSYBOX_LATEST)
-        .cmd("sh", "-c", "while :; do sleep 1; done")
-        .build();
-    final String name = randomName();
-    final ContainerCreation creation = sut.createContainer(config, name);
-    final String id = creation.id();
-
-    // Start container
-    sut.startContainer(id);
-
-    // Wait for container on a thread
-    final ExecutorService executorService = Executors.newSingleThreadExecutor();
-    final SettableFuture<Boolean> started = SettableFuture.create();
-    final SettableFuture<Boolean> interrupted = SettableFuture.create();
-
-    final Future<ContainerExit> exitFuture = executorService.submit(new Callable<ContainerExit>() {
-      @Override
-      public ContainerExit call() throws Exception {
-        try {
-          started.set(true);
-          return sut.waitContainer(id);
-        } catch (InterruptedException e) {
-          interrupted.set(true);
-          throw e;
-        }
-      }
-    });
-
-    // Interrupt waiting thread
-    started.get();
-    executorService.shutdownNow();
-    try {
-      exitFuture.get();
-      fail();
-    } catch (ExecutionException e) {
-      assertThat(e.getCause(), instanceOf(InterruptedException.class));
-    }
-
-    // Verify that the thread was interrupted
-    assertThat(interrupted.get(), is(true));
   }
 
   @Test(expected = DockerException.class)
