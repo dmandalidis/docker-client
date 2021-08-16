@@ -161,6 +161,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -1756,8 +1757,10 @@ public class DefaultDockerClientTest {
     assertThat(newContainerInfo.hostConfig().cpuShares(), is(512L));
   }
 
-  @Test(timeout = 10000) @Ignore
+  @Test(timeout = 10000)
   public void testEventStream() throws Exception {
+    // See: https://github.com/dmandalidis/docker-client/issues/348
+    Assume.assumeTrue("jersey".equals(System.getProperty(DockerClientBuilderFactory.JAXRS_CLIENT_PROPERTY)));
     // In this test we open an event stream, do stuff, and check that
     // the events for the stuff we did got pushed over the stream
 
@@ -1770,11 +1773,15 @@ public class DefaultDockerClientTest {
               .build();
 
       // Image pull
-      pull(BUSYBOX_LATEST);
-      assertTrue("Docker did not return any events. "
+      try {
+        sut.inspectImage(BUSYBOX_LATEST);
+      } catch (ImageNotFoundException infe) {
+        sut.pull(BUSYBOX_LATEST);
+        assertTrue("Docker did not return any events. "
                       + "Expected to see an event for pulling an image.",
-              eventStream.hasNext());
-      imageEventAssertions(eventStream.next(), BUSYBOX_LATEST, "pull");
+        eventStream.hasNext());
+        imageEventAssertions(eventStream.next(), BUSYBOX_LATEST, "pull");
+      }
 
       // Container create
       final ContainerCreation container = sut.createContainer(config, containerName);
