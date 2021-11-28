@@ -1,5 +1,18 @@
 # Change Log
 
+## 5.2.0 - notable changes
+
+* Bump jnr-unixsocket from 0.38.8 to 0.38.13
+* Bump logback-classic from 1.2.5 to 1.2.7
+* Bump google-auth-library-oauth2-http from 1.0.0 to 1.3.0
+* Bump version.resteasy from 4.7.1.Final to 5.0.0.Final
+* Bump jackson-bom from 2.12.4 to 2.13.0
+* Bump version.jersey from 2.34 to 2.35
+* Support OSVersion (fixes #346)
+* Support CgroupVersion (fixes #345)
+* Mark v1.41 deprecations (fixes #344)
+* Support job status (fixes #343)
+
 ## 5.1.0 - notable changes
 
 * Support for swarm jobs (fixes #341)
