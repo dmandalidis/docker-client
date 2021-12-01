@@ -57,7 +57,7 @@
 		<version.apache.compress>1.21</version.apache.compress>
 		<version.unixsocket>0.38.13</version.unixsocket>
 		<version.apache.lang>2.6</version.apache.lang>
-		<version.bcpkix>1.69</version.bcpkix>
+		<version.bcpkix>1.70</version.bcpkix>
 		<version.jaxrs>3.0.0</version.jaxrs>
 		<version.google.oauth2>1.3.0</version.google.oauth2>
 
