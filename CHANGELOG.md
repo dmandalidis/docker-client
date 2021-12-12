@@ -1,5 +1,12 @@
 # Change Log
 
+## 5.2.1 - notable changes
+
+* Downgrade JAXRS (fixes #391)
+* Bump jnr-unixsocket from 0.38.13 to 0.38.15
+* Bump version.resteasy from 5.0.0.Final to 5.0.1.Final
+* Bump bcpkix-jdk15on from 1.69 to 1.70
+
 ## 5.2.0 - notable changes
 
 * Bump jnr-unixsocket from 0.38.8 to 0.38.13
