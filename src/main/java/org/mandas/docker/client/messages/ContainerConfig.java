@@ -316,5 +316,14 @@ public interface ContainerConfig {
   public interface NetworkingConfig {
     @JsonProperty("EndpointsConfig")
     Map<String, EndpointConfig> endpointsConfig();
+    
+    interface Builder {
+      Builder endpointsConfig(Map<String, ? extends EndpointConfig> endpointsConfig);
+      NetworkingConfig build();
+    }
+    
+    public static Builder builder() {
+      return ImmutableContainerConfig.NetworkingConfig.builder();
+    }
   }
 }
