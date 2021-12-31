@@ -1,5 +1,10 @@
 # Change Log
 
+## 5.2.2 - notable changes
+
+* Fix missing builder (#404)
+* Bump jackson-bom from 2.13.0 to 2.13.1
+
 ## 5.2.1 - notable changes
 
 * Downgrade JAXRS (fixes #391)
