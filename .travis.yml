@@ -33,7 +33,7 @@ script:
 - if [ $TRAVIS_PULL_REQUEST != "false" ]; then mvn --settings
   custom-settings.xml clean verify -Dsurefire.rerunFailingTestsCount=1; fi
 after_success:
-- bash <(curl -s https://codecov.io/bash)
+- curl -Os https://uploader.codecov.io/latest/linux/codecov && chmod +x codecov && ./codecov
 after_failure:
 - "./.travis.sh dump_docker_config"
 branches:
