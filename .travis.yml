@@ -6,7 +6,7 @@ services:
 - docker
 language: java
 jdk:
-- openjdk11
+- openjdk17
 env:
   matrix:
   - DOCKER_VERSION=20.10.11
