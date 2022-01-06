@@ -126,7 +126,7 @@ import okio.Buffer;
  * <p>
  * This test may not be a true "unit test", but using a MockWebServer where we can control the HTTP
  * responses sent by the server and capture the HTTP requests sent by the class-under-test is far
- * simpler that attempting to mock the {@link javax.ws.rs.client.Client} instance used by
+ * simpler that attempting to mock the {@link jakarta.ws.rs.client.Client} instance used by
  * DefaultDockerClient, since the Client has such a rich/fluent interface and many methods/classes
  * that would need to be mocked. Ultimately for testing DefaultDockerClient all we care about is
  * the HTTP requests it sends, rather than what HTTP client library it uses.</p>
