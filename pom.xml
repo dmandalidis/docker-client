@@ -55,7 +55,7 @@
 		<version.resteasy>6.0.0.Beta1</version.resteasy>
 		<version.immutables>2.8.8</version.immutables>
 		<version.apache.compress>1.21</version.apache.compress>
-		<version.unixsocket>0.38.15</version.unixsocket>
+		<version.unixsocket>0.38.17</version.unixsocket>
 		<version.apache.lang>2.6</version.apache.lang>
 		<version.bcpkix>1.70</version.bcpkix>
 		<version.jaxrs>2.1.6</version.jaxrs>
