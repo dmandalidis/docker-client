@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import javax.ws.rs.client.Client;
+import jakarta.ws.rs.client.Client;
 
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;

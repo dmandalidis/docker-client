@@ -19,8 +19,8 @@
 */
 package org.mandas.docker.client.builder.jersey;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
 
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.Registry;
