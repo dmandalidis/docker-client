@@ -389,7 +389,7 @@
 							<classpathDependencyExcludes>
 								<classpathDependencyExclude>org.jboss.resteasy:resteasy-client</classpathDependencyExclude>
 								<classpathDependencyExclude>org.jboss.resteasy:resteasy-core</classpathDependencyExclude>
-								<classpathDependencyExclude>com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider</classpathDependencyExclude>
+								<classpathDependencyExclude>com.fasterxml.jackson.jakarta.rs:jackson-jakarta-rs-json-provider</classpathDependencyExclude>
 								<classpathDependencyExclude>com.fasterxml.jackson.jaxrs:jackson-jaxrs-base</classpathDependencyExclude>
 							</classpathDependencyExcludes>
 							<systemPropertyVariables>
@@ -440,7 +440,7 @@
 							<classpathDependencyExcludes>
 								<classpathDependencyExclude>org.jboss.resteasy:resteasy-client</classpathDependencyExclude>
 								<classpathDependencyExclude>org.jboss.resteasy:resteasy-core</classpathDependencyExclude>
-								<classpathDependencyExclude>com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider</classpathDependencyExclude>
+								<classpathDependencyExclude>com.fasterxml.jackson.jakarta.rs:jackson-jakarta-rs-json-provider</classpathDependencyExclude>
 								<classpathDependencyExclude>com.fasterxml.jackson.jaxrs:jackson-jaxrs-base</classpathDependencyExclude>
 							</classpathDependencyExcludes>
 							<systemPropertyVariables>
