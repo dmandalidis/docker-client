@@ -1,5 +1,14 @@
 # Change Log
 
+## 6.0.0 - notable changes
+
+* Bump slf4j-api from 1.7.32 to 1.7.33
+* Bump jnr-unixsocket from 0.38.15 to 0.38.17
+* Upgrade to JAX-RS 3 (fixes #408)
+    * (breaking change) RESTeasy (if used) must be updated to at least 6.0.0.Final
+    * (breaking change) Jersey (if used) must be updated to at least 3.0.0
+
+
 ## 5.2.2 - notable changes
 
 * Fix missing builder (#404)
