@@ -43,22 +43,22 @@ For using Jersey, you will have to pull the following dependencies (versions are
 <dependency>
   <groupId>org.glassfish.jersey.core</groupId>
   <artifactId>jersey-client</artifactId>
-  <version>2.30.1</version>
+  <version>3.0.3</version>
 </dependency>
 <dependency>
   <groupId>org.glassfish.jersey.inject</groupId>
   <artifactId>jersey-hk2</artifactId>
-  <version>2.30.1</version>
+  <version>3.0.3</version>
 </dependency>
 <dependency>
   <groupId>org.glassfish.jersey.connectors</groupId>
   <artifactId>jersey-apache-connector</artifactId>
-  <version>2.30.1</version>
+  <version>3.0.3</version>
 </dependency>
 <dependency>
   <groupId>org.glassfish.jersey.media</groupId>
   <artifactId>jersey-media-json-jackson</artifactId>
-  <version>2.30.1</version>
+  <version>3.0.3</version>
 </dependency>
 ```
 
@@ -69,17 +69,17 @@ For using RESTeasy, you will have to pull the following dependencies (versions a
 <dependency>
   <groupId>org.jboss.resteasy</groupId>
   <artifactId>resteasy-client</artifactId>
-  <version>4.5.3.Final</version>
+  <version>6.0.0.Final</version>
 </dependency>
 <dependency>
   <groupId>org.jboss.resteasy</groupId>
   <artifactId>resteasy-core</artifactId>
-  <version>4.5.3.Final</version>
+  <version>6.0.0.Final</version>
 </dependency>
 <dependency>
-  <groupId>com.fasterxml.jackson.jaxrs</groupId>
-  <artifactId>jackson-jaxrs-json-provider</artifactId>
-  <version>2.11.0</version>
+  <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+  <artifactId>jackson-jakarta-rs-json-provider</artifactId>
+  <version>2.13.1</version>
 </dependency>
 ```
 
