@@ -1,5 +1,9 @@
 # Change Log
 
+## 6.0.2 - notable changes
+
+* Workaround NEXUS-31214
+
 ## 6.0.1 - notable changes
 
 * Fix JAX-RS API dependency (fixes #432)
