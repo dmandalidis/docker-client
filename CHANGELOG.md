@@ -1,5 +1,11 @@
 # Change Log
 
+## 6.0.1 - notable changes
+
+* Fix JAX-RS API dependency (fixes #432)
+* Bump slf4j-api from 1.7.33 to 1.7.36
+* Bump google-auth-library-oauth2-http from 1.3.0 to 1.4.0
+
 ## 6.0.0 - notable changes
 
 * Bump slf4j-api from 1.7.32 to 1.7.33
