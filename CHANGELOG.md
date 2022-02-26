@@ -1,5 +1,10 @@
 # Change Log
 
+## 6.0.3 - notable changes
+
+* Bump google-auth-library-oauth2-http from 1.4.0 to 1.5.3
+* Bump value from 2.8.8 to 2.9.0
+
 ## 6.0.2 - notable changes
 
 * Workaround NEXUS-31214
