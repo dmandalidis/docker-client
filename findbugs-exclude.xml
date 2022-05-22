@@ -21,4 +21,8 @@
     <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
   </Match>
   
+  <Match>
+  	<Bug patter="THROWS_METHOD_THROWS_RUNTIMEEXCEPTION" />
+  </Match>
+  
 </FindBugsFilter>
