@@ -54,6 +54,7 @@ import org.mandas.docker.client.messages.ContainerCreation;
 import org.mandas.docker.client.messages.ContainerExit;
 import org.mandas.docker.client.messages.ContainerInfo;
 import org.mandas.docker.client.messages.ContainerStats;
+import org.mandas.docker.client.messages.ContainerStatsv2;
 import org.mandas.docker.client.messages.ContainerUpdate;
 import org.mandas.docker.client.messages.Distribution;
 import org.mandas.docker.client.messages.Event;
@@ -1684,6 +1685,19 @@ public interface DockerClient extends Closeable {
    * @throws InterruptedException If the thread is interrupted
    */
   ContainerStats stats(String containerId) throws DockerException, InterruptedException;
+
+  /**
+   * Retrieves one-time stats (stream=0) for the container with the specified id.
+   * This method provides memory stats for CGroup v2.
+   *
+   * @param containerId The id of the container to retrieve stats for.
+   * @return The container stats
+   * @throws ContainerNotFoundException
+   *                              if container is not found (404)
+   * @throws DockerException      if a server error occurred (500)
+   * @throws InterruptedException If the thread is interrupted
+   */
+  ContainerStatsv2 statsv2(String containerId) throws DockerException, InterruptedException;
 
   /**
    * Resize container TTY

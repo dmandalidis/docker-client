@@ -110,6 +110,7 @@ import org.mandas.docker.client.messages.ContainerCreation;
 import org.mandas.docker.client.messages.ContainerExit;
 import org.mandas.docker.client.messages.ContainerInfo;
 import org.mandas.docker.client.messages.ContainerStats;
+import org.mandas.docker.client.messages.ContainerStatsv2;
 import org.mandas.docker.client.messages.ContainerUpdate;
 import org.mandas.docker.client.messages.Distribution;
 import org.mandas.docker.client.messages.ExecCreation;
@@ -2116,6 +2117,24 @@ public class DefaultDockerClient implements DockerClient, Closeable {
 
     try {
       return request(GET, ContainerStats.class, resource, resource.request(APPLICATION_JSON_TYPE));
+    } catch (DockerRequestException e) {
+      switch (e.status()) {
+        case 404:
+          throw new ContainerNotFoundException(containerId, e);
+        default:
+          throw e;
+      }
+    }
+  }
+
+  @Override
+  public ContainerStatsv2 statsv2(final String containerId)
+          throws DockerException, InterruptedException {
+    final WebTarget resource = resource().path("containers").path(containerId).path("stats")
+            .queryParam("stream", "0");
+
+    try {
+      return request(GET, ContainerStatsv2.class, resource, resource.request(APPLICATION_JSON_TYPE));
     } catch (DockerRequestException e) {
       switch (e.status()) {
         case 404:
