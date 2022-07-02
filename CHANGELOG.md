@@ -1,5 +1,12 @@
 # Change Log
 
+## 6.0.4 - notable changes
+
+* Bump version.resteasy from 6.0.0.Final to 6.0.1.Final
+* Bump jackson-bom from 2.13.1 to 2.13.3
+* Bump google-auth-library-oauth2-http from 1.5.3 to 1.8.0
+* Bump logback-classic from 1.2.10 to 1.2.11
+
 ## 6.0.3 - notable changes
 
 * Bump google-auth-library-oauth2-http from 1.4.0 to 1.5.3
