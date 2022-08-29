@@ -1,5 +1,13 @@
 # Change Log
 
+## 6.0.5 - notable changes
+
+* Explicitly pull commons-codec (fixes #493)
+* Bump logback-classic from 1.2.11 to 1.4.0
+* Bump slf4j-api from 1.7.36 to 2.0.0
+* Bump google-auth-library-oauth2-http from 1.8.0 to 1.10.0
+* Bump version.resteasy from 6.0.1.Final to 6.0.3.Final
+
 ## 6.0.4 - notable changes
 
 * Bump version.resteasy from 6.0.0.Final to 6.0.1.Final
