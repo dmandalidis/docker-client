@@ -51,6 +51,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -80,7 +81,6 @@ import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.compress.utils.IOUtils;
 import org.mandas.docker.client.auth.RegistryAuthSupplier;
 import org.mandas.docker.client.exceptions.BadParamException;
@@ -2604,9 +2604,9 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       return "null";
     }
     try {
-      return Base64.encodeBase64String(ObjectMapperProvider
+      return new String(Base64.getEncoder().encode(ObjectMapperProvider
                                        .objectMapper()
-                                       .writeValueAsBytes(registryAuth));
+                                       .writeValueAsBytes(registryAuth)), UTF_8);
     } catch (JsonProcessingException ex) {
       throw new DockerException("Could not encode X-Registry-Auth header", ex);
     }
@@ -2632,7 +2632,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
         authRegistryJson = new StringBuilder("{\"auths\":").append(authRegistryJson).append('}').toString();
       }
 
-      return Base64.encodeBase64String(authRegistryJson.getBytes(StandardCharsets.UTF_8));
+      return new String(Base64.getEncoder().encode(authRegistryJson.getBytes(StandardCharsets.UTF_8)), UTF_8);
     } catch (JsonProcessingException | InterruptedException ex) {
       throw new DockerException("Could not encode X-Registry-Config header", ex);
     }

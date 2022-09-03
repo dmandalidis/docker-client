@@ -60,7 +60,6 @@
 		<version.bcpkix>1.70</version.bcpkix>
 		<version.jaxrs>3.0.0</version.jaxrs>
 		<version.google.oauth2>1.10.0</version.google.oauth2>
-		<version.apache.codec>1.15</version.apache.codec>
 
 		<version.junit>4.13.2</version.junit>
 		<version.mockito>4.7.0</version.mockito>
@@ -119,11 +118,6 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-compress</artifactId>
 			<version>${version.apache.compress}</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-codec</groupId>
-  			<artifactId>commons-codec</artifactId>
-  			<version>${version.apache.codec}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.jnr</groupId>
