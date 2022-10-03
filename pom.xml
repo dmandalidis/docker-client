@@ -63,7 +63,7 @@
 
 		<version.junit>4.13.2</version.junit>
 		<version.mockito>4.8.0</version.mockito>
-		<version.logback>1.4.2</version.logback>
+		<version.logback>1.4.3</version.logback>
 		<version.jimfs>1.2</version.jimfs>
 		<version.awaitility>4.2.0</version.awaitility>
 		<version.mockwebserver>4.10.0</version.mockwebserver>
