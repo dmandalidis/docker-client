@@ -52,7 +52,7 @@
 		<version.slf4j>2.0.4</version.slf4j>
 		<version.jackson>2.14.1</version.jackson>
 		<version.jersey>3.1.0</version.jersey>
-		<version.resteasy>6.1.0.Final</version.resteasy>
+		<version.resteasy>6.2.1.Final</version.resteasy>
 		<version.immutables>2.9.0</version.immutables>
 		<version.apache.compress>1.22</version.apache.compress>
 		<version.unixsocket>0.38.19</version.unixsocket>
