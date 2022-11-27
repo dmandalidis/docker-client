@@ -1,5 +1,18 @@
 # Change Log
 
+## 6.1.0 - notable changes
+
+* Type error in DeviceRequest#capabilities (fixes #531)
+* Bump jnr-unixsocket from 0.38.17 to 0.38.19
+* Bump commons-compress from 1.21 to 1.22
+* Update JAXRS to 3.1.0
+* Update Jersey to 3.1.0
+* Bump logback-classic from 1.4.0 to 1.4.5
+* Bump slf4j-api from 2.0.0 to 2.0.4
+* Bump google-auth-library-oauth2-http from 1.10.0 to 1.13.0
+* Bump jackson-bom from 2.13.3 to 2.14.1
+* Drop commons-codec dependency
+
 ## 6.0.5 - notable changes
 
 * Explicitly pull commons-codec (fixes #493)
