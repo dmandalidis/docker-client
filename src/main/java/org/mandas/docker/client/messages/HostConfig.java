@@ -675,7 +675,7 @@ public interface HostConfig {
 	  List<String> deviceIds();
 	  
 	  @JsonProperty("Capabilities")
-	  List<String> capabilities();
+	  List<List<String>> capabilities();
 	  
 	  @JsonProperty("Options")
 	  Map<String, String> options();
@@ -691,7 +691,7 @@ public interface HostConfig {
 
         Builder deviceIds(final Iterable<String> deviceIds);
         
-        Builder capabilities(final Iterable<String> capabilities);
+        Builder capabilities(final Iterable<? extends List<String>> capabilities);
         
         Builder options(final Map<String, ? extends String> options);
         
