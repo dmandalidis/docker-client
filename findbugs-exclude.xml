@@ -1,5 +1,9 @@
 <FindBugsFilter>
 
+  <Match>
+    <Source name="~Immutable.*"/>
+  </Match>
+
   <!--We're not using Java serialization-->
   <Match>
     <Bug pattern="SE_BAD_FIELD"/>

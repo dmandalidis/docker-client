@@ -53,7 +53,7 @@
 		<version.jackson>2.14.1</version.jackson>
 		<version.jersey>3.1.0</version.jersey>
 		<version.resteasy>6.1.0.Final</version.resteasy>
-		<version.immutables>2.9.0</version.immutables>
+		<version.immutables>2.9.3</version.immutables>
 		<version.apache.compress>1.22</version.apache.compress>
 		<version.unixsocket>0.38.19</version.unixsocket>
 		<version.apache.lang>2.6</version.apache.lang>
