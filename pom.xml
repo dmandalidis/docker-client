@@ -75,7 +75,7 @@
 		<version.plugin.checkstyle>3.2.1</version.plugin.checkstyle>
 		<version.plugin.enforcer>3.1.0</version.plugin.enforcer>
 		<version.plugin.jar>3.3.0</version.plugin.jar>
-		<version.plugin.projectinfo>3.4.1</version.plugin.projectinfo>
+		<version.plugin.projectinfo>3.4.2</version.plugin.projectinfo>
 		<version.plugin.source>3.2.1</version.plugin.source>
 		<version.plugin.failsafe>3.0.0-M8</version.plugin.failsafe>
 		<version.plugin.javadoc>3.4.1</version.plugin.javadoc>
