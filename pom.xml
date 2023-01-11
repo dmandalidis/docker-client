@@ -82,7 +82,7 @@
 		<version.plugin.jacoco>0.8.8</version.plugin.jacoco>
 		<version.plugin.staging>1.6.13</version.plugin.staging>
 		<version.plugin.gpg>3.0.1</version.plugin.gpg>
-		<version.plugin.surefire>3.0.0-M7</version.plugin.surefire>
+		<version.plugin.surefire>3.0.0-M8</version.plugin.surefire>
 		<version.plugin.bundle>5.1.8</version.plugin.bundle>
 		<version.plugin.pmd>3.20.0</version.plugin.pmd>
 	</properties>
