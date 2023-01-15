@@ -1,5 +1,11 @@
 # Change Log
 
+## 7.0.0 - notable changes
+
+* Update to Java 11
+* Bump slf4j-api from 2.0.4 to 2.0.6
+* Bump google-auth-library-oauth2-http from 1.13.0 to 1.14.0
+
 ## 6.1.0 - notable changes
 
 * Type error in DeviceRequest#capabilities (fixes #531)
