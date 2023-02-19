@@ -1,5 +1,12 @@
 # Change Log
 
+## 7.0.1 - notable changes
+
+* Propagate Docker error response body (fixes #558)
+* Bump version.jersey from 3.1.0 to 3.1.1
+* Bump google-auth-library-oauth2-http from 1.14.0 to 1.16.0
+* Bump jackson-bom from 2.14.1 to 2.14.2
+
 ## 7.0.0 - notable changes
 
 * Update to Java 11
