@@ -2554,7 +2554,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
     Response response = request(method, Response.class, resource, request);
     if (response.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
       throw new DockerRequestException(method, resource.getUri(), response.getStatus(),
-    		  response.readEntity(String.class), null);
+          extractDockerResponse(response), null);
     }
     tailResponse(method, response, handler, resource);
   }
@@ -2587,7 +2587,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
 
     if (response != null) {
       throw new DockerRequestException(method, resource.getUri(), response.getStatus(),
-    		  	null, cause);
+            extractDockerResponse(response), cause);
     } else if (cause instanceof InterruptedIOException) {
       throw new DockerTimeoutException(method, resource.getUri(), ex);
     } else if (cause instanceof InterruptedException) {
@@ -2597,6 +2597,15 @@ public class DefaultDockerClient implements DockerClient, Closeable {
     }
   }
 
+  private String extractDockerResponse(Response response) {
+    try {
+      return response.readEntity(String.class);
+    } catch (IllegalStateException | ProcessingException e) {
+      log.warn("Cannot extract response message", e);
+      return null;
+    }
+  }
+  
   private String authHeader(final RegistryAuth registryAuth) throws DockerException {
     // the docker daemon requires that the X-Registry-Auth header is specified
     // with a non-empty string even if your registry doesn't use authentication
