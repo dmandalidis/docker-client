@@ -1904,14 +1904,6 @@ public class DefaultDockerClientTest {
       assertThat(volumeCreate.actor().attributes(), hasEntry("driver", "local"));
       assertNotNull(volumeCreate.timeNano());
       
-  	  // check: https://github.com/moby/moby/issues/40047; double create event
-  	  final Event volumeCreate2 = stream.next();
-      assertEquals(VOLUME, volumeCreate2.type());
-      assertEquals("create", volumeCreate2.action());
-      assertEquals(volumeName, volumeCreate2.actor().id());
-      assertThat(volumeCreate2.actor().attributes(), hasEntry("driver", "local"));
-      assertNotNull(volumeCreate2.timeNano());
-
       assertTrue("Docker did not return enough volume events."
                       + "Expected a volume mount event.",
               stream.hasNext());
@@ -3068,6 +3060,9 @@ public class DefaultDockerClientTest {
     // filters={"status":["exited"]}
     sut.unpauseContainer(containerId);
     sut.stopContainer(containerId, 0);
+    // race-condition here, not actually stopped yet
+    TimeUnit.SECONDS.sleep(1);
+    //
     final List<Container> allExited = sut.listContainers(allContainers(), withStatusExited());
     assertThat(containerId, is(in(containersToIds(allExited))));
 
@@ -3795,6 +3790,11 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testRemoveVolume() throws Exception {
+    // workaround for https://github.com/moby/moby/issues/45037
+    if (compareVersion(sut.version().apiVersion(), "1.42") <= 0) {
+      return;
+    }
+    
     // Create a volume and remove it
     final Volume volume1 = sut.createVolume();
     sut.removeVolume(volume1);
