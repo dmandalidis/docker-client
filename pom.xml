@@ -62,7 +62,7 @@
 		<version.google.oauth2>1.16.0</version.google.oauth2>
 
 		<version.junit>4.13.2</version.junit>
-		<version.mockito>5.1.1</version.mockito>
+		<version.mockito>5.2.0</version.mockito>
 		<version.logback>1.4.6</version.logback>
 		<version.jimfs>1.2</version.jimfs>
 		<version.awaitility>4.2.0</version.awaitility>
