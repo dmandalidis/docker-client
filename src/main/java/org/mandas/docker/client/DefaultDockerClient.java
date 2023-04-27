@@ -604,7 +604,6 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   public void restartContainer(String containerId, int secondsToWaitBeforeRestart)
       throws DockerException, InterruptedException {
 	requireNonNull(containerId, "containerId");
-	requireNonNull(secondsToWaitBeforeRestart, "secondsToWait");
 
     MultivaluedMap<String, String> queryParameters = new MultivaluedHashMap<>();
     queryParameters.add("t", String.valueOf(secondsToWaitBeforeRestart));
