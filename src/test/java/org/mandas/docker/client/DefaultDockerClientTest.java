@@ -3789,11 +3789,6 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testRemoveVolume() throws Exception {
-    // workaround for https://github.com/moby/moby/issues/45037
-    if (compareVersion(sut.version().apiVersion(), "1.42") <= 0) {
-      return;
-    }
-    
     // Create a volume and remove it
     final Volume volume1 = sut.createVolume();
     sut.removeVolume(volume1);
