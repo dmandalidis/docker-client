@@ -127,7 +127,7 @@ public class ImageRefTest {
   }
 
   private static Matcher<ImageRef> hasRegistry(final String expected) {
-    return new FeatureMatcher<ImageRef, String>(equalTo(expected), "registryName", "registryName") {
+    return new FeatureMatcher<>(equalTo(expected), "registryName", "registryName") {
       @Override
       protected String featureValueOf(final ImageRef actual) {
         return actual.getRegistryName();
@@ -136,7 +136,7 @@ public class ImageRefTest {
   }
 
   private static Matcher<ImageRef> hasRegistryUrl(final String expected) {
-    return new FeatureMatcher<ImageRef, String>(equalTo(expected),
+    return new FeatureMatcher<>(equalTo(expected),
         "registryNameUrl", "registryNameUrl") {
       @Override
       protected String featureValueOf(final ImageRef actual) {

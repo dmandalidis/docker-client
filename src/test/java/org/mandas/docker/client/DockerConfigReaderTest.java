@@ -130,7 +130,7 @@ public class DockerConfigReaderTest {
   }
 
   private static Matcher<RegistryAuth> emptyRegistryAuth() {
-    return new CustomTypeSafeMatcher<RegistryAuth>("an empty RegistryAuth") {
+    return new CustomTypeSafeMatcher<>("an empty RegistryAuth") {
       @Override
       protected boolean matchesSafely(final RegistryAuth item) {
         return item.email() == null

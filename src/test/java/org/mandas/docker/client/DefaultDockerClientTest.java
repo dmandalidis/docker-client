@@ -161,7 +161,6 @@ import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.After;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -2847,7 +2846,7 @@ public class DefaultDockerClientTest {
         invalidContainerNameException(final String containerName) {
     final String exceptionMessage = String.format("Invalid container name: \"%s\"", containerName);
     final String description = "for container name " + containerName;
-    return new CustomTypeSafeMatcher<IllegalArgumentException>(description) {
+    return new CustomTypeSafeMatcher<>(description) {
       @Override
       protected boolean matchesSafely(final IllegalArgumentException ex) {
         return ex.getMessage().equals(exceptionMessage);
@@ -3733,7 +3732,7 @@ public class DefaultDockerClientTest {
   private static Matcher<VolumeNotFoundException> volumeNotFoundExceptionWithName(
       final String volumeName) {
     final String description = "for volume name " + volumeName;
-    return new CustomTypeSafeMatcher<VolumeNotFoundException>(description) {
+    return new CustomTypeSafeMatcher<>(description) {
       @Override
       protected boolean matchesSafely(final VolumeNotFoundException ex) {
         return ex.getVolumeName().equals(volumeName);
@@ -3824,7 +3823,7 @@ public class DefaultDockerClientTest {
 
   private static Matcher<String> equalToIgnoreLeadingSlash(final String expected) {
     final String description = "a String equal to " + expected + ", ignoring any leading '/'";
-    return new CustomTypeSafeMatcher<String>(description) {
+    return new CustomTypeSafeMatcher<>(description) {
       @Override
       protected boolean matchesSafely(final String actual) {
         return actual.startsWith("/")
@@ -4995,7 +4994,7 @@ public class DefaultDockerClientTest {
       final Matcher<Integer> targetPortMatcher, final Matcher<Integer> publishedPortMatcher,
       final Matcher<PortConfigPublishMode> publishModeMatcher) {
     final String description = "for PortConfig";
-    return new CustomTypeSafeMatcher<PortConfig>(description) {
+    return new CustomTypeSafeMatcher<>(description) {
       @Override
       protected boolean matchesSafely(final PortConfig portConfig) {
         return nameMatcher.matches(portConfig.name())

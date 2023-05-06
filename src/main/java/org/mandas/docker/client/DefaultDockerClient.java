@@ -286,48 +286,48 @@ public class DefaultDockerClient implements DockerClient, Closeable {
           Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9_.-]+$");
 
   private static final GenericType<List<Container>> CONTAINER_LIST =
-      new GenericType<List<Container>>() {
+      new GenericType<>() {
       };
 
   private static final GenericType<List<ContainerChange>> CONTAINER_CHANGE_LIST =
-      new GenericType<List<ContainerChange>>() {
+      new GenericType<>() {
       };
 
   private static final GenericType<List<Image>> IMAGE_LIST =
-      new GenericType<List<Image>>() {
+      new GenericType<>() {
       };
 
   private static final GenericType<List<Network>> NETWORK_LIST =
-      new GenericType<List<Network>>() {
+      new GenericType<>() {
       };
 
   private static final GenericType<List<ImageSearchResult>> IMAGES_SEARCH_RESULT_LIST =
-      new GenericType<List<ImageSearchResult>>() {
+      new GenericType<>() {
       };
 
   private static final GenericType<List<RemovedImage>> REMOVED_IMAGE_LIST =
-      new GenericType<List<RemovedImage>>() {
+      new GenericType<>() {
       };
 
   private static final GenericType<List<ImageHistory>> IMAGE_HISTORY_LIST =
-      new GenericType<List<ImageHistory>>() {
+      new GenericType<>() {
       };
 
   private static final GenericType<List<Service>> SERVICE_LIST =
-      new GenericType<List<Service>>() {
+      new GenericType<>() {
       };
 
   private  static final GenericType<Distribution> DISTRIBUTION =
-      new GenericType<Distribution>(){
+      new GenericType<>(){
       };
 
-  private static final GenericType<List<Task>> TASK_LIST = new GenericType<List<Task>>() { };
+  private static final GenericType<List<Task>> TASK_LIST = new GenericType<>() { };
 
-  private static final GenericType<List<Node>> NODE_LIST = new GenericType<List<Node>>() { };
+  private static final GenericType<List<Node>> NODE_LIST = new GenericType<>() { };
 
-  private static final GenericType<List<Config>> CONFIG_LIST = new GenericType<List<Config>>() { };
+  private static final GenericType<List<Config>> CONFIG_LIST = new GenericType<>() { };
 
-  private static final GenericType<List<Secret>> SECRET_LIST = new GenericType<List<Secret>>() { };
+  private static final GenericType<List<Secret>> SECRET_LIST = new GenericType<>() { };
 
   private final Client client;
   private final Client notimeoutClient;

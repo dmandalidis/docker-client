@@ -89,7 +89,7 @@ public class ContainerRegistryAuthSupplierTest {
     final String password = accessToken.getTokenValue();
 
     final Matcher<RegistryAuth> usernameMatcher =
-        new FeatureMatcher<RegistryAuth, String>(is(username), "username", "username") {
+        new FeatureMatcher<>(is(username), "username", "username") {
           @Override
           protected String featureValueOf(final RegistryAuth actual) {
             return actual.username();
@@ -97,7 +97,7 @@ public class ContainerRegistryAuthSupplierTest {
         };
 
     final Matcher<RegistryAuth> passwordMatcher =
-        new FeatureMatcher<RegistryAuth, String>(is(password), "password", "password") {
+        new FeatureMatcher<>(is(password), "password", "password") {
           @Override
           protected String featureValueOf(final RegistryAuth actual) {
             return actual.password();
