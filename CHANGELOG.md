@@ -1,5 +1,14 @@
 # Change Log
 
+## 7.0.2 - notable changes
+
+* Bump version.jersey from 3.1.1 to 3.1.2
+* Bump jackson-bom from 2.14.2 to 2.15.1
+* Bump google-auth-library-oauth2-http from 1.16.0 to 1.16.1
+* Bump commons-compress from 1.22 to 1.23.0
+* Bump slf4j-api from 2.0.6 to 2.0.7
+* Bump logback-classic from 1.4.5 to 1.4.7
+
 ## 7.0.1 - notable changes
 
 * Propagate Docker error response body (fixes #558)
