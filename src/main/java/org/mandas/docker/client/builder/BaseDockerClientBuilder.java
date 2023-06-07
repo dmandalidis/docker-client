@@ -265,6 +265,10 @@ public abstract class BaseDockerClientBuilder<B extends BaseDockerClientBuilder<
           "An HTTPS URI for DOCKER_HOST must be provided to use Docker client certificates");
     }
     
+    if (uri.getScheme().startsWith(UNIX_SCHEME) || uri.getScheme().startsWith(NPIPE_SCHEME)) {
+      this.useProxy = false;
+    }
+    
     this.client = createClient()
         .register(ObjectMapperProvider.class);
     
