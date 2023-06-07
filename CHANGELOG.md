@@ -1,5 +1,12 @@
 # Change Log
 
+## 7.0.3 - notable changes
+
+* Ignore proxy configuration when non-http(s) URI is used (fixes #601)
+* Bump jackson-bom from 2.15.1 to 2.15.2
+* Bump jnr-unixsocket from 0.38.19 to 0.38.20
+* Bump google-auth-library-oauth2-http from 1.16.1 to 1.17.0
+
 ## 7.0.2 - notable changes
 
 * Bump version.jersey from 3.1.1 to 3.1.2
