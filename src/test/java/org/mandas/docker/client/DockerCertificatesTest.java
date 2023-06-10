@@ -43,8 +43,6 @@ import org.mockito.ArgumentCaptor;
 
 public class DockerCertificatesTest {
 
-  private static final boolean TRAVIS = "true".equals(getenv("TRAVIS"));
-
   private SslContextFactory factory = mock(SslContextFactory.class);
   private ArgumentCaptor<KeyStore> keyStore = ArgumentCaptor.forClass(KeyStore.class);
   private ArgumentCaptor<KeyStore> trustStore = ArgumentCaptor.forClass(KeyStore.class);
@@ -143,9 +141,7 @@ public class DockerCertificatesTest {
 
   @Test
   public void testReadEllipticCurvePrivateKey() throws Exception {
-    assumeFalse("Travis' openjdk7 doesn't support the elliptic curve algorithm", TRAVIS);
-
-    DockerCertificates.builder()
+        DockerCertificates.builder()
         .dockerCertPath(getResourceFile("dockerSslDirectoryWithEcKey"))
         .sslFactory(factory)
         .build();
