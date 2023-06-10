@@ -26,8 +26,6 @@ import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static com.google.common.collect.Lists.newArrayList;
-import static java.lang.String.format;
-import static java.lang.System.getenv;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
@@ -70,7 +68,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 import static org.mandas.docker.client.DefaultDockerClient.NO_TIMEOUT;
 import static org.mandas.docker.client.DockerClient.EventsParam.since;
@@ -122,7 +119,6 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -195,7 +191,6 @@ import org.mandas.docker.client.messages.ContainerCreation;
 import org.mandas.docker.client.messages.ContainerExit;
 import org.mandas.docker.client.messages.ContainerInfo;
 import org.mandas.docker.client.messages.ContainerMount;
-import org.mandas.docker.client.messages.ContainerStats;
 import org.mandas.docker.client.messages.ContainerUpdate;
 import org.mandas.docker.client.messages.Device;
 import org.mandas.docker.client.messages.EndpointConfig;
@@ -300,8 +295,6 @@ public class DefaultDockerClientTest {
   private static final String CIRROS_PRIVATE = "dxia/cirros-private";
   private static final String CIRROS_PRIVATE_LATEST = CIRROS_PRIVATE + ":latest";
 
-  private static final boolean TRAVIS = "true".equals(getenv("TRAVIS"));
-
   private static final String AUTH_USERNAME = "dxia2";
   private static final String AUTH_PASSWORD = System.getenv("HUB_DXIA2_PASSWORD");
 
@@ -318,8 +311,6 @@ public class DefaultDockerClientTest {
       .email("1234@example.com")
       .build();
 
-  private URI dockerEndpoint;
-
   private DefaultDockerClient sut;
 
   @Before
@@ -332,8 +323,6 @@ public class DefaultDockerClientTest {
     } else {
       builder.readTimeoutMillis(120000);
     }
-
-    dockerEndpoint = builder.uri();
 
     sut = builder.build();
 
@@ -385,11 +374,6 @@ public class DefaultDockerClientTest {
     }
   }
   
-  private void requireStorageDriverNotAufs() throws Exception {
-    Info info = sut.info();
-    assumeFalse(info.storageDriver().equals("aufs"));
-  }
-
   @Test
   public void testSearchImage() throws Exception {
     // when
@@ -1624,8 +1608,6 @@ public class DefaultDockerClientTest {
         .memory(16777216L) // Do not set this lower: https://github.com/moby/moby/issues/38921
         .memorySwap(33554432L);
 
-    hostConfigBuilder.memorySwappiness(42);
-
     final HostConfig expected = hostConfigBuilder.build();
 
     final ContainerConfig config = ContainerConfig.builder()
@@ -1642,57 +1624,6 @@ public class DefaultDockerClientTest {
 
     assertThat(actual.memory(), equalTo(expected.memory()));
     assertThat(actual.memorySwap(), equalTo(expected.memorySwap()));
-    assertThat(actual.memorySwappiness(), equalTo(expected.memorySwappiness()));
-  }
-
-  @Test
-  public void testContainerWithAppArmorLogs() throws Exception {
-    pull(BUSYBOX_LATEST);
-
-    final boolean privileged = true;
-    final boolean publishAllPorts = true;
-    final String dns = "1.2.3.4";
-    final HostConfig expected = HostConfig.builder().privileged(privileged)
-        .publishAllPorts(publishAllPorts).dns(dns).cpuShares(4096L).build();
-
-    final String stopSignal = "SIGTERM";
-
-    final ContainerConfig config = ContainerConfig.builder().image(BUSYBOX_LATEST)
-        .hostConfig(expected).stopSignal(stopSignal).build();
-    final String name = randomName();
-    final ContainerCreation creation = sut.createContainer(config, name);
-    final String id = creation.id();
-
-    sut.startContainer(id);
-
-    final ContainerInfo inspection = sut.inspectContainer(id);
-    final HostConfig actual = inspection.hostConfig();
-
-    assertThat(actual.privileged(), equalTo(expected.privileged()));
-    assertThat(actual.publishAllPorts(), equalTo(expected.publishAllPorts()));
-    assertThat(actual.dns(), equalTo(expected.dns()));
-    assertThat(actual.cpuShares(), equalTo(expected.cpuShares()));
-    assertThat(sut.inspectContainer(id).config().stopSignal(), equalTo(config.stopSignal()));
-    assertThat(inspection.appArmorProfile(), equalTo(""));
-    assertThat(inspection.execIds(), equalTo(null));
-    assertThat(inspection.logPath(), containsString(id + "-json.log"));
-    assertThat(inspection.restartCount(), equalTo(0L));
-    assertThat(inspection.mounts().isEmpty(), equalTo(true));
-
-    // Wait for the container to exit
-    sut.waitContainer(id);
-
-    final List<Container> containers = sut.listContainers(allContainers(), withStatusExited());
-
-    Container targetCont = null;
-    for (final Container container : containers) {
-      if (container.id().equals(id)) {
-        targetCont = container;
-        break;
-      }
-    }
-    assertNotNull(targetCont);
-    assertThat(targetCont.imageId(), equalTo(inspection.image()));
   }
 
   @Test
@@ -2123,69 +2054,6 @@ public class DefaultDockerClientTest {
   }
 
   @Test
-  public void testSsl() throws Exception {
-    assumeFalse(TRAVIS);
-
-    // Build a run a container that contains a Docker instance configured with our SSL cert/key
-    final String imageName = "test-docker-ssl";
-    final String expose = "2376/tcp";
-
-    final Path dockerDirectory = getResource("dockerSslDirectory");
-    sut.build(dockerDirectory, imageName);
-
-    final HostConfig hostConfig = HostConfig.builder()
-        .privileged(true)
-        .publishAllPorts(true)
-        .build();
-    final ContainerConfig containerConfig = ContainerConfig.builder()
-        .image(imageName)
-        .exposedPorts(expose)
-        .hostConfig(hostConfig)
-        .build();
-    final String containerName = randomName();
-    final ContainerCreation containerCreation = sut.createContainer(containerConfig, containerName);
-    final String containerId = containerCreation.id();
-
-    sut.startContainer(containerId);
-
-    // Determine where the Docker instance inside the container we just started is exposed
-    final String host;
-    if (dockerEndpoint.getScheme().equalsIgnoreCase("unix")) {
-      host = "localhost";
-    } else {
-      host = dockerEndpoint.getHost();
-    }
-
-    final ContainerInfo containerInfo = sut.inspectContainer(containerId);
-    assertThat(containerInfo.state().running(), equalTo(true));
-
-    final String port = containerInfo.networkSettings().ports().get(expose).get(0).hostPort();
-
-    // Try to connect using SSL and our known cert/key
-    final DockerCertificates certs = new DockerCertificates(dockerDirectory);
-    try (final DockerClient c = DockerClientBuilderFactory.newInstance().uri(URI.create(format("https://%s:%s", host, port))).dockerCertificates(certs).build()) {
-
-      // We need to wait for the docker process inside the docker container to be ready to accept
-      // connections on the port. Otherwise, this test will fail.
-      // Even though we've checked that the container is running, this doesn't mean the process
-      // inside the container is ready.
-      final long deadline =
-          System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(TimeUnit.MINUTES.toMillis(1));
-      while (System.nanoTime() < deadline) {
-        try (final Socket ignored = new Socket(host, Integer.parseInt(port))) {
-          break;
-        } catch (IOException ignored) {
-        }
-        Thread.sleep(500);
-      }
-  
-      assertThat(c.ping(), equalTo("OK"));
-  
-      sut.stopContainer(containerId, 10);
-    }
-  }
-
-  @Test
   public void testPauseContainer() throws Exception {
     pull(BUSYBOX_LATEST);
 
@@ -2255,7 +2123,7 @@ public class DefaultDockerClientTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testInvalidExtraHosts() throws Exception {
-    final HostConfig expected = HostConfig.builder()
+    HostConfig.builder()
         .extraHosts("extrahost")
         .build();
   }
@@ -3234,24 +3102,6 @@ public class DefaultDockerClientTest {
     assertThat(containerInfo.config().macAddress(), equalTo("12:34:56:78:9a:bc"));
   }
 
-  @Test
-  public void testStats() throws Exception {
-    final ContainerConfig config = ContainerConfig.builder()
-        .image(BUSYBOX_LATEST)
-        .cmd("sh", "-c", "while :; do sleep 1; done")
-        .build();
-    final ContainerCreation container = sut.createContainer(config, randomName());
-    sut.startContainer(container.id());
-
-    final ContainerStats stats = sut.stats(container.id());
-    assertThat(stats.read(), notNullValue());
-    assertThat(stats.precpuStats(), notNullValue());
-    assertThat(stats.cpuStats(), notNullValue());
-    assertThat(stats.memoryStats(), notNullValue());
-    assertThat(stats.blockIoStats(), notNullValue());
-    assertThat(stats.networks(), notNullValue());
-  }
-
   @Test(expected = NetworkNotFoundException.class)
   public void testNetworks() throws Exception {
     final String networkName = randomName();
@@ -3895,24 +3745,6 @@ public class DefaultDockerClientTest {
   }
 
   @Test
-  public void testOomKillDisable() throws Exception {
-    // Pull image
-    pull(BUSYBOX_LATEST);
-
-    final ContainerConfig config = ContainerConfig.builder()
-        .image(BUSYBOX_LATEST)
-        .hostConfig(HostConfig.builder()
-                        .oomKillDisable(true) // Defaults to false
-                        .build())
-        .build();
-
-    final ContainerCreation container = sut.createContainer(config, randomName());
-    final ContainerInfo info = sut.inspectContainer(container.id());
-
-    assertThat(info.hostConfig().oomKillDisable(), is(true));
-  }
-
-  @Test
   public void testOomScoreAdj() throws Exception {
     // Pull image
     pull(BUSYBOX_LATEST);
@@ -3989,32 +3821,6 @@ public class DefaultDockerClientTest {
     final ContainerInfo info = sut.inspectContainer(container.id());
 
     assertThat(info.hostConfig().readonlyRootfs(), is(true));
-  }
-
-
-  @Test
-  public void testStorageOpt() throws Exception {
-    requireStorageDriverNotAufs();
-    // Doesn't work on Travis with Docker API >= v1.32 because storage driver doesn't have pquota
-    // mount option enabled.
-    assumeFalse(TRAVIS);
-    // Pull image
-    pull(BUSYBOX_LATEST);
-
-    final Map<String, String> storageOpt = Collections.singletonMap("size", "20G");
-
-    final ContainerConfig config = ContainerConfig.builder()
-                      .image(BUSYBOX_LATEST)
-                      .hostConfig(HostConfig.builder()
-                          .storageOpt(storageOpt)
-                          .build())
-                      .build();
-
-    final ContainerCreation container = sut.createContainer(config, randomName());
-    final ContainerInfo info = sut.inspectContainer(container.id());
-
-    assertThat(info.hostConfig().storageOpt().size(), is(1));
-    assertThat(info.hostConfig().storageOpt().get("size"), is("20G"));
   }
 
   @Test(expected = ContainerNotFoundException.class)

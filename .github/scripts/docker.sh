@@ -26,7 +26,7 @@ case "$1" in
     sudo apt-get -qq update
     sudo apt-get -qq remove --purge docker docker-engine docker.io containerd runc
     sudo mkdir -p /etc/systemd/system/docker.service.d/
-    sudo cp exec-override.conf /etc/systemd/system/docker.service.d/exec-override.conf
+    sudo cp .github/files/exec-override.conf /etc/systemd/system/docker.service.d/exec-override.conf
     sudo systemctl daemon-reload
     sudo rm -rf /etc/docker
     sudo rm -rf /etc/default/docker
