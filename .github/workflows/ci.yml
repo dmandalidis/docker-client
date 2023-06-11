@@ -42,7 +42,7 @@ jobs:
       env:
         SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
         SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-      run: mvn -B --settings custom-settings.xml -Pdeploy-artifacts clean deploy -Dsurefire.rerunFailingTestsCount=1
+      run: mvn -B --settings .github/files/custom-settings.xml -Pdeploy-artifacts clean deploy -Dsurefire.rerunFailingTestsCount=1
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
