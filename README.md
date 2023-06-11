@@ -1,6 +1,6 @@
 # Docker Client
 
-[![Build Status](https://api.travis-ci.com/dmandalidis/docker-client.svg?branch=master)](https://api.travis-ci.com/dmandalidis/docker-client.svg?branch=master)
+[![Build Status](https://github.com/dmandalidis/docker-client/actions/workflows/ci.yml/badge.svg)](https://github.com/dmandalidis/docker-client/actions/workflows/ci.yml/badge.svg)
 [![codecov](https://codecov.io/github/dmandalidis/docker-client/coverage.svg?branch=master)](https://codecov.io/github/dmandalidis/docker-client?branch=master)
 [![Maven Central](https://img.shields.io/maven-central/v/org.mandas/docker-client.svg)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.mandas%22%20docker-client)
 [![License](https://img.shields.io/github/license/dmandalidis/docker-client.svg)](LICENSE)
