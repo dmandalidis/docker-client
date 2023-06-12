@@ -24,10 +24,6 @@
 
 package org.mandas.docker.client;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.unmodifiableSet;
-import static java.util.Objects.requireNonNull;
-import static java.util.Optional.ofNullable;
 import static jakarta.ws.rs.HttpMethod.DELETE;
 import static jakarta.ws.rs.HttpMethod.GET;
 import static jakarta.ws.rs.HttpMethod.POST;
@@ -36,10 +32,13 @@ import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_OCTET_STREAM;
 import static jakarta.ws.rs.core.MediaType.APPLICATION_OCTET_STREAM_TYPE;
 import static jakarta.ws.rs.core.MediaType.TEXT_PLAIN_TYPE;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Collections.unmodifiableSet;
+import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
 import static org.mandas.docker.client.ObjectMapperProvider.objectMapper;
 import static org.mandas.docker.client.VersionCompare.compareVersion;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
@@ -67,19 +66,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import jakarta.ws.rs.ProcessingException;
-import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.client.Invocation;
-import jakarta.ws.rs.client.ResponseProcessingException;
-import jakarta.ws.rs.client.WebTarget;
-import jakarta.ws.rs.core.GenericType;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.MultivaluedHashMap;
-import jakarta.ws.rs.core.MultivaluedMap;
-import jakarta.ws.rs.core.Response;
 
 import org.apache.commons.compress.utils.IOUtils;
 import org.mandas.docker.client.auth.RegistryAuthSupplier;
@@ -156,7 +142,20 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-public class DefaultDockerClient implements DockerClient, Closeable {
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.Invocation;
+import jakarta.ws.rs.client.ResponseProcessingException;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
+
+public class DefaultDockerClient implements DockerClient {
 
   /**
    * Hack: this {@link ProgressHandler} is meant to capture the image ID (or image digest in Docker
@@ -378,10 +377,11 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   @Override
   public int auth(final RegistryAuth registryAuth) throws DockerException, InterruptedException {
     final WebTarget resource = resource().path("auth");
-    final Response response =
+    try (final Response response =
         request(POST, Response.class, resource, resource.request(APPLICATION_JSON_TYPE),
-                Entity.json(registryAuth));
-    return response.getStatus();
+                Entity.json(registryAuth))) {
+      return response.getStatus();
+    }
   }
 
   @Override
@@ -550,16 +550,17 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   private void containerAction(final String containerId, final String action,
                                final MultivaluedMap<String, String> queryParameters)
           throws DockerException, InterruptedException {
-    try {
-      WebTarget resource = resource()
-              .path("containers").path(containerId).path(action);
-
-      for (Map.Entry<String, List<String>> queryParameter : queryParameters.entrySet()) {
-        for (String parameterValue : queryParameter.getValue()) {
-          resource = resource.queryParam(queryParameter.getKey(), parameterValue);
-        }
+    WebTarget resource = resource()
+        .path("containers").path(containerId).path(action);
+    
+    for (Map.Entry<String, List<String>> queryParameter : queryParameters.entrySet()) {
+      for (String parameterValue : queryParameter.getValue()) {
+        resource = resource.queryParam(queryParameter.getKey(), parameterValue);
       }
-      request(POST, resource, resource.request());
+    }
+    
+    try (final Response response = request(POST, resource, resource.request())) {
+      
     } catch (DockerRequestException e) {
       switch (e.status()) {
         case 404:
@@ -629,11 +630,10 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   public void stopContainer(final String containerId, final int secondsToWaitBeforeKilling)
       throws DockerException, InterruptedException {
     
-    try {
-      final WebTarget resource = resource()
-          .path("containers").path(containerId).path("stop")
-          .queryParam("t", String.valueOf(secondsToWaitBeforeKilling));
-      request(POST, resource, resource.request());
+    final WebTarget resource = resource()
+        .path("containers").path(containerId).path("stop")
+        .queryParam("t", String.valueOf(secondsToWaitBeforeKilling));
+    try (final Response response = request(POST, resource, resource.request())) {
     } catch (DockerRequestException e) {
       switch (e.status()) {
         case 304: // already stopped, so we're cool
@@ -674,14 +674,12 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   @Override
   public void removeContainer(final String containerId, final RemoveContainerParam... params)
       throws DockerException, InterruptedException {
-    try {
-      WebTarget resource = resource().path("containers").path(containerId);
-
-      for (final RemoveContainerParam param : params) {
-        resource = resource.queryParam(param.name(), param.value());
-      }
-
-      request(DELETE, resource, resource.request(APPLICATION_JSON_TYPE));
+    WebTarget resource = resource().path("containers").path(containerId);
+    
+    for (final RemoveContainerParam param : params) {
+      resource = resource.queryParam(param.name(), param.value());
+    }
+    try (final Response response = request(DELETE, resource, resource.request(APPLICATION_JSON_TYPE))) {
     } catch (DockerRequestException e) {
       switch (e.status()) {
         case 400:
@@ -899,8 +897,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
 
     log.info("Renaming container with id {}. New name {}.", containerId, name);
 
-    try {
-      request(POST, resource, resource.request());
+    try (final Response response = request(POST, resource, resource.request())) {
     } catch (DockerRequestException e) {
       switch (e.status()) {
         case 404:
@@ -1148,8 +1145,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       resource = resource.queryParam("force", true);
     }
 
-    try {
-      request(POST, resource, resource.request());
+    try (final Response response = request(POST, resource, resource.request())) {
     } catch (DockerRequestException e) {
       switch (e.status()) {
         case 400:
@@ -1737,9 +1733,8 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   @Override
   public void removeService(final String serviceId) throws DockerException, InterruptedException {
     assertApiVersionIsAbove("1.24");
-    try {
-      final WebTarget resource = resource().path("services").path(serviceId);
-      request(DELETE, resource, resource.request(APPLICATION_JSON_TYPE));
+    final WebTarget resource = resource().path("services").path(serviceId);
+    try (final Response response = request(DELETE, resource, resource.request(APPLICATION_JSON_TYPE))) {
     } catch (DockerRequestException e) {
       switch (e.status()) {
         case 404:
@@ -1905,8 +1900,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
     assertApiVersionIsAbove("1.30");
     final WebTarget resource = resource().path("configs").path(configId);
 
-    try {
-      request(DELETE, resource, resource.request(APPLICATION_JSON_TYPE));
+    try (final Response response = request(DELETE, resource, resource.request(APPLICATION_JSON_TYPE))) {
     } catch (final DockerRequestException ex) {
       switch (ex.status()) {
         case 404:
@@ -2039,8 +2033,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
         .path(nodeId)
         .queryParam("force", String.valueOf(force));
 
-    try {
-      request(DELETE, resource, resource.request(APPLICATION_JSON_TYPE));
+    try (final Response response = request(DELETE, resource, resource.request(APPLICATION_JSON_TYPE))) {
     } catch (DockerRequestException e) {
       switch (e.status()) {
         case 404:
@@ -2068,8 +2061,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       resource = resource.queryParam("w", width);
     }
 
-    try {
-      request(POST, resource, resource.request(TEXT_PLAIN_TYPE));
+    try (final Response response = request(POST, resource, resource.request(TEXT_PLAIN_TYPE))) {
     } catch (DockerRequestException e) {
       switch (e.status()) {
         case 404:
@@ -2127,8 +2119,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
       resource = resource.queryParam("w", width);
     }
 
-    try {
-      request(POST, resource, resource.request(TEXT_PLAIN_TYPE));
+    try (final Response response = request(POST, resource, resource.request(TEXT_PLAIN_TYPE))) {
     } catch (DockerRequestException e) {
       switch (e.status()) {
         case 404:
@@ -2192,9 +2183,8 @@ public class DefaultDockerClient implements DockerClient, Closeable {
 
   @Override
   public void removeNetwork(String networkId) throws DockerException, InterruptedException {
-    try {
-      final WebTarget resource = resource().path("networks").path(networkId);
-      request(DELETE, resource, resource.request(APPLICATION_JSON_TYPE));
+    final WebTarget resource = resource().path("networks").path(networkId);
+    try (final Response response = request(DELETE, resource, resource.request(APPLICATION_JSON_TYPE))) {
     } catch (DockerRequestException e) {
       switch (e.status()) {
         case 404:
@@ -2301,8 +2291,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
   public void removeVolume(final String volumeName)
       throws DockerException, InterruptedException {
     final WebTarget resource = resource().path("volumes").path(volumeName);
-    try {
-      request(DELETE, resource, resource.request(APPLICATION_JSON_TYPE));
+    try (final Response response = request(DELETE, resource, resource.request(APPLICATION_JSON_TYPE))) {
     } catch (DockerRequestException e) {
       switch (e.status()) {
         case 404:
@@ -2409,8 +2398,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
     assertApiVersionIsAbove("1.25");
     final WebTarget resource = resource().path("secrets").path(secretId);
 
-    try {
-      request(DELETE, resource, resource.request(APPLICATION_JSON_TYPE));
+    try (final Response response = request(DELETE, resource, resource.request(APPLICATION_JSON_TYPE))) {
     } catch (final DockerRequestException ex) {
       switch (ex.status()) {
         case 404:
@@ -2464,12 +2452,12 @@ public class DefaultDockerClient implements DockerClient, Closeable {
     }
   }
 
-  private void request(final String method,
+  private Response request(final String method,
                        final WebTarget resource,
                        final Invocation.Builder request)
       throws DockerException, InterruptedException {
     try {
-      headers(request).method(method, String.class);
+      return headers(request).method(method);
     } catch (Exception e) {
       throw propagate(method, resource, e);
     }
@@ -2528,19 +2516,22 @@ public class DefaultDockerClient implements DockerClient, Closeable {
                                final WebTarget resource, final Invocation.Builder request,
                                final Entity<?> entity)
       throws DockerException, InterruptedException {
-    Response response = request(method, Response.class, resource, request, entity);
-    tailResponse(method, response, handler, resource);
+    try (Response response = request(method, Response.class, resource, request, entity)) {
+      tailResponse(method, response, handler, resource);
+    }
   }
   
   private void requestAndTail(final String method, final ProgressHandler handler,
                               final WebTarget resource, final Invocation.Builder request)
       throws DockerException, InterruptedException {
-    Response response = request(method, Response.class, resource, request);
-    if (response.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
-      throw new DockerRequestException(method, resource.getUri(), response.getStatus(),
-          extractDockerResponse(response), null);
+    
+    try (Response response = request(method, Response.class, resource, request)) {
+      if (response.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
+        throw new DockerRequestException(method, resource.getUri(), response.getStatus(),
+            extractDockerResponse(response), null);
+      }
+      tailResponse(method, response, handler, resource);
     }
-    tailResponse(method, response, handler, resource);
   }
 
   private Invocation.Builder headers(final Invocation.Builder request) {
@@ -2571,7 +2562,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
 
     if (response != null) {
       throw new DockerRequestException(method, resource.getUri(), response.getStatus(),
-            extractDockerResponse(response), cause);
+          extractDockerResponse(response), cause);
     } else if (cause instanceof InterruptedIOException) {
       throw new DockerTimeoutException(method, resource.getUri(), ex);
     } else if (cause instanceof InterruptedException) {
