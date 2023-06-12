@@ -61,55 +61,6 @@ public class ResteasyDockerClientBuilder extends BaseDockerClientBuilder<Resteas
   }
   
   @Override
-  protected Client createNoTimeoutClient() {
-    ResteasyClientBuilder builder = (ResteasyClientBuilder) ResteasyClientBuilder.newBuilder();
-
-    RequestConfig requestConfig = RequestConfig.custom()
-      .setConnectionRequestTimeout((int) connectTimeoutMillis)
-      .setConnectTimeout((int) connectTimeoutMillis)
-      .setSocketTimeout(-1)
-      .build();
-    
-    Registry<ConnectionSocketFactory> schemeRegistry = getSchemeRegistry(uri, dockerCertificatesStore);
-    HttpClientConnectionManager cm = getConnectionManager(uri, schemeRegistry, connectionPoolSize);
-    HttpClientBuilder httpClientBuilder = HttpClients.custom()
-        .setConnectionManager(cm)
-        .setDefaultRequestConfig(requestConfig);
-    
-    ProxyConfiguration proxyConfiguration = proxyFromEnv();
-    if (useProxy && proxyConfiguration != null) {
-      if (proxyConfiguration.username() != null && proxyConfiguration.password() != null) {
-        Credentials credentials = new UsernamePasswordCredentials(proxyConfiguration.username(), proxyConfiguration.password());
-        CredentialsProvider credProvider = new BasicCredentialsProvider();
-        credProvider.setCredentials(new AuthScope(proxyConfiguration.host(), Integer.parseInt(proxyConfiguration.port())), credentials);
-        httpClientBuilder.setDefaultCredentialsProvider(credProvider);
-      }
-      httpClientBuilder
-        .setProxy(new HttpHost(proxyConfiguration.host(), Integer.parseInt(proxyConfiguration.port())))
-        .setProxyAuthenticationStrategy(new ProxyAuthenticationStrategy());
-    }
-    
-    ApacheHttpClient43Engine engine = new ApacheHttpClient43Engine(httpClientBuilder.build(), false);
-    
-    if (entityProcessing != null) {
-      switch (entityProcessing) {
-        case BUFFERED:
-          engine.setChunked(false);
-          break;
-        case CHUNKED:
-          engine.setChunked(true);
-          break;
-        default:
-          throw new IllegalArgumentException("Invalid entity processing mode " + entityProcessing);
-      }
-    }
-    builder.httpEngine(engine)
-      .register(new JacksonJsonProvider());
-    
-    return builder.build();
-  }
-  
-  @Override
   protected Client createClient() {
     ResteasyClientBuilder builder = (ResteasyClientBuilder) ResteasyClientBuilder.newBuilder();
 

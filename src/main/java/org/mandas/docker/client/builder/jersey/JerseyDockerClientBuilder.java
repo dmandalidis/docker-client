@@ -61,48 +61,6 @@ public class JerseyDockerClientBuilder extends BaseDockerClientBuilder<JerseyDoc
   }
   
   @Override
-  protected Client createNoTimeoutClient() {
-    Registry<ConnectionSocketFactory> schemeRegistry = getSchemeRegistry(uri, dockerCertificatesStore);
-    
-    final HttpClientConnectionManager cm = getConnectionManager(uri, schemeRegistry, connectionPoolSize);
-
-    final RequestConfig requestConfig = RequestConfig.custom()
-        .setConnectionRequestTimeout((int) connectTimeoutMillis)
-        .setConnectTimeout((int) connectTimeoutMillis)
-        .setSocketTimeout(0)
-        .build();
-
-    ClientConfig config = new ClientConfig(JacksonFeature.class);
-    
-    if (useProxy) {
-      config = updateProxy(config);
-    }
-    
-    config
-      .connectorProvider(new ApacheConnectorProvider())
-      .property(ApacheClientProperties.CONNECTION_MANAGER, cm)
-      .property(ApacheClientProperties.CONNECTION_MANAGER_SHARED, "true")
-      .property(ApacheClientProperties.REQUEST_CONFIG, requestConfig);
-
-    if (entityProcessing != null) {
-      switch (entityProcessing) {
-        case BUFFERED:
-          config.property(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.BUFFERED);
-          break;
-        case CHUNKED:
-          config.property(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.CHUNKED);
-          break;
-        default:
-          throw new IllegalArgumentException("Invalid entity processing mode " + entityProcessing);
-      }
-    }
-
-    return ClientBuilder.newBuilder()
-        .withConfig(config)
-        .build();
-  }
-  
-  @Override
   protected Client createClient() {
     Registry<ConnectionSocketFactory> schemeRegistry = getSchemeRegistry(uri, dockerCertificatesStore);
     

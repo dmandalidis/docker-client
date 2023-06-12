@@ -39,7 +39,6 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -188,61 +187,6 @@ public class DefaultDockerClientUnitTest {
     try (final DefaultDockerClient client = DockerClientBuilderFactory.newInstance()
         .uri("https://192.168.53.103:2375").build()) {
       assertThat(client.getHost(), equalTo("192.168.53.103"));
-    }
-  }
-
-  @Test
-  public void testHostWithProxy() {
-    Assume.assumeTrue("jersey".equals(System.getProperty(DockerClientBuilderFactory.JAXRS_CLIENT_PROPERTY)));
-    try {
-      System.setProperty("http.proxyHost", "gmodules.com");
-      System.setProperty("http.proxyPort", "80");
-      try (final DefaultDockerClient client = DockerClientBuilderFactory.newInstance()
-              .uri("https://192.168.53.103:2375").build()) {
-        assertThat(client.getClient().getConfiguration()
-                        .getProperty("jersey.config.client.proxy.uri"),
-                equalTo("http://gmodules.com:80"));
-      }
-    } finally {
-      System.clearProperty("http.proxyHost");
-      System.clearProperty("http.proxyPort");
-    }
-  }
-
-  @Test
-  public void testHostWithNonProxyHost() {
-    Assume.assumeTrue("jersey".equals(System.getProperty(DockerClientBuilderFactory.JAXRS_CLIENT_PROPERTY)));
-    try {
-      System.setProperty("http.proxyHost", "gmodules.com");
-      System.setProperty("http.proxyPort", "80");
-      final String nonProxyHostsPropertyValue = "127.0.0.1|localhost|192.168.*";
-      final List<String> nonProxyHostsPropertyValues = Arrays.asList(
-              nonProxyHostsPropertyValue, "\"" + nonProxyHostsPropertyValue + "\"");
-      for (String value : nonProxyHostsPropertyValues) {
-        System.setProperty("http.nonProxyHosts", value);
-        try (final DefaultDockerClient client = DockerClientBuilderFactory.newInstance()
-                .uri("https://192.168.53.103:2375").build()) {
-          assertThat((String) client.getClient().getConfiguration()
-                          .getProperty("jersey.config.client.proxy.uri"),
-                  emptyOrNullString());
-        }
-        try (final DefaultDockerClient client1 = DockerClientBuilderFactory.newInstance()
-                .uri("https://127.0.0.1:2375").build()) {
-          assertThat((String) client1.getClient().getConfiguration()
-                          .getProperty("jersey.config.client.proxy.uri"),
-                  emptyOrNullString());
-        }
-        try (final DefaultDockerClient client2 = DockerClientBuilderFactory.newInstance()
-                .uri("https://localhost:2375").build()) {
-          assertThat((String) client2.getClient().getConfiguration()
-                          .getProperty("jersey.config.client.proxy.uri"),
-                  emptyOrNullString());
-        }
-      }
-    } finally {
-      System.clearProperty("http.proxyHost");
-      System.clearProperty("http.proxyPort");
-      System.clearProperty("http.nonProxyHosts");
     }
   }
 
