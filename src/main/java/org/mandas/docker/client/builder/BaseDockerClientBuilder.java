@@ -83,7 +83,6 @@ public abstract class BaseDockerClientBuilder<B extends BaseDockerClientBuilder<
   protected RegistryAuthSupplier registryAuthSupplier;
   protected Map<String, Object> headers = new HashMap<>();
   protected Client client;
-  protected Client noTimeoutClient;
   protected EntityProcessing entityProcessing;
 
   private B self() {
@@ -224,8 +223,6 @@ public abstract class BaseDockerClientBuilder<B extends BaseDockerClientBuilder<
   
   protected abstract Client createClient();
   
-  protected abstract Client createNoTimeoutClient();
-  
   protected ProxyConfiguration proxyFromEnv() {
     final String proxyHost = System.getProperty("http.proxyHost");
     if (proxyHost == null) {
@@ -272,9 +269,6 @@ public abstract class BaseDockerClientBuilder<B extends BaseDockerClientBuilder<
     this.client = createClient()
         .register(ObjectMapperProvider.class);
     
-    this.noTimeoutClient = createNoTimeoutClient()
-        .register(ObjectMapperProvider.class);
-    
     if (uri.getScheme().equals(UNIX_SCHEME)) {
       this.uri = UnixConnectionSocketFactory.sanitizeUri(uri);
     } else if (uri.getScheme().equals(NPIPE_SCHEME)) {
@@ -286,7 +280,7 @@ public abstract class BaseDockerClientBuilder<B extends BaseDockerClientBuilder<
       registryAuthSupplier(new ConfigFileRegistryAuthSupplier());
     }
     
-    return new DefaultDockerClient(apiVersion, registryAuthSupplier, uri, client, noTimeoutClient, headers);
+    return new DefaultDockerClient(apiVersion, registryAuthSupplier, uri, client, headers);
   }
 
   protected HttpClientConnectionManager getConnectionManager(URI uri, Registry<ConnectionSocketFactory> schemeRegistry, int connectionPoolSize) {
