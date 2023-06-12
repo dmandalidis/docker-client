@@ -342,10 +342,6 @@ public class DefaultDockerClient implements DockerClient, Closeable {
     return client;
   }
   
-  Client getNotimeoutClient() {
-    return notimeoutClient;
-  }
-
   /**
    * Create a new client using the configuration of the builder.
    * @param apiVersion the specific API version of the Docker engine 
@@ -376,7 +372,7 @@ public class DefaultDockerClient implements DockerClient, Closeable {
 
   @Override
   public String ping() throws DockerException, InterruptedException {
-    final WebTarget resource = client.target(uri).path("_ping");
+    final WebTarget resource = resource().path("_ping");
     return request(GET, String.class, resource, resource.request());
   }
 

@@ -387,7 +387,7 @@ public class DefaultDockerClientTest {
     sut.pull(BUSYBOX_BUILDROOT_2013_08_1);
   }
 
-  @Test(expected = ImageNotFoundException.class) @Ignore 
+  @Test(expected = ImageNotFoundException.class) 
   public void testPullBadImage() throws Exception {
     sut.pull(randomName());
   }
