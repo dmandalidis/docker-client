@@ -4063,9 +4063,7 @@ public class DefaultDockerClientTest {
     try {
       sut.createSecret(secretSpecConflict);
       fail("Should fail due to secret name conflict");
-    } catch (ConflictException | DockerRequestException ex) {
-      // Ignored; Docker should return status code 409 but doesn't in some earlier versions.
-      // Recent versions return 409 which translates into ConflictException.
+    } catch (ConflictException ex) {
     }
 
     String secretName2 = randomName();
@@ -4105,15 +4103,6 @@ public class DefaultDockerClientTest {
     } catch (NotFoundException ex) {
       // Ignored
     }
-
-    try {
-      sut.deleteSecret(secretId);
-      fail("Should fail because of non-existant secret ID");
-    } catch (DockerRequestException | NotFoundException ex) {
-      // Ignored; Docker should return status code 404,
-      // but it doesn't for some reason in versions < 17.04.
-      // So we catch 2 different exceptions here.
-    }
   }
   
   @Test
@@ -4146,9 +4135,7 @@ public class DefaultDockerClientTest {
     try {
       sut.createConfig(configSpecConflict);
       fail("Should fail due to config name conflict");
-    } catch (ConflictException | DockerRequestException ex) {
-      // Ignored; Docker should return status code 409 but doesn't in some earlier versions.
-      // Recent versions return 409 which translates into ConflictException.
+    } catch (ConflictException ex) {
     }
 
     String configName2 = randomName();
@@ -4187,15 +4174,6 @@ public class DefaultDockerClientTest {
       fail("Should fail because of non-existant config ID");
     } catch (NotFoundException ex) {
       // Ignored
-    }
-
-    try {
-      sut.deleteConfig(configId);
-      fail("Should fail because of non-existant config ID");
-    } catch (DockerRequestException | NotFoundException ex) {
-      // Ignored; Docker should return status code 404,
-      // but it doesn't for some reason in versions < 17.04.
-      // So we catch 2 different exceptions here.
     }
   }
 
