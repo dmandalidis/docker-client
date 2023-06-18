@@ -24,7 +24,7 @@ case "$1" in
     sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 
     sudo apt-get -qq update
-    sudo apt-get -qq remove --purge docker docker-engine docker.io containerd runc
+    sudo apt-get -qq remove --purge docker.io docker-doc docker-compose podman-docker containerd runc
     sudo mkdir -p /etc/systemd/system/docker.service.d/
     sudo cp .github/files/exec-override.conf /etc/systemd/system/docker.service.d/exec-override.conf
     sudo systemctl daemon-reload
