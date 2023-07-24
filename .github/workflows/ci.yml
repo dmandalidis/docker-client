@@ -15,7 +15,7 @@ on:
     tags:
 
 env:
-  DOCKER_VERSION: 24.0.2
+  DOCKER_VERSION: 24.0.5
 
 jobs:
   build:
