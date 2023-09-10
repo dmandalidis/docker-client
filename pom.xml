@@ -73,7 +73,7 @@
 		<version.plugin.spotbugs>4.7.3.5</version.plugin.spotbugs>
 		<version.plugin.compiler>3.11.0</version.plugin.compiler>
 		<version.plugin.checkstyle>3.3.0</version.plugin.checkstyle>
-		<version.plugin.enforcer>3.4.0</version.plugin.enforcer>
+		<version.plugin.enforcer>3.4.1</version.plugin.enforcer>
 		<version.plugin.jar>3.3.0</version.plugin.jar>
 		<version.plugin.projectinfo>3.4.5</version.plugin.projectinfo>
 		<version.plugin.source>3.3.0</version.plugin.source>
