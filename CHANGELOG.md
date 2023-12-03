@@ -1,5 +1,19 @@
 # Change Log
 
+## 7.0.4 - notable changes
+
+* Bump ch.qos.logback:logback-classic from 1.4.7 to 1.4.13
+* Bump com.fasterxml.jackson:jackson-bom from 2.15.2 to 2.16.0
+* Bump org.immutables:value from 2.9.3 to 2.10.0
+* Bump com.github.jnr:jnr-unixsocket from 0.38.20 to 0.38.21
+* Bump org.apache.commons:commons-compress from 1.23.0 to 1.25.0
+* Bump org.slf4j:slf4j-api from 2.0.7 to 2.0.9
+* Bump version.jersey from 3.1.2 to 3.1.3
+* Bump jimfs from 1.2 to 1.3.0
+* Bump google-auth-library-oauth2-http from 1.17.0 to 1.20.0
+* Fix unclosed connections
+* Drop internal no-timeout client
+
 ## 7.0.3 - notable changes
 
 * Ignore proxy configuration when non-http(s) URI is used (fixes #601)
