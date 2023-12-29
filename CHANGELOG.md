@@ -1,5 +1,13 @@
 # Change Log
 
+## 7.0.5 - notable changes
+
+* Bump com.fasterxml.jackson:jackson-bom from 2.16.0 to 2.16.1
+* Bump org.slf4j:slf4j-api from 2.0.9 to 2.0.10
+* Bump version.jersey from 3.1.4 to 3.1.5
+* Bump ch.qos.logback:logback-classic from 1.4.13 to 1.4.14
+* Bump version.jersey from 3.1.3 to 3.1.4
+
 ## 7.0.4 - notable changes
 
 * Bump ch.qos.logback:logback-classic from 1.4.7 to 1.4.13
