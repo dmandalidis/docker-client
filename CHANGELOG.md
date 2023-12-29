@@ -1,5 +1,9 @@
 # Change Log
 
+## 7.0.6 - notable changes
+
+* Switch to org.bouncycastle:bcpkix-jdk18on
+
 ## 7.0.5 - notable changes
 
 * Bump com.fasterxml.jackson:jackson-bom from 2.16.0 to 2.16.1
