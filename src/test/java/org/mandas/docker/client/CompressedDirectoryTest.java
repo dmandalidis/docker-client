@@ -55,7 +55,7 @@ public class CompressedDirectoryTest {
 
       final List<String> names = new ArrayList<>();
       TarArchiveEntry entry;
-      while ((entry = tarIn.getNextTarEntry()) != null) {
+      while ((entry = tarIn.getNextEntry()) != null) {
         final String name = entry.getName();
         names.add(name);
       }
@@ -76,7 +76,7 @@ public class CompressedDirectoryTest {
 
       final List<String> names = new ArrayList<>();
       TarArchiveEntry entry;
-      while ((entry = tarIn.getNextTarEntry()) != null) {
+      while ((entry = tarIn.getNextEntry()) != null) {
         final String name = entry.getName();
         names.add(name);
       }
@@ -99,7 +99,7 @@ public class CompressedDirectoryTest {
 
       final List<String> names = new ArrayList<>();
       TarArchiveEntry entry;
-      while ((entry = tarIn.getNextTarEntry()) != null) {
+      while ((entry = tarIn.getNextEntry()) != null) {
         final String name = entry.getName();
         names.add(name);
       }

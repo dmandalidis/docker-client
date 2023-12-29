@@ -545,7 +545,7 @@ public class DefaultDockerClient implements DockerClient {
 
   private void containerAction(final String containerId, final String action)
       throws DockerException, InterruptedException {
-    containerAction(containerId, action, new MultivaluedHashMap<String, String>());
+    containerAction(containerId, action, new MultivaluedHashMap<>());
   }
 
   private void containerAction(final String containerId, final String action,
