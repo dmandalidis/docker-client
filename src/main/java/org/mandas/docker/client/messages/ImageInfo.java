@@ -24,6 +24,7 @@ package org.mandas.docker.client.messages;
 import java.util.Date;
 
 import org.immutables.value.Value.Immutable;
+import org.immutables.value.Value.Default;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -69,8 +70,12 @@ public interface ImageInfo {
   @JsonProperty("Size")
   Long size();
 
+  @Deprecated
+  @Default
   @JsonProperty("VirtualSize")
-  Long virtualSize();
+  default Long virtualSize() {
+    return size();
+  }
 
   @Nullable
   @JsonProperty("RootFS")
