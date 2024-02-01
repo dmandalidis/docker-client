@@ -24,6 +24,7 @@ package org.mandas.docker.client.messages;
 import java.util.List;
 import java.util.Map;
 
+import org.immutables.value.Value.Default;
 import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
@@ -54,8 +55,12 @@ public interface Image {
   @JsonProperty("Size")
   Long size();
 
+  @Deprecated
+  @Default
   @JsonProperty("VirtualSize")
-  Long virtualSize();
+  default Long virtualSize() {
+    return size();
+  }
 
   @Nullable
   @JsonProperty("Labels")
