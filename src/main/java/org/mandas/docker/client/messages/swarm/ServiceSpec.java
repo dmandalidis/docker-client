@@ -53,6 +53,7 @@ public interface ServiceSpec {
   @JsonProperty("UpdateConfig")
   UpdateConfig updateConfig();
 
+  @Deprecated // as of v1.44
   @Nullable
   @JsonProperty("Networks")
   List<NetworkAttachmentConfig> networks();
