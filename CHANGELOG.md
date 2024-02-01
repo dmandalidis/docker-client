@@ -1,5 +1,13 @@
 # Change Log
 
+## 7.0.7 - notable changes
+
+* Add deprecations
+* Deprecate MacAddress
+* Deprecate virtualSize from Image
+* Fix ImageInfo message for Docker 25.0
+* Bump org.slf4j:slf4j-api from 2.0.10 to 2.0.11
+
 ## 7.0.6 - notable changes
 
 * Switch to org.bouncycastle:bcpkix-jdk18on
