@@ -2171,6 +2171,8 @@ public class DefaultDockerClient implements DockerClient {
       switch (e.status()) {
         case 404:
           throw new NotFoundException("Plugin not found", e);
+        case 409:
+          throw new ConflictException("Network already exists", e);
         default:
           throw e;
       }
