@@ -40,10 +40,12 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 @Immutable
 public interface NetworkSettings {
 
+  @Deprecated // as of v1.44
   @Nullable
   @JsonProperty("IPAddress")
   String ipAddress();
 
+  @Deprecated // as of v1.44
   @Nullable
   @JsonProperty("IPPrefixLen")
   Integer ipPrefixLen();
@@ -79,6 +81,7 @@ public interface NetworkSettings {
   @JsonProperty("Ports")
   Map<String, List<PortBinding>> nullValuedPorts();
 
+  @Deprecated // as of v1.44
   @Nullable
   @JsonProperty("MacAddress")
   String macAddress();
@@ -99,14 +102,17 @@ public interface NetworkSettings {
   @JsonProperty("SandboxKey")
   String sandboxKey();
 
+  @Deprecated // as of v1.44
   @Nullable
   @JsonProperty("HairpinMode")
   Boolean hairpinMode();
 
+  @Deprecated // as of v1.44
   @Nullable
   @JsonProperty("LinkLocalIPv6Address")
   String linkLocalIPv6Address();
 
+  @Deprecated // as of v1.44
   @Nullable
   @JsonProperty("LinkLocalIPv6PrefixLen")
   Integer linkLocalIPv6PrefixLen();

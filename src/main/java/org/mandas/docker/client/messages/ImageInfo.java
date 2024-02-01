@@ -46,9 +46,11 @@ public interface ImageInfo {
   @JsonProperty("Created")
   Date created();
 
+  @Deprecated // as of v1.44
   @JsonProperty("Container")
   String container();
 
+  @Deprecated // as of v1.44
   @JsonProperty("ContainerConfig")
   ContainerConfig containerConfig();
 
@@ -70,7 +72,7 @@ public interface ImageInfo {
   @JsonProperty("Size")
   Long size();
 
-  @Deprecated
+  @Deprecated // as of v1.43
   @Default
   @JsonProperty("VirtualSize")
   default Long virtualSize() {

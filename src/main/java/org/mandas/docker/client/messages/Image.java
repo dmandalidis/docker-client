@@ -55,7 +55,7 @@ public interface Image {
   @JsonProperty("Size")
   Long size();
 
-  @Deprecated
+  @Deprecated // as of v1.44
   @Default
   @JsonProperty("VirtualSize")
   default Long virtualSize() {
