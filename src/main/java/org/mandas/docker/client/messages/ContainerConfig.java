@@ -126,6 +126,7 @@ public interface ContainerConfig {
   @JsonProperty("Labels")
   Map<String, String> labels();
 
+  @Deprecated
   @Nullable
   @JsonProperty("MacAddress")
   String macAddress();

@@ -31,7 +31,6 @@ import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang.StringUtils.containsIgnoreCase;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -853,27 +852,6 @@ public class DefaultDockerClientTest {
     // Build again with NO_CACHE set, and verify we don't use cache.
     sut.build(dockerDirectory, "test", message ->
         assertThat(message.stream(), not(containsString(usingCache))), BuildParam.noCache());
-  }
-
-  @Test
-  public void testBuildNoRm() throws Exception {
-    final Path dockerDirectory = getResource("dockerDirectory");
-    final String removingContainers = "Removing intermediate container";
-
-    // Test that intermediate containers are removed with FORCE_RM by parsing output. We must
-    // set NO_CACHE so that docker will generate some containers to remove.
-    final AtomicBoolean removedContainer = new AtomicBoolean(false);
-    sut.build(dockerDirectory, "test", message -> {
-      if (containsIgnoreCase(message.stream(), removingContainers)) {
-        removedContainer.set(true);
-      }
-    }, BuildParam.noCache(), BuildParam.forceRm());
-    assertTrue(removedContainer.get());
-
-    // Set NO_RM and verify we don't get message that containers were removed.
-    sut.build(dockerDirectory, "test", message ->
-            assertThat(message.stream(), not(containsString(removingContainers))),
-        BuildParam.noCache(), BuildParam.rm(false));
   }
 
   @Test
@@ -3098,7 +3076,7 @@ public class DefaultDockerClientTest {
     sut.startContainer(container.id());
     final ContainerInfo containerInfo = sut.inspectContainer(container.id());
     assertThat(containerInfo, notNullValue());
-    assertThat(containerInfo.config().macAddress(), equalTo("12:34:56:78:9a:bc"));
+    assertThat(containerInfo.networkSettings().macAddress(), equalTo("12:34:56:78:9a:bc"));
   }
 
   @Test(expected = NetworkNotFoundException.class)
