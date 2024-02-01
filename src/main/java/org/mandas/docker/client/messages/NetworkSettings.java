@@ -56,7 +56,6 @@ public interface NetworkSettings {
   @JsonProperty("Bridge")
   String bridge();
 
-  // TODO: API break: Return null values
   @Nullable
   @JsonProperty("PortMapping")
   Map<String, Map<String, String>> portMapping();
