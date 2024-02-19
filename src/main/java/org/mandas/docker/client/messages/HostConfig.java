@@ -153,11 +153,6 @@ public interface HostConfig {
   Long memorySwap();
 
   @Nullable
-  @JsonProperty("KernelMemory")
-  @Deprecated // as of v1.41
-  Long kernelMemory();
-
-  @Nullable
   @JsonProperty("MemorySwappiness")
   Integer memorySwappiness();
 
@@ -413,9 +408,6 @@ public interface HostConfig {
 
     Builder memorySwappiness(Integer memorySwappiness);
     
-    @Deprecated // as of 20.10.0
-    Builder kernelMemory(Long kernelMemory);
-
     Builder memoryReservation(Long memoryReservation);
 
     Builder nanoCpus(Long nanoCpus);
