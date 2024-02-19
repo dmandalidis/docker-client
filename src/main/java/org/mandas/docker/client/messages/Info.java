@@ -45,11 +45,6 @@ public interface Info {
   String architecture();
 
   @Nullable
-  @JsonProperty("ClusterStore")
-  @Deprecated // as of v1.41
-  String clusterStore();
-
-  @Nullable
   @JsonProperty("CgroupDriver")
   String cgroupDriver();
 
@@ -123,11 +118,6 @@ public interface Info {
   @Nullable
   @JsonProperty("InitSha1")
   String initSha1();
-
-  @Nullable
-  @JsonProperty("KernelMemory")
-  @Deprecated // as of v1.41
-  Boolean kernelMemory();
 
   @JsonProperty("KernelVersion")
   String kernelVersion();
