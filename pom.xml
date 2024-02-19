@@ -54,7 +54,7 @@
 		<version.jersey>3.1.5</version.jersey>
 		<version.resteasy>6.1.0.Final</version.resteasy>
 		<version.immutables>2.10.0</version.immutables>
-		<version.apache.compress>1.25.0</version.apache.compress>
+		<version.apache.compress>1.26.0</version.apache.compress>
 		<version.unixsocket>0.38.21</version.unixsocket>
 		<version.apache.lang>2.6</version.apache.lang>
 		<version.bcpkix>1.77</version.bcpkix>
