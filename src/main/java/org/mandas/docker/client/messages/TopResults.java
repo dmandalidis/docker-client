@@ -5,7 +5,7 @@
  * Copyright (C) 2016 Spotify AB
  * Copyright (c) 2014 Oleg Poleshuk
  * Copyright (c) 2014 CyDesign Ltd
- * Copyright (C) 9/2019 - 2020 Dimitris Mandalidis
+ * Copyright (C) 9/2019 - now Dimitris Mandalidis
  * --
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

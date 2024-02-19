@@ -3,7 +3,7 @@
  * docker-client
  * --
  * Copyright (C) 2016 Spotify AB
- * Copyright (C) 9/2019 - 2020 Dimitris Mandalidis
+ * Copyright (C) 9/2019 - now Dimitris Mandalidis
  * --
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,16 +48,5 @@ public interface PortBinding {
 
   public static PortBinding randomPort(final String ip) {
     return ImmutablePortBinding.builder().hostIp(ip).hostPort("").build();
-  }
-  
-  /**
-   * @param hostIp the host IP
-   * @param hostPort the host port
-   * @return a new PortBinding
-   * @deprecated use {@link #of(String, String)} instead
-   */
-  @Deprecated
-  public static PortBinding create(final String hostIp, final String hostPort) {
-	return ImmutablePortBinding.builder().hostIp(hostIp).hostPort(hostPort).build();  
   }
 }
