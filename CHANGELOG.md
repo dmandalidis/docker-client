@@ -1,5 +1,9 @@
 # Change Log
 
+## 7.0.8 - notable changes
+
+* Bump org.apache.commons:commons-compress from 1.25.0 to 1.26.0
+
 ## 7.0.7 - notable changes
 
 * Add deprecations
