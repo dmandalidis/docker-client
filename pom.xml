@@ -81,7 +81,7 @@
 		<version.plugin.javadoc>3.6.3</version.plugin.javadoc>
 		<version.plugin.jacoco>0.8.11</version.plugin.jacoco>
 		<version.plugin.staging>1.6.13</version.plugin.staging>
-		<version.plugin.gpg>3.1.0</version.plugin.gpg>
+		<version.plugin.gpg>3.2.1</version.plugin.gpg>
 		<version.plugin.surefire>3.2.5</version.plugin.surefire>
 		<version.plugin.bundle>5.1.9</version.plugin.bundle>
 		<version.plugin.pmd>3.21.2</version.plugin.pmd>
