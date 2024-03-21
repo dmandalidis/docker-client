@@ -657,18 +657,22 @@ public interface HostConfig {
   @Immutable
   public interface DeviceRequest {
 	  
+	  @Nullable
 	  @JsonProperty("Driver")
 	  String driver();
 	  
+	  @Nullable
 	  @JsonProperty("Count")
 	  Integer count();
 	  
+	  @Nullable
 	  @JsonProperty("DeviceIDs")
 	  List<String> deviceIds();
 	  
 	  @JsonProperty("Capabilities")
 	  List<List<String>> capabilities();
 	  
+	  @Nullable
 	  @JsonProperty("Options")
 	  Map<String, String> options();
 	  
