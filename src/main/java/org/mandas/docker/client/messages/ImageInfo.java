@@ -48,10 +48,12 @@ public interface ImageInfo {
 
   @Deprecated // as of v1.44
   @JsonProperty("Container")
+  @Nullable
   String container();
 
   @Deprecated // as of v1.44
   @JsonProperty("ContainerConfig")
+  @Nullable
   ContainerConfig containerConfig();
 
   @JsonProperty("DockerVersion")
