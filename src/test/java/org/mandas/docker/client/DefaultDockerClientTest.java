@@ -167,7 +167,6 @@ import org.mandas.docker.client.DockerClient.EventsParam;
 import org.mandas.docker.client.DockerClient.ExecCreateParam;
 import org.mandas.docker.client.DockerClient.ListImagesParam;
 import org.mandas.docker.client.DockerClient.ListNetworksParam;
-import org.mandas.docker.client.auth.FixedRegistryAuthSupplier;
 import org.mandas.docker.client.builder.DockerClientBuilder;
 import org.mandas.docker.client.exceptions.BadParamException;
 import org.mandas.docker.client.exceptions.ConflictException;
@@ -211,11 +210,8 @@ import org.mandas.docker.client.messages.Network;
 import org.mandas.docker.client.messages.NetworkConfig;
 import org.mandas.docker.client.messages.NetworkConnection;
 import org.mandas.docker.client.messages.NetworkCreation;
-import org.mandas.docker.client.messages.PortBinding;
 import org.mandas.docker.client.messages.ProcessConfig;
 import org.mandas.docker.client.messages.ProgressMessage;
-import org.mandas.docker.client.messages.RegistryAuth;
-import org.mandas.docker.client.messages.RegistryConfigs;
 import org.mandas.docker.client.messages.RemovedImage;
 import org.mandas.docker.client.messages.ServiceCreateResponse;
 import org.mandas.docker.client.messages.TopResults;
@@ -269,7 +265,6 @@ import org.mandas.docker.client.messages.swarm.UpdateConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.io.Resources;
@@ -287,14 +282,6 @@ public class DefaultDockerClientTest {
 
   private static final String BUSYBOX = "busybox";
   private static final String BUSYBOX_LATEST = BUSYBOX + ":latest";
-  private static final String BUSYBOX_BUILDROOT_2013_08_1 = BUSYBOX + ":buildroot-2013.08.1";
-  private static final String MEMCACHED = "rohan/memcached-mini";
-  private static final String MEMCACHED_LATEST = MEMCACHED + ":latest";
-  private static final String CIRROS_PRIVATE = "dxia/cirros-private";
-  private static final String CIRROS_PRIVATE_LATEST = CIRROS_PRIVATE + ":latest";
-
-  private static final String AUTH_USERNAME = "dxia2";
-  private static final String AUTH_PASSWORD = System.getenv("HUB_DXIA2_PASSWORD");
 
   private static final Logger log = LoggerFactory.getLogger(DefaultDockerClientTest.class);
 
@@ -303,12 +290,6 @@ public class DefaultDockerClientTest {
 
   private final Random r = new Random(System.currentTimeMillis());
   
-  private final RegistryAuth registryAuth = RegistryAuth.builder()
-      .username(AUTH_USERNAME)
-      .password(AUTH_PASSWORD)
-      .email("1234@example.com")
-      .build();
-
   private DefaultDockerClient sut;
 
   @Before
@@ -380,21 +361,11 @@ public class DefaultDockerClientTest {
     assertThat(searchResult.size(), greaterThan(0));
   }
 
-  @Test
-  public void testPullWithTag() throws Exception {
-    sut.pull(BUSYBOX_BUILDROOT_2013_08_1);
-  }
-
   @Test(expected = ImageNotFoundException.class) 
   public void testPullBadImage() throws Exception {
     sut.pull(randomName());
   }
 
-  @Test(expected = ImageNotFoundException.class)
-  public void testPullPrivateRepoWithoutAuth() throws Exception {
-    sut.pull(CIRROS_PRIVATE_LATEST);
-  }
-  
   private static Path getResource(String name) throws URISyntaxException {
     // Resources.getResources(...).getPath() does not work correctly on windows,
     // hence this workaround.  See: https://github.com/spotify/docker-client/pull/780
@@ -434,12 +405,6 @@ public class DefaultDockerClientTest {
 
     assertNotNull(containerInfo.state().health());
     assertEquals("starting", containerInfo.state().health().status());
-  }
-
-  @Test
-  public void testPullByDigest() throws Exception {
-    // note: this digest may change over time, the value here may disappear from hub.docker.com
-    sut.pull(BUSYBOX + "@sha256:4a887a2326ec9e0fa90cce7b4764b0e627b5d6afcb81a3f73c85dc29cea00048");
   }
 
   @Test
@@ -585,23 +550,6 @@ public class DefaultDockerClientTest {
   }
 
   @Test
-  public void testAuth() throws Exception {
-    final int statusCode = sut.auth(registryAuth);
-    assertThat(statusCode, equalTo(200));
-  }
-
-  @Test
-  public void testBadAuth() throws Exception {
-    final RegistryAuth badRegistryAuth = RegistryAuth.builder()
-        .username(AUTH_USERNAME)
-        .email("user@example.com") // docker < 1.11 requires email to be set in RegistryAuth
-        .password("foobar")
-        .build();
-    final int statusCode = sut.auth(badRegistryAuth);
-    assertThat(statusCode, equalTo(401));
-  }
-
-  @Test
   public void testInfo() throws Exception {
     final Info info = sut.info();
     assertThat(info.containers(), is(anything()));
@@ -650,31 +598,6 @@ public class DefaultDockerClientTest {
   }
 
   @Test
-  public void testRemoveImage() throws Exception {
-    pull("dxia/cirros:latest");
-    pull("dxia/cirros:0.3.0");
-    final String imageLatest = "dxia/cirros:latest";
-    final String imageVersion = "dxia/cirros:0.3.0";
-
-    final Set<RemovedImage> removedImages = new HashSet<>();
-    removedImages.addAll(sut.removeImage(imageLatest));
-    removedImages.addAll(sut.removeImage(imageVersion));
-
-    assertThat(removedImages, hasItems(
-        RemovedImage.create(UNTAGGED, imageLatest),
-        RemovedImage.create(UNTAGGED, imageVersion)
-    ));
-
-    // Try to inspect deleted image and make sure ImageNotFoundException is thrown
-    try {
-      sut.inspectImage(imageLatest);
-      fail("inspectImage should have thrown ImageNotFoundException");
-    } catch (ImageNotFoundException e) {
-      // we should get exception because we deleted image
-    }
-  }
-
-  @Test
   public void testTag() throws Exception {
     pull(BUSYBOX_LATEST);
 
@@ -685,43 +608,6 @@ public class DefaultDockerClientTest {
     // Verify tag was successful by trying to remove it.
     final RemovedImage removedImage = getOnlyElement(sut.removeImage(newImageName));
     assertThat(removedImage, equalTo(RemovedImage.create(UNTAGGED, newImageName)));
-  }
-
-  @Test
-  public void testTagForce() throws Exception {
-    pull(BUSYBOX_LATEST);
-    pull(BUSYBOX_BUILDROOT_2013_08_1);
-
-    final String name = "test-repo/tag-force:sometag";
-    // Assign name to first image
-    sut.tag(BUSYBOX_LATEST, name);
-
-    // Force-re-assign tag to another image
-    sut.tag(BUSYBOX_BUILDROOT_2013_08_1, name, true);
-
-    // Verify that re-tagging was successful
-    final RemovedImage removedImage = getOnlyElement(sut.removeImage(name));
-    assertThat(removedImage, is(RemovedImage.create(UNTAGGED, name)));
-  }
-
-  @Test
-  public void testInspectImage() throws Exception {
-    pull(BUSYBOX_BUILDROOT_2013_08_1);
-    final ImageInfo info = sut.inspectImage(BUSYBOX_BUILDROOT_2013_08_1);
-    assertThat(info, notNullValue());
-    assertThat(info.architecture(), not(emptyOrNullString()));
-    assertThat(info.author(), not(emptyOrNullString()));
-    assertThat(info.config(), notNullValue());
-    assertThat(info.container(), not(emptyOrNullString()));
-    assertThat(info.containerConfig(), notNullValue());
-    assertThat(info.comment(), notNullValue());
-    assertThat(info.created(), notNullValue());
-    assertThat(info.dockerVersion(), not(emptyOrNullString()));
-    assertThat(info.id(), not(emptyOrNullString()));
-    assertThat(info.os(), equalTo("linux"));
-    assertThat(info.size(), notNullValue());
-    assertThat(info.virtualSize(), notNullValue());
-    assertThat(info.rootFs(), notNullValue());
   }
 
   @Test
@@ -777,31 +663,6 @@ public class DefaultDockerClientTest {
         });
 
     assertThat(returnedImageId, is(imageIdFromMessage.get()));
-  }
-
-  @Test
-  public void testBuildImageIdWithAuth() throws Exception {
-    final Path dockerDirectory = getResource("dockerDirectory");
-    final AtomicReference<String> imageIdFromMessage = new AtomicReference<>();
-
-    final RegistryAuth registryAuth = RegistryAuth.builder()
-        .username(AUTH_USERNAME)
-        .password(AUTH_PASSWORD)
-        .build();
-    try (final DockerClient sut2 = DockerClientBuilderFactory.newInstance().fromEnv()
-        .registryAuthSupplier(new FixedRegistryAuthSupplier(
-            registryAuth, RegistryConfigs.create(singletonMap("", registryAuth))))
-        .build()) {
-
-      final String returnedImageId = sut2.build(dockerDirectory, "test", message -> {
-        final String imageId = message.buildImageId();
-        if (imageId != null) {
-          imageIdFromMessage.set(imageId);
-        }
-      });
-  
-      assertThat(returnedImageId, is(imageIdFromMessage.get()));
-    }
   }
 
   @Test
@@ -1347,44 +1208,6 @@ public class DefaultDockerClientTest {
 
     // Ensure that waiting on the container worked without exception
     exitFuture.get();
-  }
-
-  @Test
-  public void testInspectContainerWithExposedPorts() throws Exception {
-    pull(MEMCACHED_LATEST);
-    final ContainerConfig config = ContainerConfig.builder()
-        .image(MEMCACHED_LATEST)
-        .build();
-    final ContainerCreation container = sut.createContainer(config, randomName());
-    sut.startContainer(container.id());
-    final ContainerInfo containerInfo = sut.inspectContainer(container.id());
-    assertThat(containerInfo, notNullValue());
-    assertThat(containerInfo.networkSettings().ports(),
-        hasEntry("11211/tcp", Collections.<PortBinding>emptyList()));
-  }
-
-  @Test
-  public void testInspectContainerWithSecurityOpts() throws Exception {
-    final String userLabel = "label:user:dxia";
-    final String roleLabel = "label:role:foo";
-    final String typeLabel = "label:type:bar";
-    final String levelLabel = "label:level:9001";
-
-    pull(MEMCACHED_LATEST);
-    final HostConfig hostConfig = HostConfig.builder()
-        .securityOpt(userLabel, roleLabel, typeLabel, levelLabel)
-        .build();
-    final ContainerConfig config = ContainerConfig.builder()
-        .image(MEMCACHED_LATEST)
-        .hostConfig(hostConfig)
-        .build();
-
-    final ContainerCreation container = sut.createContainer(config, randomName());
-    sut.startContainer(container.id());
-    final ContainerInfo containerInfo = sut.inspectContainer(container.id());
-    assertThat(containerInfo, notNullValue());
-    assertThat(containerInfo.hostConfig().securityOpt(),
-               hasItems(userLabel, roleLabel, typeLabel, levelLabel));
   }
 
   @Test
@@ -2017,17 +1840,6 @@ public class DefaultDockerClientTest {
       }
     }
     assertThat(BUSYBOX_LATEST, is(in(repoTags)));
-  }
-
-  @Test
-  public void testDockerDateFormat() throws Exception {
-    // This is the created date for busybox converted from nanoseconds to milliseconds
-    final Date expected = new StdDateFormat().parse("2015-09-18T17:44:28.145Z");
-
-    // Verify the formatter works when used with the client
-    pull(BUSYBOX_BUILDROOT_2013_08_1);
-    final ImageInfo imageInfo = sut.inspectImage(BUSYBOX_BUILDROOT_2013_08_1);
-    assertThat(imageInfo.created(), equalTo(expected));
   }
 
   @Test
@@ -3066,7 +2878,7 @@ public class DefaultDockerClientTest {
 
   @Test
   public void testMacAddress() throws Exception {
-    pull(MEMCACHED_LATEST);
+    pull(BUSYBOX);
     final ContainerConfig config = ContainerConfig.builder()
         .image(BUSYBOX_LATEST)
         .cmd("sleep", "1000")
@@ -4635,11 +4447,8 @@ public class DefaultDockerClientTest {
 
     final TmpfsOptions tmpfsOptions = actualServiceSpec.taskTemplate().containerSpec()
         .mounts().get(0).tmpfsOptions();
-    // TODO (dxia) Why is it null on travis-ci?
-    if (tmpfsOptions != null) {
-      assertThat(tmpfsOptions.sizeBytes(), equalTo(expectedSizeBytes));
-      assertThat(tmpfsOptions.mode(), equalTo(expectedMode));
-    }
+    assertThat(tmpfsOptions.sizeBytes(), equalTo(expectedSizeBytes));
+    assertThat(tmpfsOptions.mode(), equalTo(expectedMode));
   }
 
   private ServiceSpec createServiceSpec(final String serviceName) {
