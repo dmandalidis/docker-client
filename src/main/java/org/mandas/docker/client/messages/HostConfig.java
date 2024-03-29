@@ -665,14 +665,12 @@ public interface HostConfig {
 	  @JsonProperty("Count")
 	  Integer count();
 	  
-	  @Nullable
 	  @JsonProperty("DeviceIDs")
 	  List<String> deviceIds();
 	  
 	  @JsonProperty("Capabilities")
 	  List<List<String>> capabilities();
 	  
-	  @Nullable
 	  @JsonProperty("Options")
 	  Map<String, String> options();
 	  
