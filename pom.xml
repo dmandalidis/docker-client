@@ -79,7 +79,7 @@
 		<version.plugin.source>3.3.0</version.plugin.source>
 		<version.plugin.failsafe>3.2.5</version.plugin.failsafe>
 		<version.plugin.javadoc>3.6.3</version.plugin.javadoc>
-		<version.plugin.jacoco>0.8.11</version.plugin.jacoco>
+		<version.plugin.jacoco>0.8.12</version.plugin.jacoco>
 		<version.plugin.staging>1.6.13</version.plugin.staging>
 		<version.plugin.gpg>3.2.2</version.plugin.gpg>
 		<version.plugin.surefire>3.2.5</version.plugin.surefire>
