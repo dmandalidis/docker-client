@@ -84,7 +84,7 @@
 		<version.plugin.gpg>3.2.4</version.plugin.gpg>
 		<version.plugin.surefire>3.3.1</version.plugin.surefire>
 		<version.plugin.bundle>5.1.9</version.plugin.bundle>
-		<version.plugin.pmd>3.23.0</version.plugin.pmd>
+		<version.plugin.pmd>3.24.0</version.plugin.pmd>
 	</properties>
 
 	<dependencyManagement>
