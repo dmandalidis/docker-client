@@ -209,6 +209,10 @@ public interface HostConfig {
   String pidMode();
 
   @Nullable
+  @JsonProperty("UsernsMode")
+  String usernsMode();
+
+  @Nullable
   @JsonProperty("ShmSize")
   Long shmSize();
 
@@ -458,6 +462,8 @@ public interface HostConfig {
       pidMode("host");
       return this;
     }
+
+    Builder usernsMode(String usernsMode);
 
     Builder shmSize(Long shmSize);
 
