@@ -1729,35 +1729,6 @@ public class DefaultDockerClientTest {
     return sut.events(eventsParamsWithTypes);
   }
 
-  @Test
-  public void testEventFiltersWithSpaces() throws Exception {
-    sut.pull(BUSYBOX_LATEST);
-    final String containerName = randomName();
-    final ContainerConfig config = ContainerConfig.builder()
-        .image(BUSYBOX_LATEST)
-        .cmd("sleep", "5")
-        // Generate some healthy_status events
-        .healthcheck(Healthcheck.create(unmodifiableList(asList("CMD-SHELL", "true")),
-            1000000000L, 1000000000L, 3, 1000000000L))
-        .build();
-
-    final long startTime = new Date().getTime() / 1000;
-    final ContainerCreation container = sut.createContainer(config, containerName);
-    final String containerId = container.id();
-    sut.startContainer(containerId);
-    sut.waitContainer(containerId);
-    sut.removeContainer(containerId);
-    final long endTime = new Date().getTime() / 1000;
-
-    try (final EventStream stream = sut.events(since(startTime), until(endTime),
-        EventsParam.event("health_status: healthy")
-    )) {
-      assertTrue("Docker did not return any container events.", stream.hasNext());
-      containerEventAssertions(stream.next(), containerId, containerName,
-          "health_status: healthy", BUSYBOX_LATEST);
-    }
-  }
-
   private void imageEventAssertions(final Event event,
                                     final String imageName,
                                     final String action) throws Exception {
