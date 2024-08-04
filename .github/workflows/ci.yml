@@ -16,7 +16,7 @@ on:
       - 'v*'
 
 env:
-  DOCKER_VERSION: 26.1.4
+  DOCKER_VERSION: 27.1.1
 
 jobs:
   build:
