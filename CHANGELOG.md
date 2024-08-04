@@ -1,5 +1,24 @@
 # Change Log
 
+## 8.0.0 - notable changes
+
+* Update to Java 17
+* Bump version.jersey from 3.1.5 to 3.1.7
+* Bump jakarta.ws.rs:jakarta.ws.rs-api from 3.1.0 to 4.0.0
+* @nullable for driver and count
+* Add @nullable to optional fields in DeviceRequest
+* Bump com.fasterxml.jackson:jackson-bom from 2.16.1 to 2.17.2
+* Drop deprecated v1.41 fields
+* Bump org.apache.commons:commons-compress from 1.25.0 to 1.26.2
+* Bump ch.qos.logback:logback-classic from 1.4.14 to 1.5.6
+* Bump com.github.jnr:jnr-unixsocket from 0.38.21 to 0.38.22
+* Handle network conflict creation
+* Add deprecations
+* Deprecate MacAddress
+* Deprecate virtualSize from Image
+* Bump org.slf4j:slf4j-api from 2.0.10 to 2.0.13
+* Switch to org.bouncycastle:bcpkix-jdk18on
+
 ## 7.0.8 - notable changes
 
 * Bump org.apache.commons:commons-compress from 1.25.0 to 1.26.0
