@@ -43,10 +43,12 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 public interface ContainerConfig {
 
   @Nullable
+  @Deprecated // as of v1.46
   @JsonProperty("Hostname")
   String hostname();
 
   @Nullable
+  @Deprecated // as of v1.46
   @JsonProperty("Domainname")
   String domainname();
 
@@ -55,15 +57,18 @@ public interface ContainerConfig {
   String user();
 
   @Nullable
+  @Deprecated // as of v1.46
   @JsonProperty("AttachStdin")
   Boolean attachStdin();
 
   @Nullable
   @JsonProperty("AttachStdout")
+  @Deprecated // as of v1.46
   Boolean attachStdout();
 
   @Nullable
   @JsonProperty("AttachStderr")
+  @Deprecated // as of v1.46
   Boolean attachStderr();
 
   @Nullable
@@ -78,14 +83,17 @@ public interface ContainerConfig {
 
   @Nullable
   @JsonProperty("Tty")
+  @Deprecated // as of v1.46
   Boolean tty();
 
   @Nullable
   @JsonProperty("OpenStdin")
+  @Deprecated // as of v1.46
   Boolean openStdin();
 
   @Nullable
   @JsonProperty("StdinOnce")
+  @Deprecated // as of v1.46
   Boolean stdinOnce();
 
   @Nullable
@@ -98,6 +106,7 @@ public interface ContainerConfig {
 
   @Nullable
   @JsonProperty("Image")
+  @Deprecated // as of v1.46
   String image();
 
   @Nullable
@@ -116,6 +125,7 @@ public interface ContainerConfig {
 
   @Nullable
   @JsonProperty("NetworkDisabled")
+  @Deprecated // as of v1.46
   Boolean networkDisabled();
 
   @Nullable
