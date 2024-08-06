@@ -1,5 +1,10 @@
 # Change Log
 
+## 8.0.1 - notable changes
+
+* make userNs configurable
+* Bump version.jersey from 3.1.7 to 3.1.8
+
 ## 8.0.0 - notable changes
 
 * Update to Java 17
