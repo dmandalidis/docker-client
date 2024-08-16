@@ -1,5 +1,13 @@
 # Change Log
 
+## 8.0.2 - notable changes
+
+* Downgrade OSGi-incompatible Jakarta REST API (fixes #773)
+* Bump com.google.auth:google-auth-library-oauth2-http
+* Bump ch.qos.logback:logback-classic from 1.5.6 to 1.5.7
+* Bump org.apache.commons:commons-compress from 1.26.2 to 1.27.0
+* Bump org.slf4j:slf4j-api from 2.0.13 to 2.0.16
+
 ## 8.0.1 - notable changes
 
 * make userNs configurable
