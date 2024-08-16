@@ -58,7 +58,7 @@
 		<version.unixsocket>0.38.22</version.unixsocket>
 		<version.apache.lang>2.6</version.apache.lang>
 		<version.bcpkix>1.78.1</version.bcpkix>
-		<version.jaxrs>4.0.0</version.jaxrs>
+		<version.jaxrs>3.1.0</version.jaxrs>
 		<version.google.oauth2>1.24.0</version.google.oauth2>
 
 		<version.junit>4.13.2</version.junit>
