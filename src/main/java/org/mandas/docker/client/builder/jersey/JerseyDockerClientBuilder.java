@@ -26,8 +26,8 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.Registry;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.glassfish.jersey.apache.connector.ApacheClientProperties;
-import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
+import org.glassfish.jersey.apache5.connector.Apache5ClientProperties;
+import org.glassfish.jersey.apache5.connector.Apache5ConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.RequestEntityProcessing;
@@ -79,10 +79,10 @@ public class JerseyDockerClientBuilder extends BaseDockerClientBuilder<JerseyDoc
     }
     
     config
-      .connectorProvider(new ApacheConnectorProvider())
-      .property(ApacheClientProperties.CONNECTION_MANAGER, cm)
-      .property(ApacheClientProperties.CONNECTION_MANAGER_SHARED, "true")
-      .property(ApacheClientProperties.REQUEST_CONFIG, requestConfig);
+      .connectorProvider(new Apache5ConnectorProvider())
+      .property(Apache5ClientProperties.CONNECTION_MANAGER, cm)
+      .property(Apache5ClientProperties.CONNECTION_MANAGER_SHARED, "true")
+      .property(Apache5ClientProperties.REQUEST_CONFIG, requestConfig);
 
     if (entityProcessing != null) {
       switch (entityProcessing) {

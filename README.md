@@ -43,22 +43,22 @@ For using Jersey, you will have to pull the following dependencies (versions are
 <dependency>
   <groupId>org.glassfish.jersey.core</groupId>
   <artifactId>jersey-client</artifactId>
-  <version>3.1.0</version>
+  <version>4.0.0-M1</version>
 </dependency>
 <dependency>
   <groupId>org.glassfish.jersey.inject</groupId>
   <artifactId>jersey-hk2</artifactId>
-  <version>3.1.0</version>
+  <version>4.0.0-M1</version>
 </dependency>
 <dependency>
   <groupId>org.glassfish.jersey.connectors</groupId>
-  <artifactId>jersey-apache-connector</artifactId>
-  <version>3.1.0</version>
+  <artifactId>jersey-apache5-connector</artifactId>
+  <version>4.0.0-M1</version>
 </dependency>
 <dependency>
   <groupId>org.glassfish.jersey.media</groupId>
   <artifactId>jersey-media-json-jackson</artifactId>
-  <version>3.1.0</version>
+  <version>4.0.0-M1</version>
 </dependency>
 ```
 
@@ -69,12 +69,12 @@ For using RESTeasy, you will have to pull the following dependencies (versions a
 <dependency>
   <groupId>org.jboss.resteasy</groupId>
   <artifactId>resteasy-client</artifactId>
-  <version>6.1.0.Final</version>
+  <version>7.0.0.Alpha2</version>
 </dependency>
 <dependency>
   <groupId>org.jboss.resteasy</groupId>
   <artifactId>resteasy-core</artifactId>
-  <version>6.1.0.Final</version>
+  <version>7.0.0.Alpha2</version>
 </dependency>
 <dependency>
   <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
