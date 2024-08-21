@@ -200,7 +200,7 @@ public class DefaultDockerClientUnitTest {
     builder.header("string", "2");
     builder.header("list", Arrays.asList("a", "b", "c"));
 
-    server.enqueue(new MockResponse());
+    server.enqueue(new MockResponse().addHeader("Content-Type", "application/json"));
 
     final DefaultDockerClient dockerClient = builder.build();
     dockerClient.info();
@@ -248,7 +248,7 @@ public class DefaultDockerClientUnitTest {
         .hostConfig(hostConfig)
         .build();
 
-    server.enqueue(new MockResponse());
+    server.enqueue(new MockResponse().addHeader("Content-Type", "application/json"));
 
     dockerClient.createContainer(containerConfig);
 
@@ -273,7 +273,7 @@ public class DefaultDockerClientUnitTest {
         .hostConfig(hostConfig)
         .build();
 
-    server.enqueue(new MockResponse());
+    server.enqueue(new MockResponse().addHeader("Content-Type", "application/json"));
 
     dockerClient.createContainer(containerConfig);
 
@@ -371,7 +371,7 @@ public class DefaultDockerClientUnitTest {
         .hostConfig(hostConfig)
         .build();
 
-    server.enqueue(new MockResponse());
+    server.enqueue(new MockResponse().addHeader("Content-Type", "application/json"));
 
     dockerClient.createContainer(containerConfig);
 
@@ -1065,7 +1065,7 @@ public class DefaultDockerClientUnitTest {
         .hostConfig(hostConfig)
         .build();
 
-    server.enqueue(new MockResponse());
+    server.enqueue(new MockResponse().addHeader("Content-Type", "application/json"));
 
     dockerClient.createContainer(containerConfig);
 
@@ -1091,7 +1091,7 @@ public class DefaultDockerClientUnitTest {
   public void testKillContainer() throws Exception {
     final DefaultDockerClient dockerClient = builder.build();
 
-    server.enqueue(new MockResponse());
+    server.enqueue(new MockResponse().addHeader("Content-Type", "application/json"));
 
     final Signal signal = Signal.SIGHUP;
     dockerClient.killContainer("1234", signal);
@@ -1142,7 +1142,7 @@ public class DefaultDockerClientUnitTest {
         .hostConfig(hostConfig)
         .build();
 
-    server.enqueue(new MockResponse());
+    server.enqueue(new MockResponse().addHeader("Content-Type", "application/json"));
 
     dockerClient.createContainer(containerConfig);
 
@@ -1165,7 +1165,7 @@ public class DefaultDockerClientUnitTest {
           .hostConfig(hostConfig)
           .build();
   
-      server.enqueue(new MockResponse());
+      server.enqueue(new MockResponse().addHeader("Content-Type", "application/json"));
   
       dockerClient.createContainer(containerConfig);
   
