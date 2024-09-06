@@ -63,7 +63,7 @@ public interface ImageInfo {
   String author();
 
   @JsonProperty("Config")
-  ContainerConfig config();
+  ImageConfig config();
 
   @JsonProperty("Architecture")
   String architecture();

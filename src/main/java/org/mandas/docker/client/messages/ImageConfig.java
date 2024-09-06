@@ -36,14 +36,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-@JsonDeserialize(builder = ImmutableContainerConfig.Builder.class)
+@JsonDeserialize(builder = ImmutableImageConfig.Builder.class)
 @Immutable
-public interface ContainerConfig {
+public interface ImageConfig {
 
+  @Deprecated // as of v1.46
   @Nullable
   @JsonProperty("Hostname")
   String hostname();
 
+  @Deprecated // as of v1.46
   @Nullable
   @JsonProperty("Domainname")
   String domainname();
@@ -52,14 +54,17 @@ public interface ContainerConfig {
   @JsonProperty("User")
   String user();
 
+  @Deprecated // as of v1.46
   @Nullable
   @JsonProperty("AttachStdin")
   Boolean attachStdin();
 
+  @Deprecated // as of v1.46
   @Nullable
   @JsonProperty("AttachStdout")
   Boolean attachStdout();
 
+  @Deprecated // as of v1.46
   @Nullable
   @JsonProperty("AttachStderr")
   Boolean attachStderr();
@@ -74,14 +79,17 @@ public interface ContainerConfig {
   @JsonDeserialize(using=ObjectMapperProvider.SetDeserializer.class)
   Set<String> exposedPorts();
 
+  @Deprecated // as of v1.46
   @Nullable
   @JsonProperty("Tty")
   Boolean tty();
 
+  @Deprecated // as of v1.46
   @Nullable
   @JsonProperty("OpenStdin")
   Boolean openStdin();
 
+  @Deprecated // as of v1.46
   @Nullable
   @JsonProperty("StdinOnce")
   Boolean stdinOnce();
@@ -94,6 +102,7 @@ public interface ContainerConfig {
   @JsonProperty("Cmd")
   List<String> cmd();
 
+  @Deprecated // as of v1.46
   @Nullable
   @JsonProperty("Image")
   String image();
@@ -112,6 +121,7 @@ public interface ContainerConfig {
   @JsonProperty("Entrypoint")
   List<String> entrypoint();
 
+  @Deprecated // as of v1.46
   @Nullable
   @JsonProperty("NetworkDisabled")
   Boolean networkDisabled();
@@ -149,25 +159,30 @@ public interface ContainerConfig {
   @Derived
   @Auxiliary
   default Builder toBuilder() {
-	return ImmutableContainerConfig.builder().from(this);
+	return ImmutableImageConfig.builder().from(this);
   }
   
   public static Builder builder() {
-    return ImmutableContainerConfig.builder();
+    return ImmutableImageConfig.builder();
   }
 
   public interface Builder {
 
+    @Deprecated // as of v1.46
     Builder hostname(final String hostname);
 
+    @Deprecated // as of v1.46
     Builder domainname(final String domainname);
 
     Builder user(final String user);
 
+    @Deprecated // as of v1.46
     Builder attachStdin(final Boolean attachStdin);
 
+    @Deprecated // as of v1.46
     Builder attachStdout(final Boolean attachStdout);
 
+    @Deprecated // as of v1.46
     Builder attachStderr(final Boolean attachStderr);
 
     Builder portSpecs(final Iterable<String> portSpecs);
@@ -178,10 +193,13 @@ public interface ContainerConfig {
 
     Builder exposedPorts(final String... exposedPorts);
 
+    @Deprecated // as of v1.46
     Builder tty(final Boolean tty);
 
+    @Deprecated // as of v1.46
     Builder openStdin(final Boolean openStdin);
 
+    @Deprecated // as of v1.46
     Builder stdinOnce(final Boolean stdinOnce);
 
     Builder env(final Iterable<String> env);
@@ -192,6 +210,7 @@ public interface ContainerConfig {
 
     Builder cmd(final String... cmds);
 
+    @Deprecated // as of v1.46
     Builder image(final String image);
 
     default Builder addVolume(String volume) {
@@ -222,6 +241,7 @@ public interface ContainerConfig {
 
     Builder labels(final Map<String, ? extends String> labels);
 
+    @Deprecated // as of v1.46
     Builder macAddress(final String macAddress);
 
     Builder hostConfig(final HostConfig hostConfig);
@@ -232,6 +252,6 @@ public interface ContainerConfig {
 
     Builder networkingConfig(final NetworkingConfig networkingConfig);
 
-    ContainerConfig build();
+    ImageConfig build();
   }
 }

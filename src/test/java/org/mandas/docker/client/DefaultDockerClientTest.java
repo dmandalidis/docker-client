@@ -183,7 +183,7 @@ import org.mandas.docker.client.messages.AttachedNetwork;
 import org.mandas.docker.client.messages.Container;
 import org.mandas.docker.client.messages.ContainerChange;
 import org.mandas.docker.client.messages.ContainerConfig;
-import org.mandas.docker.client.messages.ContainerConfig.Healthcheck;
+import org.mandas.docker.client.messages.Healthcheck;
 import org.mandas.docker.client.messages.ContainerCreation;
 import org.mandas.docker.client.messages.ContainerExit;
 import org.mandas.docker.client.messages.ContainerInfo;
