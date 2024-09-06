@@ -26,7 +26,7 @@ import java.util.Map;
 
 import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
-import org.mandas.docker.client.messages.ContainerConfig;
+import org.mandas.docker.client.messages.Healthcheck;
 import org.mandas.docker.client.messages.mount.Mount;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -92,7 +92,7 @@ public interface ContainerSpec {
    */
   @Nullable
   @JsonProperty("Healthcheck")
-  ContainerConfig.Healthcheck healthcheck();
+  Healthcheck healthcheck();
 
   /**
    * @return a lits of hosts
@@ -173,7 +173,7 @@ public interface ContainerSpec {
 
     Builder dnsConfig(DnsConfig dnsConfig);
 
-    Builder healthcheck(ContainerConfig.Healthcheck healthcheck);
+    Builder healthcheck(Healthcheck healthcheck);
 
     Builder hosts(Iterable<String> hosts);
 
