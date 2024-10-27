@@ -1,5 +1,17 @@
 # Change Log
 
+## 8.0.3 - notable changes
+
+* Bump ch.qos.logback:logback-classic from 1.5.10 to 1.5.11
+* Bump com.github.jnr:jnr-unixsocket from 0.38.22 to 0.38.23
+* Bump ch.qos.logback:logback-classic from 1.5.9 to 1.5.10
+* Bump version.jersey from 3.1.8 to 3.1.9
+* Bump ch.qos.logback:logback-classic from 1.5.8 to 1.5.9
+* Bump com.fasterxml.jackson:jackson-bom from 2.17.2 to 2.18.0
+* Bump ch.qos.logback:logback-classic from 1.5.7 to 1.5.8
+* Fix v1.46 deprecations (fixes #791)
+* Bump org.apache.commons:commons-compress from 1.27.0 to 1.27.1
+
 ## 8.0.2 - notable changes
 
 * Downgrade OSGi-incompatible Jakarta REST API (fixes #773)
