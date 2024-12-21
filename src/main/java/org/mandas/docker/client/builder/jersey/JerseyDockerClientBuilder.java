@@ -19,9 +19,6 @@
 */
 package org.mandas.docker.client.builder.jersey;
 
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
-
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.Registry;
 import org.apache.http.conn.HttpClientConnectionManager;
@@ -34,6 +31,9 @@ import org.glassfish.jersey.client.RequestEntityProcessing;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.mandas.docker.client.builder.BaseDockerClientBuilder;
 import org.mandas.docker.client.builder.ProxyConfiguration;
+
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
 
 public class JerseyDockerClientBuilder extends BaseDockerClientBuilder<JerseyDockerClientBuilder> {
 

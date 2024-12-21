@@ -19,22 +19,14 @@
 */
 package org.mandas.docker;
 
-import static java.lang.System.getProperty;
-
 import org.mandas.docker.client.builder.DockerClientBuilder;
 import org.mandas.docker.client.builder.jersey.JerseyDockerClientBuilder;
-import org.mandas.docker.client.builder.resteasy.ResteasyDockerClientBuilder;
 
 public class DockerClientBuilderFactory {
 
-  public static final String JAXRS_CLIENT_PROPERTY = "jaxrs.client";
-  
   private DockerClientBuilderFactory() {}
 
   public static DockerClientBuilder newInstance() {
-    if ("resteasy".equals(getProperty(JAXRS_CLIENT_PROPERTY))) {
-      return new ResteasyDockerClientBuilder();
-    }
     return new JerseyDockerClientBuilder();
   }
 }
