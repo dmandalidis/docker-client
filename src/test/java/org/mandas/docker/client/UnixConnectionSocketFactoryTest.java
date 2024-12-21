@@ -34,8 +34,9 @@ import java.nio.channels.SocketChannel;
 
 import javax.net.ssl.SSLSocket;
 
-import org.apache.http.HttpHost;
-import org.apache.http.protocol.HttpContext;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.protocol.HttpContext;
+import org.apache.hc.core5.util.TimeValue;
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.Before;
 import org.junit.Test;
@@ -65,7 +66,7 @@ public class UnixConnectionSocketFactoryTest {
   public void testConnectSocket() throws Exception {
     final UnixSocket unixSocket = mock(UnixSocket.class);
     when(unixSocket.getChannel()).thenReturn(mock(SocketChannel.class));
-    final Socket socket = sut.connectSocket(10, unixSocket, HttpHost.create("http://foo.com"),
+    final Socket socket = sut.connectSocket(TimeValue.ofMilliseconds(10), unixSocket, HttpHost.create("http://foo.com"),
         mock(InetSocketAddress.class), mock(InetSocketAddress.class), mock(HttpContext.class));
     verify(unixSocket).setSoTimeout(10);
     assertThat(socket, IsInstanceOf.instanceOf(UnixSocket.class));
@@ -74,7 +75,7 @@ public class UnixConnectionSocketFactoryTest {
 
   @Test(expected = AssertionError.class)
   public void testConnectSocketNotUnixSocket() throws Exception {
-    sut.connectSocket(10, mock(SSLSocket.class), HttpHost.create("http://foo.com"),
+    sut.connectSocket(TimeValue.ofMilliseconds(10), mock(SSLSocket.class), HttpHost.create("http://foo.com"),
         mock(InetSocketAddress.class), mock(InetSocketAddress.class), mock(HttpContext.class));
   }
 
