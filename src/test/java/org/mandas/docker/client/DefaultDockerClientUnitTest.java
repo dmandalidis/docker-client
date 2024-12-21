@@ -63,7 +63,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 import org.mandas.docker.DockerClientBuilderFactory;
@@ -1154,7 +1153,6 @@ public class DefaultDockerClientUnitTest {
   
   @Test
   public void testChunkedRequestEntityProcessing() throws Exception {
-    Assume.assumeTrue("jersey".equals(System.getProperty(DockerClientBuilderFactory.JAXRS_CLIENT_PROPERTY)));
     builder.entityProcessing(EntityProcessing.CHUNKED);
     
     try (final DefaultDockerClient dockerClient = builder.build()) {

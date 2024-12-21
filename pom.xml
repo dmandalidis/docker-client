@@ -52,14 +52,12 @@
 		<version.slf4j>2.0.16</version.slf4j>
 		<version.jackson>2.18.2</version.jackson>
 		<version.jersey>3.1.9</version.jersey>
-		<version.resteasy>6.1.0.Final</version.resteasy>
 		<version.immutables>2.10.1</version.immutables>
 		<version.apache.compress>1.27.1</version.apache.compress>
 		<version.unixsocket>0.38.23</version.unixsocket>
 		<version.apache.lang>2.6</version.apache.lang>
 		<version.bcpkix>1.79</version.bcpkix>
 		<version.google.oauth2>1.30.1</version.google.oauth2>
-		<version.jaxrs>3.1.0</version.jaxrs>
 
 		<version.junit>4.13.2</version.junit>
 		<version.mockito>5.14.2</version.mockito>
@@ -106,11 +104,6 @@
 			<version>${version.slf4j}</version>
 		</dependency>
 		<dependency>
-			<groupId>jakarta.ws.rs</groupId>
-			<artifactId>jakarta.ws.rs-api</artifactId>
-			<version>${version.jaxrs}</version>
-		</dependency>
-		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 		</dependency>
@@ -148,47 +141,29 @@
 			<groupId>org.glassfish.jersey.core</groupId>
 			<artifactId>jersey-client</artifactId>
 			<version>${version.jersey}</version>
-			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jersey.inject</groupId>
 			<artifactId>jersey-hk2</artifactId>
 			<version>${version.jersey}</version>
-			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jersey.connectors</groupId>
-			<artifactId>jersey-apache5-connector</artifactId>
+			<artifactId>jersey-apache-connector</artifactId>
 			<version>${version.jersey}</version>
-			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jersey.media</groupId>
 			<artifactId>jersey-media-json-jackson</artifactId>
 			<version>${version.jersey}</version>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.resteasy</groupId>
-			<artifactId>resteasy-client</artifactId>
-			<version>${version.resteasy}</version>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.resteasy</groupId>
-			<artifactId>resteasy-core</artifactId>
-			<version>${version.resteasy}</version>
-			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.jakarta.rs</groupId>
 			<artifactId>jackson-jakarta-rs-json-provider</artifactId>
-			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.jaxrs</groupId>
 			<artifactId>jackson-jaxrs-base</artifactId>
-			<optional>true</optional>
 		</dependency>
 
 		<!--test deps -->
@@ -372,103 +347,11 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${version.plugin.surefire}</version>
-				<executions>
-					<execution>
-						<id>default-test</id>
-						<configuration>
-							<skip>true</skip>
-						</configuration>
-					</execution>
-					<execution>
-						<id>jersey-unit-tests</id>
-						<phase>test</phase>
-						<goals>
-							<goal>test</goal>
-						</goals>
-						<configuration>
-							<classpathDependencyExcludes>
-								<classpathDependencyExclude>org.jboss.resteasy:resteasy-client</classpathDependencyExclude>
-								<classpathDependencyExclude>org.jboss.resteasy:resteasy-core</classpathDependencyExclude>
-								<classpathDependencyExclude>com.fasterxml.jackson.jakarta.rs:jackson-jakarta-rs-json-provider</classpathDependencyExclude>
-								<classpathDependencyExclude>com.fasterxml.jackson.jaxrs:jackson-jaxrs-base</classpathDependencyExclude>
-							</classpathDependencyExcludes>
-							<systemPropertyVariables>
-								<jaxrs.client>jersey</jaxrs.client>
-							</systemPropertyVariables>
-							<trimStackTrace>false</trimStackTrace>
-						</configuration>
-					</execution>
-					<execution>
-						<id>resteasy-unit-tests</id>
-						<phase>test</phase>
-						<goals>
-							<goal>test</goal>
-						</goals>
-						<configuration>
-							<classpathDependencyExcludes>
-								<classpathDependencyExclude>org.glassfish.jersey.core:jersey-client</classpathDependencyExclude>
-								<classpathDependencyExclude>org.glassfish.jersey.inject:jersey-hk2</classpathDependencyExclude>
-								<classpathDependencyExclude>org.glassfish.jersey.connectors:jersey-apache-connector</classpathDependencyExclude>
-								<classpathDependencyExclude>org.glassfish.jersey.media:jersey-media-json-jackson</classpathDependencyExclude>
-							</classpathDependencyExcludes>
-							<trimStackTrace>false</trimStackTrace>
-							<systemPropertyVariables>
-								<jaxrs.client>resteasy</jaxrs.client>
-							</systemPropertyVariables>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>${version.plugin.failsafe}</version>
-				<executions>
-					<execution>
-						<id>default-test</id>
-						<configuration>
-							<skip>true</skip>
-						</configuration>
-					</execution>
-					<execution>
-						<id>jersey-integration-tests</id>
-						<phase>integration-test</phase>
-						<goals>
-							<goal>integration-test</goal>
-						</goals>
-						<configuration>
-							<classpathDependencyExcludes>
-								<classpathDependencyExclude>org.jboss.resteasy:resteasy-client</classpathDependencyExclude>
-								<classpathDependencyExclude>org.jboss.resteasy:resteasy-core</classpathDependencyExclude>
-								<classpathDependencyExclude>com.fasterxml.jackson.jakarta.rs:jackson-jakarta-rs-json-provider</classpathDependencyExclude>
-								<classpathDependencyExclude>com.fasterxml.jackson.jaxrs:jackson-jaxrs-base</classpathDependencyExclude>
-							</classpathDependencyExcludes>
-							<systemPropertyVariables>
-								<jaxrs.client>jersey</jaxrs.client>
-							</systemPropertyVariables>
-							<trimStackTrace>false</trimStackTrace>
-						</configuration>
-					</execution>
-					<execution>
-						<id>resteasy-integration-tests</id>
-						<phase>integration-test</phase>
-						<goals>
-							<goal>integration-test</goal>
-						</goals>
-						<configuration>
-							<classpathDependencyExcludes>
-								<classpathDependencyExclude>org.glassfish.jersey.core:jersey-client</classpathDependencyExclude>
-								<classpathDependencyExclude>org.glassfish.jersey.inject:jersey-hk2</classpathDependencyExclude>
-								<classpathDependencyExclude>org.glassfish.jersey.connectors:jersey-apache-connector</classpathDependencyExclude>
-								<classpathDependencyExclude>org.glassfish.jersey.media:jersey-media-json-jackson</classpathDependencyExclude>
-							</classpathDependencyExcludes>
-							<systemPropertyVariables>
-								<jaxrs.client>resteasy</jaxrs.client>
-							</systemPropertyVariables>
-							<trimStackTrace>false</trimStackTrace>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

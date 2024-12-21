@@ -31,64 +31,11 @@ Download the latest JAR or grab [via Maven][maven-search]
 </dependency>
 ```
 
-Since multiple JAX-RS client implementations cannot coexist in a flat classpath, 
-you need to choose either one of Jersey or RESTeasy, or create your implementation
-of `DockerClientBuilder` for something completely different. 
-
-### Jersey
-
-For using Jersey, you will have to pull the following dependencies (versions are indicative):
-
-```xml
-<dependency>
-  <groupId>org.glassfish.jersey.core</groupId>
-  <artifactId>jersey-client</artifactId>
-  <version>3.1.0</version>
-</dependency>
-<dependency>
-  <groupId>org.glassfish.jersey.inject</groupId>
-  <artifactId>jersey-hk2</artifactId>
-  <version>3.1.0</version>
-</dependency>
-<dependency>
-  <groupId>org.glassfish.jersey.connectors</groupId>
-  <artifactId>jersey-apache-connector</artifactId>
-  <version>3.1.0</version>
-</dependency>
-<dependency>
-  <groupId>org.glassfish.jersey.media</groupId>
-  <artifactId>jersey-media-json-jackson</artifactId>
-  <version>3.1.0</version>
-</dependency>
-```
-
-### RESTeasy
-
-For using RESTeasy, you will have to pull the following dependencies (versions are indicative):
-```xml
-<dependency>
-  <groupId>org.jboss.resteasy</groupId>
-  <artifactId>resteasy-client</artifactId>
-  <version>6.1.0.Final</version>
-</dependency>
-<dependency>
-  <groupId>org.jboss.resteasy</groupId>
-  <artifactId>resteasy-core</artifactId>
-  <version>6.1.0.Final</version>
-</dependency>
-<dependency>
-  <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
-  <artifactId>jackson-jakarta-rs-json-provider</artifactId>
-  <version>2.13.1</version>
-</dependency>
-```
-
 ## Usage Example
 
 ```java
 // Create a client based on DOCKER_HOST and DOCKER_CERT_PATH env vars
-final DockerClient docker = new JerseyDockerClientBuilder().fromEnv().build(); // For Jersey
-final DockerClient docker = new ResteasyDockerClientBuilder().fromEnv().build(); // For RESTeasy
+final DockerClient docker = new JerseyDockerClientBuilder().fromEnv().build();
 
 // Pull an image
 docker.pull("busybox");
