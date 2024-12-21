@@ -25,7 +25,7 @@ import org.mandas.docker.Nullable;
 /**
  * Object representing a host's proxy configuration
  * @author Dimitris Mandalidis
- * @see BaseDockerClientBuilder#proxyFromEnv()
+ * @see DockerClientBuilder#proxyFromEnv()
  */
 @Immutable
 public interface ProxyConfiguration {

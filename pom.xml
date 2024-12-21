@@ -129,8 +129,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!--optional deps -->
-		<!-- TODO we should pull out the Google Cloud support to a new library -->
 		<dependency>
 			<groupId>com.google.auth</groupId>
 			<artifactId>google-auth-library-oauth2-http</artifactId>
