@@ -1771,7 +1771,7 @@ public class DefaultDockerClientTest {
       }
     }
     assertNotNull(busybox);
-    assertThat(busybox.virtualSize(), greaterThan(0L));
+    assertThat(busybox.size(), greaterThan(0L));
     assertThat(busybox.created(), not(emptyOrNullString()));
     assertThat(busybox.id(), not(emptyOrNullString()));
     assertThat(busybox.repoTags(), notNullValue());
@@ -2858,7 +2858,7 @@ public class DefaultDockerClientTest {
     sut.startContainer(container.id());
     final ContainerInfo containerInfo = sut.inspectContainer(container.id());
     assertThat(containerInfo, notNullValue());
-    assertThat(containerInfo.networkSettings().macAddress(), equalTo("12:34:56:78:9a:bc"));
+    assertThat(containerInfo.networkSettings().networks().get("bridge").macAddress(), equalTo("12:34:56:78:9a:bc"));
   }
 
   @Test(expected = NetworkNotFoundException.class)

@@ -44,7 +44,7 @@ public class ServiceSpecTest {
     assertThat(spec.taskTemplate(), is(notNullValue()));
     assertThat(spec.mode(), is(nullValue()));
     assertThat(spec.updateConfig(), is(nullValue()));
-    assertThat(spec.networks(), is(nullValue()));
+    assertThat(spec.taskTemplate().networks(), is(nullValue()));
     assertThat(spec.endpointSpec(), is(nullValue()));
   }
 }
