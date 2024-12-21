@@ -135,11 +135,6 @@
 			<version>${version.jersey}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.glassfish.jersey.inject</groupId>
-			<artifactId>jersey-hk2</artifactId>
-			<version>${version.jersey}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.glassfish.jersey.connectors</groupId>
 			<artifactId>jersey-apache5-connector</artifactId>
 			<version>${version.jersey}</version>
