@@ -4,7 +4,7 @@
 
 	<groupId>org.mandas</groupId>
 	<artifactId>docker-client</artifactId>
-	<version>8.0.0-SNAPSHOT</version>
+	<version>9.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>docker-client</name>
 	<description>A docker client</description>
@@ -158,7 +158,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jersey.connectors</groupId>
-			<artifactId>jersey-apache-connector</artifactId>
+			<artifactId>jersey-apache5-connector</artifactId>
 			<version>${version.jersey}</version>
 			<optional>true</optional>
 		</dependency>
