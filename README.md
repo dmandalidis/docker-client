@@ -35,7 +35,7 @@ Download the latest JAR or grab [via Maven][maven-search]
 
 ```java
 // Create a client based on DOCKER_HOST and DOCKER_CERT_PATH env vars
-final DockerClient docker = new JerseyDockerClientBuilder().fromEnv().build();
+final DockerClient docker = DockerClientBuilder.fromEnv().build();
 
 // Pull an image
 docker.pull("busybox");

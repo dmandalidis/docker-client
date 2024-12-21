@@ -160,7 +160,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
-import org.mandas.docker.DockerClientBuilderFactory;
 import org.mandas.docker.client.DockerClient.AttachParameter;
 import org.mandas.docker.client.DockerClient.BuildParam;
 import org.mandas.docker.client.DockerClient.EventsParam;
@@ -183,7 +182,6 @@ import org.mandas.docker.client.messages.AttachedNetwork;
 import org.mandas.docker.client.messages.Container;
 import org.mandas.docker.client.messages.ContainerChange;
 import org.mandas.docker.client.messages.ContainerConfig;
-import org.mandas.docker.client.messages.Healthcheck;
 import org.mandas.docker.client.messages.ContainerCreation;
 import org.mandas.docker.client.messages.ContainerExit;
 import org.mandas.docker.client.messages.ContainerInfo;
@@ -195,6 +193,7 @@ import org.mandas.docker.client.messages.EndpointConfig.EndpointIpamConfig;
 import org.mandas.docker.client.messages.Event;
 import org.mandas.docker.client.messages.ExecCreation;
 import org.mandas.docker.client.messages.ExecState;
+import org.mandas.docker.client.messages.Healthcheck;
 import org.mandas.docker.client.messages.HostConfig;
 import org.mandas.docker.client.messages.HostConfig.Bind;
 import org.mandas.docker.client.messages.HostConfig.Ulimit;
@@ -294,7 +293,7 @@ public class DefaultDockerClientTest {
 
   @Before
   public void setup() throws Exception {
-    final DockerClientBuilder<?> builder = DockerClientBuilderFactory.newInstance().fromEnv();
+    final DockerClientBuilder builder = DockerClientBuilder.fromEnv();
     // Make it easier to test no read timeout occurs by using a smaller value
     // Such test methods should end in 'NoTimeout'
     if (testName.getMethodName().endsWith("NoTimeout")) {
@@ -1103,7 +1102,7 @@ public class DefaultDockerClientTest {
   @Test(expected = DockerException.class)
   public void testConnectTimeout() throws Exception {
     // Attempt to connect to reserved IP -> should timeout
-    try (final DefaultDockerClient connectTimeoutClient = DockerClientBuilderFactory.newInstance()
+    try (final DefaultDockerClient connectTimeoutClient = DockerClientBuilder.fromEnv()
         .uri("http://240.0.0.1:2375")
         .connectTimeoutMillis(100)
         .readTimeoutMillis(NO_TIMEOUT)
@@ -1118,7 +1117,7 @@ public class DefaultDockerClientTest {
       // Bind and listen but do not accept -> read will time out.
       socket.bind(new InetSocketAddress("127.0.0.1", 0));
       awaitConnectable(socket.getInetAddress(), socket.getLocalPort());
-      try (final DockerClient connectTimeoutClient = DockerClientBuilderFactory.newInstance()
+      try (final DockerClient connectTimeoutClient = DockerClientBuilder.fromEnv()
           .uri("http://127.0.0.1:" + socket.getLocalPort())
           .connectTimeoutMillis(NO_TIMEOUT)
           .readTimeoutMillis(100)
@@ -1139,7 +1138,7 @@ public class DefaultDockerClientTest {
     // Spawn and wait on many more containers than the connection pool size.
     // This should cause a timeout once the connection pool is exhausted.
 
-    try (final DockerClient dockerClient = DockerClientBuilderFactory.newInstance().fromEnv()
+    try (final DockerClient dockerClient = DockerClientBuilder.fromEnv()
         .connectionPoolSize(connectionPoolSize)
         .build()) {
       // Create container

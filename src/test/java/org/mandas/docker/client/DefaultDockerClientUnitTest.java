@@ -65,12 +65,12 @@ import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mandas.docker.DockerClientBuilderFactory;
 import org.mandas.docker.client.DockerClient.Signal;
 import org.mandas.docker.client.auth.RegistryAuthSupplier;
 import org.mandas.docker.client.builder.DockerClientBuilder;
 import org.mandas.docker.client.builder.DockerClientBuilder.EntityProcessing;
 import org.mandas.docker.client.exceptions.ConflictException;
+import org.mandas.docker.client.exceptions.DockerCertificateException;
 import org.mandas.docker.client.exceptions.DockerException;
 import org.mandas.docker.client.exceptions.NodeNotFoundException;
 import org.mandas.docker.client.exceptions.NonSwarmNodeException;
@@ -142,13 +142,13 @@ public class DefaultDockerClientUnitTest {
 
   private final MockWebServer server = new MockWebServer();
 
-  private DockerClientBuilder<?> builder;
+  private DockerClientBuilder builder;
 
   @Before
   public void setup() throws Exception {
     server.start();
 
-    builder = DockerClientBuilderFactory.newInstance();
+    builder = DockerClientBuilder.fromEnv();
     builder.uri(server.url("/").uri());
   }
 
@@ -158,32 +158,32 @@ public class DefaultDockerClientUnitTest {
   }
 
   @Test
-  public void testHostForUnixSocket() {
-    try (final DefaultDockerClient client = DockerClientBuilderFactory.newInstance()
+  public void testHostForUnixSocket() throws DockerCertificateException {
+    try (final DefaultDockerClient client = DockerClientBuilder.fromEnv()
         .uri("unix:///var/run/docker.sock").build()) {
       assertThat(client.getHost(), equalTo("localhost"));
     }
   }
 
   @Test
-  public void testHostForLocalHttps() {
-    try (final DefaultDockerClient client = DockerClientBuilderFactory.newInstance()
+  public void testHostForLocalHttps() throws DockerCertificateException {
+    try (final DefaultDockerClient client = DockerClientBuilder.fromEnv()
         .uri("https://localhost:2375").build()) {
       assertThat(client.getHost(), equalTo("localhost"));
     }
   }
 
   @Test
-  public void testHostForFqdnHttps() {
-    try (final DefaultDockerClient client = DockerClientBuilderFactory.newInstance()
+  public void testHostForFqdnHttps() throws DockerCertificateException {
+    try (final DefaultDockerClient client = DockerClientBuilder.fromEnv()
         .uri("https://perdu.com:2375").build()) {
       assertThat(client.getHost(), equalTo("perdu.com"));
     }
   }
 
   @Test
-  public void testHostForIpHttps() {
-    try (final DefaultDockerClient client = DockerClientBuilderFactory.newInstance()
+  public void testHostForIpHttps() throws DockerCertificateException {
+    try (final DefaultDockerClient client = DockerClientBuilder.fromEnv()
         .uri("https://192.168.53.103:2375").build()) {
       assertThat(client.getHost(), equalTo("192.168.53.103"));
     }
