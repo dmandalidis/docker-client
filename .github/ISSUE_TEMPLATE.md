@@ -2,7 +2,7 @@
 
 If you're looking for help check
 [Stack Overflow](https://stackoverflow.com/questions/tagged/spotify-docker-client) and the
-[user manual](https://github.com/dmandalidis/docker-client/blob/master/docs/user_manual.md).
+[user manual](https://github.com/dmandalidis/docker-client/blob/main/docs/user_manual.md).
 -->
 
 **Is this a BUG REPORT or FEATURE REQUEST?**:

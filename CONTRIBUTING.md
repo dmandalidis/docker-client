@@ -18,7 +18,7 @@ my best.
 
 Please make sure you're using the latest version. This project is
 released continuously as it's developed so new releases come out almost as frequently as we
-commit to master.
+commit to main.
 
 ## Contributing
 

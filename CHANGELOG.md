@@ -505,4 +505,4 @@ and the version (otherwise it's a bug, triggering an immediate patch release)
 If you are interested in the history of changes when this project was managed
 by Spotify you can refer to [Changelog pre-fork history][]
 
-[Changelog pre-fork history]: https://github.com/dmandalidis/docker-client/blob/master/CHANGELOG_PREFORK.md
+[Changelog pre-fork history]: https://github.com/dmandalidis/docker-client/blob/main/CHANGELOG_PREFORK.md

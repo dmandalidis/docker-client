@@ -1,13 +1,13 @@
 # Docker Client
 
 [![Build Status](https://github.com/dmandalidis/docker-client/actions/workflows/ci.yml/badge.svg)](https://github.com/dmandalidis/docker-client/actions/workflows/ci.yml/badge.svg)
-[![codecov](https://codecov.io/github/dmandalidis/docker-client/coverage.svg?branch=master)](https://codecov.io/github/dmandalidis/docker-client?branch=master)
+[![codecov](https://codecov.io/github/dmandalidis/docker-client/coverage.svg?branch=main)](https://codecov.io/github/dmandalidis/docker-client?branch=main)
 [![Maven Central](https://img.shields.io/maven-central/v/org.mandas/docker-client.svg)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.mandas%22%20docker-client)
 [![License](https://img.shields.io/github/license/dmandalidis/docker-client.svg)](LICENSE)
 
 This is a [Docker](https://github.com/docker/docker) client written in Java.
 It was used in many critical production systems at Spotify until its 
-[fork](https://github.com/dmandalidis/docker-client/blob/master/FORK.md) on September 2019.
+[fork](https://github.com/dmandalidis/docker-client/blob/main/FORK.md) on September 2019.
 
 The `docker-client` is built and tested against the latest `docker-ce` major release.
 
@@ -17,7 +17,7 @@ The `docker-client` is built and tested against the latest `docker-ce` major rel
 * [Prerequisites](#prerequisites)
 * [Testing](#testing)
 * [Releasing](#releasing)
-* [User Manual](https://github.com/dmandalidis/docker-client/blob/master/docs/user_manual.md)
+* [User Manual](https://github.com/dmandalidis/docker-client/blob/main/docs/user_manual.md)
 
 ## Download
 
@@ -122,7 +122,7 @@ after many test runs. You may find it helpful to occasionally issue `docker rm $
 
 ## Releasing
 
-Commits to the master branch will trigger our continuous integration agent to build the jar and
+Commits to the main branch will trigger our continuous integration agent to build the jar and
 release by uploading to Sonatype. If you are a project maintainer with the necessary credentials,
 you can also build and release locally by running the below.
 
