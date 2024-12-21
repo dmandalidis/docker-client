@@ -132,9 +132,6 @@ Docker-client is packaged with a few implementations of this interface
   `~/.docker/config.json`)
 - `auth.FixedRegistryAuthSupplier` which uses a fixed instance of the
   `RegistryAuth` and `RegistryConfigs` POJOs
-- `auth.gcr.ContainerRegistryAuthSupplier`, which programmatically fetches
-  access tokens for use with Google Container Registry based on given Google
-  Cloud account credentials
 - `auth.MultiRegistryAuthSupplier`, which can be used to combine multiple other
   implementations
 
