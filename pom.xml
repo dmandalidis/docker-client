@@ -130,12 +130,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.google.auth</groupId>
-			<artifactId>google-auth-library-oauth2-http</artifactId>
-			<version>${version.google.oauth2}</version>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
 			<groupId>org.glassfish.jersey.core</groupId>
 			<artifactId>jersey-client</artifactId>
 			<version>${version.jersey}</version>

@@ -1,5 +1,16 @@
 # Change Log
 
+## 9.0.0 - notable changes
+
+* **breaking** RESTeasy support (and subsequently custom HTTP client support) was dropped.
+    * It generated high maintenance complexity while the project's evolution was held back
+to achieve JAX-RS version compatibility
+* **breaking** Based on the above, building a `DockerClient` is heavily [simplified](./README.md)
+    * manually pulling Jersey dependencies is no longer needed
+* **breaking** Google OAuth2 support was dropped
+    * Users are advised to copy `ContainerRegistryAuthSupplier` from a `docker-client` 8.x version
+    and maintain it on their own side.
+
 ## 8.0.3 - notable changes
 
 * Bump ch.qos.logback:logback-classic from 1.5.10 to 1.5.11
