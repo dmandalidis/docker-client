@@ -1,5 +1,14 @@
 # Change Log
 
+## 9.0.1 - notable changes
+
+* Bump com.fasterxml.jackson:jackson-bom from 2.18.2 to 2.18.3
+* Bump org.slf4j:slf4j-api from 2.0.16 to 2.0.17
+* Bump ch.qos.logback:logback-classic from 1.5.14 to 1.5.17
+* Drop obsolete jackson-jaxrs-base (fixes #852)
+* Bump org.bouncycastle:bcpkix-jdk18on from 1.79 to 1.80
+* Bump version.jersey from 3.1.9 to 3.1.10
+
 ## 9.0.0 - notable changes
 
 * **breaking** RESTeasy support (and subsequently custom HTTP client support) was dropped.
