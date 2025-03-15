@@ -87,9 +87,6 @@ public class DockerClientBuilder {
   private long DEFAULT_CONNECT_TIMEOUT_MILLIS = SECONDS.toMillis(5);
   private long DEFAULT_READ_TIMEOUT_MILLIS = SECONDS.toMillis(30);
   private int DEFAULT_CONNECTION_POOL_SIZE = 100;
-  private String ERROR_MESSAGE = "LOGIC ERROR: DefaultDockerClient does not support being built "
-        + "with both `registryAuth` and `registryAuthSupplier`. "
-        + "Please build with at most one of these options.";
   private URI uri;
   private String apiVersion;
   private long connectTimeoutMillis = DEFAULT_CONNECT_TIMEOUT_MILLIS;
@@ -307,9 +304,6 @@ public class DockerClientBuilder {
   }
 
   public DockerClientBuilder registryAuthSupplier(final RegistryAuthSupplier registryAuthSupplier) {
-    if (this.registryAuthSupplier != null) {
-      throw new IllegalStateException(ERROR_MESSAGE);
-    }
     this.registryAuthSupplier = registryAuthSupplier;
     return this;
   }
