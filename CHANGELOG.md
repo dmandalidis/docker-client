@@ -1,5 +1,10 @@
 # Change Log
 
+## 9.0.2 - notable changes
+
+* Exposed non-sanitized URI (#861)
+* Fix builder weird state management for registry auth (#861)
+
 ## 9.0.1 - notable changes
 
 * Bump com.fasterxml.jackson:jackson-bom from 2.18.2 to 2.18.3
