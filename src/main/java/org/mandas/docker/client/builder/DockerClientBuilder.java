@@ -88,6 +88,7 @@ public class DockerClientBuilder {
   private long DEFAULT_READ_TIMEOUT_MILLIS = SECONDS.toMillis(30);
   private int DEFAULT_CONNECTION_POOL_SIZE = 100;
   private URI uri;
+  private URI sanitizedUri;
   private String apiVersion;
   private long connectTimeoutMillis = DEFAULT_CONNECT_TIMEOUT_MILLIS;
   private long readTimeoutMillis = DEFAULT_READ_TIMEOUT_MILLIS;
@@ -321,7 +322,9 @@ public class DockerClientBuilder {
 
   /**
    * @return the URI of the Docker engine
+   * @deprecated this will be removed
    */
+  @Deprecated
   public URI uri() {
     return uri;
   }
@@ -392,9 +395,11 @@ public class DockerClientBuilder {
         .register(ObjectMapperProvider.class);
     
     if (uri.getScheme().equals(UNIX_SCHEME)) {
-      this.uri = UnixConnectionSocketFactory.sanitizeUri(uri);
+      this.sanitizedUri = UnixConnectionSocketFactory.sanitizeUri(uri);
     } else if (uri.getScheme().equals(NPIPE_SCHEME)) {
-      this.uri = NpipeConnectionSocketFactory.sanitizeUri(uri);
+      this.sanitizedUri = NpipeConnectionSocketFactory.sanitizeUri(uri);
+    } else {
+      this.sanitizedUri = this.uri;
     }
     
     // read the docker config file for auth info if nothing else was specified
@@ -402,7 +407,7 @@ public class DockerClientBuilder {
       registryAuthSupplier(new ConfigFileRegistryAuthSupplier());
     }
     
-    return new DefaultDockerClient(apiVersion, registryAuthSupplier, uri, client, headers);
+    return new DefaultDockerClient(apiVersion, registryAuthSupplier, sanitizedUri, client, headers);
   }
 
   private HttpClientConnectionManager getConnectionManager(URI uri, Registry<ConnectionSocketFactory> schemeRegistry, int connectionPoolSize) {
