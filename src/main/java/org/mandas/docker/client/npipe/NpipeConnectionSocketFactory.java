@@ -27,12 +27,11 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URI;
 
-import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
-import org.apache.hc.core5.annotation.Contract;
-import org.apache.hc.core5.annotation.ThreadingBehavior;
-import org.apache.hc.core5.http.HttpHost;
-import org.apache.hc.core5.http.protocol.HttpContext;
-import org.apache.hc.core5.util.TimeValue;
+import org.apache.http.HttpHost;
+import org.apache.http.annotation.Contract;
+import org.apache.http.annotation.ThreadingBehavior;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.protocol.HttpContext;
 
 /**
  * Provides a ConnectionSocketFactory for connecting Apache HTTP clients to windows named pipe.
@@ -65,7 +64,7 @@ public class NpipeConnectionSocketFactory implements ConnectionSocketFactory {
   }
 
   @Override
-  public Socket connectSocket(final TimeValue connectTimeout,
+  public Socket connectSocket(final int connectTimeout,
                               final Socket socket,
                               final HttpHost host,
                               final InetSocketAddress remoteAddress,
@@ -74,7 +73,7 @@ public class NpipeConnectionSocketFactory implements ConnectionSocketFactory {
     if (!(socket instanceof NamedPipeSocket)) {
       throw new AssertionError("Unexpected socket: " + socket);
     }
-    socket.connect(new NpipeSocketAddress(socketFile), (int) connectTimeout.toDuration().toMillis());
+    socket.connect(new NpipeSocketAddress(socketFile), connectTimeout);
     return socket;
   }
 }

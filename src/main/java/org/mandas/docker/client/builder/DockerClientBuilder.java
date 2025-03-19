@@ -32,27 +32,22 @@ import static org.mandas.docker.client.DockerHost.defaultPort;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import org.apache.hc.client5.http.config.ConnectionConfig;
-import org.apache.hc.client5.http.config.RequestConfig;
-import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
-import org.apache.hc.client5.http.impl.io.BasicHttpClientConnectionManager;
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
-import org.apache.hc.client5.http.io.HttpClientConnectionManager;
-import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
-import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
-import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
-import org.apache.hc.core5.http.config.Registry;
-import org.apache.hc.core5.http.config.RegistryBuilder;
-import org.apache.hc.core5.util.TimeValue;
-import org.apache.hc.core5.util.Timeout;
-import org.glassfish.jersey.apache5.connector.Apache5ClientProperties;
-import org.glassfish.jersey.apache5.connector.Apache5ConnectorProvider;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.glassfish.jersey.apache.connector.ApacheClientProperties;
+import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.RequestEntityProcessing;
@@ -129,8 +124,9 @@ public class DockerClientBuilder {
     final HttpClientConnectionManager cm = getConnectionManager(uri, schemeRegistry, connectionPoolSize);
 
     final RequestConfig requestConfig = RequestConfig.custom()
-        .setConnectionRequestTimeout(Timeout.of(Duration.ofMillis(connectTimeoutMillis)))
-        .setResponseTimeout(Timeout.of(Duration.ofMillis(readTimeoutMillis)))
+        .setConnectionRequestTimeout((int) connectTimeoutMillis)
+        .setConnectTimeout((int) connectTimeoutMillis)
+        .setSocketTimeout((int) readTimeoutMillis)
         .build();
 
     ClientConfig config = new ClientConfig(JacksonFeature.class);
@@ -139,14 +135,11 @@ public class DockerClientBuilder {
       config = updateProxy(config);
     }
     
-    DefaultHttpRequestRetryStrategy retryStrategy = new DefaultHttpRequestRetryStrategy(0, TimeValue.ZERO_MILLISECONDS);
-    
     config
-      .connectorProvider(new Apache5ConnectorProvider())
-      .property(Apache5ClientProperties.CONNECTION_MANAGER, cm)
-      .property(Apache5ClientProperties.CONNECTION_MANAGER_SHARED, "true")
-      .property(Apache5ClientProperties.REQUEST_CONFIG, requestConfig)
-      .property(Apache5ClientProperties.RETRY_STRATEGY, retryStrategy);
+      .connectorProvider(new ApacheConnectorProvider())
+      .property(ApacheClientProperties.CONNECTION_MANAGER, cm)
+      .property(ApacheClientProperties.CONNECTION_MANAGER_SHARED, "true")
+      .property(ApacheClientProperties.REQUEST_CONFIG, requestConfig);
 
     if (entityProcessing != null) {
       switch (entityProcessing) {
@@ -414,15 +407,9 @@ public class DockerClientBuilder {
     if (uri.getScheme().equals(NPIPE_SCHEME)) {
       return new BasicHttpClientConnectionManager(schemeRegistry);
     }
-    
-    ConnectionConfig connectionConfig = ConnectionConfig.custom()
-        .setConnectTimeout(Timeout.of(Duration.ofMillis(connectTimeoutMillis)))
-        .build();
-    
     final PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(schemeRegistry);
     // Use all available connections instead of artificially limiting ourselves to 2 per server.
     cm.setMaxTotal(connectionPoolSize);
-    cm.setConnectionConfigResolver((route) -> connectionConfig);
     cm.setDefaultMaxPerRoute(cm.getMaxTotal());
     return cm;
   }

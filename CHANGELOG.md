@@ -24,11 +24,6 @@ to achieve JAX-RS version compatibility
 * **breaking** Google OAuth2 support was dropped
     * Users are advised to copy `ContainerRegistryAuthSupplier` from a `docker-client` 8.x version
     and maintain it on their own side.
-* Switch to apache5 connector (fixes #817)
-* Bump org.bouncycastle:bcpkix-jdk18on from 1.78.1 to 1.79
-* Bump com.fasterxml.jackson:jackson-bom from 2.18.0 to 2.18.2
-* Bump ch.qos.logback:logback-classic from 1.5.11 to 1.5.14
-
 
 ## 8.0.3 - notable changes
 

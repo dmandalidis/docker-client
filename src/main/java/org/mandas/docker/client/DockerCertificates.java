@@ -53,8 +53,8 @@ import java.util.Set;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 
-import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
-import org.apache.hc.core5.ssl.SSLContexts;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.ssl.SSLContexts;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
