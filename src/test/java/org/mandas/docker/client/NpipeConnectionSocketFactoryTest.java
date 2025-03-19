@@ -33,9 +33,8 @@ import java.nio.channels.SocketChannel;
 
 import javax.net.ssl.SSLSocket;
 
-import org.apache.hc.core5.http.HttpHost;
-import org.apache.hc.core5.http.protocol.HttpContext;
-import org.apache.hc.core5.util.TimeValue;
+import org.apache.http.HttpHost;
+import org.apache.http.protocol.HttpContext;
 import org.hamcrest.core.IsInstanceOf;
 import org.junit.Before;
 import org.junit.Test;
@@ -65,7 +64,7 @@ public class NpipeConnectionSocketFactoryTest {
   public void testConnectSocket() throws Exception {
     final NamedPipeSocket npipeSocket = mock(NamedPipeSocket.class);
     when(npipeSocket.getChannel()).thenReturn(mock(SocketChannel.class));
-    final Socket socket = sut.connectSocket(TimeValue.ofMilliseconds(10), npipeSocket, HttpHost.create("http://foo.com"),
+    final Socket socket = sut.connectSocket(10, npipeSocket, HttpHost.create("http://foo.com"),
         mock(InetSocketAddress.class), mock(InetSocketAddress.class), mock(HttpContext.class));
     assertThat(socket, IsInstanceOf.instanceOf(NamedPipeSocket.class));
     assertThat((NamedPipeSocket) socket, equalTo(npipeSocket));
@@ -73,7 +72,7 @@ public class NpipeConnectionSocketFactoryTest {
 
   @Test(expected = AssertionError.class)
   public void testConnectSocketNotUnixSocket() throws Exception {
-    sut.connectSocket(TimeValue.ofMilliseconds(10), mock(SSLSocket.class), HttpHost.create("http://foo.com"),
+    sut.connectSocket(10, mock(SSLSocket.class), HttpHost.create("http://foo.com"),
         mock(InetSocketAddress.class), mock(InetSocketAddress.class), mock(HttpContext.class));
   }
 
