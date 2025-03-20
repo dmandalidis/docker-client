@@ -1,5 +1,10 @@
 # Change Log
 
+## 9.0.3 - notable changes
+
+* Switch back to apache4 connector (fixes #861)
+* Bump ch.qos.logback:logback-classic from 1.5.17 to 1.5.18
+
 ## 9.0.2 - notable changes
 
 * Exposed non-sanitized URI (#861)
