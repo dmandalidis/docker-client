@@ -25,17 +25,6 @@
 		<tag>HEAD</tag>
 	</scm>
 
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-	</distributionManagement>
-
 	<developers>
 		<developer>
 			<id>dmandalidis</id>
@@ -78,7 +67,7 @@
 		<version.plugin.failsafe>3.5.3</version.plugin.failsafe>
 		<version.plugin.javadoc>3.11.2</version.plugin.javadoc>
 		<version.plugin.jacoco>0.8.13</version.plugin.jacoco>
-		<version.plugin.staging>1.7.0</version.plugin.staging>
+		<version.plugin.publishing>0.7.0</version.plugin.publishing>
 		<version.plugin.gpg>3.2.7</version.plugin.gpg>
 		<version.plugin.surefire>3.5.3</version.plugin.surefire>
 		<version.plugin.bundle>6.0.0</version.plugin.bundle>
@@ -398,14 +387,13 @@
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.sonatype.plugins</groupId>
-						<artifactId>nexus-staging-maven-plugin</artifactId>
-						<version>${version.plugin.staging}</version>
+						<groupId>org.sonatype.central</groupId>
+						<artifactId>central-publishing-maven-plugin</artifactId>
+						<version>${version.plugin.publishing}</version>
 						<extensions>true</extensions>
 						<configuration>
-							<serverId>ossrh</serverId>
-							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-							<autoReleaseAfterClose>true</autoReleaseAfterClose>
+							<publishingServerId>central</publishingServerId>
+							<autoPublish>true</autoPublish>
 						</configuration>
 					</plugin>
 					<plugin>
