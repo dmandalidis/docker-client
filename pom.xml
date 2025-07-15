@@ -41,7 +41,7 @@
 		<version.slf4j>2.0.17</version.slf4j>
 		<version.jackson>2.19.1</version.jackson>
 		<version.jersey>3.1.10</version.jersey>
-		<version.immutables>2.11.0</version.immutables>
+		<version.immutables>2.11.1</version.immutables>
 		<version.apache.compress>1.27.1</version.apache.compress>
 		<version.unixsocket>0.38.23</version.unixsocket>
 		<version.apache.lang>2.6</version.apache.lang>
