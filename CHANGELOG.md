@@ -1,5 +1,11 @@
 # Change Log
 
+## 9.0.4 - notable changes
+
+* Bump org.apache.commons:commons-compress from 1.27.1 to 1.28.0
+* Bump com.fasterxml.jackson:jackson-bom from 2.18.3 to 2.19.2
+* Bump org.bouncycastle:bcpkix-jdk18on from 1.80 to 1.81
+
 ## 9.0.3 - notable changes
 
 * Switch back to apache4 connector (fixes #861)
