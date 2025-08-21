@@ -56,7 +56,7 @@
 		<version.mockwebserver>5.1.0</version.mockwebserver>
 		<version.spotify.hamcrest>1.3.2</version.spotify.hamcrest>
 
-		<version.plugin.spotbugs>4.9.3.2</version.plugin.spotbugs>
+		<version.plugin.spotbugs>4.9.4.0</version.plugin.spotbugs>
 		<version.plugin.compiler>3.14.0</version.plugin.compiler>
 		<version.spotbugs>4.9.4</version.spotbugs>
 		<version.plugin.checkstyle>3.6.0</version.plugin.checkstyle>
