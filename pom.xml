@@ -64,7 +64,7 @@
 		<version.plugin.jar>3.4.2</version.plugin.jar>
 		<version.plugin.projectinfo>3.9.0</version.plugin.projectinfo>
 		<version.plugin.source>3.3.1</version.plugin.source>
-		<version.plugin.failsafe>3.5.3</version.plugin.failsafe>
+		<version.plugin.failsafe>3.5.4</version.plugin.failsafe>
 		<version.plugin.javadoc>3.11.3</version.plugin.javadoc>
 		<version.plugin.jacoco>0.8.13</version.plugin.jacoco>
 		<version.plugin.publishing>0.8.0</version.plugin.publishing>
