@@ -60,7 +60,7 @@
 		<version.plugin.compiler>3.14.1</version.plugin.compiler>
 		<version.spotbugs>4.9.6</version.spotbugs>
 		<version.plugin.checkstyle>3.6.0</version.plugin.checkstyle>
-		<version.plugin.enforcer>3.6.1</version.plugin.enforcer>
+		<version.plugin.enforcer>3.6.2</version.plugin.enforcer>
 		<version.plugin.jar>3.4.2</version.plugin.jar>
 		<version.plugin.projectinfo>3.9.0</version.plugin.projectinfo>
 		<version.plugin.source>3.3.1</version.plugin.source>
