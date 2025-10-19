@@ -58,7 +58,7 @@
 
 		<version.plugin.spotbugs>4.9.6.0</version.plugin.spotbugs>
 		<version.plugin.compiler>3.14.1</version.plugin.compiler>
-		<version.spotbugs>4.9.6</version.spotbugs>
+		<version.spotbugs>4.9.8</version.spotbugs>
 		<version.plugin.checkstyle>3.6.0</version.plugin.checkstyle>
 		<version.plugin.enforcer>3.6.2</version.plugin.enforcer>
 		<version.plugin.jar>3.4.2</version.plugin.jar>
