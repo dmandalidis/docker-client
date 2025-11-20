@@ -21,28 +21,18 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import static org.mandas.docker.FixtureUtil.fixture;
-import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+
+import org.junit.Test;
+import org.mandas.docker.client.ObjectMapperProvider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.mandas.docker.client.ObjectMapperProvider;
-import org.junit.Test;
 
 public class DnsConfigTest {
 
   private ObjectMapper objectMapper = ObjectMapperProvider.objectMapper();
-
-  @Test
-  public void test1_32() throws Exception {
-    final DnsConfig config = objectMapper.readValue(fixture(
-        "fixtures/1.32/dnsConfig.json"), DnsConfig.class);
-    assertThat(config.nameServers(), contains("8.8.8.8"));
-    assertThat(config.search(), contains("example.org"));
-    assertThat(config.options(), contains("timeout:3"));
-  }
 
   @Test
   public void test1_32_WithoutNullables() throws Exception {

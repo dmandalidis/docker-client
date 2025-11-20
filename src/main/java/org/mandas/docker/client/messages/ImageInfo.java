@@ -37,9 +37,13 @@ public interface ImageInfo {
   @JsonProperty("Id")
   String id();
 
+  @Deprecated // as of v1.48
+  @Nullable
   @JsonProperty("Parent")
   String parent();
 
+  @Deprecated // as of v1.44
+  @Nullable
   @JsonProperty("Comment")
   String comment();
 
@@ -56,9 +60,13 @@ public interface ImageInfo {
   @Nullable
   ContainerConfig containerConfig();
 
+  @Deprecated // as of v1.48
+  @Nullable
   @JsonProperty("DockerVersion")
   String dockerVersion();
 
+  @Deprecated // as of v1.44
+  @Nullable
   @JsonProperty("Author")
   String author();
 
@@ -73,13 +81,6 @@ public interface ImageInfo {
 
   @JsonProperty("Size")
   Long size();
-
-  @Deprecated // as of v1.43
-  @Default
-  @JsonProperty("VirtualSize")
-  default Long virtualSize() {
-    return size();
-  }
 
   @Nullable
   @JsonProperty("RootFS")

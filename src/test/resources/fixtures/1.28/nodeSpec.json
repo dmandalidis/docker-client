@@ -1,8 +1,0 @@
-{
-  "Availability": "active",
-  "Name": "node-name",
-  "Role": "manager",
-  "Labels": {
-    "foo": "bar"
-  }
-}
