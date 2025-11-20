@@ -160,7 +160,7 @@ public class DockerClientBuilder {
   }
   
   /**
-   * Sets or overwrites {@link #uri()} and {@link #dockerCertificates(DockerCertificatesStore)} according to the values
+   * Sets or overwrites URI and {@link #dockerCertificates(DockerCertificatesStore)} according to the values
    * present in DOCKER_HOST and DOCKER_CERT_PATH environment variables.
    *
    * @return Modifies a builder that can be used to further customize and then build the client.
@@ -311,15 +311,6 @@ public class DockerClientBuilder {
   public DockerClientBuilder header(String name, Object value) {
     headers.put(name, value);
     return this;
-  }
-
-  /**
-   * @return the URI of the Docker engine
-   * @deprecated this will be removed
-   */
-  @Deprecated
-  public URI uri() {
-    return uri;
   }
 
   /**
