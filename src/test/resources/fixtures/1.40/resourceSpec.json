@@ -1,1 +1,0 @@
-[{"NamedResourceSpec":{"Kind":"NVIDIA-GPU","Value":"UUID1"}},{"NamedResourceSpec":{"Kind":"NVIDIA-GPU","Value":"UUID2"}},{"DiscreteResourceSpec":{"Kind":"FOO","Value":1}}]

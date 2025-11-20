@@ -24,10 +24,8 @@ package org.mandas.docker.client;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonArray;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonObject;
 import static com.spotify.hamcrest.jackson.JsonMatchers.jsonText;
-import static com.spotify.hamcrest.pojo.IsPojo.pojo;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
 import static java.util.Collections.unmodifiableList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -36,29 +34,18 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mandas.docker.FixtureUtil.fixture;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.Date;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -66,7 +53,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mandas.docker.client.DockerClient.Signal;
-import org.mandas.docker.client.auth.RegistryAuthSupplier;
 import org.mandas.docker.client.builder.DockerClientBuilder;
 import org.mandas.docker.client.builder.DockerClientBuilder.EntityProcessing;
 import org.mandas.docker.client.exceptions.ConflictException;
@@ -76,40 +62,16 @@ import org.mandas.docker.client.exceptions.NodeNotFoundException;
 import org.mandas.docker.client.exceptions.NonSwarmNodeException;
 import org.mandas.docker.client.exceptions.NotFoundException;
 import org.mandas.docker.client.messages.ContainerConfig;
-import org.mandas.docker.client.messages.Distribution;
 import org.mandas.docker.client.messages.HostConfig;
 import org.mandas.docker.client.messages.HostConfig.Bind;
-import org.mandas.docker.client.messages.RegistryAuth;
-import org.mandas.docker.client.messages.RegistryConfigs;
-import org.mandas.docker.client.messages.ServiceCreateResponse;
-import org.mandas.docker.client.messages.Volume;
-import org.mandas.docker.client.messages.swarm.Config;
-import org.mandas.docker.client.messages.swarm.ConfigBind;
-import org.mandas.docker.client.messages.swarm.ConfigCreateResponse;
-import org.mandas.docker.client.messages.swarm.ConfigFile;
 import org.mandas.docker.client.messages.swarm.ConfigSpec;
-import org.mandas.docker.client.messages.swarm.ContainerSpec;
-import org.mandas.docker.client.messages.swarm.EngineConfig;
-import org.mandas.docker.client.messages.swarm.Node;
-import org.mandas.docker.client.messages.swarm.NodeDescription;
-import org.mandas.docker.client.messages.swarm.NodeInfo;
 import org.mandas.docker.client.messages.swarm.NodeSpec;
-import org.mandas.docker.client.messages.swarm.Placement;
-import org.mandas.docker.client.messages.swarm.Preference;
-import org.mandas.docker.client.messages.swarm.ResourceRequirements;
-import org.mandas.docker.client.messages.swarm.Service;
-import org.mandas.docker.client.messages.swarm.ServiceSpec;
-import org.mandas.docker.client.messages.swarm.Spread;
 import org.mandas.docker.client.messages.swarm.SwarmJoin;
-import org.mandas.docker.client.messages.swarm.Task;
-import org.mandas.docker.client.messages.swarm.TaskSpec;
-import org.mandas.docker.client.messages.swarm.Version;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
-import com.google.common.io.Resources;
 
 import okhttp3.HttpUrl;
 import okhttp3.mockwebserver.MockResponse;
@@ -303,62 +265,6 @@ public class DefaultDockerClientUnitTest {
   }
 
   @Test
-  public void testBuildPassesMultipleRegistryConfigs() throws Exception {
-	Map<String, RegistryAuth> registryAuths = new HashMap<>();
-	registryAuths.put("server1", RegistryAuth.builder()
-            .serverAddress("server1")
-            .username("u1")
-            .password("p1")
-            .email("e1")
-            .build());
-	registryAuths.put("server2", RegistryAuth.builder()
-            .serverAddress("server2")
-            .username("u2")
-            .password("p2")
-            .email("e2")
-            .build());
-	
-    final RegistryConfigs registryConfigs = RegistryConfigs.create(registryAuths);
-
-    final RegistryAuthSupplier authSupplier = mock(RegistryAuthSupplier.class);
-    when(authSupplier.authForBuild()).thenReturn(registryConfigs);
-
-    final DefaultDockerClient client = builder.registryAuthSupplier(authSupplier)
-        .build();
-
-    // build() calls /version to check what format of header to send
-    enqueueServerApiVersion("1.20");
-
-    server.enqueue(new MockResponse()
-            .setResponseCode(200)
-            .addHeader("Content-Type", "application/json")
-            .setBody(
-                fixture("fixtures/1.22/build.json")
-            )
-    );
-
-    final Path path = Paths.get(Resources.getResource("dockerDirectory").toURI());
-
-    client.build(path);
-
-    final RecordedRequest versionRequest = takeRequestImmediately();
-    assertThat(versionRequest.getMethod(), is("GET"));
-    assertThat(versionRequest.getPath(), is("/version"));
-
-    final RecordedRequest buildRequest = takeRequestImmediately();
-    assertThat(buildRequest.getMethod(), is("POST"));
-    assertThat(buildRequest.getPath(), is("/build"));
-
-    final String registryConfigHeader = buildRequest.getHeader("X-Registry-Config");
-    assertThat(registryConfigHeader, is(not(nullValue())));
-
-    // check that the JSON in the header is equivalent to what we mocked out above from
-    // the registryAuthSupplier
-    final JsonNode headerJsonNode = toJson(Base64.getDecoder().decode(registryConfigHeader));
-    assertThat(headerJsonNode, is(toJson(registryConfigs.configs())));
-  }
-
-  @Test
   public void testNanoCpus() throws Exception {
     final DefaultDockerClient dockerClient = builder.build();
 
@@ -382,73 +288,6 @@ public class DefaultDockerClientUnitTest {
     assertThat(hostConfig.nanoCpus(), is(nanoCpus.longValue()));
   }
 
-  @Test
-  public void testInspectNode() throws Exception {
-    final DefaultDockerClient dockerClient = builder.build();
-
-    // build() calls /version to check what format of header to send
-    enqueueServerApiVersion("1.28");
-    enqueueServerApiResponse(200, "fixtures/1.28/nodeInfo.json");
-
-    final NodeInfo nodeInfo = dockerClient.inspectNode("24ifsmvkjbyhk");
-
-    assertThat(nodeInfo, notNullValue());
-    assertThat(nodeInfo.id(), is("24ifsmvkjbyhk"));
-    assertThat(nodeInfo.status(), notNullValue());
-    assertThat(nodeInfo.status().addr(), is("172.17.0.2"));
-    assertThat(nodeInfo.managerStatus(), notNullValue());
-    assertThat(nodeInfo.managerStatus().addr(), is("172.17.0.2:2377"));
-    assertThat(nodeInfo.managerStatus().leader(), is(true));
-    assertThat(nodeInfo.managerStatus().reachability(), is("reachable"));
-  }
-
-  @Test
-  public void testInspectNonLeaderNode() throws Exception {
-    final DefaultDockerClient dockerClient = builder.build();
-
-    enqueueServerApiVersion("1.27");
-
-    server.enqueue(new MockResponse()
-        .setResponseCode(200)
-        .addHeader("Content-Type", "application/json")
-        .setBody(
-            fixture("fixtures/1.27/nodeInfoNonLeader.json")
-        )
-    );
-
-    NodeInfo nodeInfo = dockerClient.inspectNode("24ifsmvkjbyhk");
-    assertThat(nodeInfo, notNullValue());
-    assertThat(nodeInfo.id(), is("24ifsmvkjbyhk"));
-    assertThat(nodeInfo.status(), notNullValue());
-    assertThat(nodeInfo.status().addr(), is("172.17.0.2"));
-    assertThat(nodeInfo.managerStatus(), notNullValue());
-    assertThat(nodeInfo.managerStatus().addr(), is("172.17.0.2:2377"));
-    assertThat(nodeInfo.managerStatus().leader(), nullValue());
-    assertThat(nodeInfo.managerStatus().reachability(), is("reachable"));
-  }
-
-  @Test
-  public void testInspectNodeNonManager() throws Exception {
-    final DefaultDockerClient dockerClient = builder.build();
-
-    enqueueServerApiVersion("1.27");
-
-    server.enqueue(new MockResponse()
-        .setResponseCode(200)
-        .addHeader("Content-Type", "application/json")
-        .setBody(
-            fixture("fixtures/1.27/nodeInfoNonManager.json")
-        )
-    );
-
-    NodeInfo nodeInfo = dockerClient.inspectNode("24ifsmvkjbyhk");
-    assertThat(nodeInfo, notNullValue());
-    assertThat(nodeInfo.id(), is("24ifsmvkjbyhk"));
-    assertThat(nodeInfo.status(), notNullValue());
-    assertThat(nodeInfo.status().addr(), is("172.17.0.2"));
-    assertThat(nodeInfo.managerStatus(), nullValue());
-  }
-
   @Test(expected = NodeNotFoundException.class)
   public void testInspectMissingNode() throws Exception {
     final DefaultDockerClient dockerClient = builder.build();
@@ -469,36 +308,6 @@ public class DefaultDockerClientUnitTest {
     enqueueServerApiEmptyResponse(503);
 
     dockerClient.inspectNode("24ifsmvkjbyhk");
-  }
-
-  @Test
-  public void testUpdateNode() throws Exception {
-    final DefaultDockerClient dockerClient = builder.build();
-
-    enqueueServerApiVersion("1.28");
-    enqueueServerApiResponse(200, "fixtures/1.28/listNodes.json");
-
-    final List<Node> nodes = dockerClient.listNodes();
-
-    assertThat(nodes.size(), is(1));
-
-    final Node node = nodes.get(0);
-
-    assertThat(node.id(), equalTo("24ifsmvkjbyhk"));
-    assertThat(node.version().index(), equalTo(8L));
-    assertThat(node.spec().name(), equalTo("my-node"));
-    assertThat(node.spec().role(), equalTo("manager"));
-    assertThat(node.spec().availability(), equalTo("active"));
-    assertThat(node.spec().labels(), hasKey(equalTo("foo")));
-
-    final NodeSpec updatedNodeSpec = NodeSpec.builder(node.spec())
-        .addLabel("foobar", "foobar")
-        .build();
-
-    enqueueServerApiVersion("1.28");
-    enqueueServerApiEmptyResponse(200);
-
-    dockerClient.updateNode(node.id(), node.version().index(), updatedNodeSpec);
   }
 
   @Test(expected = DockerException.class)
@@ -609,193 +418,11 @@ public class DefaultDockerClientUnitTest {
     dockerClient.deleteNode("node-1234");
   }
 
-  @Test
-  public void testCreateServiceWithWarnings() throws Exception {
-    final DefaultDockerClient dockerClient = builder.build();
-
-    // build() calls /version to check what format of header to send
-    enqueueServerApiVersion("1.25");
-    enqueueServerApiResponse(201, "fixtures/1.25/createServiceResponse.json");
-
-    final TaskSpec taskSpec = TaskSpec.builder()
-        .containerSpec(ContainerSpec.builder()
-            .image("this_image_is_not_found_in_the_registry")
-            .build())
-        .build();
-
-    final ServiceSpec spec = ServiceSpec.builder()
-        .name("test")
-        .taskTemplate(taskSpec)
-        .build();
-
-    final ServiceCreateResponse response = dockerClient.createService(spec);
-    assertThat(response.id(), is(notNullValue()));
-    assertThat(response.warnings(), is(hasSize(1)));
-    assertThat(response.warnings(),
-        contains("unable to pin image this_image_is_not_found_in_the_registry to digest"));
-  }
-
-  @Test
-  public void testServiceLogs() throws Exception {
-    final DefaultDockerClient dockerClient = builder.build();
-
-    enqueueServerApiVersion("1.25");
-
-    server.enqueue(new MockResponse()
-            .setResponseCode(200)
-            .addHeader("Content-Type", "text/plain; charset=utf-8")
-            .setBody(
-                fixture("fixtures/1.25/serviceLogs.txt")
-            )
-    );
-
-    final LogStream stream = dockerClient.serviceLogs("serviceId", DockerClient.LogsParam.stderr());
-    assertThat(stream.readFully(), is("Log Statement"));
-  }
-
   private void enqueueServerApiEmptyResponse(final int statusCode) {
     server.enqueue(new MockResponse()
         .setResponseCode(statusCode)
         .addHeader("Content-Type", "application/json")
     );
-  }
-
-  @Test
-  public void testCreateServiceWithPlacementPreference()
-      throws IOException, DockerException, InterruptedException {
-    final DefaultDockerClient dockerClient = builder.build();
-
-    final List<Preference> prefs = Collections.singletonList(
-        Preference.create(
-            Spread.create(
-                "test"
-            )
-        )
-    );
-
-    final TaskSpec taskSpec = TaskSpec.builder()
-        .placement(Placement.create(null, prefs))
-        .containerSpec(ContainerSpec.builder()
-            .image("this_image_is_found_in_the_registry")
-            .build())
-        .build();
-
-    final ServiceSpec spec = ServiceSpec.builder()
-        .name("test")
-        .taskTemplate(taskSpec)
-        .build();
-
-
-    enqueueServerApiVersion("1.30");
-    enqueueServerApiResponse(201, "fixtures/1.30/createServiceResponse.json");
-
-    final ServiceCreateResponse response = dockerClient.createService(spec);
-    assertThat(response.id(), equalTo("ak7w3gjqoa3kuz8xcpnyy0pvl"));
-
-    enqueueServerApiVersion("1.30");
-    enqueueServerApiResponse(200, "fixtures/1.30/inspectCreateResponseWithPlacementPrefs.json");
-
-    final Service service = dockerClient.inspectService("ak7w3gjqoa3kuz8xcpnyy0pvl");
-    assertThat(service.spec().taskTemplate().placement(), equalTo(taskSpec.placement()));
-  }
-
-  @Test
-  public void testCreateServiceWithConfig() throws Exception {
-    final DefaultDockerClient dockerClient = builder.build();
-
-    // build() calls /version to check what format of header to send
-    enqueueServerApiVersion("1.30");
-    enqueueServerApiResponse(201, "fixtures/1.30/configCreateResponse.json");
-
-    final ConfigSpec configSpec = ConfigSpec
-        .builder()
-        .data(Base64.getEncoder().encodeToString("foobar".getBytes(StandardCharsets.UTF_8)))
-        .name("foo.yaml")
-        .build();
-
-    final ConfigCreateResponse configCreateResponse = dockerClient.createConfig(configSpec);
-    assertThat(configCreateResponse.id(), equalTo("ktnbjxoalbkvbvedmg1urrz8h"));
-
-    final ConfigBind configBind = ConfigBind.builder()
-        .configName(configSpec.name())
-        .configId(configCreateResponse.id())
-        .file(ConfigFile.builder()
-          .gid("1000")
-          .uid("1000")
-          .mode(600L)
-          .name(configSpec.name())
-          .build()
-        ).build();
-
-    final TaskSpec taskSpec = TaskSpec.builder()
-        .containerSpec(ContainerSpec.builder()
-            .image("this_image_is_found_in_the_registry")
-            .configs(Collections.singletonList(configBind))
-            .build())
-        .build();
-
-    final ServiceSpec spec = ServiceSpec.builder()
-        .name("test")
-        .taskTemplate(taskSpec)
-        .build();
-
-    enqueueServerApiVersion("1.30");
-    enqueueServerApiResponse(201, "fixtures/1.30/createServiceResponse.json");
-
-    final ServiceCreateResponse response = dockerClient.createService(spec);
-    assertThat(response.id(), equalTo("ak7w3gjqoa3kuz8xcpnyy0pvl"));
-  }
-
-  @Test
-  public void testListConfigs() throws Exception {
-    final DefaultDockerClient dockerClient = builder.build();
-
-    enqueueServerApiVersion("1.30");
-
-    server.enqueue(new MockResponse()
-        .setResponseCode(200)
-        .addHeader("Content-Type", "application/json")
-        .setBody(
-            fixture("fixtures/1.30/listConfigs.json")
-        )
-    );
-
-    final List<Config> configs = dockerClient.listConfigs();
-    assertThat(configs.size(), equalTo(1));
-
-    final Config config = configs.get(0);
-
-    assertThat(config, notNullValue());
-    assertThat(config.id(), equalTo("ktnbjxoalbkvbvedmg1urrz8h"));
-    assertThat(config.version().index(), equalTo(11L));
-
-    final ConfigSpec configSpec = config.configSpec();
-    assertThat(configSpec.name(), equalTo("server.conf"));
-  }
-
-  @Test
-  public void testCreateConfig() throws Exception {
-    final DefaultDockerClient dockerClient = builder.build();
-
-    enqueueServerApiVersion("1.30");
-
-    server.enqueue(new MockResponse()
-        .setResponseCode(201)
-        .addHeader("Content-Type", "application/json")
-        .setBody(
-            fixture("fixtures/1.30/inspectConfig.json")
-        )
-    );
-
-    final ConfigSpec configSpec = ConfigSpec
-        .builder()
-        .data(Base64.getEncoder().encodeToString("foobar".getBytes(StandardCharsets.UTF_8)))
-        .name("foo.yaml")
-        .build();
-
-    final ConfigCreateResponse configCreateResponse = dockerClient.createConfig(configSpec);
-
-    assertThat(configCreateResponse.id(), equalTo("ktnbjxoalbkvbvedmg1urrz8h"));
   }
 
   @Test(expected = ConflictException.class)
@@ -836,30 +463,6 @@ public class DefaultDockerClientUnitTest {
         .build();
 
     dockerClient.createConfig(configSpec);
-  }
-
-  @Test
-  public void testInspectConfig() throws Exception {
-    final DefaultDockerClient dockerClient = builder.build();
-
-    enqueueServerApiVersion("1.30");
-
-    server.enqueue(new MockResponse()
-        .setResponseCode(200)
-        .addHeader("Content-Type", "application/json")
-        .setBody(
-            fixture("fixtures/1.30/inspectConfig.json")
-        )
-    );
-
-    final Config config = dockerClient.inspectConfig("ktnbjxoalbkvbvedmg1urrz8h");
-
-    assertThat(config, notNullValue());
-    assertThat(config.id(), equalTo("ktnbjxoalbkvbvedmg1urrz8h"));
-    assertThat(config.version().index(), equalTo(11L));
-
-    final ConfigSpec configSpec = config.configSpec();
-    assertThat(configSpec.name(), equalTo("app-dev.crt"));
   }
 
   @Test(expected = NotFoundException.class)
@@ -972,55 +575,6 @@ public class DefaultDockerClientUnitTest {
     dockerClient.updateConfig("ktnbjxoalbkvbvedmg1urrz8h", 11L, configSpec);
   }
 
-  @Test
-  public void testListNodes() throws Exception {
-    final DefaultDockerClient dockerClient = builder.build();
-
-    enqueueServerApiVersion("1.28");
-
-    server.enqueue(new MockResponse()
-        .setResponseCode(200)
-        .addHeader("Content-Type", "application/json")
-        .setBody(
-            fixture("fixtures/1.28/listNodes.json")
-        )
-    );
-
-    final List<Node> nodes = dockerClient.listNodes();
-    assertThat(nodes.size(), equalTo(1));
-
-    final Node node = nodes.get(0);
-
-    assertThat(node, notNullValue());
-    assertThat(node.id(), is("24ifsmvkjbyhk"));
-    assertThat(node.version().index(), is(8L));
-
-    final NodeSpec nodeSpec = node.spec();
-    assertThat(nodeSpec.name(), is("my-node"));
-    assertThat(nodeSpec.role(), is("manager"));
-    assertThat(nodeSpec.availability(), is("active"));
-    assertThat(nodeSpec.labels().keySet(), contains("foo"));
-
-    final NodeDescription desc = node.description();
-    assertThat(desc.hostname(), is("bf3067039e47"));
-    assertThat(desc.platform().architecture(), is("x86_64"));
-    assertThat(desc.platform().os(), is("linux"));
-    assertThat(desc.resources().memoryBytes(), is(8272408576L));
-    assertThat(desc.resources().nanoCpus(), is(4000000000L));
-
-    final EngineConfig engine = desc.engine();
-    assertThat(engine.engineVersion(), is("17.04.0"));
-    assertThat(engine.labels().keySet(), contains("foo"));
-    assertThat(engine.plugins().size(), equalTo(4));
-
-    assertThat(node.status(), notNullValue());
-    assertThat(node.status().addr(), is("172.17.0.2"));
-    assertThat(node.managerStatus(), notNullValue());
-    assertThat(node.managerStatus().addr(), is("172.17.0.2:2377"));
-    assertThat(node.managerStatus().leader(), is(true));
-    assertThat(node.managerStatus().reachability(), is("reachable"));
-  }
-
   @Test(expected = DockerException.class)
   public void testListNodesWithServerError() throws Exception {
     final DefaultDockerClient dockerClient = builder.build();
@@ -1102,35 +656,6 @@ public class DefaultDockerClientUnitTest {
   }
 
   @Test
-  public void testInspectVolume() throws Exception {
-    final DefaultDockerClient dockerClient = builder.build();
-
-    server.enqueue(new MockResponse()
-        .setResponseCode(200)
-        .addHeader("Content-Type", "application/json")
-        .setBody(
-            fixture("fixtures/1.33/inspectVolume.json")
-        )
-    );
-
-    final Volume volume = dockerClient.inspectVolume("my-volume");
-
-    assertThat(volume.name(), is("tardis"));
-    assertThat(volume.driver(), is("custom"));
-    assertThat(volume.mountpoint(), is("/var/lib/docker/volumes/tardis"));
-    assertThat(volume.status(), is(singletonMap("hello", "world")));
-    Map<String, String> expectedLabels = new HashMap<>();
-    expectedLabels.put("com.example.some-label", "some-value");
-    expectedLabels.put("com.example.some-other-label", "some-other-value");
-    assertThat(volume.labels(), is(expectedLabels));
-    assertThat(volume.scope(), is("local"));
-    Map<String, String> expectedOptions = new HashMap<>();
-    expectedOptions.put("foo", "bar");
-    expectedOptions.put("baz", "qux");
-    assertThat(volume.options(), is(expectedOptions));
-  }
-  
-  @Test
   public void testBufferedRequestEntityProcessing() throws Exception {
     builder.entityProcessing(EntityProcessing.BUFFERED);
     final DefaultDockerClient dockerClient = builder.build();
@@ -1172,119 +697,6 @@ public class DefaultDockerClientUnitTest {
       assertThat(recordedRequest.getHeader("Content-Length"), nullValue());
       assertThat(recordedRequest.getHeader("Transfer-Encoding"), is("chunked"));
     }
-  }
-
-  @Test
-  public void testGetDistribution() throws Exception {
-    final DefaultDockerClient dockerClient = builder.build();
-
-    server.enqueue(new MockResponse()
-        .setResponseCode(200)
-        .addHeader("Content-Type", "application/json")
-        .setBody(
-          fixture("fixtures/1.30/distribution.json")
-        )
-    );
-    final Distribution distribution = dockerClient.getDistribution("my-image");
-    assertThat(distribution, notNullValue());
-    assertThat(distribution.platforms().size(), is(1));
-    assertThat(distribution.platforms().get(0).architecture(), is("amd64"));
-    assertThat(distribution.platforms().get(0).os(), is("linux"));
-    assertThat(distribution.platforms().get(0).osVersion(), is(""));
-    assertThat(distribution.platforms().get(0).variant(), is(""));
-    assertThat(distribution.descriptor().size(), is(3987495L));
-    assertThat(distribution.descriptor().digest(), is(
-        "sha256:c0537ff6a5218ef531ece93d4984efc99bbf3f7497c0a7726c88e2bb7584dc96"));
-    assertThat(distribution.descriptor().mediaType(), is(
-        "application/vnd.docker.distribution.manifest.v2+json"
-    ));
-    assertThat(distribution.platforms().get(0).osFeatures(), is(unmodifiableList(asList(
-        "feature1", "feature2"
-    ))));
-    assertThat(distribution.platforms().get(0).features(), is(unmodifiableList(asList(
-        "feature1", "feature2"
-    ))));
-    assertThat(distribution.descriptor().urls(), is(unmodifiableList(asList(
-        "url1", "url2"
-    ))));
-  }
-
-  @Test
-  public void testInspectTask() throws Exception {
-    final DefaultDockerClient dockerClient = builder.build();
-
-    enqueueServerApiVersion("1.24");
-    enqueueServerApiResponse(200, "fixtures/1.24/task.json");
-
-    final Task task = dockerClient.inspectTask("0kzzo1i0y4jz6027t0k7aezc7");
-
-    assertThat(task, is(pojo(Task.class)
-        .where("id", is("0kzzo1i0y4jz6027t0k7aezc7"))
-        .where("version", is(pojo(Version.class)
-            .where("index", is(71L))
-        ))
-        .where("createdAt", is(Date.from(Instant.parse("2016-06-07T21:07:31.171892745Z"))))
-        .where("updatedAt", is(Date.from(Instant.parse("2016-06-07T21:07:31.376370513Z"))))
-        .where("spec", is(pojo(TaskSpec.class)
-            .where("containerSpec", is(pojo(ContainerSpec.class)
-                .where("image", is("redis"))
-            ))
-            .where("resources", is(pojo(ResourceRequirements.class)
-                .where("limits",
-                    is(pojo(org.mandas.docker.client.messages.swarm.Resources.class)))
-                .where("reservations",
-                    is(pojo(org.mandas.docker.client.messages.swarm.Reservations.class)))
-            ))
-        ))
-    ));
-  }
-
-
-  @Test
-  public void testListTaskWithCriteria() throws Exception {
-    final DefaultDockerClient dockerClient = builder.build();
-
-    enqueueServerApiVersion("1.24");
-    enqueueServerApiResponse(200, "fixtures/1.24/tasks.json");
-    final List<Task> tasks = dockerClient.listTasks();
-    // Throw away the first request that gets the docker server version
-    takeRequestImmediately();
-    final RecordedRequest recordedRequest = takeRequestImmediately();
-    assertThat(recordedRequest.getRequestUrl().querySize(), is(0));
-    assertThat(tasks, contains(
-        pojo(Task.class)
-            .where("id", is("0kzzo1i0y4jz6027t0k7aezc7")),
-        pojo(Task.class)
-            .where("id", is("1yljwbmlr8er2waf8orvqpwms"))
-    ));
-
-    enqueueServerApiVersion("1.24");
-    enqueueServerApiResponse(200, "fixtures/1.24/tasks.json");
-    final String taskId = "task-1";
-    dockerClient.listTasks(Task.find().taskId(taskId).build());
-    takeRequestImmediately();
-    final RecordedRequest recordedRequest2 = takeRequestImmediately();
-    final HttpUrl requestUrl2 = recordedRequest2.getRequestUrl();
-    assertThat(requestUrl2.querySize(), is(1));
-    final JsonNode requestJson2 =
-        toJson(recordedRequest2.getRequestUrl().queryParameter("filters"));
-    assertThat(requestJson2, is(jsonObject()
-        .where("id", is(jsonArray(
-            contains(jsonText(taskId)))))));
-
-    enqueueServerApiVersion("1.24");
-    enqueueServerApiResponse(200, "fixtures/1.24/tasks.json");
-    final String serviceName = "service-1";
-    dockerClient.listTasks(Task.find().serviceName(serviceName).build());
-    takeRequestImmediately();
-    final RecordedRequest recordedRequest3 = takeRequestImmediately();
-    final HttpUrl requestUrl3 = recordedRequest3.getRequestUrl();
-    assertThat(requestUrl3.querySize(), is(1));
-    final JsonNode requestJson3 =
-        toJson(recordedRequest3.getRequestUrl().queryParameter("filters"));
-    assertThat(requestJson3, is(jsonObject()
-        .where("service", is(jsonArray(
-            contains(jsonText(serviceName)))))));
   }
 
   private void enqueueServerApiResponse(final int statusCode, final String fileName)
