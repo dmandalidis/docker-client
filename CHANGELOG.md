@@ -1,5 +1,15 @@
 # Change Log
 
+## 10.0.0 - notable changes
+
+* Support for Docker v1.52 and removal of pre-v1.44 support
+* Build with JDK25, release with JDK21
+* Bump ch.qos.logback:logback-classic from 1.5.18 to 1.5.21
+* Bump com.fasterxml.jackson:jackson-bom from 2.19.2 to 2.20.1
+* Bump com.github.jnr:jnr-unixsocket from 0.38.23 to 0.38.24
+* Bump org.bouncycastle:bcpkix-jdk18on from 1.81 to 1.82
+* Bump version.jersey from 3.1.10 to 3.1.11
+
 ## 9.0.4 - notable changes
 
 * Bump org.apache.commons:commons-compress from 1.27.1 to 1.28.0
