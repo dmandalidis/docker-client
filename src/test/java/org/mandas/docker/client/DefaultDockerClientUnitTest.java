@@ -24,7 +24,8 @@ package org.mandas.docker.client;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableList;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -58,11 +59,11 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 
+import mockwebserver3.MockResponse;
+import mockwebserver3.MockWebServer;
+import mockwebserver3.RecordedRequest;
 import okhttp3.HttpUrl;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
-import okio.Buffer;
+import okio.ByteString;
 
 /**
  * Tests DefaultDockerClient against a {@link okhttp3.mockwebserver.MockWebServer} instance, so
@@ -88,20 +89,18 @@ import okio.Buffer;
 class DefaultDockerClientUnitTest {
 
   private final MockWebServer server = new MockWebServer();
-
   private DockerClientBuilder builder;
 
   @BeforeEach
   void setup() throws Exception {
     server.start();
-
     builder = DockerClientBuilder.fromEnv();
     builder.uri(server.url("/").uri());
   }
 
   @AfterEach
   void tearDown() throws Exception {
-    server.shutdown();
+    server.close();
   }
 
   @Test
@@ -146,26 +145,26 @@ class DefaultDockerClientUnitTest {
     builder.header("string", "2");
     builder.header("list", Arrays.asList("a", "b", "c"));
 
-    server.enqueue(new MockResponse());
+    server.enqueue(new MockResponse.Builder().build());
 
     final DefaultDockerClient dockerClient = builder.build();
     dockerClient.info();
 
     final RecordedRequest recordedRequest = takeRequestImmediately();
     assertThat(recordedRequest.getMethod()).isEqualTo("GET");
-    assertThat(recordedRequest.getPath()).isEqualTo("/info");
+    assertThat(recordedRequest.getUrl().encodedPath()).isEqualTo("/info");
 
-    assertThat(recordedRequest.getHeader("int")).isEqualTo("1");
-    assertThat(recordedRequest.getHeader("string")).isEqualTo("2");
+    assertThat(recordedRequest.getHeaders().get("int")).isEqualTo("1");
+    assertThat(recordedRequest.getHeaders().get("string")).isEqualTo("2");
     // TODO (mbrown): this seems like incorrect behavior - the client should send 3 headers with
     // name "list", not one header with a value of "[a, b, c]"
     assertThat(recordedRequest.getHeaders().values("list")).containsExactly("[a, b, c]");
   }
 
-  private static JsonNode toJson(Buffer buffer) throws IOException {
-    return ObjectMapperProvider.objectMapper().readTree(buffer.inputStream());
+  private static JsonNode toJson(ByteString buffer) throws IOException {
+    return ObjectMapperProvider.objectMapper().readTree(buffer.toByteArray());
   }
-
+  
   private static ObjectNode createObjectNode() {
     return ObjectMapperProvider.objectMapper().createObjectNode();
   }
@@ -182,7 +181,7 @@ class DefaultDockerClientUnitTest {
         .hostConfig(hostConfig)
         .build();
 
-    server.enqueue(new MockResponse());
+    server.enqueue(new MockResponse.Builder().build());
 
     dockerClient.createContainer(containerConfig);
 
@@ -207,16 +206,16 @@ class DefaultDockerClientUnitTest {
         .hostConfig(hostConfig)
         .build();
 
-    server.enqueue(new MockResponse());
+    server.enqueue(new MockResponse.Builder().build());
 
     dockerClient.createContainer(containerConfig);
 
     final RecordedRequest recordedRequest = takeRequestImmediately();
 
     assertThat(recordedRequest.getMethod()).isEqualTo("POST");
-    assertThat(recordedRequest.getPath()).isEqualTo("/containers/create");
+    assertThat(recordedRequest.getUrl().encodedPath()).isEqualTo("/containers/create");
 
-    assertThat(recordedRequest.getHeader("Content-Type")).isEqualTo("application/json");
+    assertThat(recordedRequest.getHeaders().get("Content-Type")).isEqualTo("application/json");
 
     final JsonNode requestJson = toJson(recordedRequest.getBody());
     final JsonNode capAdd = requestJson.get("HostConfig").get("CapAdd");
@@ -250,7 +249,7 @@ class DefaultDockerClientUnitTest {
         .hostConfig(hostConfig)
         .build();
 
-    server.enqueue(new MockResponse());
+    server.enqueue(new MockResponse.Builder().build());
 
     dockerClient.createContainer(containerConfig);
 
@@ -400,10 +399,10 @@ class DefaultDockerClientUnitTest {
   }
 
   private void enqueueServerApiEmptyResponse(final int statusCode) {
-    server.enqueue(new MockResponse()
-        .setResponseCode(statusCode)
+    server.enqueue(new MockResponse.Builder()
+        .code(statusCode)
         .addHeader("Content-Type", "application/json")
-    );
+        .build());
   }
 
   @Test
@@ -412,10 +411,10 @@ class DefaultDockerClientUnitTest {
 
     enqueueServerApiVersion("1.30");
 
-    server.enqueue(new MockResponse()
-        .setResponseCode(409)
+    server.enqueue(new MockResponse.Builder()
+        .code(409)
         .addHeader("Content-Type", "application/json")
-    );
+        .build());
 
     final ConfigSpec configSpec = ConfigSpec
         .builder()
@@ -433,10 +432,10 @@ class DefaultDockerClientUnitTest {
 
     enqueueServerApiVersion("1.30");
 
-    server.enqueue(new MockResponse()
-        .setResponseCode(503)
+    server.enqueue(new MockResponse.Builder()
+        .code(503)
         .addHeader("Content-Type", "application/json")
-    );
+        .build());
 
     final ConfigSpec configSpec = ConfigSpec
         .builder()
@@ -454,10 +453,10 @@ class DefaultDockerClientUnitTest {
 
     enqueueServerApiVersion("1.30");
 
-    server.enqueue(new MockResponse()
-        .setResponseCode(404)
+    server.enqueue(new MockResponse.Builder()
+        .code(404)
         .addHeader("Content-Type", "application/json")
-    );
+        .build());
 
     assertThatThrownBy(() -> dockerClient.inspectConfig("ktnbjxoalbkvbvedmg1urrz8h"))
         .isInstanceOf(NotFoundException.class);
@@ -469,10 +468,10 @@ class DefaultDockerClientUnitTest {
 
     enqueueServerApiVersion("1.30");
 
-    server.enqueue(new MockResponse()
-        .setResponseCode(503)
+    server.enqueue(new MockResponse.Builder()
+        .code(503)
         .addHeader("Content-Type", "application/json")
-    );
+        .build());
 
     assertThatThrownBy(() -> dockerClient.inspectConfig("ktnbjxoalbkvbvedmg1urrz8h"))
         .isInstanceOf(NonSwarmNodeException.class);
@@ -484,10 +483,10 @@ class DefaultDockerClientUnitTest {
 
     enqueueServerApiVersion("1.30");
 
-    server.enqueue(new MockResponse()
-        .setResponseCode(204)
+    server.enqueue(new MockResponse.Builder()
+        .code(204)
         .addHeader("Content-Type", "application/json")
-    );
+        .build());
 
     dockerClient.deleteConfig("ktnbjxoalbkvbvedmg1urrz8h");
   }
@@ -498,10 +497,10 @@ class DefaultDockerClientUnitTest {
 
     enqueueServerApiVersion("1.30");
 
-    server.enqueue(new MockResponse()
-        .setResponseCode(404)
+    server.enqueue(new MockResponse.Builder()
+        .code(404)
         .addHeader("Content-Type", "application/json")
-    );
+        .build());
 
     assertThatThrownBy(() -> dockerClient.deleteConfig("ktnbjxoalbkvbvedmg1urrz8h"))
         .isInstanceOf(NotFoundException.class);
@@ -513,10 +512,10 @@ class DefaultDockerClientUnitTest {
 
     enqueueServerApiVersion("1.30");
 
-    server.enqueue(new MockResponse()
-        .setResponseCode(503)
+    server.enqueue(new MockResponse.Builder()
+        .code(503)
         .addHeader("Content-Type", "application/json")
-    );
+        .build());
 
     assertThatThrownBy(() -> dockerClient.deleteConfig("ktnbjxoalbkvbvedmg1urrz8h"))
         .isInstanceOf(NonSwarmNodeException.class);
@@ -528,10 +527,10 @@ class DefaultDockerClientUnitTest {
 
     enqueueServerApiVersion("1.30");
 
-    server.enqueue(new MockResponse()
-        .setResponseCode(404)
+    server.enqueue(new MockResponse.Builder()
+        .code(404)
         .addHeader("Content-Type", "application/json")
-    );
+        .build());
 
     final ConfigSpec configSpec = ConfigSpec
         .builder()
@@ -549,10 +548,10 @@ class DefaultDockerClientUnitTest {
 
     enqueueServerApiVersion("1.30");
 
-    server.enqueue(new MockResponse()
-        .setResponseCode(503)
+    server.enqueue(new MockResponse.Builder()
+        .code(503)
         .addHeader("Content-Type", "application/json")
-    );
+        .build());
 
     final ConfigSpec configSpec = ConfigSpec
         .builder()
@@ -570,10 +569,10 @@ class DefaultDockerClientUnitTest {
 
     enqueueServerApiVersion("1.28");
 
-    server.enqueue(new MockResponse()
-        .setResponseCode(500)
+    server.enqueue(new MockResponse.Builder()
+        .code(500)
         .addHeader("Content-Type", "application/json")
-    );
+        .build());
 
     assertThatThrownBy(() -> dockerClient.listNodes())
         .isInstanceOf(DockerException.class);
@@ -608,7 +607,7 @@ class DefaultDockerClientUnitTest {
         .hostConfig(hostConfig)
         .build();
 
-    server.enqueue(new MockResponse());
+    server.enqueue(new MockResponse.Builder().build());
 
     dockerClient.createContainer(containerConfig);
 
@@ -632,14 +631,14 @@ class DefaultDockerClientUnitTest {
   void testKillContainer() throws Exception {
     final DefaultDockerClient dockerClient = builder.build();
 
-    server.enqueue(new MockResponse());
+    server.enqueue(new MockResponse.Builder().build());
 
     final Signal signal = Signal.SIGHUP;
     dockerClient.killContainer("1234", signal);
 
     final RecordedRequest recordedRequest = takeRequestImmediately();
 
-    final HttpUrl requestUrl = recordedRequest.getRequestUrl();
+    final HttpUrl requestUrl = recordedRequest.getUrl();
     assertThat(requestUrl.queryParameter("signal")).isEqualTo(signal.toString());
   }
 
@@ -654,14 +653,14 @@ class DefaultDockerClientUnitTest {
         .hostConfig(hostConfig)
         .build();
 
-    server.enqueue(new MockResponse());
+    server.enqueue(new MockResponse.Builder().build());
 
     dockerClient.createContainer(containerConfig);
 
     final RecordedRequest recordedRequest = takeRequestImmediately();
 
-    assertThat(recordedRequest.getHeader("Content-Length")).isNotNull();
-    assertThat(recordedRequest.getHeader("Transfer-Encoding")).isNull();
+    assertThat(recordedRequest.getHeaders().get("Content-Length")).isNotNull();
+    assertThat(recordedRequest.getHeaders().get("Transfer-Encoding")).isNull();
   }
   
   @Test
@@ -676,25 +675,25 @@ class DefaultDockerClientUnitTest {
           .hostConfig(hostConfig)
           .build();
   
-      server.enqueue(new MockResponse());
+      server.enqueue(new MockResponse.Builder().build());
   
       dockerClient.createContainer(containerConfig);
   
       final RecordedRequest recordedRequest = takeRequestImmediately();
   
-      assertThat(recordedRequest.getHeader("Content-Length")).isNull();
-      assertThat(recordedRequest.getHeader("Transfer-Encoding")).isEqualTo("chunked");
+      assertThat(recordedRequest.getHeaders().get("Content-Length")).isNull();
+      assertThat(recordedRequest.getHeaders().get("Transfer-Encoding")).isEqualTo("chunked");
     }
   }
 
   private void enqueueServerApiResponse(final int statusCode, final ObjectNode objectResponse) {
-    server.enqueue(new MockResponse()
-        .setResponseCode(statusCode)
+    server.enqueue(new MockResponse.Builder()
+        .code(statusCode)
         .addHeader("Content-Type", "application/json")
-        .setBody(
+        .body(
             objectResponse.toString()
         )
-    );
+        .build());
   }
 
   private void enqueueServerApiVersion(final String apiVersion) {
