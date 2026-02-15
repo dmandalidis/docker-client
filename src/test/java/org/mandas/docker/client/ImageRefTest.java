@@ -21,127 +21,102 @@
 
 package org.mandas.docker.client;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.mandas.docker.client.ImageRef.parseRegistryUrl;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.hamcrest.FeatureMatcher;
-import org.hamcrest.Matcher;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ImageRefTest {
+class ImageRefTest {
 
   @Test
-  public void testImageWithoutTag() {
+  void testImageWithoutTag() {
     final ImageRef sut = new ImageRef("foobar");
-    assertThat(sut.getImage(), equalTo("foobar"));
-    assertThat(sut.getTag(), is(nullValue()));
+    assertThat(sut.getImage()).isEqualTo("foobar");
+    assertThat(sut.getTag()).isNull();
   }
 
   @Test
-  public void testImageWithTag() {
+  void testImageWithTag() {
     final ImageRef sut = new ImageRef("foobar:12345");
-    assertThat(sut.getImage(), equalTo("foobar"));
-    assertThat(sut.getTag(), is("12345"));
+    assertThat(sut.getImage()).isEqualTo("foobar");
+    assertThat(sut.getTag()).isEqualTo("12345");
   }
 
   @Test
-  public void testImageWithTagAndRegistry() {
+  void testImageWithTagAndRegistry() {
     final ImageRef sut = new ImageRef("registry:4711/foo/bar:12345");
-    assertThat(sut.getImage(), equalTo("registry:4711/foo/bar"));
-    assertThat(sut.getTag(), is("12345"));
+    assertThat(sut.getImage()).isEqualTo("registry:4711/foo/bar");
+    assertThat(sut.getTag()).isEqualTo("12345");
   }
 
   @Test
-  public void testImageWithDigest() {
+  void testImageWithDigest() {
     final ImageRef sut = new ImageRef("bar@sha256:12345");
-    assertThat(sut.getImage(), equalTo("bar@sha256:12345"));
+    assertThat(sut.getImage()).isEqualTo("bar@sha256:12345");
   }
 
   @Test
-  public void testImageWithDigestAndRegistry() {
+  void testImageWithDigestAndRegistry() {
     final ImageRef sut = new ImageRef("registry:4711/foo/bar@sha256:12345");
-    assertThat(sut.getImage(), equalTo("registry:4711/foo/bar@sha256:12345"));
+    assertThat(sut.getImage()).isEqualTo("registry:4711/foo/bar@sha256:12345");
   }
 
   @Test
-  public void testRegistry() {
+  void testRegistry() {
     final String defaultRegistry = "docker.io";
-    assertThat(new ImageRef("ubuntu"), hasRegistry(defaultRegistry));
-    assertThat(new ImageRef("library/ubuntu"), hasRegistry(defaultRegistry));
-    assertThat(new ImageRef("docker.io/library/ubuntu"), hasRegistry(defaultRegistry));
-    assertThat(new ImageRef("index.docker.io/library/ubuntu"), hasRegistry("index.docker.io"));
-    assertThat(new ImageRef("quay.io/library/ubuntu"), hasRegistry("quay.io"));
-    assertThat(new ImageRef("gcr.io/library/ubuntu"), hasRegistry("gcr.io"));
-    assertThat(new ImageRef("us.gcr.io/library/ubuntu"), hasRegistry("us.gcr.io"));
-    assertThat(new ImageRef("gcr.kubernetes.io/library/ubuntu"),
-        hasRegistry("gcr.kubernetes.io"));
+    assertThat(new ImageRef("ubuntu").getRegistryName()).isEqualTo(defaultRegistry);
+    assertThat(new ImageRef("library/ubuntu").getRegistryName()).isEqualTo(defaultRegistry);
+    assertThat(new ImageRef("docker.io/library/ubuntu").getRegistryName()).isEqualTo(defaultRegistry);
+    assertThat(new ImageRef("index.docker.io/library/ubuntu").getRegistryName()).isEqualTo("index.docker.io");
+    assertThat(new ImageRef("quay.io/library/ubuntu").getRegistryName()).isEqualTo("quay.io");
+    assertThat(new ImageRef("gcr.io/library/ubuntu").getRegistryName()).isEqualTo("gcr.io");
+    assertThat(new ImageRef("us.gcr.io/library/ubuntu").getRegistryName()).isEqualTo("us.gcr.io");
+    assertThat(new ImageRef("gcr.kubernetes.io/library/ubuntu").getRegistryName()).isEqualTo("gcr.kubernetes.io");
 
-    assertThat(new ImageRef("registry.example.net/foo/bar"),
-        hasRegistry("registry.example.net"));
+    assertThat(new ImageRef("registry.example.net/foo/bar").getRegistryName())
+        .isEqualTo("registry.example.net");
 
-    assertThat(new ImageRef("registry.example.net/foo/bar:1.2.3"),
-        hasRegistry("registry.example.net"));
+    assertThat(new ImageRef("registry.example.net/foo/bar:1.2.3").getRegistryName())
+        .isEqualTo("registry.example.net");
 
-    assertThat(new ImageRef("registry.example.net/foo/bar:latest"),
-        hasRegistry("registry.example.net"));
+    assertThat(new ImageRef("registry.example.net/foo/bar:latest").getRegistryName())
+        .isEqualTo("registry.example.net");
 
-    assertThat(new ImageRef("registry.example.net:5555/foo/bar:latest"),
-        hasRegistry("registry.example.net:5555"));
+    assertThat(new ImageRef("registry.example.net:5555/foo/bar:latest").getRegistryName())
+        .isEqualTo("registry.example.net:5555");
   }
 
   @Test
-  public void testRegistryUrl() throws Exception {
+  void testRegistryUrl() {
     final String defaultRegistry = "https://index.docker.io/v1/";
-    assertThat(new ImageRef("ubuntu"), hasRegistryUrl(defaultRegistry));
-    assertThat(new ImageRef("library/ubuntu"), hasRegistryUrl(defaultRegistry));
-    assertThat(new ImageRef("docker.io/library/ubuntu"), hasRegistryUrl(defaultRegistry));
-    assertThat(new ImageRef("index.docker.io/library/ubuntu"), hasRegistryUrl(defaultRegistry));
-    assertThat(new ImageRef("quay.io/library/ubuntu"), hasRegistryUrl("quay.io"));
-    assertThat(new ImageRef("gcr.io/library/ubuntu"), hasRegistryUrl("https://gcr.io"));
-    assertThat(new ImageRef("us.gcr.io/library/ubuntu"), hasRegistryUrl("https://us.gcr.io"));
-    assertThat(new ImageRef("gcr.kubernetes.io/library/ubuntu"),
-        hasRegistryUrl("https://gcr.kubernetes.io"));
+    assertThat(new ImageRef("ubuntu").getRegistryUrl()).isEqualTo(defaultRegistry);
+    assertThat(new ImageRef("library/ubuntu").getRegistryUrl()).isEqualTo(defaultRegistry);
+    assertThat(new ImageRef("docker.io/library/ubuntu").getRegistryUrl()).isEqualTo(defaultRegistry);
+    assertThat(new ImageRef("index.docker.io/library/ubuntu").getRegistryUrl()).isEqualTo(defaultRegistry);
+    assertThat(new ImageRef("quay.io/library/ubuntu").getRegistryUrl()).isEqualTo("quay.io");
+    assertThat(new ImageRef("gcr.io/library/ubuntu").getRegistryUrl()).isEqualTo("https://gcr.io");
+    assertThat(new ImageRef("us.gcr.io/library/ubuntu").getRegistryUrl()).isEqualTo("https://us.gcr.io");
+    assertThat(new ImageRef("gcr.kubernetes.io/library/ubuntu").getRegistryUrl())
+        .isEqualTo("https://gcr.kubernetes.io");
 
-    assertThat(new ImageRef("registry.example.net/foo/bar"),
-        hasRegistryUrl("https://registry.example.net"));
+    assertThat(new ImageRef("registry.example.net/foo/bar").getRegistryUrl())
+        .isEqualTo("https://registry.example.net");
 
-    assertThat(new ImageRef("registry.example.net/foo/bar:1.2.3"),
-        hasRegistryUrl("https://registry.example.net"));
+    assertThat(new ImageRef("registry.example.net/foo/bar:1.2.3").getRegistryUrl())
+        .isEqualTo("https://registry.example.net");
 
-    assertThat(new ImageRef("registry.example.net/foo/bar:latest"),
-        hasRegistryUrl("https://registry.example.net"));
+    assertThat(new ImageRef("registry.example.net/foo/bar:latest").getRegistryUrl())
+        .isEqualTo("https://registry.example.net");
 
-    assertThat(new ImageRef("registry.example.net:5555/foo/bar:latest"),
-        hasRegistryUrl("https://registry.example.net:5555"));
+    assertThat(new ImageRef("registry.example.net:5555/foo/bar:latest").getRegistryUrl())
+        .isEqualTo("https://registry.example.net:5555");
   }
 
   @Test
-  public void testParseUrl() throws Exception {
-    assertThat(parseRegistryUrl("docker.io"), equalTo("https://index.docker.io/v1/"));
-    assertThat(parseRegistryUrl("index.docker.io"), equalTo("https://index.docker.io/v1/"));
-    assertThat(parseRegistryUrl("registry.net"), equalTo("https://registry.net"));
-    assertThat(parseRegistryUrl("registry.net:80"), equalTo("https://registry.net:80"));
-  }
-
-  private static Matcher<ImageRef> hasRegistry(final String expected) {
-    return new FeatureMatcher<>(equalTo(expected), "registryName", "registryName") {
-      @Override
-      protected String featureValueOf(final ImageRef actual) {
-        return actual.getRegistryName();
-      }
-    };
-  }
-
-  private static Matcher<ImageRef> hasRegistryUrl(final String expected) {
-    return new FeatureMatcher<>(equalTo(expected),
-        "registryNameUrl", "registryNameUrl") {
-      @Override
-      protected String featureValueOf(final ImageRef actual) {
-        return actual.getRegistryUrl();
-      }
-    };
+  void testParseUrl() {
+    assertThat(parseRegistryUrl("docker.io")).isEqualTo("https://index.docker.io/v1/");
+    assertThat(parseRegistryUrl("index.docker.io")).isEqualTo("https://index.docker.io/v1/");
+    assertThat(parseRegistryUrl("registry.net")).isEqualTo("https://registry.net");
+    assertThat(parseRegistryUrl("registry.net:80")).isEqualTo("https://registry.net:80");
   }
 }

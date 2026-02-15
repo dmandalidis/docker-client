@@ -29,7 +29,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mandas.docker.client.ObjectMapperProvider;
 
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -22,13 +22,13 @@
 package org.mandas.docker.client.auth;
 
 import static java.util.Collections.singletonMap;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -36,13 +36,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mandas.docker.client.DockerConfigReader;
 import org.mandas.docker.client.messages.RegistryAuth;
 import org.mandas.docker.client.messages.RegistryConfigs;
@@ -51,34 +51,34 @@ public class ConfigFileRegistryAuthSupplierTest {
 
   private final DockerConfigReader reader = mock(DockerConfigReader.class);
 
-  @Rule
-  public TemporaryFolder tempFolder = new TemporaryFolder();
+  @TempDir
+  Path tempDir;
 
   private File configFile;
 
   private ConfigFileRegistryAuthSupplier supplier;
 
-  @Before
-  public void setUp() throws Exception {
-    configFile = tempFolder.newFile();
+  @BeforeEach
+  public void setUp() throws IOException {
+    configFile = tempDir.resolve("config.json").toFile();
+    configFile.createNewFile();
 
     supplier = new ConfigFileRegistryAuthSupplier(reader, configFile.toPath());
   }
 
   @Test
   public void testAuthFor_ConfigFileDoesNotExist() throws Exception {
-    assertTrue("unable to delete file", configFile.delete());
+    assertTrue(configFile.delete());
 
     // sanity check
-    assertFalse("cannot continue this test if the file " + configFile + " actually exists",
-        configFile.exists());
+    assertFalse(configFile.exists());
 
     assertThat(supplier.authFor("foo.example.net/bar:1.2.3"), is(nullValue()));
   }
 
   @Test
   public void testAuthFor_ConfigFileEmptyFile() throws Exception {
-    assertEquals("file is not empty", 0, Files.readAllBytes(configFile.toPath()).length);
+    assertEquals(0, Files.readAllBytes(configFile.toPath()).length);
 
     assertThat(supplier.authFor("foo.example.net/bar:1.2.3"), is(nullValue()));
   }
@@ -104,18 +104,17 @@ public class ConfigFileRegistryAuthSupplierTest {
 
   @Test
   public void testAuthForBuild_ConfigFileDoesNotExist() throws Exception {
-    assertTrue("unable to delete file", configFile.delete());
+    assertTrue(configFile.delete());
 
     // sanity check
-    assertFalse("cannot continue this test if the file " + configFile + " actually exists",
-        configFile.exists());
+    assertFalse(configFile.exists());
 
     assertThat(supplier.authForBuild(), is(nullValue()));
   }
 
   @Test
   public void testAuthForBuild_ConfigFileEmptyFile() throws Exception {
-    assertEquals("file is not empty", 0, Files.readAllBytes(configFile.toPath()).length);
+    assertEquals(0, Files.readAllBytes(configFile.toPath()).length);
 
     assertThat(supplier.authForBuild(), is(nullValue()));
   }

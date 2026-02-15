@@ -31,7 +31,7 @@ import org.mandas.docker.client.ObjectMapperProvider;
 
 import java.util.Date;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class UnixTimestampSerializerTest {
 

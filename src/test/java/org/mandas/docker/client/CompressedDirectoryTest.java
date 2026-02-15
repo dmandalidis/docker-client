@@ -40,7 +40,7 @@ import java.util.List;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class CompressedDirectoryTest {
 

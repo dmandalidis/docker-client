@@ -21,11 +21,8 @@
 
 package org.mandas.docker.client;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import com.google.common.io.Resources;
 import org.mandas.docker.client.DockerCertificates.SslContextFactory;
@@ -36,36 +33,37 @@ import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-public class DockerCertificatesTest {
+class DockerCertificatesTest {
 
   private SslContextFactory factory = mock(SslContextFactory.class);
   private ArgumentCaptor<KeyStore> keyStore = ArgumentCaptor.forClass(KeyStore.class);
   private ArgumentCaptor<KeyStore> trustStore = ArgumentCaptor.forClass(KeyStore.class);
   private ArgumentCaptor<char[]> password = ArgumentCaptor.forClass(char[].class);
 
-  @Test(expected = DockerCertificateException.class)
-  public void testBadDockerCertificates() throws Exception {
+  @Test
+  void testBadDockerCertificates() {
     // try building a DockerCertificates with specifying a cert path to something that
     // isn't a cert
-    DockerCertificates.builder()
+    assertThatThrownBy(() -> DockerCertificates.builder()
         .dockerCertPath(getResourceFile("dockerInvalidSslDirectory"))
-        .build();
+        .build())
+        .isInstanceOf(DockerCertificateException.class);
   }
 
   @Test
-  public void testNoDockerCertificatesInDir() throws Exception {
+  void testNoDockerCertificatesInDir() throws Exception {
     final Path certDir = Paths.get(System.getProperty("java.io.tmpdir"));
     final Optional<DockerCertificatesStore> result = DockerCertificates.builder()
         .dockerCertPath(certDir)
         .build();
-    assertThat(result.isPresent(), is(false));
+    assertThat(result.isPresent()).isFalse();
   }
 
   @Test
-  public void testDefaultDockerCertificates() throws Exception {
+  void testDefaultDockerCertificates() throws Exception {
     DockerCertificates.builder()
         .dockerCertPath(getCertPath())
         .sslFactory(factory)
@@ -78,14 +76,14 @@ public class DockerCertificatesTest {
 
     final KeyStore caKeyStore = trustStore.getValue();
 
-    assertNotNull(pkEntry);
-    assertNotNull(pkEntry.getCertificate());
-    assertNotNull(caKeyStore.getCertificate("o=boot2docker"));
+    assertThat(pkEntry).isNotNull();
+    assertThat(pkEntry.getCertificate()).isNotNull();
+    assertThat(caKeyStore.getCertificate("o=boot2docker")).isNotNull();
   }
 
 
   @Test
-  public void testDockerCertificatesWithMultiCa() throws Exception {
+  void testDockerCertificatesWithMultiCa() throws Exception {
     DockerCertificates.builder()
         .dockerCertPath(getCertPath())
         .caCertPath(getVariant("ca-multi.pem"))
@@ -97,16 +95,16 @@ public class DockerCertificatesTest {
     final KeyStore.PrivateKeyEntry pkEntry = (KeyStore.PrivateKeyEntry) keyStore.getValue()
         .getEntry("key", new KeyStore.PasswordProtection(password.getValue()));
 
-    assertNotNull(pkEntry);
-    assertNotNull(pkEntry.getCertificate());
-    assertNotNull(trustStore.getValue().getCertificate(
-        "cn=ca-test,o=internet widgits pty ltd,st=some-state,c=cr"));
-    assertNotNull(trustStore.getValue().getCertificate(
-        "cn=ca-test-2,o=internet widgits pty ltd,st=some-state,c=cr"));
+    assertThat(pkEntry).isNotNull();
+    assertThat(pkEntry.getCertificate()).isNotNull();
+    assertThat(trustStore.getValue().getCertificate(
+        "cn=ca-test,o=internet widgits pty ltd,st=some-state,c=cr")).isNotNull();
+    assertThat(trustStore.getValue().getCertificate(
+        "cn=ca-test-2,o=internet widgits pty ltd,st=some-state,c=cr")).isNotNull();
   }
 
   @Test
-  public void testReadPrivateKeyPkcs1() throws Exception {
+  void testReadPrivateKeyPkcs1() throws Exception {
     DockerCertificates.builder()
         .dockerCertPath(getCertPath())
         .clientKeyPath(getVariant("key-pkcs1.pem"))
@@ -118,11 +116,11 @@ public class DockerCertificatesTest {
     final KeyStore.PrivateKeyEntry pkEntry = (KeyStore.PrivateKeyEntry) keyStore.getValue()
         .getEntry("key", new KeyStore.PasswordProtection(password.getValue()));
 
-    assertNotNull(pkEntry.getPrivateKey());
+    assertThat(pkEntry.getPrivateKey()).isNotNull();
   }
 
   @Test
-  public void testReadPrivateKeyPkcs8() throws Exception {
+  void testReadPrivateKeyPkcs8() throws Exception {
     DockerCertificates.builder()
         .dockerCertPath(getCertPath())
         .clientKeyPath(getVariant("key-pkcs8.pem"))
@@ -134,11 +132,11 @@ public class DockerCertificatesTest {
     final KeyStore.PrivateKeyEntry pkEntry = (KeyStore.PrivateKeyEntry) keyStore.getValue()
         .getEntry("key", new KeyStore.PasswordProtection(password.getValue()));
 
-    assertNotNull(pkEntry.getPrivateKey());
+    assertThat(pkEntry.getPrivateKey()).isNotNull();
   }
 
   @Test
-  public void testReadEllipticCurvePrivateKey() throws Exception {
+  void testReadEllipticCurvePrivateKey() throws Exception {
         DockerCertificates.builder()
         .dockerCertPath(getResourceFile("dockerSslDirectoryWithEcKey"))
         .sslFactory(factory)
@@ -149,7 +147,7 @@ public class DockerCertificatesTest {
     final KeyStore.PrivateKeyEntry pkEntry = (KeyStore.PrivateKeyEntry) keyStore.getValue()
             .getEntry("key", new KeyStore.PasswordProtection(password.getValue()));
 
-    assertNotNull(pkEntry.getPrivateKey());
+    assertThat(pkEntry.getPrivateKey()).isNotNull();
   }
 
   private Path getResourceFile(final String path) throws URISyntaxException {

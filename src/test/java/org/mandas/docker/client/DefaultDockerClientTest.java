@@ -22,10 +22,10 @@
 
 package org.mandas.docker.client;
 
-import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static com.google.common.collect.Lists.newArrayList;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
@@ -60,14 +60,14 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mandas.docker.client.DefaultDockerClient.NO_TIMEOUT;
 import static org.mandas.docker.client.DockerClient.EventsParam.since;
 import static org.mandas.docker.client.DockerClient.EventsParam.type;
@@ -153,14 +153,13 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.hamcrest.CustomTypeSafeMatcher;
 import org.hamcrest.Matcher;
-import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.Timeout;
 import org.mandas.docker.client.DockerClient.AttachParameter;
 import org.mandas.docker.client.DockerClient.BuildParam;
 import org.mandas.docker.client.DockerClient.EventsParam;
@@ -286,19 +285,16 @@ public class DefaultDockerClientTest {
 
   private static final Logger log = LoggerFactory.getLogger(DefaultDockerClientTest.class);
 
-  @Rule
-  public final TestName testName = new TestName();
-
   private final Random r = new Random(System.currentTimeMillis());
   
   private DefaultDockerClient sut;
 
-  @Before
-  public void setup() throws Exception {
+  @BeforeEach
+  public void setup(TestInfo testInfo) throws Exception {
     final DockerClientBuilder builder = DockerClientBuilder.fromEnv();
     // Make it easier to test no read timeout occurs by using a smaller value
     // Such test methods should end in 'NoTimeout'
-    if (testName.getMethodName().endsWith("NoTimeout")) {
+    if (testInfo.getDisplayName().endsWith("NoTimeout()")) {
       builder.readTimeoutMillis(5000);
     } else {
       builder.readTimeoutMillis(120000);
@@ -306,10 +302,10 @@ public class DefaultDockerClientTest {
 
     sut = builder.build();
 
-    System.out.printf("- %s\n", testName.getMethodName());
+    System.out.printf("- %s\n", testInfo.getDisplayName());
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     try {
       final List<Service> services = sut.listServices();
@@ -362,9 +358,9 @@ public class DefaultDockerClientTest {
     assertThat(searchResult.size(), greaterThan(0));
   }
 
-  @Test(expected = ImageNotFoundException.class) 
+  @Test
   public void testPullBadImage() throws Exception {
-    sut.pull(randomName());
+    assertThrows(ImageNotFoundException.class, () -> sut.pull(randomName()));
   }
 
   private static Path getResource(String name) throws URISyntaxException {
@@ -491,7 +487,7 @@ public class DefaultDockerClientTest {
 
   private File save(final String ... images) throws Exception {
     final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-    assertTrue("Temp directory " + tmpDir.getAbsolutePath() + " does not exist", tmpDir.exists());
+    assertTrue(tmpDir.exists());
     final File imageFile = new File(tmpDir, "busybox-" + System.nanoTime() + ".tar");
     //noinspection ResultOfMethodCallIgnored
     imageFile.createNewFile();
@@ -1101,78 +1097,84 @@ public class DefaultDockerClientTest {
     }
   }
 
-  @Test(expected = DockerException.class)
+  @Test
   public void testConnectTimeout() throws Exception {
     // Attempt to connect to reserved IP -> should timeout
-    try (final DefaultDockerClient connectTimeoutClient = DockerClientBuilder.fromEnv()
-        .uri("http://240.0.0.1:2375")
-        .connectTimeoutMillis(100)
-        .readTimeoutMillis(NO_TIMEOUT)
-        .build()) {
-      connectTimeoutClient.version();
-    }
-  }
-
-  @Test(expected = DockerTimeoutException.class)
-  public void testReadTimeout() throws Exception {
-    try (final ServerSocket socket = new ServerSocket()) {
-      // Bind and listen but do not accept -> read will time out.
-      socket.bind(new InetSocketAddress("127.0.0.1", 0));
-      awaitConnectable(socket.getInetAddress(), socket.getLocalPort());
-      try (final DockerClient connectTimeoutClient = DockerClientBuilder.fromEnv()
-          .uri("http://127.0.0.1:" + socket.getLocalPort())
-          .connectTimeoutMillis(NO_TIMEOUT)
-          .readTimeoutMillis(100)
+    assertThrows(DockerException.class, () -> {
+      try (final DefaultDockerClient connectTimeoutClient = DockerClientBuilder.fromEnv()
+          .uri("http://240.0.0.1:2375")
+          .connectTimeoutMillis(100)
+          .readTimeoutMillis(NO_TIMEOUT)
           .build()) {
         connectTimeoutClient.version();
       }
-    }
+    });
   }
 
-  @Test(expected = DockerTimeoutException.class)
-  public void testConnectionRequestTimeout() throws Exception {
-    final int connectionPoolSize = 1;
-    final int callableCount = connectionPoolSize * 100;
-
-    final ExecutorService executor = Executors.newCachedThreadPool();
-    final CompletionService<ContainerExit> completion = new ExecutorCompletionService<>(executor);
-
-    // Spawn and wait on many more containers than the connection pool size.
-    // This should cause a timeout once the connection pool is exhausted.
-
-    try (final DockerClient dockerClient = DockerClientBuilder.fromEnv()
-        .connectionPoolSize(connectionPoolSize)
-        .build()) {
-      // Create container
-      final ContainerConfig config = ContainerConfig.builder()
-          .image(BUSYBOX_LATEST)
-          .cmd("sh", "-c", "while :; do sleep 1; done")
-          .build();
-      final String name = randomName();
-      final ContainerCreation creation = dockerClient.createContainer(config, name);
-      final String id = creation.id();
-
-      // Start the container
-      dockerClient.startContainer(id);
-
-      // Submit a bunch of waitContainer requests
-      for (int i = 0; i < callableCount; i++) {
-        //noinspection unchecked
-        completion.submit(() -> dockerClient.waitContainer(id));
-      }
-
-      // Wait for the requests to complete or throw expected exception
-      for (int i = 0; i < callableCount; i++) {
-        try {
-          completion.take().get();
-        } catch (ExecutionException e) {
-          Throwables.throwIfInstanceOf(e.getCause(), DockerTimeoutException.class);
-          throw e;
+  @Test
+  public void testReadTimeout() throws Exception {
+    assertThrows(DockerTimeoutException.class, () -> {
+      try (final ServerSocket socket = new ServerSocket()) {
+        // Bind and listen but do not accept -> read will time out.
+        socket.bind(new InetSocketAddress("127.0.0.1", 0));
+        awaitConnectable(socket.getInetAddress(), socket.getLocalPort());
+        try (final DockerClient connectTimeoutClient = DockerClientBuilder.fromEnv()
+            .uri("http://127.0.0.1:" + socket.getLocalPort())
+            .connectTimeoutMillis(NO_TIMEOUT)
+            .readTimeoutMillis(100)
+            .build()) {
+          connectTimeoutClient.version();
         }
       }
-    } finally {
-      executor.shutdown();
-    }
+    });
+  }
+
+  @Test
+  public void testConnectionRequestTimeout() throws Exception {
+    assertThrows(DockerTimeoutException.class, () -> {
+      final int connectionPoolSize = 1;
+      final int callableCount = connectionPoolSize * 100;
+
+      final ExecutorService executor = Executors.newCachedThreadPool();
+      final CompletionService<ContainerExit> completion = new ExecutorCompletionService<>(executor);
+
+      // Spawn and wait on many more containers than the connection pool size.
+      // This should cause a timeout once the connection pool is exhausted.
+
+      try (final DockerClient dockerClient = DockerClientBuilder.fromEnv()
+          .connectionPoolSize(connectionPoolSize)
+          .build()) {
+        // Create container
+        final ContainerConfig config = ContainerConfig.builder()
+            .image(BUSYBOX_LATEST)
+            .cmd("sh", "-c", "while :; do sleep 1; done")
+            .build();
+        final String name = randomName();
+        final ContainerCreation creation = dockerClient.createContainer(config, name);
+        final String id = creation.id();
+
+        // Start the container
+        dockerClient.startContainer(id);
+
+        // Submit a bunch of waitContainer requests
+        for (int i = 0; i < callableCount; i++) {
+          //noinspection unchecked
+          completion.submit(() -> dockerClient.waitContainer(id));
+        }
+
+        // Wait for the requests to complete or throw expected exception
+        for (int i = 0; i < callableCount; i++) {
+          try {
+            completion.take().get();
+          } catch (ExecutionException e) {
+            Throwables.throwIfInstanceOf(e.getCause(), DockerTimeoutException.class);
+            throw e;
+          }
+        }
+      } finally {
+        executor.shutdown();
+      }
+    });
   }
 
   @Test
@@ -1542,7 +1544,8 @@ public class DefaultDockerClientTest {
             "destroy", BUSYBOX_LATEST);
   }
 
-  @Test(timeout = 10000)
+  @Test
+  @Timeout(value = 10, unit = TimeUnit.SECONDS)
   public void testEventTypes() throws Exception {
     final String volumeName = randomName();
     final String containerName = randomName();
@@ -1591,42 +1594,33 @@ public class DefaultDockerClientTest {
     // Image events
     try (final EventStream stream =
                  sut.events(since(startTime), until(endTime), type(IMAGE))) {
-      assertTrue("Docker did not return any image events.",
-              stream.hasNext());
+      assertTrue(stream.hasNext());
       imageEventAssertions(stream.next(), BUSYBOX_LATEST, "pull");
-      assertFalse("Expect no more image events", stream.hasNext());
+      assertFalse(stream.hasNext());
     }
 
     // Container events
     try (final EventStream stream =
                  sut.events(since(startTime), until(endTime), type(CONTAINER))) {
-      assertTrue("Docker did not return any container events.",
-              stream.hasNext());
+      assertTrue(stream.hasNext());
       containerEventAssertions(stream.next(), containerId, containerName,
               "create", BUSYBOX_LATEST);
-      assertTrue("Docker did not return enough events. "
-                      + "Expected to see an event for starting a container.",
-              stream.hasNext());
+      assertTrue(stream.hasNext());
       containerEventAssertions(stream.next(), containerId, containerName,
               "start", BUSYBOX_LATEST);
-      assertTrue("Docker did not return enough events. "
-                      + "Expected to see an event for the container finishing.",
-              stream.hasNext());
+      assertTrue(stream.hasNext());
       containerEventAssertions(stream.next(), containerId, containerName,
               "die", BUSYBOX_LATEST);
-      assertTrue("Docker did not return enough events. "
-                      + "Expected to see an event for removing the container.",
-              stream.hasNext());
+      assertTrue(stream.hasNext());
       containerEventAssertions(stream.next(), containerId, containerName,
               "destroy", BUSYBOX_LATEST);
-      assertFalse("Expect no more container events", stream.hasNext());
+      assertFalse(stream.hasNext());
     }
 
     // Volume events
     try (final EventStream stream =
                  sut.events(since(startTime), until(endTime), type(VOLUME))) {
-      assertTrue("Docker did not return any volume events.",
-              stream.hasNext());
+      assertTrue(stream.hasNext());
 
       final Event volumeCreate = stream.next();
       assertEquals(VOLUME, volumeCreate.type());
@@ -1635,9 +1629,7 @@ public class DefaultDockerClientTest {
       assertThat(volumeCreate.actor().attributes(), hasEntry("driver", "local"));
       assertNotNull(volumeCreate.timeNano());
       
-      assertTrue("Docker did not return enough volume events."
-                      + "Expected a volume mount event.",
-              stream.hasNext());
+      assertTrue(stream.hasNext());
       final Event volumeMount = stream.next();
       assertEquals(VOLUME, volumeMount.type());
       assertEquals("mount", volumeMount.action());
@@ -1650,9 +1642,7 @@ public class DefaultDockerClientTest {
       assertThat(mountAttributes, hasKey("propagation")); // Default value is system-dependent
       assertNotNull(volumeMount.timeNano());
 
-      assertTrue("Docker did not return enough volume events."
-                      + "Expected a volume unmount event.",
-              stream.hasNext());
+      assertTrue(stream.hasNext());
       final Event volumeUnmount = stream.next();
       assertEquals(VOLUME, volumeUnmount.type());
       assertEquals("unmount", volumeUnmount.action());
@@ -1661,14 +1651,13 @@ public class DefaultDockerClientTest {
       assertThat(volumeUnmount.actor().attributes(), hasEntry("container", containerId));
       assertNotNull(volumeUnmount.timeNano());
 
-      assertFalse("Expect no more volume events", stream.hasNext());
+      assertFalse(stream.hasNext());
     }
 
     // Network events
     try (final EventStream stream =
                  sut.events(since(startTime), until(endTime), type(NETWORK))) {
-      assertTrue("Docker did not return any network events.",
-              stream.hasNext());
+      assertTrue(stream.hasNext());
       final Event networkConnect = stream.next();
       assertEquals(NETWORK, networkConnect.type());
       assertEquals("connect", networkConnect.action());
@@ -1677,9 +1666,7 @@ public class DefaultDockerClientTest {
       assertThat(networkConnect.actor().attributes(), hasEntry("name", "bridge"));
       assertThat(networkConnect.actor().attributes(), hasEntry("type", "bridge"));
 
-      assertTrue("Docker did not return enough network events."
-                      + "Expected a network disconnect event.",
-              stream.hasNext());
+      assertTrue(stream.hasNext());
       final Event networkDisconnect = stream.next();
       assertEquals(NETWORK, networkDisconnect.type());
       assertEquals("disconnect", networkDisconnect.action());
@@ -1688,17 +1675,16 @@ public class DefaultDockerClientTest {
       assertThat(networkDisconnect.actor().attributes(), hasEntry("name", "bridge"));
       assertThat(networkDisconnect.actor().attributes(), hasEntry("type", "bridge"));
 
-      assertFalse("Expect no more network events", stream.hasNext());
+      assertFalse(stream.hasNext());
     }
     
     // Secret events
 	try (final EventStream stream = sut.events(since(startTime), until(endTime), type(Event.Type.SECRET))) {
-	      assertTrue("Docker did not return any secret events.", stream.hasNext());
+	      assertTrue(stream.hasNext());
 	      Event createSecret = stream.next();
 	      assertEquals(Event.Type.SECRET, createSecret.type());
 	      assertEquals("create", createSecret.action());
-	      assertTrue("Docker did not return enough secret events."
-	              + "Expected a secret remove event.", stream.hasNext());
+	      assertTrue(stream.hasNext());
 	      Event removeSecret = stream.next();
 	      assertEquals(Event.Type.SECRET, removeSecret.type());
 	      assertEquals("remove", removeSecret.action());
@@ -1707,16 +1693,14 @@ public class DefaultDockerClientTest {
     // Config events
   	try (final EventStream stream =
           sut.events(since(startTime), until(endTime), type(Event.Type.CONFIG))) {
-  		assertTrue("Docker did not return any config events.",
-    		stream.hasNext());
-    		Event createConfig = stream.next();
-	        assertEquals(Event.Type.CONFIG, createConfig.type());
-	        assertEquals("create", createConfig.action());
-	        assertTrue("Docker did not return enough secret events."
-	              + "Expected a secret remove event.", stream.hasNext());
-	        Event removeConfig = stream.next();
-	        assertEquals(Event.Type.CONFIG, removeConfig.type());
-	        assertEquals("remove", removeConfig.action());
+  		assertTrue(stream.hasNext());
+    	Event createConfig = stream.next();
+	    assertEquals(Event.Type.CONFIG, createConfig.type());
+	    assertEquals("create", createConfig.action());
+	    assertTrue(stream.hasNext());
+	    Event removeConfig = stream.next();
+	    assertEquals(Event.Type.CONFIG, removeConfig.type());
+	    assertEquals("remove", removeConfig.action());
   	}
   }
 
@@ -1878,11 +1862,11 @@ public class DefaultDockerClientTest {
     assertThat(logs, containsString("1.2.3.4"));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testInvalidExtraHosts() throws Exception {
-    HostConfig.builder()
+    assertThrows(IllegalArgumentException.class, () -> HostConfig.builder()
         .extraHosts("extrahost")
-        .build();
+        .build());
   }
 
   @Test
@@ -2413,22 +2397,24 @@ public class DefaultDockerClientTest {
     assertThat(info.state().exitCode(), is(0L));
   }
 
-  @Test(expected = ContainerNotFoundException.class)
+  @Test
   public void testStartBadContainer() throws Exception {
-    sut.startContainer(randomName());
+    assertThrows(ContainerNotFoundException.class, () -> sut.startContainer(randomName()));
   }
 
-  @Test(expected = ImageNotFoundException.class)
+  @Test
   public void testCreateContainerWithBadImage() throws Exception {
-    final ContainerConfig config = ContainerConfig.builder()
-        .image(randomName())
-        .cmd("sh", "-c", "while :; do sleep 1; done")
-        .build();
-    final String name = randomName();
-    sut.createContainer(config, name);
+    assertThrows(ImageNotFoundException.class, () -> {
+      final ContainerConfig config = ContainerConfig.builder()
+          .image(randomName())
+          .cmd("sh", "-c", "while :; do sleep 1; done")
+          .build();
+      final String name = randomName();
+      sut.createContainer(config, name);
+    });
   }
 
-  @Test(expected = ConflictException.class)
+  @Test
   public void testCreateConflictingContainer() throws Exception {
     final ContainerConfig config = ContainerConfig.builder()
         .image(BUSYBOX_LATEST)
@@ -2437,7 +2423,7 @@ public class DefaultDockerClientTest {
 
     String containerName = randomName();
     sut.createContainer(config, containerName);
-    sut.createContainer(config, containerName);
+    assertThrows(ConflictException.class, () -> sut.createContainer(config, containerName));
   }
   
   @Test
@@ -2479,55 +2465,55 @@ public class DefaultDockerClientTest {
     };
   }
 
-  @Test(expected = ContainerNotFoundException.class)
+  @Test
   public void testKillBadContainer() throws Exception {
-    sut.killContainer(randomName());
+    assertThrows(ContainerNotFoundException.class, () -> sut.killContainer(randomName()));
   }
 
-  @Test(expected = ContainerNotFoundException.class)
+  @Test
   public void testKillBadContainerWithSignal() throws Exception {
-    sut.killContainer(randomName(), DockerClient.Signal.SIGKILL);
+    assertThrows(ContainerNotFoundException.class, () -> sut.killContainer(randomName(), DockerClient.Signal.SIGKILL));
   }
 
-  @Test(expected = ContainerNotFoundException.class)
+  @Test
   public void testPauseBadContainer() throws Exception {
-    sut.pauseContainer(randomName());
+    assertThrows(ContainerNotFoundException.class, () -> sut.pauseContainer(randomName()));
   }
 
-  @Test(expected = ContainerNotFoundException.class)
+  @Test
   public void testRemoveBadContainer() throws Exception {
-    sut.removeContainer(randomName());
+    assertThrows(ContainerNotFoundException.class, () -> sut.removeContainer(randomName()));
   }
   
-  @Test(expected = ConflictException.class)
+  @Test
   public void testRemoveRunningContainer() throws Exception {
     String container = createSleepingContainer();
-    sut.removeContainer(container);
+    assertThrows(ConflictException.class, () -> sut.removeContainer(container));
   }
 
-  @Test(expected = ContainerNotFoundException.class)
+  @Test
   public void testRestartBadContainer() throws Exception {
-    sut.restartContainer(randomName());
+    assertThrows(ContainerNotFoundException.class, () -> sut.restartContainer(randomName()));
   }
 
-  @Test(expected = ContainerNotFoundException.class)
+  @Test
   public void testStopBadContainer() throws Exception {
-    sut.stopContainer(randomName(), 10);
+    assertThrows(ContainerNotFoundException.class, () -> sut.stopContainer(randomName(), 10));
   }
 
-  @Test(expected = ImageNotFoundException.class)
+  @Test
   public void testTagBadImage() throws Exception {
-    sut.tag(randomName(), randomName());
+    assertThrows(ImageNotFoundException.class, () -> sut.tag(randomName(), randomName()));
   }
 
-  @Test(expected = ContainerNotFoundException.class)
+  @Test
   public void testUnpauseBadContainer() throws Exception {
-    sut.unpauseContainer(randomName());
+    assertThrows(ContainerNotFoundException.class, () -> sut.unpauseContainer(randomName()));
   }
 
-  @Test(expected = ImageNotFoundException.class)
+  @Test
   public void testRemoveBadImage() throws Exception {
-    sut.removeImage(randomName());
+    assertThrows(ImageNotFoundException.class, () -> sut.removeImage(randomName()));
   }
 
   @Test
@@ -2859,7 +2845,7 @@ public class DefaultDockerClientTest {
     assertThat(containerInfo.networkSettings().networks().get("bridge").macAddress(), equalTo("12:34:56:78:9a:bc"));
   }
 
-  @Test(expected = NetworkNotFoundException.class)
+  @Test
   public void testNetworks() throws Exception {
     final String networkName = randomName();
     final IpamConfig ipamConfig =
@@ -2883,12 +2869,11 @@ public class DefaultDockerClientTest {
     final List<Network> networks = sut.listNetworks();
     assertTrue(networks.size() > 0);
 
-    Network network = null;
-    for (final Network n : networks) {
-      if (n.name().equals(networkName)) {
-        network = n;
-      }
-    }
+    Network network = networks.stream()
+      .filter(n -> n.name().equals(networkName))
+      .findAny()
+      .orElseThrow();
+
     assertThat(network, is(notNullValue()));
     //noinspection ConstantConditions
     assertThat(network.id(), is(notNullValue()));
@@ -2901,10 +2886,10 @@ public class DefaultDockerClientTest {
 
     sut.removeNetwork(network.id());
 
-    sut.inspectNetwork(network.id());
+    assertThrows(NetworkNotFoundException.class, () -> sut.inspectNetwork(network.id()));
   }
   
-  @Ignore // most probably a bug, inspect network returns a {} but list returns null
+  @Disabled("most probably a bug, inspect network returns a {} but list returns null")
   @Test
   public void testFilterNetworks() throws Exception {
     final NetworkConfig network1Config = NetworkConfig.builder().checkDuplicate(true)
@@ -3326,7 +3311,7 @@ public class DefaultDockerClientTest {
     final String badVolumeName = "this-is-a-very-unlikely-volume-name";
 
     VolumeNotFoundException exception = assertThrows(VolumeNotFoundException.class, () -> sut.inspectVolume(badVolumeName));
-    MatcherAssert.assertThat(exception, volumeNotFoundExceptionWithName(badVolumeName));
+    assertThat(exception, volumeNotFoundExceptionWithName(badVolumeName));
   }
 
   private static Matcher<VolumeNotFoundException> volumeNotFoundExceptionWithName(
@@ -3515,8 +3500,7 @@ public class DefaultDockerClientTest {
   @Test
   public void testPidsLimit() throws Exception {
     if (OsUtils.isLinux()) {
-      assumeTrue("Linux kernel must be at least 4.3.",
-                 compareVersion(System.getProperty("os.version"), "4.3") >= 0);
+      assumeTrue(compareVersion(System.getProperty("os.version"), "4.3") >= 0);
     }
 
     // Pull image
@@ -3573,7 +3557,7 @@ public class DefaultDockerClientTest {
     assertThat(info.hostConfig().readonlyRootfs(), is(true));
   }
 
-  @Test(expected = ContainerNotFoundException.class)
+  @Test
   public void testAutoRemoveWhenSetToTrue() throws Exception {
     // Container should be removed after it is stopped (new since API v.1.25)
     // Pull image
@@ -3595,7 +3579,7 @@ public class DefaultDockerClientTest {
     await().until(containerIsRunning(sut, container.id()), is(false));
 
     // A ContainerNotFoundException should be thrown since the container is removed when it stops
-    sut.inspectContainer(container.id());
+    assertThrows(ContainerNotFoundException.class, () -> sut.inspectContainer(container.id()));
   }
   
   @Test

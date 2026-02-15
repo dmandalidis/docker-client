@@ -36,8 +36,10 @@ import javax.net.ssl.SSLSocket;
 import org.apache.http.HttpHost;
 import org.apache.http.protocol.HttpContext;
 import org.hamcrest.core.IsInstanceOf;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.mandas.docker.client.npipe.NamedPipeSocket;
 import org.mandas.docker.client.npipe.NpipeConnectionSocketFactory;
 
@@ -45,7 +47,7 @@ public class NpipeConnectionSocketFactoryTest {
 
   private NpipeConnectionSocketFactory sut;
 
-  @Before
+  @BeforeEach
   public void setup() throws Exception {
     sut = new NpipeConnectionSocketFactory(new URI("npipe://localhost"));
   }
@@ -70,10 +72,12 @@ public class NpipeConnectionSocketFactoryTest {
     assertThat((NamedPipeSocket) socket, equalTo(npipeSocket));
   }
 
-  @Test(expected = AssertionError.class)
+  @Test
   public void testConnectSocketNotUnixSocket() throws Exception {
-    sut.connectSocket(10, mock(SSLSocket.class), HttpHost.create("http://foo.com"),
-        mock(InetSocketAddress.class), mock(InetSocketAddress.class), mock(HttpContext.class));
+    assertThrows(AssertionError.class, () -> 
+      sut.connectSocket(10, mock(SSLSocket.class), HttpHost.create("http://foo.com"),
+        mock(InetSocketAddress.class), mock(InetSocketAddress.class), mock(HttpContext.class))
+    );
   }
 
 }
