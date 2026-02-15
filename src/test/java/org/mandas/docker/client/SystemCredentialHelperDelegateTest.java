@@ -21,32 +21,28 @@
 
 package org.mandas.docker.client;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.mandas.docker.client.SystemCredentialHelperDelegate.readServerAuthDetails;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.mandas.docker.client.messages.DockerCredentialHelperAuth;
 import java.io.BufferedReader;
 import java.io.StringReader;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class SystemCredentialHelperDelegateTest {
+class SystemCredentialHelperDelegateTest {
 
   private ObjectMapper objectMapper;
 
-  @Before
-  public void setup() {
+  @BeforeEach
+  void setup() {
     objectMapper = ObjectMapperProvider.objectMapper();
   }
 
   @Test
-  public void testReadServerAuthDetails() throws Exception {
+  void testReadServerAuthDetails() throws Exception {
     final ObjectNode node = objectMapper.createObjectNode()
         .put("Username", "foo")
         .put("Secret", "bar")
@@ -54,13 +50,13 @@ public class SystemCredentialHelperDelegateTest {
     final StringReader input = new StringReader(objectMapper.writeValueAsString(node));
     final DockerCredentialHelperAuth auth = readServerAuthDetails(new BufferedReader(input));
     
-    assertEquals("foo", auth.username());
-    assertEquals("bar", auth.secret());
-    assertEquals("example.com", auth.serverUrl());
+    assertThat(auth.username()).isEqualTo("foo");
+    assertThat(auth.secret()).isEqualTo("bar");
+    assertThat(auth.serverUrl()).isEqualTo("example.com");
   }
   
   @Test
-  public void readServerAuthDetailsFromMultipleLines() throws Exception {
+  void readServerAuthDetailsFromMultipleLines() throws Exception {
     final ObjectNode node = objectMapper.createObjectNode()
         .put("Username", "foo")
         .put("Secret", "bar")
@@ -69,13 +65,13 @@ public class SystemCredentialHelperDelegateTest {
         new StringReader(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(node));
     final DockerCredentialHelperAuth auth = readServerAuthDetails(new BufferedReader(input));
     
-    assertEquals("foo", auth.username());
-    assertEquals("bar", auth.secret());
-    assertEquals("example.com", auth.serverUrl());
+    assertThat(auth.username()).isEqualTo("foo");
+    assertThat(auth.secret()).isEqualTo("bar");
+    assertThat(auth.serverUrl()).isEqualTo("example.com");
   }
   
   @Test
-  public void readServerAuthDetailsNoServerUrl() throws Exception {
+  void readServerAuthDetailsNoServerUrl() throws Exception {
     final ObjectNode node = objectMapper.createObjectNode()
         .put("Username", "foo")
         .put("Secret", "bar");
@@ -83,9 +79,9 @@ public class SystemCredentialHelperDelegateTest {
         new StringReader(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(node));
     final DockerCredentialHelperAuth auth = readServerAuthDetails(new BufferedReader(input));
     
-    assertEquals("foo", auth.username());
-    assertEquals("bar", auth.secret());
-    assertNull(auth.serverUrl());
+    assertThat(auth.username()).isEqualTo("foo");
+    assertThat(auth.secret()).isEqualTo("bar");
+    assertThat(auth.serverUrl()).isNull();
   }
 
 }

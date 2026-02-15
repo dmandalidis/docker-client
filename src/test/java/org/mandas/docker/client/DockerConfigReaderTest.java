@@ -25,6 +25,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -37,9 +38,9 @@ import java.nio.file.Paths;
 import org.apache.commons.lang.RandomStringUtils;
 import org.hamcrest.CustomTypeSafeMatcher;
 import org.hamcrest.Matcher;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mandas.docker.client.DockerCredentialHelper.CredentialHelperDelegate;
 import org.mandas.docker.client.messages.DockerCredentialHelperAuth;
 import org.mandas.docker.client.messages.RegistryAuth;
@@ -73,13 +74,13 @@ public class DockerConfigReaderTest {
 
   private CredentialHelperDelegate credentialHelperDelegate;
 
-  @Before
+  @BeforeEach
   public void setup() {
     credentialHelperDelegate = mock(CredentialHelperDelegate.class);
     DockerCredentialHelper.setCredentialHelperDelegate(credentialHelperDelegate);
   }
 
-  @AfterClass
+  @AfterAll
   public static void afterClass() {
     DockerCredentialHelper.restoreSystemCredentialHelperDelegate();
   }
@@ -141,10 +142,10 @@ public class DockerConfigReaderTest {
     };
   }
 
-  @Test(expected = FileNotFoundException.class)
+  @Test
   public void testFromDockerConfig_MissingConfigFile() throws Exception {
     final Path randomPath = Paths.get(RandomStringUtils.randomAlphanumeric(16) + ".json");
-    reader.anyRegistryAuth(randomPath);
+    assertThrows(FileNotFoundException.class, () -> reader.anyRegistryAuth(randomPath));
   }
 
   @Test

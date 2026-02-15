@@ -21,9 +21,10 @@
 
 package org.mandas.docker;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+import com.google.common.io.Resources;
 
 public class FixtureUtil {
 
@@ -32,7 +33,7 @@ public class FixtureUtil {
   }
 
   public static String fixture(final String filename) throws IOException {
-    return Resources.toString(Resources.getResource(filename), Charsets.UTF_8).trim();
+    return Resources.toString(Resources.getResource(filename), StandardCharsets.UTF_8).trim();
   }
 
 }

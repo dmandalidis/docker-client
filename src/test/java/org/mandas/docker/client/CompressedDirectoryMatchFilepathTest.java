@@ -24,111 +24,97 @@ package org.mandas.docker.client;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.describedAs;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Stream;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
 
-@RunWith(Parameterized.class)
 public class CompressedDirectoryMatchFilepathTest {
 
-  @Parameters(name = "Pattern {0} matching {1}: {2} throwing {3}")
-  public static Iterable<Object[]> data() {
+  static Stream<Arguments> data() {
 
     // Data copy-pasted from http://golang.org/src/path/filepath/match_test.go#L22
     // Patterns we don't correctly handle are commented out
-    return Arrays.asList(new Object[][] {
-        {"abc", "abc", true, null},
-        {"*", "abc", true, null},
-        {"*c", "abc", true, null},
-        {"a*", "a", true, null},
-        {"a*", "abc", true, null},
-        {"a*", "ab/c", false, null},
-        {"a*/b", "abc/b", true, null},
-        {"a*/b", "a/c/b", false, null},
-        {"a*b*c*d*e*/f", "axbxcxdxe/f", true, null},
-        {"a*b*c*d*e*/f", "axbxcxdxexxx/f", true, null},
-        {"a*b*c*d*e*/f", "axbxcxdxe/xxx/f", false, null},
-        {"a*b*c*d*e*/f", "axbxcxdxexxx/fff", false, null},
-        {"a*b?c*x", "abxbbxdbxebxczzx", true, null},
-        {"a*b?c*x", "abxbbxdbxebxczzy", false, null},
-        {"ab[c]", "abc", true, null},
-        {"ab[b-d]", "abc", true, null},
-        {"ab[e-g]", "abc", false, null},
-        {"ab[^c]", "abc", false, null},
-        {"ab[^b-d]", "abc", false, null},
-        {"ab[^e-g]", "abc", true, null},
-        {"a\\*b", "a*b", true, null},
-        {"a\\*b", "ab", false, null},
-        {"a?b", "a☺b", true, null},
-        {"a[^a]b", "a☺b", true, null},
-        {"a???b", "a☺b", false, null},
-        {"a[^a][^a][^a]b", "a☺b", false, null},
-        {"[a-ζ]*", "α", true, null},
-        {"*[a-ζ]", "A", false, null},
-        {"a?b", "a/b", false, null},
-        {"a*b", "a/b", false, null},
-        {"[\\]a]", "]", true, null},
-        {"[\\-]", "-", true, null},
-        {"[x\\-]", "x", true, null},
-        {"[x\\-]", "-", true, null},
-        {"[x\\-]", "z", false, null},
-        {"[\\-x]", "x", true, null},
-        {"[\\-x]", "-", true, null},
-        {"[\\-x]", "a", false, null},
-        {"[]a]", "]", false, PatternSyntaxException.class},
-        // {"[-]", "-", false, PatternSyntaxException.class},
-        // {"[x-]", "x", false, PatternSyntaxException.class},
-        // {"[x-]", "-", false, PatternSyntaxException.class},
-        // {"[x-]", "z", false, PatternSyntaxException.class},
-        // {"[-x]", "x", false, PatternSyntaxException.class},
-        // {"[-x]", "-", false, PatternSyntaxException.class},
-        // {"[-x]", "a", false, PatternSyntaxException.class},
-        // {"\\", "a", false, PatternSyntaxException.class},
-        // {"[a-b-c]", "a", false, PatternSyntaxException.class},
-        {"[", "a", false, PatternSyntaxException.class},
-        {"[^", "a", false, PatternSyntaxException.class},
-        {"[^bc", "a", false, PatternSyntaxException.class},
-        // {"a[", "a", false, null},
-        {"a[", "ab", false, PatternSyntaxException.class},
-        {"*x", "xxx", true, null},
-        });
+    return Stream.of(
+        Arguments.of("abc", "abc", true, null),
+        Arguments.of("*", "abc", true, null),
+        Arguments.of("*c", "abc", true, null),
+        Arguments.of("a*", "a", true, null),
+        Arguments.of("a*", "abc", true, null),
+        Arguments.of("a*", "ab/c", false, null),
+        Arguments.of("a*/b", "abc/b", true, null),
+        Arguments.of("a*/b", "a/c/b", false, null),
+        Arguments.of("a*b*c*d*e*/f", "axbxcxdxe/f", true, null),
+        Arguments.of("a*b*c*d*e*/f", "axbxcxdxexxx/f", true, null),
+        Arguments.of("a*b*c*d*e*/f", "axbxcxdxe/xxx/f", false, null),
+        Arguments.of("a*b*c*d*e*/f", "axbxcxdxexxx/fff", false, null),
+        Arguments.of("a*b?c*x", "abxbbxdbxebxczzx", true, null),
+        Arguments.of("a*b?c*x", "abxbbxdbxebxczzy", false, null),
+        Arguments.of("ab[c]", "abc", true, null),
+        Arguments.of("ab[b-d]", "abc", true, null),
+        Arguments.of("ab[e-g]", "abc", false, null),
+        Arguments.of("ab[^c]", "abc", false, null),
+        Arguments.of("ab[^b-d]", "abc", false, null),
+        Arguments.of("ab[^e-g]", "abc", true, null),
+        Arguments.of("a\\*b", "a*b", true, null),
+        Arguments.of("a\\*b", "ab", false, null),
+        Arguments.of("a?b", "a☺b", true, null),
+        Arguments.of("a[^a]b", "a☺b", true, null),
+        Arguments.of("a???b", "a☺b", false, null),
+        Arguments.of("a[^a][^a][^a]b", "a☺b", false, null),
+        Arguments.of("[a-ζ]*", "α", true, null),
+        Arguments.of("*[a-ζ]", "A", false, null),
+        Arguments.of("a?b", "a/b", false, null),
+        Arguments.of("a*b", "a/b", false, null),
+        Arguments.of("[\\]a]", "]", true, null),
+        Arguments.of("[\\-]", "-", true, null),
+        Arguments.of("[x\\-]", "x", true, null),
+        Arguments.of("[x\\-]", "-", true, null),
+        Arguments.of("[x\\-]", "z", false, null),
+        Arguments.of("[\\-x]", "x", true, null),
+        Arguments.of("[\\-x]", "-", true, null),
+        Arguments.of("[\\-x]", "a", false, null),
+        Arguments.of("[]a]", "]", false, PatternSyntaxException.class),
+        // Arguments.of("[-]", "-", false, PatternSyntaxException.class),
+        // Arguments.of("[x-]", "x", false, PatternSyntaxException.class),
+        // Arguments.of("[x-]", "-", false, PatternSyntaxException.class),
+        // Arguments.of("[x-]", "z", false, PatternSyntaxException.class),
+        // Arguments.of("[-x]", "x", false, PatternSyntaxException.class),
+        // Arguments.of("[-x]", "-", false, PatternSyntaxException.class),
+        // Arguments.of("[-x]", "a", false, PatternSyntaxException.class),
+        // Arguments.of("\\", "a", false, PatternSyntaxException.class),
+        // Arguments.of("[a-b-c]", "a", false, PatternSyntaxException.class),
+        Arguments.of("[", "a", false, PatternSyntaxException.class),
+        Arguments.of("[^", "a", false, PatternSyntaxException.class),
+        Arguments.of("[^bc", "a", false, PatternSyntaxException.class),
+        // Arguments.of("a[", "a", false, null),
+        Arguments.of("a[", "ab", false, PatternSyntaxException.class),
+        Arguments.of("*x", "xxx", true, null)
+    );
   }
-
-  @Parameter(0)
-  public String pattern;
-
-  @Parameter(1)
-  public String pathString;
-
-  @Parameter(2)
-  public boolean matched;
-
-  @Parameter(3)
-  public Class<? extends Exception> exception;
 
   private FileSystem fs;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     fs = Jimfs.newFileSystem(Configuration.unix());
   }
 
-  @Test
-  public void testMatchFilepath() {
+  @ParameterizedTest(name = "Pattern {0} matching {1}: {2} throwing {3}")
+  @MethodSource("data")
+  public void testMatchFilepath(String pattern, String pathString, boolean matched, 
+                                  Class<? extends Exception> exception) {
     final Path path = fs.getPath(pathString);
     if (exception != null) {
     	assertThrows(exception, () -> CompressedDirectory.goPathMatcher(fs, pattern).matches(path)); 

@@ -21,13 +21,13 @@
 
 package org.mandas.docker.client.auth;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 
 import org.mandas.docker.client.exceptions.DockerException;
 import org.mandas.docker.client.messages.RegistryAuth;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class FixedRegistryAuthSupplierTest {
 
