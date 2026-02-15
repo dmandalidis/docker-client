@@ -19,76 +19,87 @@
 */
 package org.mandas.docker.client.builder;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 /**
  * Object representing a host's proxy configuration
  * @author Dimitris Mandalidis
  * @see DockerClientBuilder#proxyFromEnv()
+ * @param host the host running the proxy (FQDN)
+ * @param port the port to which the proxy listens (network port)
+ * @param username an optional username in case of authenticated access
+ * @param password an optional password in case of authenticated access
  */
-@Immutable
-public interface ProxyConfiguration {
+public record ProxyConfiguration(
+    String host,
+    String port,
+    @Nullable
+    String username,
+    @Nullable
+    String password) {
 
-  /**
-   * @return the host running the proxy
-   */
-  String host();
-  
-  /**
-   * @return the port to which the proxy listens
-   */
-  String port();
-  
-  /**
-   * @return an optional username in case of authenticated access
-   */
-  @Nullable
-  String username();
-  
-  /**
-   * @return an optional password in case of authenticated access
-   */
-  @Nullable
-  String password();
-  
-  interface Builder {
+  @JsonPOJOBuilder(withPrefix = "")
+  public static class Builder {
+    private String host;
+    private String port;
+    private String username;
+    private String password;
+
     /**
      * Set the host running the proxy 
      * @param host the FQDN
      * @return this
      */
-    Builder host(String host);
+    public Builder host(String host) {
+      this.host = host;
+      return this;
+    }
+
     /**
      * Set the port to which the proxy listens 
      * @param port a network port
      * @return this
      */
-    Builder port(String port);
+    public Builder port(String port) {
+      this.port = port;
+      return this;
+    }
+
     /**
      * Set the user in case of authenticated access 
      * @param username the username
      * @return this
      */
-    Builder username(String username);
+    public Builder username(String username) {
+      this.username = username;
+      return this;
+    }
+
     /**
      * Set the password of the user in case of authenticated access 
      * @param password the password of the user
      * @return this
      */
-    Builder password(String password);
+    public Builder password(String password) {
+      this.password = password;
+      return this;
+    }
+
     /**
      * Build this configuration
      * @return a new {@link ProxyConfiguration}
      */
-    ProxyConfiguration build();
+    public ProxyConfiguration build() {
+      return new ProxyConfiguration(host, port, username, password);
+    }
   }
-  
+
   /**
    * Get a {@link ProxyConfiguration} builder
    * @return a new builder
    */
   static Builder builder() {
-    return ImmutableProxyConfiguration.builder();
+    return new Builder();
   }
 }

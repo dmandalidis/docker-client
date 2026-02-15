@@ -21,38 +21,86 @@
 
 package org.mandas.docker.client.messages;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
-@JsonDeserialize(builder = ImmutableVersion.Builder.class)
-@Immutable
-public interface Version {
+@JsonDeserialize(builder = Version.Builder.class)
+public record Version(
+    @JsonProperty("ApiVersion")
+    String apiVersion,
+    @JsonProperty("Arch")
+    String arch,
+    @Nullable
+    @JsonProperty("BuildTime")
+    String buildTime,
+    @JsonProperty("GitCommit")
+    String gitCommit,
+    @JsonProperty("GoVersion")
+    String goVersion,
+    @JsonProperty("KernelVersion")
+    String kernelVersion,
+    @JsonProperty("Os")
+    String os,
+    @JsonProperty("Version")
+    String version) {
 
-  @JsonProperty("ApiVersion")
-  String apiVersion();
+  @JsonPOJOBuilder(withPrefix = "")
+  public static class Builder {
+    private String apiVersion;
+    private String arch;
+    private String buildTime;
+    private String gitCommit;
+    private String goVersion;
+    private String kernelVersion;
+    private String os;
+    private String version;
 
-  @JsonProperty("Arch")
-  String arch();
+    public Builder apiVersion(String apiVersion) {
+      this.apiVersion = apiVersion;
+      return this;
+    }
 
-  @Nullable
-  @JsonProperty("BuildTime")
-  String buildTime();
+    public Builder arch(String arch) {
+      this.arch = arch;
+      return this;
+    }
 
-  @JsonProperty("GitCommit")
-  String gitCommit();
+    public Builder buildTime(String buildTime) {
+      this.buildTime = buildTime;
+      return this;
+    }
 
-  @JsonProperty("GoVersion")
-  String goVersion();
+    public Builder gitCommit(String gitCommit) {
+      this.gitCommit = gitCommit;
+      return this;
+    }
 
-  @JsonProperty("KernelVersion")
-  String kernelVersion();
+    public Builder goVersion(String goVersion) {
+      this.goVersion = goVersion;
+      return this;
+    }
 
-  @JsonProperty("Os")
-  String os();
+    public Builder kernelVersion(String kernelVersion) {
+      this.kernelVersion = kernelVersion;
+      return this;
+    }
 
-  @JsonProperty("Version")
-  String version();
+    public Builder os(String os) {
+      this.os = os;
+      return this;
+    }
+
+    public Builder version(String version) {
+      this.version = version;
+      return this;
+    }
+
+    public Version build() {
+      return new Version(apiVersion, arch, buildTime, gitCommit, goVersion, 
+          kernelVersion, os, version);
+    }
+  }
 }
