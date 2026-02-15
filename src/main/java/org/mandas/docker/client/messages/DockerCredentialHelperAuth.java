@@ -21,50 +21,65 @@
 
 package org.mandas.docker.client.messages;
 
-import org.immutables.value.Value.Derived;
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 /**
  * Represents the auth response received from a docker credential helper
  * on a "get" operation, or sent to a credential helper on a "store".
  *
  * <p>See {@link org.mandas.docker.client.DockerCredentialHelper}.</p>
+ * 
+ * @param username the username
+ * @param secret the secret/password
+ * @param serverUrl optional server URL
  */
-@JsonDeserialize(builder = ImmutableDockerCredentialHelperAuth.Builder.class)
-@Immutable
-public interface DockerCredentialHelperAuth {
-  @JsonProperty("Username")
-  String username();
+@JsonDeserialize(builder = DockerCredentialHelperAuth.Builder.class)
+public record DockerCredentialHelperAuth(
+    @JsonProperty("Username")
+    String username,
+    @JsonProperty("Secret")
+    String secret,
+    @Nullable
+    @JsonProperty("ServerURL")
+    String serverUrl) {
 
-  @JsonProperty("Secret")
-  String secret();
+  @JsonPOJOBuilder(withPrefix = "")
+  public static class Builder {
+    private String username;
+    private String secret;
+    private String serverUrl;
 
-  @Nullable
-  @JsonProperty("ServerURL")
-  String serverUrl();
+    public Builder username(String username) {
+      this.username = username;
+      return this;
+    }
 
-  interface Builder {
-	  Builder username(String username);
-	  
-	  Builder secret(String secret);
-	  
-	  Builder serverUrl(String serverUrl);
-	  
-	  DockerCredentialHelperAuth build();
+    public Builder secret(String secret) {
+      this.secret = secret;
+      return this;
+    }
+
+    public Builder serverUrl(String serverUrl) {
+      this.serverUrl = serverUrl;
+      return this;
+    }
+
+    public DockerCredentialHelperAuth build() {
+      return new DockerCredentialHelperAuth(username, secret, serverUrl);
+    }
   }
-  
-  static Builder builder() {
-	  return ImmutableDockerCredentialHelperAuth.builder();
+
+  public static Builder builder() {
+    return new Builder();
   }
-  
+
   @JsonIgnore
-  @Derived
-  default RegistryAuth toRegistryAuth() {
+  public RegistryAuth toRegistryAuth() {
     return RegistryAuth.builder()
         .username(username())
         .password(secret())

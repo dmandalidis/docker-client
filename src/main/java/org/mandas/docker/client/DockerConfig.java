@@ -23,46 +23,102 @@ package org.mandas.docker.client;
 
 import java.util.Map;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 import org.mandas.docker.client.messages.RegistryAuth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 /**
  * Represents the contents of the docker config.json file.
+ * @param credHelpers credential helpers mapping
+ * @param auths authentication details mapping
+ * @param httpHeaders HTTP headers mapping
+ * @param credsStore optional credentials store
+ * @param detachKeys optional detach keys
+ * @param stackOrchestrator optional stack orchestrator
+ * @param psFormat optional ps format
+ * @param imagesFormat optional images format
  */
-@Immutable
-@JsonDeserialize(builder = ImmutableDockerConfig.Builder.class)
-public interface DockerConfig {
+@JsonDeserialize(builder = DockerConfig.Builder.class)
+public record DockerConfig(
+    @JsonProperty("credHelpers")
+    Map<String, String> credHelpers,
+    @JsonProperty("auths")
+    Map<String, RegistryAuth> auths,
+    @JsonProperty("HttpHeaders")
+    Map<String, String> httpHeaders,
+    @Nullable
+    @JsonProperty("credsStore")
+    String credsStore,
+    @Nullable
+    @JsonProperty("detachKeys")
+    String detachKeys,
+    @Nullable
+    @JsonProperty("stackOrchestrator")
+    String stackOrchestrator,
+    @Nullable
+    @JsonProperty("psFormat")
+    String psFormat,
+    @Nullable
+    @JsonProperty("imagesFormat")
+    String imagesFormat) {
 
-  @JsonProperty("credHelpers")
-  Map<String, String> credHelpers();
+  @JsonPOJOBuilder(withPrefix = "")
+  public static class Builder {
+    private Map<String, String> credHelpers;
+    private Map<String, RegistryAuth> auths;
+    private Map<String, String> httpHeaders;
+    private String credsStore;
+    private String detachKeys;
+    private String stackOrchestrator;
+    private String psFormat;
+    private String imagesFormat;
 
-  @JsonProperty("auths")
-  Map<String, RegistryAuth> auths();
+    public Builder credHelpers(Map<String, String> credHelpers) {
+      this.credHelpers = credHelpers;
+      return this;
+    }
 
-  @JsonProperty("HttpHeaders")
-  Map<String, String> httpHeaders();
+    public Builder auths(Map<String, RegistryAuth> auths) {
+      this.auths = auths;
+      return this;
+    }
 
-  @Nullable
-  @JsonProperty("credsStore")
-  String credsStore();
+    public Builder httpHeaders(Map<String, String> httpHeaders) {
+      this.httpHeaders = httpHeaders;
+      return this;
+    }
 
-  @Nullable
-  @JsonProperty("detachKeys")
-  String detachKeys();
+    public Builder credsStore(String credsStore) {
+      this.credsStore = credsStore;
+      return this;
+    }
 
-  @Nullable
-  @JsonProperty("stackOrchestrator")
-  String stackOrchestrator();
+    public Builder detachKeys(String detachKeys) {
+      this.detachKeys = detachKeys;
+      return this;
+    }
 
-  @Nullable
-  @JsonProperty("psFormat")
-  String psFormat();
+    public Builder stackOrchestrator(String stackOrchestrator) {
+      this.stackOrchestrator = stackOrchestrator;
+      return this;
+    }
 
-  @Nullable
-  @JsonProperty("imagesFormat")
-  String imagesFormat();
+    public Builder psFormat(String psFormat) {
+      this.psFormat = psFormat;
+      return this;
+    }
+
+    public Builder imagesFormat(String imagesFormat) {
+      this.imagesFormat = imagesFormat;
+      return this;
+    }
+
+    public DockerConfig build() {
+      return new DockerConfig(credHelpers, auths, httpHeaders, credsStore, detachKeys, 
+          stackOrchestrator, psFormat, imagesFormat);
+    }
+  }
 }

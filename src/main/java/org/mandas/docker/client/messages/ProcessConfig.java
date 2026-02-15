@@ -23,33 +23,70 @@ package org.mandas.docker.client.messages;
 
 import java.util.List;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 /**
  * An object that represents the JSON returned by the Docker API for an exec command's process
  * configuration.
+ * @param privileged whether the process runs with elevated privileges
+ * @param user optional user for the process
+ * @param tty whether a pseudo-terminal is allocated
+ * @param entrypoint the entrypoint command
+ * @param arguments the command arguments
  */
-@JsonDeserialize(builder = ImmutableProcessConfig.Builder.class)
-@Immutable
-public interface ProcessConfig {
+@JsonDeserialize(builder = ProcessConfig.Builder.class)
+public record ProcessConfig(
+    @JsonProperty("privileged")
+    Boolean privileged,
+    @Nullable
+    @JsonProperty("user")
+    String user,
+    @JsonProperty("tty")
+    Boolean tty,
+    @JsonProperty("entrypoint")
+    String entrypoint,
+    @JsonProperty("arguments")
+    List<String> arguments) {
 
-  @JsonProperty("privileged")
-  Boolean privileged();
+  @JsonPOJOBuilder(withPrefix = "")
+  public static class Builder {
+    private Boolean privileged;
+    private String user;
+    private Boolean tty;
+    private String entrypoint;
+    private List<String> arguments;
 
-  @Nullable
-  @JsonProperty("user")
-  String user();
+    public Builder privileged(Boolean privileged) {
+      this.privileged = privileged;
+      return this;
+    }
 
-  @JsonProperty("tty")
-  Boolean tty();
+    public Builder user(String user) {
+      this.user = user;
+      return this;
+    }
 
-  @JsonProperty("entrypoint")
-  String entrypoint();
+    public Builder tty(Boolean tty) {
+      this.tty = tty;
+      return this;
+    }
 
-  @JsonProperty("arguments")
-  List<String> arguments();
+    public Builder entrypoint(String entrypoint) {
+      this.entrypoint = entrypoint;
+      return this;
+    }
+
+    public Builder arguments(List<String> arguments) {
+      this.arguments = arguments;
+      return this;
+    }
+
+    public ProcessConfig build() {
+      return new ProcessConfig(privileged, user, tty, entrypoint, arguments);
+    }
+  }
 }

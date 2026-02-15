@@ -23,80 +23,106 @@ package org.mandas.docker.client.messages;
 
 import java.util.Map;
 
-import org.immutables.value.Value.Enclosing;
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
-@JsonDeserialize(builder = ImmutableNetwork.Builder.class)
-@Immutable
-@Enclosing
-public interface Network {
-
-  @JsonProperty("Name")
-  String name();
-
-  @JsonProperty("Id")
-  String id();
-
-  @JsonProperty("Scope")
-  String scope();
-
-  @JsonProperty("Driver")
-  String driver();
-
-  @JsonProperty("IPAM")
-  Ipam ipam();
-
-  @Nullable
-  @JsonProperty("Containers")
-  Map<String, Container> containers();
-
-  @Nullable
-  @JsonProperty("Options")
-  Map<String, String> options();
-  
-  @Nullable
-  @JsonProperty("Internal")
-  Boolean internal();
-  
-  @Nullable
-  @JsonProperty("EnableIPv6")
-  Boolean enableIPv6();
-
-  @Nullable
-  @JsonProperty("Labels")
-  Map<String, String> labels();
-
-  @Nullable
-  @JsonProperty("Attachable")
-  Boolean attachable();
-
-  @JsonDeserialize(builder = ImmutableNetwork.Container.Builder.class)
-  @Immutable
-  public interface Container {
-
-    @Nullable
+@JsonDeserialize(builder = Network.Builder.class)
+public record Network(
     @JsonProperty("Name")
-    String name();
+    String name,
+    @JsonProperty("Id")
+    String id,
+    @JsonProperty("Scope")
+    String scope,
+    @JsonProperty("Driver")
+    String driver,
+    @JsonProperty("IPAM")
+    Ipam ipam,
+    @Nullable
+    @JsonProperty("Containers")
+    Map<String, Container> containers,
+    @Nullable
+    @JsonProperty("Options")
+    Map<String, String> options,
+    @Nullable
+    @JsonProperty("Internal")
+    Boolean internal,
+    @Nullable
+    @JsonProperty("EnableIPv6")
+    Boolean enableIPv6,
+    @Nullable
+    @JsonProperty("Labels")
+    Map<String, String> labels,
+    @Nullable
+    @JsonProperty("Attachable")
+    Boolean attachable) {
 
-    @JsonProperty("EndpointID")
-    String endpointId();
+  /**
+   * Container attached to the network
+   * @param name optional container name
+   * @param endpointId endpoint ID
+   * @param macAddress MAC address
+   * @param ipv4Address IPv4 address
+   * @param ipv6Address IPv6 address
+   */
+  @JsonDeserialize(builder = Container.Builder.class)
+  public record Container(
+      @Nullable
+      @JsonProperty("Name")
+      String name,
+      @JsonProperty("EndpointID")
+      String endpointId,
+      @JsonProperty("MacAddress")
+      String macAddress,
+      @JsonProperty("IPv4Address")
+      String ipv4Address,
+      @JsonProperty("IPv6Address")
+      String ipv6Address) {
 
-    @JsonProperty("MacAddress")
-    String macAddress();
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class Builder {
+      private String name;
+      private String endpointId;
+      private String macAddress;
+      private String ipv4Address;
+      private String ipv6Address;
 
-    @JsonProperty("IPv4Address")
-    String ipv4Address();
+      public Builder name(String name) {
+        this.name = name;
+        return this;
+      }
 
-    @JsonProperty("IPv6Address")
-    String ipv6Address();
+      public Builder endpointId(String endpointId) {
+        this.endpointId = endpointId;
+        return this;
+      }
+
+      public Builder macAddress(String macAddress) {
+        this.macAddress = macAddress;
+        return this;
+      }
+
+      public Builder ipv4Address(String ipv4Address) {
+        this.ipv4Address = ipv4Address;
+        return this;
+      }
+
+      public Builder ipv6Address(String ipv6Address) {
+        this.ipv6Address = ipv6Address;
+        return this;
+      }
+
+      public Container build() {
+        return new Container(name, endpointId, macAddress, ipv4Address, ipv6Address);
+      }
+    }
   }
-  
+
   /**
    * Docker networks come in two kinds: built-in or custom. 
    */
@@ -116,6 +142,81 @@ public interface Network {
     @JsonValue
     public String getName() {
       return name;
+    }
+  }
+
+  @JsonPOJOBuilder(withPrefix = "")
+  public static class Builder {
+    private String name;
+    private String id;
+    private String scope;
+    private String driver;
+    private Ipam ipam;
+    private Map<String, Container> containers;
+    private Map<String, String> options;
+    private Boolean internal;
+    private Boolean enableIPv6;
+    private Map<String, String> labels;
+    private Boolean attachable;
+
+    public Builder name(String name) {
+      this.name = name;
+      return this;
+    }
+
+    public Builder id(String id) {
+      this.id = id;
+      return this;
+    }
+
+    public Builder scope(String scope) {
+      this.scope = scope;
+      return this;
+    }
+
+    public Builder driver(String driver) {
+      this.driver = driver;
+      return this;
+    }
+
+    public Builder ipam(Ipam ipam) {
+      this.ipam = ipam;
+      return this;
+    }
+
+    public Builder containers(Map<String, Container> containers) {
+      this.containers = containers;
+      return this;
+    }
+
+    public Builder options(Map<String, String> options) {
+      this.options = options;
+      return this;
+    }
+
+    public Builder internal(Boolean internal) {
+      this.internal = internal;
+      return this;
+    }
+
+    public Builder enableIPv6(Boolean enableIPv6) {
+      this.enableIPv6 = enableIPv6;
+      return this;
+    }
+
+    public Builder labels(Map<String, String> labels) {
+      this.labels = labels;
+      return this;
+    }
+
+    public Builder attachable(Boolean attachable) {
+      this.attachable = attachable;
+      return this;
+    }
+
+    public Network build() {
+      return new Network(name, id, scope, driver, ipam, containers, options, internal, 
+          enableIPv6, labels, attachable);
     }
   }
 }

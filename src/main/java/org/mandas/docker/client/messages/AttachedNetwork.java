@@ -23,45 +23,103 @@ package org.mandas.docker.client.messages;
 
 import java.util.List;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
-@Immutable
-@JsonDeserialize(builder = ImmutableAttachedNetwork.Builder.class)
-public interface AttachedNetwork {
+@JsonDeserialize(builder = AttachedNetwork.Builder.class)
+public record AttachedNetwork(
+    @Nullable
+    @JsonProperty("Aliases")
+    List<String> aliases,
+    @Nullable
+    @JsonProperty("NetworkID")
+    String networkId,
+    @JsonProperty("EndpointID")
+    String endpointId,
+    @JsonProperty("Gateway")
+    String gateway,
+    @JsonProperty("IPAddress")
+    String ipAddress,
+    @JsonProperty("IPPrefixLen")
+    Integer ipPrefixLen,
+    @JsonProperty("IPv6Gateway")
+    String ipv6Gateway,
+    @JsonProperty("GlobalIPv6Address")
+    String globalIPv6Address,
+    @JsonProperty("GlobalIPv6PrefixLen")
+    Integer globalIPv6PrefixLen,
+    @JsonProperty("MacAddress")
+    String macAddress) {
 
-  @Nullable
-  @JsonProperty("Aliases")
-  List<String> aliases();
+  @JsonPOJOBuilder(withPrefix = "")
+  public static class Builder {
+    private List<String> aliases;
+    private String networkId;
+    private String endpointId;
+    private String gateway;
+    private String ipAddress;
+    private Integer ipPrefixLen;
+    private String ipv6Gateway;
+    private String globalIPv6Address;
+    private Integer globalIPv6PrefixLen;
+    private String macAddress;
 
-  @Nullable
-  @JsonProperty("NetworkID")
-  String networkId();
+    public Builder aliases(List<String> aliases) {
+      this.aliases = aliases;
+      return this;
+    }
 
-  @JsonProperty("EndpointID")
-  String endpointId();
+    public Builder networkId(String networkId) {
+      this.networkId = networkId;
+      return this;
+    }
 
-  @JsonProperty("Gateway")
-  String gateway();
+    public Builder endpointId(String endpointId) {
+      this.endpointId = endpointId;
+      return this;
+    }
 
-  @JsonProperty("IPAddress")
-  String ipAddress();
+    public Builder gateway(String gateway) {
+      this.gateway = gateway;
+      return this;
+    }
 
-  @JsonProperty("IPPrefixLen")
-  Integer ipPrefixLen();
+    public Builder ipAddress(String ipAddress) {
+      this.ipAddress = ipAddress;
+      return this;
+    }
 
-  @JsonProperty("IPv6Gateway")
-  String ipv6Gateway();
+    public Builder ipPrefixLen(Integer ipPrefixLen) {
+      this.ipPrefixLen = ipPrefixLen;
+      return this;
+    }
 
-  @JsonProperty("GlobalIPv6Address")
-  String globalIPv6Address();
+    public Builder ipv6Gateway(String ipv6Gateway) {
+      this.ipv6Gateway = ipv6Gateway;
+      return this;
+    }
 
-  @JsonProperty("GlobalIPv6PrefixLen")
-  Integer globalIPv6PrefixLen();
+    public Builder globalIPv6Address(String globalIPv6Address) {
+      this.globalIPv6Address = globalIPv6Address;
+      return this;
+    }
 
-  @JsonProperty("MacAddress")
-  String macAddress();
+    public Builder globalIPv6PrefixLen(Integer globalIPv6PrefixLen) {
+      this.globalIPv6PrefixLen = globalIPv6PrefixLen;
+      return this;
+    }
+
+    public Builder macAddress(String macAddress) {
+      this.macAddress = macAddress;
+      return this;
+    }
+
+    public AttachedNetwork build() {
+      return new AttachedNetwork(aliases, networkId, endpointId, gateway, ipAddress, 
+          ipPrefixLen, ipv6Gateway, globalIPv6Address, globalIPv6PrefixLen, macAddress);
+    }
+  }
 }

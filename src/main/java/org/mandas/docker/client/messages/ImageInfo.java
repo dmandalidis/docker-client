@@ -23,65 +23,138 @@ package org.mandas.docker.client.messages;
 
 import java.util.Date;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
-@JsonDeserialize(builder = ImmutableImageInfo.Builder.class)
-@Immutable
-public interface ImageInfo {
+@JsonDeserialize(builder = ImageInfo.Builder.class)
+public record ImageInfo(
+    @JsonProperty("Id")
+    String id,
+    @Deprecated // as of v1.48
+    @Nullable
+    @JsonProperty("Parent")
+    String parent,
+    @Deprecated // as of v1.44
+    @Nullable
+    @JsonProperty("Comment")
+    String comment,
+    @JsonProperty("Created")
+    Date created,
+    @Deprecated // as of v1.44
+    @JsonProperty("Container")
+    @Nullable
+    String container,
+    @Deprecated // as of v1.44
+    @JsonProperty("ContainerConfig")
+    @Nullable
+    ContainerConfig containerConfig,
+    @Deprecated // as of v1.48
+    @Nullable
+    @JsonProperty("DockerVersion")
+    String dockerVersion,
+    @Deprecated // as of v1.44
+    @Nullable
+    @JsonProperty("Author")
+    String author,
+    @JsonProperty("Config")
+    ImageConfig config,
+    @JsonProperty("Architecture")
+    String architecture,
+    @JsonProperty("Os")
+    String os,
+    @JsonProperty("Size")
+    Long size,
+    @Nullable
+    @JsonProperty("RootFS")
+    RootFs rootFs) {
 
-  @JsonProperty("Id")
-  String id();
+  @JsonPOJOBuilder(withPrefix = "")
+  public static class Builder {
+    private String id;
+    private String parent;
+    private String comment;
+    private Date created;
+    private String container;
+    private ContainerConfig containerConfig;
+    private String dockerVersion;
+    private String author;
+    private ImageConfig config;
+    private String architecture;
+    private String os;
+    private Long size;
+    private RootFs rootFs;
 
-  @Deprecated // as of v1.48
-  @Nullable
-  @JsonProperty("Parent")
-  String parent();
+    public Builder id(String id) {
+      this.id = id;
+      return this;
+    }
 
-  @Deprecated // as of v1.44
-  @Nullable
-  @JsonProperty("Comment")
-  String comment();
+    public Builder parent(String parent) {
+      this.parent = parent;
+      return this;
+    }
 
-  @JsonProperty("Created")
-  Date created();
+    public Builder comment(String comment) {
+      this.comment = comment;
+      return this;
+    }
 
-  @Deprecated // as of v1.44
-  @JsonProperty("Container")
-  @Nullable
-  String container();
+    public Builder created(Date created) {
+      this.created = created;
+      return this;
+    }
 
-  @Deprecated // as of v1.44
-  @JsonProperty("ContainerConfig")
-  @Nullable
-  ContainerConfig containerConfig();
+    public Builder container(String container) {
+      this.container = container;
+      return this;
+    }
 
-  @Deprecated // as of v1.48
-  @Nullable
-  @JsonProperty("DockerVersion")
-  String dockerVersion();
+    public Builder containerConfig(ContainerConfig containerConfig) {
+      this.containerConfig = containerConfig;
+      return this;
+    }
 
-  @Deprecated // as of v1.44
-  @Nullable
-  @JsonProperty("Author")
-  String author();
+    public Builder dockerVersion(String dockerVersion) {
+      this.dockerVersion = dockerVersion;
+      return this;
+    }
 
-  @JsonProperty("Config")
-  ImageConfig config();
+    public Builder author(String author) {
+      this.author = author;
+      return this;
+    }
 
-  @JsonProperty("Architecture")
-  String architecture();
+    public Builder config(ImageConfig config) {
+      this.config = config;
+      return this;
+    }
 
-  @JsonProperty("Os")
-  String os();
+    public Builder architecture(String architecture) {
+      this.architecture = architecture;
+      return this;
+    }
 
-  @JsonProperty("Size")
-  Long size();
+    public Builder os(String os) {
+      this.os = os;
+      return this;
+    }
 
-  @Nullable
-  @JsonProperty("RootFS")
-  RootFs rootFs();
+    public Builder size(Long size) {
+      this.size = size;
+      return this;
+    }
+
+    public Builder rootFs(RootFs rootFs) {
+      this.rootFs = rootFs;
+      return this;
+    }
+
+    public ImageInfo build() {
+      return new ImageInfo(id, parent, comment, created, container, containerConfig, 
+          dockerVersion, author, config, architecture, os, size, rootFs);
+    }
+  }
 }

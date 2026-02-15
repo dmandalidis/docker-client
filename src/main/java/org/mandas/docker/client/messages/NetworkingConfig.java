@@ -21,23 +21,30 @@ package org.mandas.docker.client.messages;
 
 import java.util.Map;
 
-import org.immutables.value.Value.Immutable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
-@JsonDeserialize(builder = ImmutableNetworkingConfig.Builder.class)
-@Immutable
-public interface NetworkingConfig {
-  @JsonProperty("EndpointsConfig")
-  Map<String, EndpointConfig> endpointsConfig();
+@JsonDeserialize(builder = NetworkingConfig.Builder.class)
+public record NetworkingConfig(
+    @JsonProperty("EndpointsConfig")
+    Map<String, EndpointConfig> endpointsConfig) {
   
-  interface Builder {
-    NetworkingConfig.Builder endpointsConfig(Map<String, ? extends EndpointConfig> endpointsConfig);
-    NetworkingConfig build();
+  @JsonPOJOBuilder(withPrefix = "")
+  public static class Builder {
+    private Map<String, EndpointConfig> endpointsConfig;
+
+    public Builder endpointsConfig(Map<String, EndpointConfig> endpointsConfig) {
+      this.endpointsConfig = endpointsConfig;
+      return this;
+    }
+
+    public NetworkingConfig build() {
+      return new NetworkingConfig(endpointsConfig);
+    }
   }
   
-  public static NetworkingConfig.Builder builder() {
-    return ImmutableNetworkingConfig.builder();
+  public static Builder builder() {
+    return new Builder();
   }
 }
