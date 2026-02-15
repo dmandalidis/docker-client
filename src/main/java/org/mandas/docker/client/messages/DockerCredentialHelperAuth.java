@@ -21,54 +21,60 @@
 
 package org.mandas.docker.client.messages;
 
-import org.immutables.value.Value.Derived;
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-/**
- * Represents the auth response received from a docker credential helper
- * on a "get" operation, or sent to a credential helper on a "store".
- *
- * <p>See {@link org.mandas.docker.client.DockerCredentialHelper}.</p>
- */
-@JsonDeserialize(builder = ImmutableDockerCredentialHelperAuth.Builder.class)
-@Immutable
-public interface DockerCredentialHelperAuth {
+public record DockerCredentialHelperAuth(
   @JsonProperty("Username")
-  String username();
+  String username,
 
   @JsonProperty("Secret")
-  String secret();
+  String secret,
 
   @Nullable
   @JsonProperty("ServerURL")
-  String serverUrl();
+  String serverUrl
+) {
 
-  interface Builder {
-	  Builder username(String username);
-	  
-	  Builder secret(String secret);
-	  
-	  Builder serverUrl(String serverUrl);
-	  
-	  DockerCredentialHelperAuth build();
-  }
   
-  static Builder builder() {
-	  return ImmutableDockerCredentialHelperAuth.builder();
+  
+  public static Builder builder() {
+    return new Builder();
+  }
+
+  public static class Builder {
+    private String username;
+    private String secret;
+    private String serverUrl;
+
+    public Builder username(String username) {
+      this.username = username;
+      return this;
+    }
+
+    public Builder secret(String secret) {
+      this.secret = secret;
+      return this;
+    }
+
+    public Builder serverUrl(String serverUrl) {
+      this.serverUrl = serverUrl;
+      return this;
+    }
+
+    public DockerCredentialHelperAuth build() {
+      return new DockerCredentialHelperAuth(username, secret, serverUrl);
+    }
   }
   
   @JsonIgnore
-  @Derived
-  default RegistryAuth toRegistryAuth() {
+  public RegistryAuth toRegistryAuth() {
     return RegistryAuth.builder()
-        .username(username())
-        .password(secret())
-        .serverAddress(serverUrl())
+        .username(username)
+        .password(secret)
+        .serverAddress(serverUrl)
         .build();
   }
 }

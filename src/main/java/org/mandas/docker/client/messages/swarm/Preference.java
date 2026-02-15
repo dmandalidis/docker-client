@@ -21,19 +21,14 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutablePreference.Builder.class)
-@Immutable
-public interface Preference {
-
+public record Preference(
   @JsonProperty("Spread")
-  Spread spread();
+  Spread spread
+) {
 
   public static Preference create(final Spread spread) {
-    return ImmutablePreference.builder().spread(spread).build();
+    return new Preference(spread);
   }
 }

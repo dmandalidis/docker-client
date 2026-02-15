@@ -23,17 +23,12 @@ package org.mandas.docker.client.messages;
 
 import java.util.List;
 
-import org.immutables.value.Value.Immutable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableRootFs.Builder.class)
-@Immutable
-public interface RootFs {
+public record RootFs(
   @JsonProperty("Type")
-  String type();
+  String type,
 
   @JsonProperty("Layers")
-  List<String> layers();
-}
+  List<String> layers
+) {}

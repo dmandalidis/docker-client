@@ -23,32 +23,25 @@ package org.mandas.docker.client.messages;
 
 import java.util.List;
 
-import org.immutables.value.Value.Immutable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 
-@JsonDeserialize(builder = ImmutablePlatform.Builder.class)
-@Immutable
-public interface Platform {
-
+public record Platform(
   @JsonProperty("Architecture")
-  String architecture();
+  String architecture,
 
   @JsonProperty("OS")
-  String os();
+  String os,
 
   @JsonProperty("OSVersion")
-  String osVersion();
+  String osVersion,
 
   @JsonProperty("OSFeatures")
-  List<String> osFeatures();
+  List<String> osFeatures,
 
   @JsonProperty("Variant")
-  String variant();
+  String variant,
 
   @JsonProperty("Features")
-  List<String> features();
-
-}
+  List<String> features
+) {}

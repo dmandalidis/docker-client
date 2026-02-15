@@ -23,43 +23,19 @@ package org.mandas.docker.client.messages;
 
 import static java.util.stream.Collectors.toMap;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.immutables.value.Value.Immutable;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 
-/**
- * A formatted string passed in X-Registry-Config request header.
- *
- * <pre>
- * {
- *   "docker.example.com": {
- *     "serveraddress": "docker.example.com",
- *     "username": "janedoe",
- *     "password": "hunter2",
- *     "email": "janedoe@example.com",
- *     "auth": ""
- *   },
- *   "https://index.docker.io/v1/": {
- *     "serveraddress": "docker.example.com",
- *     "username": "mobydock",
- *     "password": "conta1n3rize14",
- *     "email": "mobydock@example.com",
- *     "auth": ""
- *   }
- * }
- * </pre>
- */
-@Immutable
-public interface RegistryConfigs {
+public record RegistryConfigs(
+  Map<String, RegistryAuth> configs
+) {
 
   public static RegistryConfigs empty() {
     return builder().build();
   }
-
-  Map<String, RegistryAuth> configs();
 
   @JsonCreator
   public static RegistryConfigs create(final Map<String, RegistryAuth> configs) {
@@ -67,32 +43,40 @@ public interface RegistryConfigs {
       return empty();
     }
 
-    // need to add serverAddress to each RegistryAuth instance; it is not available when
-    // Jackson is deserializing the RegistryAuth field
     final Map<String, RegistryAuth> transformedMap = configs.entrySet().stream()
       .collect(toMap(Entry::getKey, entry -> {
         RegistryAuth value = entry.getValue();
-    	if (value == null) {
-    	  return null;
-    	}
-    	if (value.serverAddress() == null) {
-    	  return value.toBuilder().serverAddress(entry.getKey()).build();
-    	}
-    	return value;
+        if (value == null) {
+          return null;
+        }
+        if (value.serverAddress() == null) {
+          return value.toBuilder().serverAddress(entry.getKey()).build();
+        }
+        return value;
       }));
     
     return builder().configs(transformedMap).build();
   }
 
   public static Builder builder() {
-    return ImmutableRegistryConfigs.builder();
+    return new Builder();
   }
 
-  interface Builder {
-    Builder configs(Map<String, ? extends RegistryAuth> configs);
+  public static class Builder {
+    private Map<String, RegistryAuth> configs = new HashMap<>();
 
-    Builder addConfig(final String server, final RegistryAuth registryAuth);
+    public Builder configs(Map<String, ? extends RegistryAuth> configs) {
+      this.configs = new HashMap<>(configs);
+      return this;
+    }
 
-    RegistryConfigs build();
+    public Builder addConfig(final String server, final RegistryAuth registryAuth) {
+      this.configs.put(server, registryAuth);
+      return this;
+    }
+
+    public RegistryConfigs build() {
+      return new RegistryConfigs(configs);
+    }
   }
 }

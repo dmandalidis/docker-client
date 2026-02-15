@@ -24,112 +24,49 @@ package org.mandas.docker.client.messages;
 import java.util.Date;
 import java.util.List;
 
-import org.immutables.value.Value.Enclosing;
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableContainerInfo.Builder.class)
-@Immutable
-@Enclosing
-public interface ContainerInfo {
-
-  @Nullable
-  @JsonProperty("Id")
-  String id();
-
-  @JsonProperty("Created")
-  Date created();
-
-  @JsonProperty("Path")
-  String path();
-
-  @JsonProperty("Args")
-  List<String> args();
-
-  @JsonProperty("Config")
-  ContainerConfig config();
-
-  @Nullable
-  @JsonProperty("HostConfig")
-  HostConfig hostConfig();
-
-  @JsonProperty("State")
-  ContainerState state();
-
-  @JsonProperty("Image")
-  String image();
-
-  @JsonProperty("NetworkSettings")
-  NetworkSettings networkSettings();
-
-  @JsonProperty("ResolvConfPath")
-  String resolvConfPath();
-
-  @JsonProperty("HostnamePath")
-  String hostnamePath();
-
-  @JsonProperty("HostsPath")
-  String hostsPath();
-
-  @JsonProperty("Name")
-  String name();
-
-  @JsonProperty("Driver")
-  String driver();
-
-  @Nullable
-  @JsonProperty("ExecDriver")
-  String execDriver();
-
-  @JsonProperty("ProcessLabel")
-  String processLabel();
-
-  @JsonProperty("MountLabel")
-  String mountLabel();
-
-  @JsonProperty("AppArmorProfile")
-  String appArmorProfile();
-
-  @Nullable
-  @JsonProperty("ExecIDs")
-  List<String> execIds();
-
-  @JsonProperty("LogPath")
-  String logPath();
-
-  @JsonProperty("RestartCount")
-  Long restartCount();
-
-  @Nullable
-  @JsonProperty("Mounts")
-  List<ContainerMount> mounts();
+public record ContainerInfo(
+  @Nullable @JsonProperty("Id") String id,
+  @JsonProperty("Created") Date created,
+  @JsonProperty("Path") String path,
+  @JsonProperty("Args") List<String> args,
+  @JsonProperty("Config") ContainerConfig config,
+  @Nullable @JsonProperty("HostConfig") HostConfig hostConfig,
+  @JsonProperty("State") ContainerState state,
+  @JsonProperty("Image") String image,
+  @JsonProperty("NetworkSettings") NetworkSettings networkSettings,
+  @JsonProperty("ResolvConfPath") String resolvConfPath,
+  @JsonProperty("HostnamePath") String hostnamePath,
+  @JsonProperty("HostsPath") String hostsPath,
+  @JsonProperty("Name") String name,
+  @JsonProperty("Driver") String driver,
+  @Nullable @JsonProperty("ExecDriver") String execDriver,
+  @JsonProperty("ProcessLabel") String processLabel,
+  @JsonProperty("MountLabel") String mountLabel,
+  @JsonProperty("AppArmorProfile") String appArmorProfile,
+  @Nullable @JsonProperty("ExecIDs") List<String> execIds,
+  @JsonProperty("LogPath") String logPath,
+  @JsonProperty("RestartCount") Long restartCount,
+  @Nullable @JsonProperty("Mounts") List<ContainerMount> mounts,
+  @Nullable @JsonProperty("Node") Node node
+) {
 
   /**
    * This field is an extension defined by the Docker Swarm API, therefore it will only be populated
    * when communicating with a Swarm cluster.
-   * @return the node information where the container is placed
+   * 
+   * @param id the node ID
+   * @param ip the node IP address
+   * @param addr the node address
+   * @param name the node name
    */
-  @Nullable
-  @JsonProperty("Node")
-  Node node();
-
-  @JsonDeserialize(builder = ImmutableContainerInfo.Node.Builder.class)
-  @Immutable
-  public interface Node {
-
-    @JsonProperty("ID")
-    String id();
-
-    @JsonProperty("IP")
-    String ip();
-
-    @JsonProperty("Addr")
-    String addr();
-
-    @JsonProperty("Name")
-    String name();
-  }
+  public record Node(
+    @JsonProperty("ID") String id,
+    @JsonProperty("IP") String ip,
+    @JsonProperty("Addr") String addr,
+    @JsonProperty("Name") String name
+  ) {}
 }

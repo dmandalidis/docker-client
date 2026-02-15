@@ -23,23 +23,17 @@ package org.mandas.docker.client.messages.swarm;
 
 import java.util.Map;
 
-import org.immutables.value.Value.Immutable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableExternalCa.Builder.class)
-@Immutable
-public interface ExternalCa {
-
-  static final String PROTOCOL_CFSSL = "cfssl";
-
+public record ExternalCa(
   @JsonProperty("Protocol")
-  String protocol();
+  String protocol,
 
   @JsonProperty("URL")
-  String url();
+  String url,
 
   @JsonProperty("Options")
-  Map<String, String> options();
+  Map<String, String> options
+) {
+  public static final String PROTOCOL_CFSSL = "cfssl";
 }

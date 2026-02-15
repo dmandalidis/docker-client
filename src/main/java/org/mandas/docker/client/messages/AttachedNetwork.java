@@ -23,45 +23,40 @@ package org.mandas.docker.client.messages;
 
 import java.util.List;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@Immutable
-@JsonDeserialize(builder = ImmutableAttachedNetwork.Builder.class)
-public interface AttachedNetwork {
-
+public record AttachedNetwork(
   @Nullable
   @JsonProperty("Aliases")
-  List<String> aliases();
+  List<String> aliases,
 
   @Nullable
   @JsonProperty("NetworkID")
-  String networkId();
+  String networkId,
 
   @JsonProperty("EndpointID")
-  String endpointId();
+  String endpointId,
 
   @JsonProperty("Gateway")
-  String gateway();
+  String gateway,
 
   @JsonProperty("IPAddress")
-  String ipAddress();
+  String ipAddress,
 
   @JsonProperty("IPPrefixLen")
-  Integer ipPrefixLen();
+  Integer ipPrefixLen,
 
   @JsonProperty("IPv6Gateway")
-  String ipv6Gateway();
+  String ipv6Gateway,
 
   @JsonProperty("GlobalIPv6Address")
-  String globalIPv6Address();
+  String globalIPv6Address,
 
   @JsonProperty("GlobalIPv6PrefixLen")
-  Integer globalIPv6PrefixLen();
+  Integer globalIPv6PrefixLen,
 
   @JsonProperty("MacAddress")
-  String macAddress();
-}
+  String macAddress
+) {}

@@ -23,65 +23,60 @@ package org.mandas.docker.client.messages;
 
 import java.util.Date;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableImageInfo.Builder.class)
-@Immutable
-public interface ImageInfo {
-
+public record ImageInfo(
   @JsonProperty("Id")
-  String id();
+  String id,
 
-  @Deprecated // as of v1.48
+  @Deprecated
   @Nullable
   @JsonProperty("Parent")
-  String parent();
+  String parent,
 
-  @Deprecated // as of v1.44
+  @Deprecated
   @Nullable
   @JsonProperty("Comment")
-  String comment();
+  String comment,
 
   @JsonProperty("Created")
-  Date created();
+  Date created,
 
-  @Deprecated // as of v1.44
+  @Deprecated
   @JsonProperty("Container")
   @Nullable
-  String container();
+  String container,
 
-  @Deprecated // as of v1.44
+  @Deprecated
   @JsonProperty("ContainerConfig")
   @Nullable
-  ContainerConfig containerConfig();
+  ContainerConfig containerConfig,
 
-  @Deprecated // as of v1.48
+  @Deprecated
   @Nullable
   @JsonProperty("DockerVersion")
-  String dockerVersion();
+  String dockerVersion,
 
-  @Deprecated // as of v1.44
+  @Deprecated
   @Nullable
   @JsonProperty("Author")
-  String author();
+  String author,
 
   @JsonProperty("Config")
-  ImageConfig config();
+  ImageConfig config,
 
   @JsonProperty("Architecture")
-  String architecture();
+  String architecture,
 
   @JsonProperty("Os")
-  String os();
+  String os,
 
   @JsonProperty("Size")
-  Long size();
+  Long size,
 
   @Nullable
   @JsonProperty("RootFS")
-  RootFs rootFs();
-}
+  RootFs rootFs
+) {}

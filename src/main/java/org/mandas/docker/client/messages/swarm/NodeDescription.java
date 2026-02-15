@@ -21,24 +21,18 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableNodeDescription.Builder.class)
-@Immutable
-public interface NodeDescription {
-
+public record NodeDescription(
   @JsonProperty("Hostname")
-  String hostname();
+  String hostname,
 
   @JsonProperty("Platform")
-  Platform platform();
+  Platform platform,
 
   @JsonProperty("Resources")
-  Resources resources();
+  Resources resources,
 
   @JsonProperty("Engine")
-  EngineConfig engine();
-}
+  EngineConfig engine
+) {}

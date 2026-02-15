@@ -23,27 +23,23 @@ package org.mandas.docker.client.messages.swarm;
 
 import java.util.List;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutablePlacement.Builder.class)
-@Immutable
-public interface Placement {
-
+public record Placement(
   @Nullable
   @JsonProperty("Constraints")
-  List<String> constraints();
+  List<String> constraints,
 
   @Nullable
   @JsonProperty("Preferences")
-  List<Preference> preferences();
+  List<Preference> preferences,
   
   @Nullable
   @JsonProperty("MaxReplicas")
-  Integer maxReplicas();
+  Integer maxReplicas
+) {
 
   public static Placement create(final List<String> constraints) {
     return create(constraints, null, null);
@@ -54,6 +50,6 @@ public interface Placement {
   }
   
   public static Placement create(final List<String> constraints, final List<Preference> preferences, final Integer maxReplicas) {
-    return ImmutablePlacement.builder().constraints(constraints).preferences(preferences).maxReplicas(maxReplicas).build();
+    return new Placement(constraints, preferences, maxReplicas);
   }
 }

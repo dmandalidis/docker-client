@@ -21,19 +21,14 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableSpread.Builder.class)
-@Immutable
-public interface Spread {
-
+public record Spread(
   @JsonProperty("SpreadDescriptor")
-  String spreadDescriptor();
+  String spreadDescriptor
+) {
 
   public static Spread create(final String spreadDescriptor) {
-    return ImmutableSpread.builder().spreadDescriptor(spreadDescriptor).build();
+    return new Spread(spreadDescriptor);
   }
 }

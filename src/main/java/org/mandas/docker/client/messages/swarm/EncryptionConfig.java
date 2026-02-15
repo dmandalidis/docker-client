@@ -21,27 +21,32 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableEncryptionConfig.Builder.class)
-@Immutable
-public interface EncryptionConfig {
-
+public record EncryptionConfig(
   @Nullable
   @JsonProperty("AutoLockManagers")
-  Boolean autoLockManagers();
+  Boolean autoLockManagers
+) {
 
-  interface Builder {
-    Builder autoLockManagers(Boolean autoLockManagers);
+  
 
-    EncryptionConfig build();
+  public static Builder builder() {
+    return new Builder();
   }
 
-  public static EncryptionConfig.Builder builder() {
-    return ImmutableEncryptionConfig.builder();
+  public static class Builder {
+    private Boolean autoLockManagers;
+
+    public Builder autoLockManagers(Boolean autoLockManagers) {
+      this.autoLockManagers = autoLockManagers;
+      return this;
+    }
+
+    public EncryptionConfig build() {
+      return new EncryptionConfig(autoLockManagers);
+    }
   }
 }

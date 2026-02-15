@@ -21,16 +21,9 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableConfigCreateResponse.Builder.class)
-@Immutable
-public interface ConfigCreateResponse {
-
+public record ConfigCreateResponse(
   @JsonProperty("ID")
-  String id();
-
-}
+  String id
+) {}

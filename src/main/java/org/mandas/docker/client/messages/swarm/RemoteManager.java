@@ -21,19 +21,12 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableRemoteManager.Builder.class)
-@Immutable
-public interface RemoteManager {
-
+public record RemoteManager(
   @JsonProperty("Addr")
-  String addr();
+  String addr,
 
   @JsonProperty("NodeID")
-  String nodeId();
-
-}
+  String nodeId
+) {}

@@ -19,25 +19,30 @@
 */
 package org.mandas.docker.client.messages;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import org.immutables.value.Value.Immutable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableNetworkingConfig.Builder.class)
-@Immutable
-public interface NetworkingConfig {
+public record NetworkingConfig(
   @JsonProperty("EndpointsConfig")
-  Map<String, EndpointConfig> endpointsConfig();
-  
-  interface Builder {
-    NetworkingConfig.Builder endpointsConfig(Map<String, ? extends EndpointConfig> endpointsConfig);
-    NetworkingConfig build();
-  }
+  Map<String, EndpointConfig> endpointsConfig
+) {
   
   public static NetworkingConfig.Builder builder() {
-    return ImmutableNetworkingConfig.builder();
+    return new Builder();
+  }
+
+  public static class Builder {
+    private Map<String, EndpointConfig> endpointsConfig;
+
+    public NetworkingConfig.Builder endpointsConfig(Map<String, ? extends EndpointConfig> endpointsConfig) {
+      this.endpointsConfig = new HashMap<>(endpointsConfig);
+      return this;
+    }
+
+    public NetworkingConfig build() {
+      return new NetworkingConfig(endpointsConfig);
+    }
   }
 }

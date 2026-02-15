@@ -23,43 +23,57 @@ package org.mandas.docker.client.messages.swarm;
 
 import java.util.List;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-
-@JsonDeserialize(builder = ImmutableSwarmJoin.Builder.class)
-@Immutable
-public interface SwarmJoin {
+public record SwarmJoin(
   @JsonProperty("ListenAddr")
-  String listenAddr();
+  String listenAddr,
 
   @Nullable
   @JsonProperty("AdvertiseAddr")
-  String advertiseAddr();
+  String advertiseAddr,
 
   @JsonProperty("RemoteAddrs")
-  List<String> remoteAddrs();
+  List<String> remoteAddrs,
 
   @JsonProperty("JoinToken")
-  String joinToken();
-
-  interface Builder {
-    Builder listenAddr(String listenAddr);
-
-    Builder advertiseAddr(String advertiseAddr);
-
-    Builder remoteAddrs(Iterable<String> remoteAddrs);
-
-    Builder joinToken(String swarmSpec);
-
-    SwarmJoin build();
-  }
+  String joinToken
+) {
 
   public static Builder builder() {
-    return ImmutableSwarmJoin.builder();
+    return new Builder();
   }
 
+  public static class Builder {
+    private String listenAddr;
+    private String advertiseAddr;
+    private List<String> remoteAddrs;
+    private String joinToken;
+
+    public Builder listenAddr(String listenAddr) {
+      this.listenAddr = listenAddr;
+      return this;
+    }
+
+    public Builder advertiseAddr(String advertiseAddr) {
+      this.advertiseAddr = advertiseAddr;
+      return this;
+    }
+
+    public Builder remoteAddrs(List<String> remoteAddrs) {
+      this.remoteAddrs = remoteAddrs;
+      return this;
+    }
+
+    public Builder joinToken(String joinToken) {
+      this.joinToken = joinToken;
+      return this;
+    }
+
+    public SwarmJoin build() {
+      return new SwarmJoin(listenAddr, advertiseAddr, remoteAddrs, joinToken);
+    }
+  }
 }

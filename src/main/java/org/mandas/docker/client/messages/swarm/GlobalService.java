@@ -21,19 +21,15 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
-@JsonDeserialize(builder = ImmutableGlobalService.Builder.class)
-@Immutable
-public interface GlobalService {
+public record GlobalService() {
 
   public static Builder builder() {
-    return ImmutableGlobalService.builder();
+    return new Builder();
   }
 
-  interface Builder {
-    GlobalService build();
+  public static class Builder {
+    public GlobalService build() {
+      return new GlobalService();
+    }
   }
 }

@@ -21,16 +21,10 @@
 
 package org.mandas.docker.client.messages;
 
-import org.immutables.value.Value.Immutable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 
-@JsonDeserialize(builder = ImmutableContainerExit.Builder.class)
-@Immutable
-public interface ContainerExit {
-
+public record ContainerExit(
   @JsonProperty("StatusCode")
-  Long statusCode();
-}
+  Long statusCode
+) {}

@@ -21,44 +21,65 @@
 
 package org.mandas.docker.client.messages.mount;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableVolumeOptions.Builder.class)
-@Immutable
-public interface VolumeOptions {
-
+public record VolumeOptions(
   @Nullable
   @JsonProperty("NoCopy")
-  Boolean noCopy();
+  Boolean noCopy,
 
   @Nullable
   @JsonProperty("Labels")
-  Map<String, String> labels();
+  Map<String, String> labels,
 
   @Nullable
   @JsonProperty("DriverConfig")
-  Driver driverConfig();
+  Driver driverConfig
+) {
 
-  interface Builder {
-
-    Builder noCopy(Boolean noCopy);
-
-    Builder labels(Map<String, ? extends String> labels);
-
-    Builder addLabel(final String label, final String value);
-
-    Builder driverConfig(Driver driverConfig);
-
-    VolumeOptions build();
-  }
+  
 
   public static Builder builder() {
-    return ImmutableVolumeOptions.builder();
+    return new Builder();
+  }
+
+  public static class Builder {
+    private Boolean noCopy;
+    private Map<String, String> labels;
+    private Driver driverConfig;
+
+    public Builder noCopy(Boolean noCopy) {
+      this.noCopy = noCopy;
+      return this;
+    }
+
+    public Builder labels(Map<String, String> labels) {
+      this.labels = labels == null ? null : Map.copyOf(labels);
+      return this;
+    }
+
+    public Builder addLabel(final String label, final String value) {
+      if (this.labels == null) {
+        this.labels = new HashMap<>();
+      } else {
+        this.labels = new HashMap<>(this.labels);
+      }
+      this.labels.put(label, value);
+      return this;
+    }
+
+    public Builder driverConfig(Driver driverConfig) {
+      this.driverConfig = driverConfig;
+      return this;
+    }
+
+    public VolumeOptions build() {
+      return new VolumeOptions(noCopy, labels == null ? null : Map.copyOf(labels), driverConfig);
+    }
   }
 }

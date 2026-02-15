@@ -23,96 +23,97 @@ package org.mandas.docker.client.messages.swarm;
 
 import java.util.Date;
 
-import org.immutables.value.Value.Enclosing;
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableNode.Builder.class)
-@Immutable
-@Enclosing
-public interface Node {
-
+public record Node(
   @JsonProperty("ID")
-  String id();
+  String id,
 
   @JsonProperty("Version")
-  Version version();
+  Version version,
 
   @JsonProperty("CreatedAt")
-  Date createdAt();
+  Date createdAt,
 
   @JsonProperty("UpdatedAt")
-  Date updatedAt();
+  Date updatedAt,
 
   @JsonProperty("Spec")
-  NodeSpec spec();
+  NodeSpec spec,
 
   @JsonProperty("Description")
-  NodeDescription description();
+  NodeDescription description,
 
   @JsonProperty("Status")
-  NodeStatus status();
+  NodeStatus status,
 
   @Nullable
   @JsonProperty("ManagerStatus")
-  ManagerStatus managerStatus();
+  ManagerStatus managerStatus
+) {
 
-  @JsonDeserialize(builder = ImmutableNode.Criteria.Builder.class)
-  @Immutable
-  public interface Criteria {
-    /**
-     * @return Filter by node id.
-     */
+  public record Criteria(
     @Nullable
-    String nodeId();
+    String nodeId,
 
-    /**
-     * @return Filter by label.
-     */
     @Nullable
-    String label();
+    String label,
 
-    /**
-     * @return Filter by membership {accepted | pending}.
-     */
     @Nullable
-    String membership();
+    String membership,
 
-    /**
-     * @return Filter by node name.
-     */
     @Nullable
-    String nodeName();
+    String nodeName,
 
-    /**
-     * @return Filter by node role {manager | worker}.
-     */
     @Nullable
-    String nodeRole();
-
-    public static Criteria.Builder builder() {
-      return ImmutableNode.Criteria.builder();
-    }
+    String nodeRole
+  ) {
     
-    interface Builder {
-      Builder nodeId(String nodeId);
+    public static Builder builder() {
+    return new Builder();
+    }
 
-      Builder label(String label);
+    public static class Builder {
+      private String nodeId;
+      private String label;
+      private String membership;
+      private String nodeName;
+      private String nodeRole;
 
-      Builder nodeName(String nodeName);
+      public Builder nodeId(String nodeId) {
+        this.nodeId = nodeId;
+        return this;
+      }
 
-      Builder membership(String membership);
+      public Builder label(String label) {
+        this.label = label;
+        return this;
+      }
 
-      Builder nodeRole(String nodeRole);
+      public Builder membership(String membership) {
+        this.membership = membership;
+        return this;
+      }
 
-      Criteria build();
+      public Builder nodeName(String nodeName) {
+        this.nodeName = nodeName;
+        return this;
+      }
+
+      public Builder nodeRole(String nodeRole) {
+        this.nodeRole = nodeRole;
+        return this;
+      }
+
+      public Criteria build() {
+        return new Criteria(nodeId, label, membership, nodeName, nodeRole);
+      }
     }
   }
 
-  public static Node.Criteria.Builder find() {
-    return ImmutableNode.Criteria.builder();
+  public static Criteria.Builder find() {
+    return Criteria.builder();
   }
 }

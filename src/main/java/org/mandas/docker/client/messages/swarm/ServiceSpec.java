@@ -21,72 +21,113 @@
 
 package org.mandas.docker.client.messages.swarm;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableServiceSpec.Builder.class)
-@Immutable
-public interface ServiceSpec {
-
+public record ServiceSpec(
   @Nullable
   @JsonProperty("Name")
-  String name();
+  String name,
 
   @Nullable
   @JsonProperty("Labels")
-  Map<String, String> labels();
+  Map<String, String> labels,
 
   @JsonProperty("TaskTemplate")
-  TaskSpec taskTemplate();
+  TaskSpec taskTemplate,
 
   @Nullable
   @JsonProperty("Mode")
-  ServiceMode mode();
+  ServiceMode mode,
 
   @Nullable
   @JsonProperty("UpdateConfig")
-  UpdateConfig updateConfig();
+  UpdateConfig updateConfig,
 
-  @Deprecated // as of v1.44
+  @Deprecated
   @Nullable
   @JsonProperty("Networks")
-  List<NetworkAttachmentConfig> networks();
+  List<NetworkAttachmentConfig> networks,
 
   @Nullable
   @JsonProperty("EndpointSpec")
-  EndpointSpec endpointSpec();
+  EndpointSpec endpointSpec
+) {
 
-  interface Builder {
-
-    Builder name(String name);
-
-    Builder addLabel(final String label, final String value);
-
-    Builder labels(Map<String, ? extends String> labels);
-
-    Builder taskTemplate(TaskSpec taskTemplate);
-
-    Builder mode(ServiceMode mode);
-
-    Builder updateConfig(UpdateConfig updateConfig);
-
-    Builder networks(NetworkAttachmentConfig... networks);
-
-    Builder networks(Iterable<? extends NetworkAttachmentConfig> networks);
-
-    Builder endpointSpec(EndpointSpec endpointSpec);
-
-    ServiceSpec build();
-  }
+  
 
   public static Builder builder() {
-    return ImmutableServiceSpec.builder();
+    return new Builder();
   }
 
+  public static class Builder {
+    private String name;
+    private Map<String, String> labels;
+    private TaskSpec taskTemplate;
+    private ServiceMode mode;
+    private UpdateConfig updateConfig;
+    private List<NetworkAttachmentConfig> networks;
+    private EndpointSpec endpointSpec;
+
+    public Builder name(String name) {
+      this.name = name;
+      return this;
+    }
+
+    public Builder addLabel(final String label, final String value) {
+      if (this.labels == null) {
+        this.labels = new HashMap<>();
+      } else {
+        this.labels = new HashMap<>(this.labels);
+      }
+      this.labels.put(label, value);
+      return this;
+    }
+
+    public Builder labels(Map<String, String> labels) {
+      this.labels = labels == null ? null : Map.copyOf(labels);
+      return this;
+    }
+
+    public Builder taskTemplate(TaskSpec taskTemplate) {
+      this.taskTemplate = taskTemplate;
+      return this;
+    }
+
+    public Builder mode(ServiceMode mode) {
+      this.mode = mode;
+      return this;
+    }
+
+    public Builder updateConfig(UpdateConfig updateConfig) {
+      this.updateConfig = updateConfig;
+      return this;
+    }
+
+    public Builder networks(NetworkAttachmentConfig... networks) {
+      this.networks = networks == null ? null : List.of(networks);
+      return this;
+    }
+
+    public Builder networks(List<NetworkAttachmentConfig> networks) {
+      this.networks = networks;
+      return this;
+    }
+
+    public Builder endpointSpec(EndpointSpec endpointSpec) {
+      this.endpointSpec = endpointSpec;
+      return this;
+    }
+
+    public ServiceSpec build() {
+      return new ServiceSpec(name, labels == null ? null : Map.copyOf(labels), 
+          taskTemplate, mode, updateConfig, 
+          networks == null ? null : List.copyOf(networks), endpointSpec);
+    }
+  }
 }

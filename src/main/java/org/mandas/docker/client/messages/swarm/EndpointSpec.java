@@ -21,21 +21,23 @@
 
 package org.mandas.docker.client.messages.swarm;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.immutables.value.Value.Auxiliary;
-import org.immutables.value.Value.Derived;
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableEndpointSpec.Builder.class)
-@Immutable
-public interface EndpointSpec {
+public record EndpointSpec(
+  @Nullable
+  @JsonProperty("Mode")
+  Mode mode,
+
+  @JsonProperty("Ports")
+  List<PortConfig> ports
+) {
 
   public enum Mode {
     RESOLUTION_MODE_VIP("vip"),
@@ -53,46 +55,61 @@ public interface EndpointSpec {
     }
   }
 
-  @Nullable
-  @JsonProperty("Mode")
-  Mode mode();
-
-  @JsonProperty("Ports")
-  List<PortConfig> ports();
-
   @JsonIgnore
-  @Derived
-  @Auxiliary
-  default Builder toBuilder() {
-	return ImmutableEndpointSpec.builder().from(this);
+  public Builder toBuilder() {
+    Builder builder = builder();
+    if (mode != null) {
+      builder.mode(mode);
+    }
+    if (ports != null) {
+      builder.ports(ports);
+    }
+    return builder;
   }
   
-  default EndpointSpec withVipMode() {
+  public EndpointSpec withVipMode() {
     return toBuilder().mode(Mode.RESOLUTION_MODE_VIP).build();
   }
 
-  default EndpointSpec withDnsrrMode() {
+  public EndpointSpec withDnsrrMode() {
     return toBuilder().mode(Mode.RESOLUTION_MODE_DNSRR).build();
   }
 
-  interface Builder {
+  public static Builder builder() {
+    return new Builder();
+  }
 
-    Builder mode(Mode mode);
+  public static class Builder {
+    private Mode mode;
+    private List<PortConfig> ports;
 
-    default Builder addPort(final PortConfig portConfig) {
-    	ports(portConfig);
-    	return this;
+    public Builder mode(Mode mode) {
+      this.mode = mode;
+      return this;
     }
 
-    Builder ports(PortConfig... ports);
+    public Builder addPort(final PortConfig portConfig) {
+      if (this.ports == null) {
+        this.ports = new ArrayList<>();
+      } else {
+        this.ports = new ArrayList<>(this.ports);
+      }
+      this.ports.add(portConfig);
+      return this;
+    }
 
-    Builder ports(Iterable<? extends PortConfig> ports);
+    public Builder ports(PortConfig... ports) {
+      this.ports = ports == null ? null : List.of(ports);
+      return this;
+    }
 
-    EndpointSpec build();
+    public Builder ports(List<PortConfig> ports) {
+      this.ports = ports;
+      return this;
+    }
+
+    public EndpointSpec build() {
+      return new EndpointSpec(mode, ports == null ? null : List.copyOf(ports));
+    }
   }
-
-  public static Builder builder() {
-    return ImmutableEndpointSpec.builder();
-  }
-
 }

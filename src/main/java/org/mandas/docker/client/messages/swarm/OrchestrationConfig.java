@@ -21,28 +21,32 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-
-@JsonDeserialize(builder = ImmutableOrchestrationConfig.Builder.class)
-@Immutable
-public interface OrchestrationConfig {
-
+public record OrchestrationConfig(
   @Nullable
   @JsonProperty("TaskHistoryRetentionLimit")
-  Integer taskHistoryRetentionLimit();
+  Integer taskHistoryRetentionLimit
+) {
 
-  interface Builder {
-    Builder taskHistoryRetentionLimit(Integer taskHistoryRetentionLimit);
-
-    OrchestrationConfig build();
-  }
+  
 
   public static Builder builder() {
-    return ImmutableOrchestrationConfig.builder();
+    return new Builder();
+  }
+
+  public static class Builder {
+    private Integer taskHistoryRetentionLimit;
+
+    public Builder taskHistoryRetentionLimit(Integer taskHistoryRetentionLimit) {
+      this.taskHistoryRetentionLimit = taskHistoryRetentionLimit;
+      return this;
+    }
+
+    public OrchestrationConfig build() {
+      return new OrchestrationConfig(taskHistoryRetentionLimit);
+    }
   }
 }

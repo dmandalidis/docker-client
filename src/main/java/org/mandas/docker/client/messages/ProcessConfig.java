@@ -23,33 +23,34 @@ package org.mandas.docker.client.messages;
 
 import java.util.List;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * An object that represents the JSON returned by the Docker API for an exec command's process
  * configuration.
+ * 
+ * @param privileged whether the process runs in privileged mode
+ * @param user the user to run the process as
+ * @param tty whether to allocate a pseudo-TTY
+ * @param entrypoint the entrypoint for the process
+ * @param arguments the arguments for the process
  */
-@JsonDeserialize(builder = ImmutableProcessConfig.Builder.class)
-@Immutable
-public interface ProcessConfig {
-
+public record ProcessConfig(
   @JsonProperty("privileged")
-  Boolean privileged();
+  Boolean privileged,
 
   @Nullable
   @JsonProperty("user")
-  String user();
+  String user,
 
   @JsonProperty("tty")
-  Boolean tty();
+  Boolean tty,
 
   @JsonProperty("entrypoint")
-  String entrypoint();
+  String entrypoint,
 
   @JsonProperty("arguments")
-  List<String> arguments();
-}
+  List<String> arguments
+) {}

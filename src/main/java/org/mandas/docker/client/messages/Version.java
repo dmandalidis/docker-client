@@ -21,38 +21,33 @@
 
 package org.mandas.docker.client.messages;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableVersion.Builder.class)
-@Immutable
-public interface Version {
-
+public record Version(
   @JsonProperty("ApiVersion")
-  String apiVersion();
+  String apiVersion,
 
   @JsonProperty("Arch")
-  String arch();
+  String arch,
 
   @Nullable
   @JsonProperty("BuildTime")
-  String buildTime();
+  String buildTime,
 
   @JsonProperty("GitCommit")
-  String gitCommit();
+  String gitCommit,
 
   @JsonProperty("GoVersion")
-  String goVersion();
+  String goVersion,
 
   @JsonProperty("KernelVersion")
-  String kernelVersion();
+  String kernelVersion,
 
   @JsonProperty("Os")
-  String os();
+  String os,
 
   @JsonProperty("Version")
-  String version();
-}
+  String version
+) {}

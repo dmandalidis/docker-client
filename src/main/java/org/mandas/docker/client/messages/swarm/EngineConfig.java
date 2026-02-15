@@ -24,24 +24,19 @@ package org.mandas.docker.client.messages.swarm;
 import java.util.List;
 import java.util.Map;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableEngineConfig.Builder.class)
-@Immutable
-public interface EngineConfig {
-
+public record EngineConfig(
   @JsonProperty("EngineVersion")
-  String engineVersion();
+  String engineVersion,
 
   @Nullable
   @JsonProperty("Labels")
-  Map<String, String> labels();
+  Map<String, String> labels,
 
   @Nullable
   @JsonProperty("Plugins")
-  List<EnginePlugin> plugins();
-}
+  List<EnginePlugin> plugins
+) {}

@@ -21,52 +21,73 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableRaftConfig.Builder.class)
-@Immutable
-public interface RaftConfig {
-
+public record RaftConfig(
   @Nullable
   @JsonProperty("SnapshotInterval")
-  Integer snapshotInterval();
+  Integer snapshotInterval,
 
   @Nullable
   @JsonProperty("KeepOldSnapshots")
-  Integer keepOldSnapshots();
+  Integer keepOldSnapshots,
 
   @Nullable
   @JsonProperty("LogEntriesForSlowFollowers")
-  Integer logEntriesForSlowFollowers();
+  Integer logEntriesForSlowFollowers,
 
   @Nullable
   @JsonProperty("ElectionTick")
-  Integer electionTick();
+  Integer electionTick,
 
   @Nullable
   @JsonProperty("HeartbeatTick")
-  Integer heartbeatTick();
+  Integer heartbeatTick
+) {
 
-  interface Builder {
-
-    Builder snapshotInterval(Integer snapshotInterval);
-
-    Builder keepOldSnapshots(Integer keepOldSnapshots);
-
-    Builder logEntriesForSlowFollowers(Integer logEntriesForSlowFollowers);
-
-    Builder electionTick(Integer electionTick);
-
-    Builder heartbeatTick(Integer heartbeatTick);
-
-    RaftConfig build();
-  }
+  
 
   public static Builder builder() {
-    return ImmutableRaftConfig.builder();
+    return new Builder();
+  }
+
+  public static class Builder {
+    private Integer snapshotInterval;
+    private Integer keepOldSnapshots;
+    private Integer logEntriesForSlowFollowers;
+    private Integer electionTick;
+    private Integer heartbeatTick;
+
+    public Builder snapshotInterval(Integer snapshotInterval) {
+      this.snapshotInterval = snapshotInterval;
+      return this;
+    }
+
+    public Builder keepOldSnapshots(Integer keepOldSnapshots) {
+      this.keepOldSnapshots = keepOldSnapshots;
+      return this;
+    }
+
+    public Builder logEntriesForSlowFollowers(Integer logEntriesForSlowFollowers) {
+      this.logEntriesForSlowFollowers = logEntriesForSlowFollowers;
+      return this;
+    }
+
+    public Builder electionTick(Integer electionTick) {
+      this.electionTick = electionTick;
+      return this;
+    }
+
+    public Builder heartbeatTick(Integer heartbeatTick) {
+      this.heartbeatTick = heartbeatTick;
+      return this;
+    }
+
+    public RaftConfig build() {
+      return new RaftConfig(snapshotInterval, keepOldSnapshots, logEntriesForSlowFollowers, 
+          electionTick, heartbeatTick);
+    }
   }
 }

@@ -21,78 +21,104 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableServiceMode.Builder.class)
-@Immutable
-public interface ServiceMode {
-
+public record ServiceMode(
   @Nullable
   @JsonProperty("Replicated")
-  ReplicatedService replicated();
+  ReplicatedService replicated,
 
   @Nullable
   @JsonProperty("ReplicatedJob")
-  ReplicatedJob replicatedJob();
+  ReplicatedJob replicatedJob,
   
   @Nullable
   @JsonProperty("Global")
-  GlobalService global();
+  GlobalService global,
 
   @Nullable
   @JsonProperty("GlobalJob")
-  GlobalJob globalJob();
+  GlobalJob globalJob
+) {
   
   public static ServiceMode withReplicas(final long replicas) {
-    return ImmutableServiceMode.builder()
-        .replicated(ReplicatedService.builder().replicas(replicas).build())
-        .build();
+    return new ServiceMode(
+        ReplicatedService.builder().replicas(replicas).build(),
+        null,
+        null,
+        null
+    );
   }
   
   public static ServiceMode withReplicas(final long replicas, final long maxConcurrent) {
-    return ImmutableServiceMode.builder()
-        .replicated(ReplicatedService.builder().replicas(replicas).maxConcurrent(maxConcurrent).build())
-        .build();
+    return new ServiceMode(
+        ReplicatedService.builder().replicas(replicas).maxConcurrent(maxConcurrent).build(),
+        null,
+        null,
+        null
+    );
   }
   
   public static ServiceMode withJobReplicas(final long totalCompletions) {
-    return ImmutableServiceMode.builder()
-        .replicatedJob(ReplicatedJob.builder().totalCompletions(totalCompletions).build())
-        .build();
+    return new ServiceMode(
+        null,
+        ReplicatedJob.builder().totalCompletions(totalCompletions).build(),
+        null,
+        null
+    );
   }
   
   public static ServiceMode withJobReplicas(final long totalCompletions, final long maxConcurrent) {
-    return ImmutableServiceMode.builder()
-        .replicatedJob(ReplicatedJob.builder().totalCompletions(totalCompletions).maxConcurrent(maxConcurrent).build())
-        .build();
+    return new ServiceMode(
+        null,
+        ReplicatedJob.builder().totalCompletions(totalCompletions).maxConcurrent(maxConcurrent).build(),
+        null,
+        null
+    );
   }
 
   public static ServiceMode withGlobal() {
-    return ImmutableServiceMode.builder().global(GlobalService.builder().build()).build();
+    return new ServiceMode(null, null, GlobalService.builder().build(), null);
   }
   
   public static ServiceMode withGlobalJob() {
-    return ImmutableServiceMode.builder().globalJob(GlobalJob.builder().build()).build();
-  }
-
-  interface Builder {
-
-    Builder replicated(ReplicatedService replicated);
-    
-    Builder replicatedJob(ReplicatedJob replicated);
-
-    Builder global(GlobalService global);
-
-    Builder globalJob(GlobalJob global);
-    
-    ServiceMode build();
+    return new ServiceMode(null, null, null, GlobalJob.builder().build());
   }
 
   public static ServiceMode.Builder builder() {
-    return ImmutableServiceMode.builder();
+    return new Builder();
+  }
+
+  public static class Builder {
+    private ReplicatedService replicated;
+    private ReplicatedJob replicatedJob;
+    private GlobalService global;
+    private GlobalJob globalJob;
+
+    public Builder replicated(ReplicatedService replicated) {
+      this.replicated = replicated;
+      return this;
+    }
+    
+    public Builder replicatedJob(ReplicatedJob replicatedJob) {
+      this.replicatedJob = replicatedJob;
+      return this;
+    }
+
+    public Builder global(GlobalService global) {
+      this.global = global;
+      return this;
+    }
+
+    public Builder globalJob(GlobalJob globalJob) {
+      this.globalJob = globalJob;
+      return this;
+    }
+    
+    public ServiceMode build() {
+      return new ServiceMode(replicated, replicatedJob, global, globalJob);
+    }
   }
 }

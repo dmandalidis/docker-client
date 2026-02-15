@@ -21,17 +21,10 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 
-@JsonDeserialize(builder = ImmutableUnlockKey.Builder.class)
-@Immutable
-public interface UnlockKey {
-
+public record UnlockKey(
   @JsonProperty("UnlockKey")
-  String unlockKey();
-
-}
+  String unlockKey
+) {}

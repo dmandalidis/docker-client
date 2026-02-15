@@ -23,45 +23,51 @@ package org.mandas.docker.client.messages.swarm;
 
 import java.util.Map;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableConfigSpec.Builder.class)
-@Immutable
-public interface ConfigSpec {
-
+public record ConfigSpec(
   @JsonProperty("Name")
-  String name();
+  String name,
 
   @Nullable
   @JsonProperty("Labels")
-  Map<String, String> labels();
+  Map<String, String> labels,
 
   @Nullable
   @JsonProperty("Data")
-  String data();
+  String data
+) {
 
   public static Builder builder() {
-    return ImmutableConfigSpec.builder();
+    return new Builder();
   }
 
-  interface Builder {
+  
 
-    Builder name(String name);
+  public static class Builder {
+    private String name;
+    private Map<String, String> labels;
+    private String data;
 
-    Builder labels(Map<String, ? extends String> labels);
+    public Builder name(String name) {
+      this.name = name;
+      return this;
+    }
 
-    /**
-     * Base64-url-safe-encoded secret data.
-     *
-     * @param data the config data.
-     * @return the builder
-     */
-    Builder data(String data);
+    public Builder labels(Map<String, String> labels) {
+      this.labels = labels == null ? null : Map.copyOf(labels);
+      return this;
+    }
 
-    ConfigSpec build();
+    public Builder data(String data) {
+      this.data = data;
+      return this;
+    }
+
+    public ConfigSpec build() {
+      return new ConfigSpec(name, labels == null ? null : Map.copyOf(labels), data);
+    }
   }
 }

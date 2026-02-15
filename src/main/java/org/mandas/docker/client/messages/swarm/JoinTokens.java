@@ -21,19 +21,13 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 
-@JsonDeserialize(builder = ImmutableJoinTokens.Builder.class)
-@Immutable
-public interface JoinTokens {
-
+public record JoinTokens(
   @JsonProperty("Worker")
-  String worker();
+  String worker,
 
   @JsonProperty("Manager")
-  String manager();
-}
+  String manager
+) {}

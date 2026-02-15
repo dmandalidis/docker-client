@@ -23,57 +23,45 @@ package org.mandas.docker.client.messages;
 
 import java.util.List;
 
-import org.immutables.value.Value.Enclosing;
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableCpuStats.Builder.class)
-@Immutable
-@Enclosing
-public interface CpuStats {
-
+public record CpuStats(
   @JsonProperty("cpu_usage")
-  CpuUsage cpuUsage();
+  CpuUsage cpuUsage,
 
   @Nullable
   @JsonProperty("system_cpu_usage")
-  Long systemCpuUsage();
+  Long systemCpuUsage,
 
   @JsonProperty("throttling_data")
-  ThrottlingData throttlingData();
+  ThrottlingData throttlingData
+) {
 
-  @JsonDeserialize(builder = ImmutableCpuStats.CpuUsage.Builder.class)
-  @Immutable
-  public interface CpuUsage {
-
+  public record CpuUsage(
     @JsonProperty("total_usage")
-    Long totalUsage();
+    Long totalUsage,
 
     @Nullable
     @JsonProperty("percpu_usage")
-    List<Long> percpuUsage();
+    List<Long> percpuUsage,
 
     @JsonProperty("usage_in_kernelmode")
-    Long usageInKernelmode();
+    Long usageInKernelmode,
 
     @JsonProperty("usage_in_usermode")
-    Long usageInUsermode();
-  }
+    Long usageInUsermode
+  ) {}
 
-  @JsonDeserialize(builder = ImmutableCpuStats.ThrottlingData.Builder.class)
-  @Immutable
-  public interface ThrottlingData {
-
+  public record ThrottlingData(
     @JsonProperty("periods")
-    Long periods();
+    Long periods,
 
     @JsonProperty("throttled_periods")
-    Long throttledPeriods();
+    Long throttledPeriods,
 
     @JsonProperty("throttled_time")
-    Long throttledTime();
-  }
+    Long throttledTime
+  ) {}
 }

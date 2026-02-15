@@ -21,19 +21,13 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 
-@JsonDeserialize(builder = ImmutableVersion.Builder.class)
-@Immutable
-public interface Version {
-
+public record Version(
   @Nullable
   @JsonProperty("Index")
-  Long index();
-
-}
+  Long index
+) {}

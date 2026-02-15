@@ -21,29 +21,32 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-
-@JsonDeserialize(builder = ImmutableDispatcherConfig.Builder.class)
-@Immutable
-public interface DispatcherConfig {
-
+public record DispatcherConfig(
   @Nullable
   @JsonProperty("HeartbeatPeriod")
-  Long heartbeatPeriod();
+  Long heartbeatPeriod
+) {
 
-  interface Builder {
+  
 
-    Builder heartbeatPeriod(Long heartbeatPeriod);
-
-    DispatcherConfig build();
+  public static Builder builder() {
+    return new Builder();
   }
 
-  public static DispatcherConfig.Builder builder() {
-    return ImmutableDispatcherConfig.builder();
+  public static class Builder {
+    private Long heartbeatPeriod;
+
+    public Builder heartbeatPeriod(Long heartbeatPeriod) {
+      this.heartbeatPeriod = heartbeatPeriod;
+      return this;
+    }
+
+    public DispatcherConfig build() {
+      return new DispatcherConfig(heartbeatPeriod);
+    }
   }
 }

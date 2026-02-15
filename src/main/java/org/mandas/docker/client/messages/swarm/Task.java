@@ -25,135 +25,129 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.immutables.value.Value.Enclosing;
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableTask.Builder.class)
-@Immutable
-@Enclosing
-public interface Task {
-
+public record Task(
   @JsonProperty("ID")
-  String id();
+  String id,
 
   @JsonProperty("Version")
-  Version version();
+  Version version,
 
   @JsonProperty("CreatedAt")
-  Date createdAt();
+  Date createdAt,
 
   @JsonProperty("UpdatedAt")
-  Date updatedAt();
+  Date updatedAt,
 
   @Nullable
   @JsonProperty("Name")
-  String name();
+  String name,
 
   @Nullable
   @JsonProperty("Labels")
-  Map<String, String> labels();
+  Map<String, String> labels,
 
   @JsonProperty("Spec")
-  TaskSpec spec();
+  TaskSpec spec,
 
   @JsonProperty("ServiceID")
-  String serviceId();
+  String serviceId,
 
   @Nullable
   @JsonProperty("Slot")
-  Integer slot();
+  Integer slot,
 
   @Nullable
   @JsonProperty("NodeID")
-  String nodeId();
+  String nodeId,
 
   @JsonProperty("Status")
-  TaskStatus status();
+  TaskStatus status,
 
   @JsonProperty("DesiredState")
-  String desiredState();
+  String desiredState,
 
   @Nullable
   @JsonProperty("NetworksAttachments")
-  List<NetworkAttachment> networkAttachments();
+  List<NetworkAttachment> networkAttachments,
 
   @Nullable
   @JsonProperty("JobIteration")
-  Version jobIteration();
+  Version jobIteration
+) {
   
-  @JsonDeserialize(builder = ImmutableTask.Criteria.Builder.class)
-  @Immutable
-  public interface Criteria {
-
-    /**
-     * Filter by task id.
-     * @return an optional task id
-     */
+  public record Criteria(
     @Nullable
-    String taskId();
+    String taskId,
 
-    /**
-     * Filter by task name.
-     * @return an optional task name
-     */
     @Nullable
-    String taskName();
+    String taskName,
 
-    /**
-     * Filter by service name.
-     * @return an optional service name
-     */
     @Nullable
-    String serviceName();
+    String serviceName,
 
-    /**
-     * Filter by node id.
-     * @return an optional node id
-     */
     @Nullable
-    String nodeId();
+    String nodeId,
 
-    /**
-     * Filter by label.
-     * @return an optional label
-     */
     @Nullable
-    String label();
+    String label,
 
-    /**
-     * Filter by desired state.
-     * @return an optional desired state
-     */
     @Nullable
-    String desiredState();
+    String desiredState
+  ) {
 
-    public static Criteria.Builder builder() {
-      return ImmutableTask.Criteria.builder();
+    public static Builder builder() {
+    return new Builder();
     }
 
-    interface Builder {
+    public static class Builder {
+      private String taskId;
+      private String taskName;
+      private String serviceName;
+      private String nodeId;
+      private String label;
+      private String desiredState;
 
-      Builder taskId(final String taskId);
+      public Builder taskId(String taskId) {
+        this.taskId = taskId;
+        return this;
+      }
 
-      Builder taskName(final String taskName);
+      public Builder taskName(String taskName) {
+        this.taskName = taskName;
+        return this;
+      }
 
-      Builder serviceName(final String serviceName);
+      public Builder serviceName(String serviceName) {
+        this.serviceName = serviceName;
+        return this;
+      }
 
-      Builder nodeId(final String nodeId);
+      public Builder nodeId(String nodeId) {
+        this.nodeId = nodeId;
+        return this;
+      }
 
-      Builder label(final String label);
+      public Builder label(String label) {
+        this.label = label;
+        return this;
+      }
 
-      Builder desiredState(final String desiredState);
+      public Builder desiredState(String desiredState) {
+        this.desiredState = desiredState;
+        return this;
+      }
 
-      Criteria build();
+      public Criteria build() {
+        return new Criteria(taskId, taskName, serviceName, nodeId, label, desiredState);
+      }
     }
   }
 
   public static Criteria.Builder find() {
-    return ImmutableTask.Criteria.builder();
+    return Criteria.builder();
   }
 }

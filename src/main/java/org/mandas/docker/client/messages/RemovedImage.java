@@ -21,35 +21,33 @@
 
 package org.mandas.docker.client.messages;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Immutable
-public interface RemovedImage {
-
-  Type type();
+public record RemovedImage(
+  Type type,
 
   @Nullable
-  String imageId();
+  String imageId
+) {
 
   @JsonCreator
   public static RemovedImage create(
       @JsonProperty("Untagged") final String untagged,
       @JsonProperty("Deleted") final String deleted) {
     if (untagged != null) {
-      return ImmutableRemovedImage.builder().type(Type.UNTAGGED).imageId(untagged).build();
+      return new RemovedImage(Type.UNTAGGED, untagged);
     } else if (deleted != null) {
-      return ImmutableRemovedImage.builder().type(Type.DELETED).imageId(deleted).build();
+      return new RemovedImage(Type.DELETED, deleted);
     } else {
-      return ImmutableRemovedImage.builder().type(Type.UNKNOWN).build();
+      return new RemovedImage(Type.UNKNOWN, null);
     }
   }
 
   public static RemovedImage create(final Type type, final String imageId) {
-    return ImmutableRemovedImage.builder().type(type).imageId(imageId).build();
+    return new RemovedImage(type, imageId);
   }
 
   public enum Type {
@@ -58,4 +56,3 @@ public interface RemovedImage {
     UNKNOWN
   }
 }
-

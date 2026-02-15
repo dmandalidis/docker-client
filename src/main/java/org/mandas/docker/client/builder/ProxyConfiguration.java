@@ -19,76 +19,54 @@
 */
 package org.mandas.docker.client.builder;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
-/**
- * Object representing a host's proxy configuration
- * @author Dimitris Mandalidis
- * @see DockerClientBuilder#proxyFromEnv()
- */
-@Immutable
-public interface ProxyConfiguration {
-
-  /**
-   * @return the host running the proxy
-   */
-  String host();
+public record ProxyConfiguration(
+  String host,
   
-  /**
-   * @return the port to which the proxy listens
-   */
-  String port();
+  String port,
   
-  /**
-   * @return an optional username in case of authenticated access
-   */
   @Nullable
-  String username();
+  String username,
   
-  /**
-   * @return an optional password in case of authenticated access
-   */
   @Nullable
-  String password();
+  String password
+) {
   
-  interface Builder {
-    /**
-     * Set the host running the proxy 
-     * @param host the FQDN
-     * @return this
-     */
-    Builder host(String host);
-    /**
-     * Set the port to which the proxy listens 
-     * @param port a network port
-     * @return this
-     */
-    Builder port(String port);
-    /**
-     * Set the user in case of authenticated access 
-     * @param username the username
-     * @return this
-     */
-    Builder username(String username);
-    /**
-     * Set the password of the user in case of authenticated access 
-     * @param password the password of the user
-     * @return this
-     */
-    Builder password(String password);
-    /**
-     * Build this configuration
-     * @return a new {@link ProxyConfiguration}
-     */
-    ProxyConfiguration build();
+  
+  
+  public static Builder builder() {
+    return new Builder();
   }
-  
-  /**
-   * Get a {@link ProxyConfiguration} builder
-   * @return a new builder
-   */
-  static Builder builder() {
-    return ImmutableProxyConfiguration.builder();
+
+  public static class Builder {
+    private String host;
+    private String port;
+    private String username;
+    private String password;
+
+    public Builder host(String host) {
+      this.host = host;
+      return this;
+    }
+
+    public Builder port(String port) {
+      this.port = port;
+      return this;
+    }
+
+    public Builder username(String username) {
+      this.username = username;
+      return this;
+    }
+
+    public Builder password(String password) {
+      this.password = password;
+      return this;
+    }
+
+    public ProxyConfiguration build() {
+      return new ProxyConfiguration(host, port, username, password);
+    }
   }
 }

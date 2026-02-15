@@ -21,32 +21,39 @@
 
 package org.mandas.docker.client.messages;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableNetworkConnection.Builder.class)
-@Immutable
-public interface NetworkConnection {
-
+public record NetworkConnection(
   @JsonProperty("Container")
-  String containerId();
+  String containerId,
 
   @Nullable
   @JsonProperty("EndpointConfig")
-  EndpointConfig endpointConfig();
+  EndpointConfig endpointConfig
+) {
 
   public static Builder builder() {
-    return ImmutableNetworkConnection.builder();
+    return new Builder();
   }
 
-  interface Builder {
-    Builder containerId(String containerId);
+  public static class Builder {
+    private String containerId;
+    private EndpointConfig endpointConfig;
 
-    Builder endpointConfig(EndpointConfig endpointConfig);
+    public Builder containerId(String containerId) {
+      this.containerId = containerId;
+      return this;
+    }
 
-    NetworkConnection build();
+    public Builder endpointConfig(EndpointConfig endpointConfig) {
+      this.endpointConfig = endpointConfig;
+      return this;
+    }
+
+    public NetworkConnection build() {
+      return new NetworkConnection(containerId, endpointConfig);
+    }
   }
 }

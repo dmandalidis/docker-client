@@ -23,65 +23,65 @@ package org.mandas.docker.client.messages.swarm;
 
 import java.util.Date;
 
-import org.immutables.value.Value.Enclosing;
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableSecret.Builder.class)
-@Immutable
-@Enclosing
-public interface Secret {
-
+public record Secret(
   @JsonProperty("ID")
-  String id();
+  String id,
   
   @JsonProperty("Version")
-  Version version();
+  Version version,
 
   @JsonProperty("CreatedAt")
-  Date createdAt();
+  Date createdAt,
 
   @JsonProperty("UpdatedAt")
-  Date updatedAt();
+  Date updatedAt,
 
   @JsonProperty("Spec")
-  SecretSpec secretSpec();
+  SecretSpec secretSpec
+) {
   
-  @Immutable
-  public interface Criteria {
-    /**
-     * @return Filter by secret id.
-     */
+  public record Criteria(
     @Nullable
-    String id();
+    String id,
 
-    /**
-     * @return Filter by label.
-     */
     @Nullable
-    String label();
+    String label,
 
-    /**
-     * @return Filter by secret name.
-     */
     @Nullable
-    String name();
+    String name
+  ) {
     
-    public static Criteria.Builder builder() {
-      return ImmutableSecret.Criteria.builder();
+    public static Builder builder() {
+    return new Builder();
     }
 
-    interface Builder {
-      Builder id(String id);
+    public static class Builder {
+      private String id;
+      private String label;
+      private String name;
 
-      Builder label(String label);
+      public Builder id(String id) {
+        this.id = id;
+        return this;
+      }
 
-      Builder name(String name);
-      
-      Criteria build();
+      public Builder label(String label) {
+        this.label = label;
+        return this;
+      }
+
+      public Builder name(String name) {
+        this.name = name;
+        return this;
+      }
+
+      public Criteria build() {
+        return new Criteria(id, label, name);
+      }
     }
   }
 }

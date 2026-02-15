@@ -26,72 +26,38 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import java.io.IOException;
 import java.util.Base64;
 
-import org.immutables.value.Value.Auxiliary;
-import org.immutables.value.Value.Derived;
-import org.immutables.value.Value.Immutable;
-import org.immutables.value.Value.Redacted;
 import org.mandas.docker.Nullable;
 import org.mandas.docker.client.DockerConfigReader;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * Represents all the auth info for a particular registry.
- *
- * <p>These are sent to docker during authenticated registry operations
- * in the X-Registry-Config header (see {@link RegistryConfigs}).</p>
- *
- * <p>Typically these objects are built by requesting auth information from a
- * {@link org.mandas.docker.client.DockerCredentialHelper}. However, in older less-secure
- * docker versions, these can be written directly into the ~/.docker/config.json file,
- * with the username and password joined with a ":" and base-64 encoded.</p>
- */
-@Immutable
-public interface RegistryAuth {
-
+public record RegistryAuth(
   @Nullable
   @JsonProperty("username")
-  String username();
+  String username,
 
   @Nullable
-  @Redacted
   @JsonProperty("password")
-  String password();
+  String password,
 
-  /**
-   * @return Unused but must be a well-formed email address (e.g. 1234@5678.com).
-   */
   @Nullable
-  @Redacted
   @JsonProperty("email")
-  String email();
+  String email,
 
   @Nullable
   @JsonProperty("serveraddress")
-  String serverAddress();
+  String serverAddress,
 
   @Nullable
   @JsonProperty("identitytoken")
-  String identityToken();
+  String identityToken
+) {
 
-  @JsonIgnore
-  @Derived
-  @Auxiliary
-  default Builder toBuilder() {
-	  return ImmutableRegistryAuth.builder().from(this);
+  public Builder toBuilder() {
+    return new Builder(this);
   }
 
-  /**
-   * This function looks for and parses credentials for logging into the Docker registry specified
-   * by serverAddress. We first look in ~/.docker/config.json and fallback to ~/.dockercfg. These
-   * files are created from running `docker login`.
-   *
-   * @param serverAddress A string representing the server address
-   * @return a {@link Builder}
-   * @throws IOException when we can't parse the docker config file
-   */
   public static Builder fromDockerConfig(final String serverAddress) throws IOException {
     DockerConfigReader dockerCfgReader = new DockerConfigReader();
     return dockerCfgReader
@@ -121,14 +87,9 @@ public interface RegistryAuth {
         .build();
   }
 
-  /** 
-   * @param auth the "auth" field of the docker client config file.
-   * @return Construct a Builder based upon the "auth" field of the docker client config file. 
-   */
   public static Builder forAuth(final String auth) {
-    // split with limit=2 to catch case where password contains a colon
-	byte[] authByteValue = Base64.getDecoder().decode(auth);
-	final String[] authParams = new String(authByteValue, UTF_8).split(":", 2);
+    byte[] authByteValue = Base64.getDecoder().decode(auth);
+    final String[] authParams = new String(authByteValue, UTF_8).split(":", 2);
 
     if (authParams.length != 2) {
       return builder();
@@ -140,21 +101,54 @@ public interface RegistryAuth {
   }
 
   public static Builder builder() {
-    return ImmutableRegistryAuth.builder();
+    return new Builder();
   }
 
-  interface Builder {
+  public static class Builder {
+    private String username;
+    private String password;
+    private String email;
+    private String serverAddress;
+    private String identityToken;
 
-    Builder username(final String username);
+    public Builder() {
+    }
 
-    Builder password(final String password);
+    public Builder(RegistryAuth auth) {
+      this.username = auth.username;
+      this.password = auth.password;
+      this.email = auth.email;
+      this.serverAddress = auth.serverAddress;
+      this.identityToken = auth.identityToken;
+    }
 
-    Builder email(final String email);
+    public Builder username(final String username) {
+      this.username = username;
+      return this;
+    }
 
-    Builder serverAddress(final String serverAddress);
+    public Builder password(final String password) {
+      this.password = password;
+      return this;
+    }
 
-    Builder identityToken(final String token);
+    public Builder email(final String email) {
+      this.email = email;
+      return this;
+    }
 
-    RegistryAuth build();
+    public Builder serverAddress(final String serverAddress) {
+      this.serverAddress = serverAddress;
+      return this;
+    }
+
+    public Builder identityToken(final String token) {
+      this.identityToken = token;
+      return this;
+    }
+
+    public RegistryAuth build() {
+      return new RegistryAuth(username, password, email, serverAddress, identityToken);
+    }
   }
 }

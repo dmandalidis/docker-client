@@ -23,39 +23,51 @@ package org.mandas.docker.client.messages.swarm;
 
 import java.util.Map;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableSecretSpec.Builder.class)
-@Immutable
-public interface SecretSpec {
-
+public record SecretSpec(
   @JsonProperty("Name")
-  String name();
+  String name,
   
   @Nullable
   @JsonProperty("Labels")
-  Map<String, String> labels();
+  Map<String, String> labels,
 
   @Nullable
   @JsonProperty("Data")
-  String data();
+  String data
+) {
   
   public static Builder builder() {
-    return ImmutableSecretSpec.builder();
+    return new Builder();
   }
   
-  interface Builder {
+  
 
-    Builder name(String name);
-    
-    Builder labels(Map<String, ? extends String> labels);
-    
-    Builder data(String data);
-    
-    SecretSpec build();
+  public static class Builder {
+    private String name;
+    private Map<String, String> labels;
+    private String data;
+
+    public Builder name(String name) {
+      this.name = name;
+      return this;
+    }
+
+    public Builder labels(Map<String, String> labels) {
+      this.labels = labels == null ? null : Map.copyOf(labels);
+      return this;
+    }
+
+    public Builder data(String data) {
+      this.data = data;
+      return this;
+    }
+
+    public SecretSpec build() {
+      return new SecretSpec(name, labels == null ? null : Map.copyOf(labels), data);
+    }
   }
 }

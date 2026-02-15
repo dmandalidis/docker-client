@@ -24,36 +24,31 @@ package org.mandas.docker.client.messages;
 import java.util.Date;
 import java.util.Map;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableContainerStats.Builder.class)
-@Immutable
-public interface ContainerStats {
-
+public record ContainerStats(
   @JsonProperty("read")
-  Date read();
+  Date read,
 
   @Nullable
   @JsonProperty("network")
-  NetworkStats network();
+  NetworkStats network,
 
   @Nullable
   @JsonProperty("networks")
-  Map<String, NetworkStats> networks();
+  Map<String, NetworkStats> networks,
 
   @JsonProperty("memory_stats")
-  MemoryStats memoryStats();
+  MemoryStats memoryStats,
 
   @JsonProperty("blkio_stats")
-  BlockIoStats blockIoStats();
+  BlockIoStats blockIoStats,
 
   @JsonProperty("cpu_stats")
-  CpuStats cpuStats();
+  CpuStats cpuStats,
 
   @JsonProperty("precpu_stats")
-  CpuStats precpuStats();
-}
+  CpuStats precpuStats
+) {}

@@ -23,116 +23,128 @@ package org.mandas.docker.client.messages;
 
 import java.util.List;
 
-import org.immutables.value.Value.Enclosing;
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableEndpointConfig.Builder.class)
-@Immutable
-@Enclosing
-public interface EndpointConfig {
-
-  @Nullable
-  @JsonProperty("IPAMConfig")
-  EndpointIpamConfig ipamConfig();
-
-  @Nullable
-  @JsonProperty("Links")
-  List<String> links();
-
-  @Nullable
-  @JsonProperty("Aliases")
-  List<String> aliases();
-
-  @Nullable
-  @JsonProperty("Gateway")
-  String gateway();
-
-  @Nullable
-  @JsonProperty("IPAddress")
-  String ipAddress();
-
-  @Nullable
-  @JsonProperty("IPPrefixLen")
-  Integer ipPrefixLen();
-
-  @Nullable
-  @JsonProperty("IPv6Gateway")
-  String ipv6Gateway();
-
-  @Nullable
-  @JsonProperty("GlobalIPv6Address")
-  String globalIPv6Address();
-
-  @Nullable
-  @JsonProperty("GlobalIPv6PrefixLen")
-  Integer globalIPv6PrefixLen();
-
-  @Nullable
-  @JsonProperty("MacAddress")
-  String macAddress();
+public record EndpointConfig(
+  @Nullable @JsonProperty("IPAMConfig") EndpointIpamConfig ipamConfig,
+  @Nullable @JsonProperty("Links") List<String> links,
+  @Nullable @JsonProperty("Aliases") List<String> aliases,
+  @Nullable @JsonProperty("Gateway") String gateway,
+  @Nullable @JsonProperty("IPAddress") String ipAddress,
+  @Nullable @JsonProperty("IPPrefixLen") Integer ipPrefixLen,
+  @Nullable @JsonProperty("IPv6Gateway") String ipv6Gateway,
+  @Nullable @JsonProperty("GlobalIPv6Address") String globalIPv6Address,
+  @Nullable @JsonProperty("GlobalIPv6PrefixLen") Integer globalIPv6PrefixLen,
+  @Nullable @JsonProperty("MacAddress") String macAddress
+) {
 
   public static Builder builder() {
-    return ImmutableEndpointConfig.builder();
+    return new Builder();
   }
 
-  interface Builder {
+  public static class Builder {
+    private EndpointIpamConfig ipamConfig;
+    private List<String> links;
+    private List<String> aliases;
+    private String gateway;
+    private String ipAddress;
+    private Integer ipPrefixLen;
+    private String ipv6Gateway;
+    private String globalIPv6Address;
+    private Integer globalIPv6PrefixLen;
+    private String macAddress;
 
-    Builder ipamConfig(EndpointIpamConfig ipamConfig);
-
-    Builder links(Iterable<String> links);
-
-    Builder aliases(Iterable<String> aliases);
-
-    Builder gateway(String gateway);
-
-    Builder ipAddress(String ipAddress);
-
-    Builder ipPrefixLen(Integer ipPrefixLen);
-
-    Builder ipv6Gateway(String ipv6Gateway);
-
-    Builder globalIPv6Address(String globalIPv6Address);
-
-    Builder globalIPv6PrefixLen(Integer globalIPv6PrefixLen);
-
-    Builder macAddress(String macAddress);
-
-    EndpointConfig build();
-  }
-
-  @JsonDeserialize(builder = ImmutableEndpointConfig.EndpointIpamConfig.Builder.class)
-  @Immutable
-  public interface EndpointIpamConfig {
-
-    @Nullable
-    @JsonProperty("IPv4Address")
-    String ipv4Address();
-
-    @Nullable
-    @JsonProperty("IPv6Address")
-    String ipv6Address();
-
-    @Nullable
-    @JsonProperty("LinkLocalIPs")
-    List<String> linkLocalIPs();
-
-    public static Builder builder() {
-      return ImmutableEndpointConfig.EndpointIpamConfig.builder();
+    public Builder ipamConfig(EndpointIpamConfig ipamConfig) {
+      this.ipamConfig = ipamConfig;
+      return this;
     }
 
-    interface Builder {
+    public Builder links(List<String> links) {
+      this.links = links;
+      return this;
+    }
 
-      Builder ipv4Address(String ipv4Address);
+    public Builder aliases(List<String> aliases) {
+      this.aliases = aliases;
+      return this;
+    }
 
-      Builder ipv6Address(String ipv6Address);
+    public Builder gateway(String gateway) {
+      this.gateway = gateway;
+      return this;
+    }
 
-      Builder linkLocalIPs(Iterable<String> linkLocalIPs);
+    public Builder ipAddress(String ipAddress) {
+      this.ipAddress = ipAddress;
+      return this;
+    }
 
-      EndpointIpamConfig build();
+    public Builder ipPrefixLen(Integer ipPrefixLen) {
+      this.ipPrefixLen = ipPrefixLen;
+      return this;
+    }
+
+    public Builder ipv6Gateway(String ipv6Gateway) {
+      this.ipv6Gateway = ipv6Gateway;
+      return this;
+    }
+
+    public Builder globalIPv6Address(String globalIPv6Address) {
+      this.globalIPv6Address = globalIPv6Address;
+      return this;
+    }
+
+    public Builder globalIPv6PrefixLen(Integer globalIPv6PrefixLen) {
+      this.globalIPv6PrefixLen = globalIPv6PrefixLen;
+      return this;
+    }
+
+    public Builder macAddress(String macAddress) {
+      this.macAddress = macAddress;
+      return this;
+    }
+
+    public EndpointConfig build() {
+      return new EndpointConfig(ipamConfig, links, aliases, gateway, ipAddress, ipPrefixLen, 
+                               ipv6Gateway, globalIPv6Address, globalIPv6PrefixLen, macAddress);
+    }
+  }
+
+  public record EndpointIpamConfig(
+    @Nullable @JsonProperty("IPv4Address") String ipv4Address,
+    @Nullable @JsonProperty("IPv6Address") String ipv6Address,
+    @Nullable @JsonProperty("LinkLocalIPs") List<String> linkLocalIPs
+  ) {
+
+    public static Builder builder() {
+      return new Builder();
+    }
+
+    public static class Builder {
+      private String ipv4Address;
+      private String ipv6Address;
+      private List<String> linkLocalIPs;
+
+      public Builder ipv4Address(String ipv4Address) {
+        this.ipv4Address = ipv4Address;
+        return this;
+      }
+
+      public Builder ipv6Address(String ipv6Address) {
+        this.ipv6Address = ipv6Address;
+        return this;
+      }
+
+      public Builder linkLocalIPs(List<String> linkLocalIPs) {
+        this.linkLocalIPs = linkLocalIPs;
+        return this;
+      }
+
+      public EndpointIpamConfig build() {
+        return new EndpointIpamConfig(ipv4Address, ipv6Address, linkLocalIPs);
+      }
     }
   }
 }

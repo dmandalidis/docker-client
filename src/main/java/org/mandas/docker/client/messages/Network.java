@@ -23,87 +23,73 @@ package org.mandas.docker.client.messages;
 
 import java.util.Map;
 
-import org.immutables.value.Value.Enclosing;
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableNetwork.Builder.class)
-@Immutable
-@Enclosing
-public interface Network {
-
+public record Network(
   @JsonProperty("Name")
-  String name();
+  String name,
 
   @JsonProperty("Id")
-  String id();
+  String id,
 
   @JsonProperty("Scope")
-  String scope();
+  String scope,
 
   @JsonProperty("Driver")
-  String driver();
+  String driver,
 
   @JsonProperty("IPAM")
-  Ipam ipam();
+  Ipam ipam,
 
   @Nullable
   @JsonProperty("Containers")
-  Map<String, Container> containers();
+  Map<String, Container> containers,
 
   @Nullable
   @JsonProperty("Options")
-  Map<String, String> options();
+  Map<String, String> options,
   
   @Nullable
   @JsonProperty("Internal")
-  Boolean internal();
+  Boolean internal,
   
   @Nullable
   @JsonProperty("EnableIPv6")
-  Boolean enableIPv6();
+  Boolean enableIPv6,
 
   @Nullable
   @JsonProperty("Labels")
-  Map<String, String> labels();
+  Map<String, String> labels,
 
   @Nullable
   @JsonProperty("Attachable")
-  Boolean attachable();
+  Boolean attachable
+) {
 
-  @JsonDeserialize(builder = ImmutableNetwork.Container.Builder.class)
-  @Immutable
-  public interface Container {
-
+  public record Container(
     @Nullable
     @JsonProperty("Name")
-    String name();
+    String name,
 
     @JsonProperty("EndpointID")
-    String endpointId();
+    String endpointId,
 
     @JsonProperty("MacAddress")
-    String macAddress();
+    String macAddress,
 
     @JsonProperty("IPv4Address")
-    String ipv4Address();
+    String ipv4Address,
 
     @JsonProperty("IPv6Address")
-    String ipv6Address();
-  }
+    String ipv6Address
+  ) {}
   
-  /**
-   * Docker networks come in two kinds: built-in or custom. 
-   */
   public enum Type {
-    /** Predefined networks that are built-in into Docker. */
     BUILTIN("builtin"),
-    /** Custom networks that were created by users. */
     CUSTOM("custom");
     
     private final String name;

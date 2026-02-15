@@ -23,46 +23,50 @@ package org.mandas.docker.client;
 
 import java.util.Map;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 import org.mandas.docker.client.messages.RegistryAuth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * Represents the contents of the docker config.json file.
+ * 
+ * @param credHelpers credential helpers configuration
+ * @param auths authentication configurations
+ * @param httpHeaders HTTP headers to include in requests
+ * @param credsStore the credentials store to use
+ * @param detachKeys the detach keys configuration
+ * @param stackOrchestrator the stack orchestrator configuration
+ * @param psFormat the format string for ps command output
+ * @param imagesFormat the format string for images command output
  */
-@Immutable
-@JsonDeserialize(builder = ImmutableDockerConfig.Builder.class)
-public interface DockerConfig {
-
+public record DockerConfig(
   @JsonProperty("credHelpers")
-  Map<String, String> credHelpers();
+  Map<String, String> credHelpers,
 
   @JsonProperty("auths")
-  Map<String, RegistryAuth> auths();
+  Map<String, RegistryAuth> auths,
 
   @JsonProperty("HttpHeaders")
-  Map<String, String> httpHeaders();
+  Map<String, String> httpHeaders,
 
   @Nullable
   @JsonProperty("credsStore")
-  String credsStore();
+  String credsStore,
 
   @Nullable
   @JsonProperty("detachKeys")
-  String detachKeys();
+  String detachKeys,
 
   @Nullable
   @JsonProperty("stackOrchestrator")
-  String stackOrchestrator();
+  String stackOrchestrator,
 
   @Nullable
   @JsonProperty("psFormat")
-  String psFormat();
+  String psFormat,
 
   @Nullable
   @JsonProperty("imagesFormat")
-  String imagesFormat();
-}
+  String imagesFormat
+) {}

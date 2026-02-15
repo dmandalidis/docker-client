@@ -2049,9 +2049,7 @@ public class DefaultDockerClientTest {
             .readOnly(true)
             .build();
     final HostConfig hostConfig = HostConfig.builder()
-        .binds(bind)
-        .binds(bindStringFrom + ":" + bindStringTo)
-        .binds(bindUsingVolume)
+        .binds(List.of(bind.representation(), bindStringFrom + ":" + bindStringTo, bindUsingVolume.representation()))
         .build();
     final ContainerConfig volumeConfig = ContainerConfig.builder()
         .image(BUSYBOX_LATEST)

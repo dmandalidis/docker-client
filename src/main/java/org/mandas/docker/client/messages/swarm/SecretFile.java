@@ -21,44 +21,59 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableSecretFile.Builder.class)
-@Immutable
-public interface SecretFile {
+public record SecretFile(
   @JsonProperty("Name")
-  String name();
+  String name,
 
   @Nullable
   @JsonProperty("UID")
-  String uid();
+  String uid,
 
   @Nullable
   @JsonProperty("GID")
-  String gid();
+  String gid,
 
   @Nullable
   @JsonProperty("Mode")
-  Long mode();
+  Long mode
+) {
 
   public static Builder builder() {
-    return ImmutableSecretFile.builder();
+    return new Builder();
   }
 
-  interface Builder {
+  public static class Builder {
+    private String name;
+    private String uid;
+    private String gid;
+    private Long mode;
 
-    Builder name(String name);
+    public Builder name(String name) {
+      this.name = name;
+      return this;
+    }
 
-    Builder uid(String uid);
+    public Builder uid(String uid) {
+      this.uid = uid;
+      return this;
+    }
 
-    Builder gid(String gid);
+    public Builder gid(String gid) {
+      this.gid = gid;
+      return this;
+    }
 
-    Builder mode(Long mode);
+    public Builder mode(Long mode) {
+      this.mode = mode;
+      return this;
+    }
 
-    SecretFile build();
+    public SecretFile build() {
+      return new SecretFile(name, uid, gid, mode);
+    }
   }
 }

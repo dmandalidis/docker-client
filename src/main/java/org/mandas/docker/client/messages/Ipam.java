@@ -21,50 +21,59 @@
 
 package org.mandas.docker.client.messages;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableIpam.Builder.class)
-@Immutable
-public interface Ipam {
-
+public record Ipam(
   @JsonProperty("Driver")
-  String driver();
+  String driver,
 
   @Nullable
   @JsonProperty("Config")
-  List<IpamConfig> config();
+  List<IpamConfig> config,
 
   @Nullable
   @JsonProperty("Options")
-  Map<String, String> options();
+  Map<String, String> options
+) {
 
   public static Builder builder() {
-    return ImmutableIpam.builder();
+    return new Builder();
   }
 
-  interface Builder {
-
-    Builder driver(String driver);
-
-    Builder options(Map<String, ? extends String> options);
-
-    Builder config(Iterable<? extends IpamConfig> config);
-
-    public abstract Ipam build();
+  public static Ipam create(final String driver, final List<IpamConfig> config) {
+    return new Ipam(driver, config, null);
   }
 
-  static Ipam create(final String driver, final List<IpamConfig> config) {
-    return builder()
-        .driver(driver)
-        .config(config)
-        .options(null)
-        .build();
+  public static class Builder {
+    private String driver;
+    private List<IpamConfig> config;
+    private Map<String, String> options;
+
+    public Builder driver(String driver) {
+      this.driver = driver;
+      return this;
+    }
+
+    public Builder options(Map<String, String> options) {
+      this.options = new HashMap<>(options);
+      return this;
+    }
+
+    public Builder config(List<IpamConfig> config) {
+      this.config = new ArrayList<>();
+      config.forEach(this.config::add);
+      return this;
+    }
+
+    public Ipam build() {
+      return new Ipam(driver, config, options);
+    }
   }
 }

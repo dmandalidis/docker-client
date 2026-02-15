@@ -21,64 +21,92 @@
 
 package org.mandas.docker.client.messages.mount;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableMount.Builder.class)
-@Immutable
-public interface Mount {
-
+public record Mount(
   @Nullable
   @JsonProperty("Type")
-  String type();
+  String type,
 
   @Nullable
   @JsonProperty("Source")
-  String source();
+  String source,
 
   @Nullable
   @JsonProperty("Target")
-  String target();
+  String target,
 
   @Nullable
   @JsonProperty("ReadOnly")
-  Boolean readOnly();
+  Boolean readOnly,
 
   @Nullable
   @JsonProperty("BindOptions")
-  BindOptions bindOptions();
+  BindOptions bindOptions,
 
   @Nullable
   @JsonProperty("VolumeOptions")
-  VolumeOptions volumeOptions();
+  VolumeOptions volumeOptions,
 
   @Nullable
   @JsonProperty("TmpfsOptions")
-  TmpfsOptions tmpfsOptions();
+  TmpfsOptions tmpfsOptions
+) {
 
-  interface Builder {
-
-    Builder type(String type);
-
-    Builder source(String source);
-
-    Builder target(String target);
-
-    Builder readOnly(Boolean readOnly);
-
-    Builder bindOptions(BindOptions bindOptions);
-
-    Builder volumeOptions(VolumeOptions volumeOptions);
-
-    Builder tmpfsOptions(TmpfsOptions tmpfsOptions);
-
-    Mount build();
-  }
+  
 
   public static Builder builder() {
-    return ImmutableMount.builder();
+    return new Builder();
+  }
+
+  public static class Builder {
+    private String type;
+    private String source;
+    private String target;
+    private Boolean readOnly;
+    private BindOptions bindOptions;
+    private VolumeOptions volumeOptions;
+    private TmpfsOptions tmpfsOptions;
+
+    public Builder type(String type) {
+      this.type = type;
+      return this;
+    }
+
+    public Builder source(String source) {
+      this.source = source;
+      return this;
+    }
+
+    public Builder target(String target) {
+      this.target = target;
+      return this;
+    }
+
+    public Builder readOnly(Boolean readOnly) {
+      this.readOnly = readOnly;
+      return this;
+    }
+
+    public Builder bindOptions(BindOptions bindOptions) {
+      this.bindOptions = bindOptions;
+      return this;
+    }
+
+    public Builder volumeOptions(VolumeOptions volumeOptions) {
+      this.volumeOptions = volumeOptions;
+      return this;
+    }
+
+    public Builder tmpfsOptions(TmpfsOptions tmpfsOptions) {
+      this.tmpfsOptions = tmpfsOptions;
+      return this;
+    }
+
+    public Mount build() {
+      return new Mount(type, source, target, readOnly, bindOptions, volumeOptions, tmpfsOptions);
+    }
   }
 }

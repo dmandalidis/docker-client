@@ -21,37 +21,57 @@
 
 package org.mandas.docker.client.messages.swarm;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableDriver.Builder.class)
-@Immutable
-public interface Driver {
-
+public record Driver(
   @Nullable
   @JsonProperty("Name")
-  String name();
+  String name,
 
   @JsonProperty("Options")
-  Map<String, String> options();
+  Map<String, String> options
+) {
 
-  interface Builder {
-
-    Builder name(String name);
-
-    Builder addOption(final String name, final String value);
-
-    Builder options(Map<String, ? extends String> options);
-
-    Driver build();
+  // Compact constructor to ensure options is never null
+  public Driver {
+    if (options == null) {
+      options = Map.of();
+    }
   }
 
   public static Driver.Builder builder() {
-    return ImmutableDriver.builder();
+    return new Builder();
+  }
+
+  public static class Builder {
+    private String name;
+    private Map<String, String> options;
+
+    public Builder name(String name) {
+      this.name = name;
+      return this;
+    }
+
+    public Builder addOption(final String name, final String value) {
+      if (this.options == null) {
+        this.options = new HashMap<>();
+      }
+      this.options.put(name, value);
+      return this;
+    }
+
+    public Builder options(Map<String, String> options) {
+      this.options = new HashMap<>(options);
+      return this;
+    }
+
+    public Driver build() {
+      return new Driver(name, options);
+    }
   }
 }

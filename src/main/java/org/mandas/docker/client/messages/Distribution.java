@@ -23,32 +23,16 @@ package org.mandas.docker.client.messages;
 
 import java.util.List;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableDistribution.Builder.class)
-@Immutable
-public interface Distribution {
-
+public record Distribution(
   @JsonProperty("Descriptor")
-  Descriptor descriptor();
+  Descriptor descriptor,
 
   @Nullable
   @JsonProperty("Platforms")
-  List<Platform> platforms();
-
-  interface Builder {
-    Builder descriptor(Descriptor descriptor);
-
-    Builder platforms(Iterable<? extends Platform> platforms);
-
-    Distribution build();
-  }
-
-  static Builder builder() {
-    return ImmutableDistribution.builder();
-  }
+  List<Platform> platforms
+) {
 }

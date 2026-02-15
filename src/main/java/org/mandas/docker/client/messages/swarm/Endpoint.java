@@ -23,28 +23,23 @@ package org.mandas.docker.client.messages.swarm;
 
 import java.util.List;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableEndpoint.Builder.class)
-@Immutable
-public interface Endpoint {
-
+public record Endpoint(
   @JsonProperty("Spec")
-  EndpointSpec spec();
+  EndpointSpec spec,
 
   @Nullable
   @JsonProperty("ExposedPorts")
-  List<PortConfig> exposedPorts();
+  List<PortConfig> exposedPorts,
 
   @Nullable
   @JsonProperty("Ports")
-  List<PortConfig> ports();
+  List<PortConfig> ports,
 
   @Nullable
   @JsonProperty("VirtualIPs")
-  List<EndpointVirtualIp> virtualIps();
-}
+  List<EndpointVirtualIp> virtualIps
+) {}

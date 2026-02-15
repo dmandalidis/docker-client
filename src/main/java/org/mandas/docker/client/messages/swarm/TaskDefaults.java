@@ -21,28 +21,32 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableTaskDefaults.Builder.class)
-@Immutable
-public interface TaskDefaults {
-
+public record TaskDefaults(
   @Nullable
   @JsonProperty("LogDriver")
-  Driver logDriver();
+  Driver logDriver
+) {
 
-  interface Builder {
+  
 
-    Builder logDriver(Driver logDriver);
-
-    TaskDefaults build();
+  public static Builder builder() {
+    return new Builder();
   }
 
-  public static TaskDefaults.Builder builder() {
-    return ImmutableTaskDefaults.builder();
+  public static class Builder {
+    private Driver logDriver;
+
+    public Builder logDriver(Driver logDriver) {
+      this.logDriver = logDriver;
+      return this;
+    }
+
+    public TaskDefaults build() {
+      return new TaskDefaults(logDriver);
+    }
   }
 }

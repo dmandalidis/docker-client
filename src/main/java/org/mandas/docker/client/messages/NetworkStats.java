@@ -21,37 +21,31 @@
 
 package org.mandas.docker.client.messages;
 
-import org.immutables.value.Value.Immutable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 
-@JsonDeserialize(builder = ImmutableNetworkStats.Builder.class)
-@Immutable
-public interface NetworkStats {
-
+public record NetworkStats(
   @JsonProperty("rx_bytes")
-  Long rxBytes();
+  Long rxBytes,
 
   @JsonProperty("rx_packets")
-  Long rxPackets();
+  Long rxPackets,
 
   @JsonProperty("rx_dropped")
-  Long rxDropped();
+  Long rxDropped,
 
   @JsonProperty("rx_errors")
-  Long rxErrors();
+  Long rxErrors,
 
   @JsonProperty("tx_bytes")
-  Long txBytes();
+  Long txBytes,
 
   @JsonProperty("tx_packets")
-  Long txPackets();
+  Long txPackets,
 
   @JsonProperty("tx_dropped")
-  Long txDropped();
+  Long txDropped,
 
   @JsonProperty("tx_errors")
-  Long txErrors();
-}
+  Long txErrors
+) {}

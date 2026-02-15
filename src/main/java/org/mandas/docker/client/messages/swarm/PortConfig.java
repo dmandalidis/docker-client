@@ -21,58 +21,78 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutablePortConfig.Builder.class)
-@Immutable
-public interface PortConfig {
+public record PortConfig(
+  @Nullable
+  @JsonProperty("Name")
+  String name,
+
+  @Nullable
+  @JsonProperty("Protocol")
+  String protocol,
+
+  @Nullable
+  @JsonProperty("TargetPort")
+  Integer targetPort,
+
+  @Nullable
+  @JsonProperty("PublishedPort")
+  Integer publishedPort,
+
+  @Nullable
+  @JsonProperty("PublishMode")
+  PortConfigPublishMode publishMode
+) {
 
   public static final String PROTOCOL_TCP = "tcp";
   public static final String PROTOCOL_UDP = "udp";
 
-  @Nullable
-  @JsonProperty("Name")
-  String name();
-
-  @Nullable
-  @JsonProperty("Protocol")
-  String protocol();
-
-  @Nullable
-  @JsonProperty("TargetPort")
-  Integer targetPort();
-
-  @Nullable
-  @JsonProperty("PublishedPort")
-  Integer publishedPort();
-
-  @Nullable
-  @JsonProperty("PublishMode")
-  PortConfigPublishMode publishMode();
-
-  interface Builder {
-
-    Builder name(String name);
-
-    Builder protocol(String protocol);
-
-    Builder targetPort(Integer targetPort);
-
-    Builder publishedPort(Integer publishedPort);
-
-    Builder publishMode(PortConfigPublishMode publishMode);
-
-    PortConfig build();
-  }
+  
 
   public static Builder builder() {
-    return ImmutablePortConfig.builder();
+    return new Builder();
+  }
+
+  public static class Builder {
+    private String name;
+    private String protocol;
+    private Integer targetPort;
+    private Integer publishedPort;
+    private PortConfigPublishMode publishMode;
+
+    public Builder name(String name) {
+      this.name = name;
+      return this;
+    }
+
+    public Builder protocol(String protocol) {
+      this.protocol = protocol;
+      return this;
+    }
+
+    public Builder targetPort(Integer targetPort) {
+      this.targetPort = targetPort;
+      return this;
+    }
+
+    public Builder publishedPort(Integer publishedPort) {
+      this.publishedPort = publishedPort;
+      return this;
+    }
+
+    public Builder publishMode(PortConfigPublishMode publishMode) {
+      this.publishMode = publishMode;
+      return this;
+    }
+
+    public PortConfig build() {
+      return new PortConfig(name, protocol, targetPort, publishedPort, publishMode);
+    }
   }
 
   public enum PortConfigPublishMode {

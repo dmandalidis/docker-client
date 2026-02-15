@@ -23,21 +23,16 @@ package org.mandas.docker.client.messages;
 
 import java.util.List;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableVolumeList.Builder.class)
-@Immutable
-public interface VolumeList {
-
+public record VolumeList(
   @Nullable
   @JsonProperty("Volumes")
-  List<Volume> volumes();
+  List<Volume> volumes,
 
   @Nullable
   @JsonProperty("Warnings")
-  List<String> warnings();
-}
+  List<String> warnings
+) {}

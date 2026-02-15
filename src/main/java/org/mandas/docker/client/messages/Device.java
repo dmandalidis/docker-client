@@ -21,40 +21,50 @@
 
 package org.mandas.docker.client.messages;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableDevice.Builder.class)
-@Immutable
-public interface Device {
-
+public record Device(
   @Nullable
   @JsonProperty("PathOnHost")
-  String pathOnHost();
+  String pathOnHost,
 
   @Nullable
   @JsonProperty("PathInContainer")
-  String pathInContainer();
+  String pathInContainer,
 
   @Nullable
   @JsonProperty("CgroupPermissions")
-  String cgroupPermissions();
-
-  interface Builder {
-
-    Builder pathOnHost(String pathOnHost);
-
-    Builder pathInContainer(String pathInContainer);
-
-    Builder cgroupPermissions(String cgroupPermissions);
-
-    Device build();
-  }
+  String cgroupPermissions
+) {
 
   public static Device.Builder builder() {
-    return ImmutableDevice.builder();
+    return new Builder();
+  }
+
+  public static class Builder {
+    private String pathOnHost;
+    private String pathInContainer;
+    private String cgroupPermissions;
+
+    public Builder pathOnHost(String pathOnHost) {
+      this.pathOnHost = pathOnHost;
+      return this;
+    }
+
+    public Builder pathInContainer(String pathInContainer) {
+      this.pathInContainer = pathInContainer;
+      return this;
+    }
+
+    public Builder cgroupPermissions(String cgroupPermissions) {
+      this.cgroupPermissions = cgroupPermissions;
+      return this;
+    }
+
+    public Device build() {
+      return new Device(pathOnHost, pathInContainer, cgroupPermissions);
+    }
   }
 }

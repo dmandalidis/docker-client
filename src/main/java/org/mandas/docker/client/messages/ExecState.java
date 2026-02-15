@@ -21,47 +21,52 @@
 
 package org.mandas.docker.client.messages;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * An object that represents the JSON returned by the Docker API for low-level information about
  * exec commands.
+ * 
+ * @param id the exec command ID
+ * @param running whether the exec command is running
+ * @param exitCode the exit code of the exec command
+ * @param processConfig the process configuration
+ * @param openStdin whether stdin is open
+ * @param openStdout whether stdout is open
+ * @param openStderr whether stderr is open
+ * @param container the container information
+ * @param containerId the container ID
  */
-@JsonDeserialize(builder = ImmutableExecState.Builder.class)
-@Immutable
-public interface ExecState {
-
+public record ExecState(
   @JsonProperty("ID")
-  String id();
+  String id,
 
   @JsonProperty("Running")
-  Boolean running();
+  Boolean running,
 
   @Nullable
   @JsonProperty("ExitCode")
-  Long exitCode();
+  Long exitCode,
 
   @JsonProperty("ProcessConfig")
-  ProcessConfig processConfig();
+  ProcessConfig processConfig,
 
   @JsonProperty("OpenStdin")
-  Boolean openStdin();
+  Boolean openStdin,
 
   @JsonProperty("OpenStdout")
-  Boolean openStdout();
+  Boolean openStdout,
 
   @JsonProperty("OpenStderr")
-  Boolean openStderr();
+  Boolean openStderr,
 
   @Nullable
   @JsonProperty("Container")
-  ContainerInfo container();
+  ContainerInfo container,
 
   @Nullable
   @JsonProperty("ContainerID")
-  String containerId();
-}
+  String containerId
+) {}

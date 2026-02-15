@@ -23,19 +23,14 @@ package org.mandas.docker.client.messages;
 
 import java.util.List;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 
-@JsonDeserialize(builder = ImmutableServiceCreateResponse.Builder.class)
-@Immutable
-public interface ServiceCreateResponse {
-
+public record ServiceCreateResponse(
   @JsonProperty("ID")
-  String id();
+  String id,
 
   /**
    * @return any warnings produced during creating the service
@@ -43,5 +38,5 @@ public interface ServiceCreateResponse {
    */
   @Nullable
   @JsonProperty("Warnings")
-  List<String> warnings();
-}
+  List<String> warnings
+) {}

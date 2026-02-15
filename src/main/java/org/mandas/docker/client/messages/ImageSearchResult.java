@@ -21,28 +21,22 @@
 
 package org.mandas.docker.client.messages;
 
-import org.immutables.value.Value.Immutable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 
-@JsonDeserialize(builder = ImmutableImageSearchResult.Builder.class)
-@Immutable
-public interface ImageSearchResult {
-
+public record ImageSearchResult(
   @JsonProperty("description")
-  String description();
+  String description,
 
   @JsonProperty("is_official")
-  boolean official();
+  boolean official,
 
   @JsonProperty("is_automated")
-  boolean automated();
+  boolean automated,
 
   @JsonProperty("name")
-  String name();
+  String name,
 
   @JsonProperty("star_count")
-  int starCount();
-}
+  int starCount
+) {}

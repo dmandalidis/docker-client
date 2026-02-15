@@ -23,41 +23,53 @@ package org.mandas.docker.client.messages.swarm;
 
 import java.util.List;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableReservations.Builder.class)
-@Immutable
-public interface Reservations {
-
+public record Reservations(
   @Nullable
   @JsonProperty("NanoCPUs")
-  Long nanoCpus();
+  Long nanoCpus,
 
   @Nullable
   @JsonProperty("MemoryBytes")
-  Long memoryBytes();
+  Long memoryBytes,
   
   @Nullable
   @JsonProperty("GenericResources")
-  List<ResourceSpec> resources();
+  List<ResourceSpec> resources
+) {
 
-  interface Builder {
+  
 
-    Builder nanoCpus(Long nanoCpus);
-
-    Builder memoryBytes(Long memoryBytes);
-
-    Builder resources(Iterable<? extends ResourceSpec> resources);
-    
-    Reservations build();
+  public static Builder builder() {
+    return new Builder();
   }
 
-  public static Reservations.Builder builder() {
-    return ImmutableReservations.builder();
-  }
+  public static class Builder {
+    private Long nanoCpus;
+    private Long memoryBytes;
+    private List<ResourceSpec> resources;
 
+    public Builder nanoCpus(Long nanoCpus) {
+      this.nanoCpus = nanoCpus;
+      return this;
+    }
+
+    public Builder memoryBytes(Long memoryBytes) {
+      this.memoryBytes = memoryBytes;
+      return this;
+    }
+
+    public Builder resources(List<ResourceSpec> resources) {
+      this.resources = resources;
+      return this;
+    }
+
+    public Reservations build() {
+      return new Reservations(nanoCpus, memoryBytes, 
+          resources == null ? null : List.copyOf(resources));
+    }
+  }
 }

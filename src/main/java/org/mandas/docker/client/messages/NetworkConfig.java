@@ -23,77 +23,109 @@ package org.mandas.docker.client.messages;
 
 import java.util.Map;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableNetworkConfig.Builder.class)
-@Immutable
-public interface NetworkConfig {
-
+public record NetworkConfig(
   @JsonProperty("Name")
-  String name();
+  String name,
 
   @Nullable
   @JsonProperty("Driver")
-  String driver();
+  String driver,
 
   @Nullable
   @JsonProperty("IPAM")
-  Ipam ipam();
+  Ipam ipam,
 
   @JsonProperty("Options")
-  Map<String, String> options();
+  Map<String, String> options,
 
   @Nullable
   @JsonProperty("CheckDuplicate")
-  Boolean checkDuplicate();
+  Boolean checkDuplicate,
   
   @Nullable
   @JsonProperty("Internal")
-  Boolean internal();
+  Boolean internal,
   
   @Nullable
   @JsonProperty("EnableIPv6")
-  Boolean enableIPv6();
+  Boolean enableIPv6,
 
   @Nullable
   @JsonProperty("Attachable")
-  Boolean attachable();
+  Boolean attachable,
 
   @Nullable
   @JsonProperty("Labels")
-  Map<String, String> labels();
+  Map<String, String> labels
+) {
 
   public static Builder builder() {
-    return ImmutableNetworkConfig.builder();
+    return new Builder();
   }
 
-  interface Builder {
+  public static class Builder {
+    private String name;
+    private String driver;
+    private Ipam ipam;
+    private Map<String, String> options;
+    private Boolean checkDuplicate;
+    private Boolean internal;
+    private Boolean enableIPv6;
+    private Boolean attachable;
+    private Map<String, String> labels;
 
-    Builder name(final String name);
+    public Builder name(String name) {
+      this.name = name;
+      return this;
+    }
 
-    Builder addOption(final String key, final String value);
-    
-    Builder options(Map<String, ? extends String> options);
+    public Builder driver(String driver) {
+      this.driver = driver;
+      return this;
+    }
 
-    Builder ipam(final Ipam ipam);
+    public Builder ipam(Ipam ipam) {
+      this.ipam = ipam;
+      return this;
+    }
 
-    Builder driver(final String driver);
+    public Builder options(Map<String, String> options) {
+      this.options = options != null ? Map.copyOf(options) : null;
+      return this;
+    }
 
-    Builder checkDuplicate(Boolean check);
-    
-    Builder internal(Boolean internal);
-    
-    Builder enableIPv6(Boolean ipv6);
+    public Builder checkDuplicate(Boolean checkDuplicate) {
+      this.checkDuplicate = checkDuplicate;
+      return this;
+    }
 
-    Builder attachable(Boolean attachable);
+    public Builder internal(Boolean internal) {
+      this.internal = internal;
+      return this;
+    }
 
-    Builder labels(Map<String, ? extends String> labels);
-    
-    NetworkConfig build();
+    public Builder enableIPv6(Boolean enableIPv6) {
+      this.enableIPv6 = enableIPv6;
+      return this;
+    }
+
+    public Builder attachable(Boolean attachable) {
+      this.attachable = attachable;
+      return this;
+    }
+
+    public Builder labels(Map<String, String> labels) {
+      this.labels = labels != null ? Map.copyOf(labels) : null;
+      return this;
+    }
+
+    public NetworkConfig build() {
+      return new NetworkConfig(name, driver, ipam, options, checkDuplicate, 
+                              internal, enableIPv6, attachable, labels);
+    }
   }
-
 }

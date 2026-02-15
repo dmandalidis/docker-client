@@ -23,25 +23,19 @@ package org.mandas.docker.client.messages;
 
 import java.util.List;
 
-import org.immutables.value.Value.Immutable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 
-@JsonDeserialize(builder = ImmutableDescriptor.Builder.class)
-@Immutable
-public interface Descriptor {
-
+public record Descriptor(
   @JsonProperty("MediaType")
-  String mediaType();
+  String mediaType,
 
   @JsonProperty("Digest")
-  String digest();
+  String digest,
 
   @JsonProperty("Size")
-  Long size();
+  Long size,
 
   @JsonProperty("URLs")
-  List<String> urls();
-}
+  List<String> urls
+) {}
