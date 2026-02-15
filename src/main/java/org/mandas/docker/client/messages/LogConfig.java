@@ -21,40 +21,50 @@
 
 package org.mandas.docker.client.messages;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableLogConfig.Builder.class)
-@Immutable
-public interface LogConfig {
-
+public record LogConfig(
   @JsonProperty("Type")
-  String logType();
+  String logType,
 
   @Nullable
   @JsonProperty("Config")
-  Map<String, String> logOptions();
+  Map<String, String> logOptions
+) {
 
-  static LogConfig create(final String logType) {
-    return ImmutableLogConfig.builder().logType(logType).build();
+  public static LogConfig create(final String logType) {
+    return new LogConfig(logType, null);
   }
   
-  static LogConfig create(final String logType, final Map<String, String> logOptions) {
-    return ImmutableLogConfig.builder().logType(logType).logOptions(logOptions).build();  
+  public static LogConfig create(final String logType, final Map<String, String> logOptions) {
+    return new LogConfig(logType, logOptions);
   }
   
-  interface Builder {
-	  Builder logType(String logType);
-	  Builder logOptions(Map<String, ? extends String> logOptions);
-	  LogConfig build();
+  public static Builder builder() {
+    return new Builder();
   }
-  
-  static Builder builder() {
-	  return ImmutableLogConfig.builder();
+
+  public static class Builder {
+    private String logType;
+    private Map<String, String> logOptions;
+
+    public Builder logType(String logType) {
+      this.logType = logType;
+      return this;
+    }
+
+    public Builder logOptions(Map<String, String> logOptions) {
+      this.logOptions = new HashMap<>(logOptions);
+      return this;
+    }
+
+    public LogConfig build() {
+      return new LogConfig(logType, logOptions);
+    }
   }
 }

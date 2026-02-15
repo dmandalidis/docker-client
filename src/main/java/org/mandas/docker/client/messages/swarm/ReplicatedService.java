@@ -21,36 +21,42 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-
-@JsonDeserialize(builder = ImmutableReplicatedService.Builder.class)
-@Immutable
-public interface ReplicatedService {
-
+public record ReplicatedService(
   @Nullable
   @JsonProperty("Replicas")
-  Long replicas();
+  Long replicas,
   
   @Nullable
   @JsonProperty("MaxConcurrent")
-  Long maxConcurrent();
+  Long maxConcurrent
+) {
 
-  interface Builder {
-
-    Builder replicas(Long replicas);
-    
-    Builder maxConcurrent(Long maxConcurrent);
-
-    ReplicatedService build();
-  }
+  
 
   public static Builder builder() {
-    return ImmutableReplicatedService.builder();
+    return new Builder();
   }
 
+  public static class Builder {
+    private Long replicas;
+    private Long maxConcurrent;
+
+    public Builder replicas(Long replicas) {
+      this.replicas = replicas;
+      return this;
+    }
+
+    public Builder maxConcurrent(Long maxConcurrent) {
+      this.maxConcurrent = maxConcurrent;
+      return this;
+    }
+
+    public ReplicatedService build() {
+      return new ReplicatedService(replicas, maxConcurrent);
+    }
+  }
 }

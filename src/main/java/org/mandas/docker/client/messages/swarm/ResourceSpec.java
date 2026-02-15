@@ -19,65 +19,80 @@
 */
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Enclosing;
-import org.immutables.value.Value.Immutable;
-import org.mandas.docker.client.messages.swarm.ImmutableResourceSpec.NamedResourceSpec;
-import org.mandas.docker.client.messages.swarm.ResourceSpec.DiscreteResourceSpec;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@Enclosing
 @JsonTypeInfo(use=Id.NAME, include = As.WRAPPER_OBJECT)
 @JsonSubTypes({
-	@JsonSubTypes.Type(value = NamedResourceSpec.class, name = "NamedResourceSpec"),
-	@JsonSubTypes.Type(value = DiscreteResourceSpec.class, name = "DiscreteResourceSpec"),
+	@JsonSubTypes.Type(value = ResourceSpec.NamedResourceSpec.class, name = "NamedResourceSpec"),
+	@JsonSubTypes.Type(value = ResourceSpec.DiscreteResourceSpec.class, name = "DiscreteResourceSpec"),
 })
-public interface ResourceSpec {
+public sealed interface ResourceSpec permits ResourceSpec.NamedResourceSpec, ResourceSpec.DiscreteResourceSpec {
 	
 	@JsonProperty("Kind")
 	String kind();
 	
-	@JsonDeserialize(builder = ImmutableResourceSpec.NamedResourceSpec.Builder.class)
-	@Immutable
 	@JsonTypeName("NamedResourceSpec")
-	interface NamedResourceSpec extends ResourceSpec {
-		@JsonProperty("Value")
-		String value();
+	record NamedResourceSpec(
+		@JsonProperty("Kind") String kind,
+		@JsonProperty("Value") String value
+	) implements ResourceSpec {
 		
-		interface Builder extends ResourceSpec.Builder<Builder> {
-			Builder value(String value);
-			NamedResourceSpec build();
+		public static Builder builder() {
+			return new Builder();
 		}
 		
-		static Builder builder() {
-			return ImmutableResourceSpec.NamedResourceSpec.builder();
+		public static class Builder {
+			private String kind;
+			private String value;
+			
+			public Builder kind(String kind) {
+				this.kind = kind;
+				return this;
+			}
+			
+			public Builder value(String value) {
+				this.value = value;
+				return this;
+			}
+			
+			public NamedResourceSpec build() {
+				return new NamedResourceSpec(kind, value);
+			}
 		}
 	}
 	
-	@JsonDeserialize(builder = ImmutableResourceSpec.DiscreteResourceSpec.Builder.class)
-	@Immutable
 	@JsonTypeName("DiscreteResourceSpec")
-	interface DiscreteResourceSpec extends ResourceSpec {
-		@JsonProperty("Value")
-		int value();
+	record DiscreteResourceSpec(
+		@JsonProperty("Kind") String kind,
+		@JsonProperty("Value") int value
+	) implements ResourceSpec {
 		
-		interface Builder extends ResourceSpec.Builder<Builder> {
-			Builder value(int value);
-			DiscreteResourceSpec build();
+		public static Builder builder() {
+			return new Builder();
 		}
 		
-		static Builder builder() {
-			return ImmutableResourceSpec.DiscreteResourceSpec.builder();
+		public static class Builder {
+			private String kind;
+			private int value;
+			
+			public Builder kind(String kind) {
+				this.kind = kind;
+				return this;
+			}
+			
+			public Builder value(int value) {
+				this.value = value;
+				return this;
+			}
+			
+			public DiscreteResourceSpec build() {
+				return new DiscreteResourceSpec(kind, value);
+			}
 		}
-	}
-	
-	interface Builder<T> {
-		T kind(String kind);
 	}
 }

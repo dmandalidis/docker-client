@@ -21,35 +21,40 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableResources.Builder.class)
-@Immutable
-public interface Resources {
-
+public record Resources(
   @Nullable
   @JsonProperty("NanoCPUs")
-  Long nanoCpus();
+  Long nanoCpus,
 
   @Nullable
   @JsonProperty("MemoryBytes")
-  Long memoryBytes();
-
-  interface Builder {
-
-    Builder nanoCpus(Long nanoCpus);
-
-    Builder memoryBytes(Long memoryBytes);
-
-    Resources build();
-  }
+  Long memoryBytes
+) {
 
   public static Resources.Builder builder() {
-    return ImmutableResources.builder();
+    return new Builder();
   }
 
+  public static class Builder {
+    private Long nanoCpus;
+    private Long memoryBytes;
+
+    public Builder nanoCpus(Long nanoCpus) {
+      this.nanoCpus = nanoCpus;
+      return this;
+    }
+
+    public Builder memoryBytes(Long memoryBytes) {
+      this.memoryBytes = memoryBytes;
+      return this;
+    }
+
+    public Resources build() {
+      return new Resources(nanoCpus, memoryBytes);
+    }
+  }
 }

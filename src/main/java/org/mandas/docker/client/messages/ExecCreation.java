@@ -23,20 +23,15 @@ package org.mandas.docker.client.messages;
 
 import java.util.List;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableExecCreation.Builder.class)
-@Immutable
-public interface ExecCreation {
-
+public record ExecCreation(
   @JsonProperty("Id")
-  String id();
+  String id,
 
   @Nullable
   @JsonProperty("Warnings")
-  List<String> warnings();
-}
+  List<String> warnings
+) {}

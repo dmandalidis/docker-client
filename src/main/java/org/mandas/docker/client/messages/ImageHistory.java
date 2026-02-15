@@ -23,33 +23,28 @@ package org.mandas.docker.client.messages;
 
 import java.util.List;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableImageHistory.Builder.class)
-@Immutable
-public interface ImageHistory {
-
+public record ImageHistory(
   @JsonProperty("Id")
-  String id();
+  String id,
 
   @JsonProperty("Created")
-  Long created();
+  Long created,
 
   @JsonProperty("CreatedBy")
-  String createdBy();
+  String createdBy,
 
   @Nullable
   @JsonProperty("Tags")
-  List<String> tags();
+  List<String> tags,
 
   @JsonProperty("Size")
-  Long size();
+  Long size,
 
   @Nullable
   @JsonProperty("Comment")
-  String comment();
-}
+  String comment
+) {}

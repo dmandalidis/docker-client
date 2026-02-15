@@ -21,35 +21,47 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableSecretBind.Builder.class)
-@Immutable
-public interface SecretBind {
+public record SecretBind(
   @JsonProperty("File")
-  SecretFile file();
+  SecretFile file,
 
   @JsonProperty("SecretID")
-  String secretId();
+  String secretId,
 
   @JsonProperty("SecretName")
-  String secretName();
+  String secretName
+) {
 
   public static Builder builder() {
-    return ImmutableSecretBind.builder();
+    return new Builder();
   }
 
-  interface Builder {
+  
 
-    Builder file(SecretFile file);
+  public static class Builder {
+    private SecretFile file;
+    private String secretId;
+    private String secretName;
 
-    Builder secretId(String secretId);
+    public Builder file(SecretFile file) {
+      this.file = file;
+      return this;
+    }
 
-    Builder secretName(String secretName);
+    public Builder secretId(String secretId) {
+      this.secretId = secretId;
+      return this;
+    }
 
-    SecretBind build();
+    public Builder secretName(String secretName) {
+      this.secretName = secretName;
+      return this;
+    }
+
+    public SecretBind build() {
+      return new SecretBind(file, secretId, secretName);
+    }
   }
 }

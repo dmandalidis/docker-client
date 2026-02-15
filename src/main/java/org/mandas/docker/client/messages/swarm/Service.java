@@ -22,87 +22,100 @@
 package org.mandas.docker.client.messages.swarm;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
-import org.immutables.value.Value.Enclosing;
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableService.Builder.class)
-@Immutable
-@Enclosing
-public interface Service {
-
+public record Service(
   @JsonProperty("ID")
-  String id();
+  String id,
 
   @JsonProperty("Version")
-  Version version();
+  Version version,
 
   @JsonProperty("CreatedAt")
-  Date createdAt();
+  Date createdAt,
 
   @JsonProperty("UpdatedAt")
-  Date updatedAt();
+  Date updatedAt,
 
   @JsonProperty("Spec")
-  ServiceSpec spec();
+  ServiceSpec spec,
 
   @JsonProperty("Endpoint")
-  Endpoint endpoint();
+  Endpoint endpoint,
 
   @Nullable
   @JsonProperty("UpdateStatus")
-  UpdateStatus updateStatus();
+  UpdateStatus updateStatus,
 
   @Nullable
   @JsonProperty("JobStatus")
-  JobStatus jobStatus();
+  JobStatus jobStatus
+) {
   
-  @JsonDeserialize(builder = ImmutableService.Criteria.Builder.class)
-  @Immutable
-  public interface Criteria {
-
-    /**
-     * @return Filter by service id.
-     */
+  public record Criteria(
     @Nullable
-    String serviceId();
+    String serviceId,
 
-    /**
-     * @return Filter by service name.
-     */
     @Nullable
-    String serviceName();
+    String serviceName,
 
-    /**
-     * @return Filter by label.
-     */
-    Map<String, String> labels();
+    Map<String, String> labels
+  ) {
     
-    public static Criteria.Builder builder() {
-      return ImmutableService.Criteria.builder();
+    // Compact constructor to ensure labels is never null
+    public Criteria {
+      if (labels == null) {
+        labels = Map.of();
+      }
+    }
+    
+    public static Builder builder() {
+      return new Builder();
     }
 
-    interface Builder {
+    public static class Builder {
+      private String serviceId;
+      private String serviceName;
+      private Map<String, String> labels;
 
-      Builder serviceId(final String serviceId);
+      public Builder serviceId(String serviceId) {
+        this.serviceId = serviceId;
+        return this;
+      }
 
-      Builder serviceName(final String serviceName);
+      public Builder serviceName(String serviceName) {
+        this.serviceName = serviceName;
+        return this;
+      }
 
-      Builder labels(final Map<String, ? extends String> labels);
-      
-      Builder addLabel(final String label, final String value);
-      
-      Criteria build();
+      public Builder labels(Map<String, String> labels) {
+        this.labels = labels == null ? null : Map.copyOf(labels);
+        return this;
+      }
+
+      public Builder addLabel(final String label, final String value) {
+        if (this.labels == null) {
+          this.labels = new HashMap<>();
+        } else {
+          this.labels = new HashMap<>(this.labels);
+        }
+        this.labels.put(label, value);
+        return this;
+      }
+
+      public Criteria build() {
+        return new Criteria(serviceId, serviceName, 
+            labels == null ? null : Map.copyOf(labels));
+      }
     }
   }
 
   public static Criteria.Builder find() {
-    return ImmutableService.Criteria.builder();
+    return Criteria.builder();
   }
-
 }

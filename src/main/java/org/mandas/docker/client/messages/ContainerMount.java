@@ -21,42 +21,37 @@
 
 package org.mandas.docker.client.messages;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 
-@JsonDeserialize(builder = ImmutableContainerMount.Builder.class)
-@Immutable
-public interface ContainerMount {
-
+public record ContainerMount(
   @Nullable
   @JsonProperty("Type")
-  String type();
+  String type,
 
   @Nullable
   @JsonProperty("Name")
-  String name();
+  String name,
 
   @JsonProperty("Source")
-  String source();
+  String source,
 
   @JsonProperty("Destination")
-  String destination();
+  String destination,
 
   @Nullable
   @JsonProperty("Driver")
-  String driver();
+  String driver,
 
   @JsonProperty("Mode")
-  String mode();
+  String mode,
 
   @JsonProperty("RW")
-  Boolean rw();
+  Boolean rw,
 
   @Nullable
   @JsonProperty("Propagation")
-  String propagation();
-}
+  String propagation
+) {}

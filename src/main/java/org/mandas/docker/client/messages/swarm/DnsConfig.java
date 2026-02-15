@@ -21,49 +21,65 @@
 
 package org.mandas.docker.client.messages.swarm;
 
+import java.util.Arrays;
 import java.util.List;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableDnsConfig.Builder.class)
-@Immutable
-public interface DnsConfig {
-
+public record DnsConfig(
   @Nullable
   @JsonProperty("Nameservers")
-  List<String> nameServers();
+  List<String> nameServers,
 
   @Nullable
   @JsonProperty("Search")
-  List<String> search();
+  List<String> search,
 
   @Nullable
   @JsonProperty("Options")
-  List<String> options();
-
-
-  interface Builder {
-
-    Builder nameServers(String... nameServers);
-
-    Builder nameServers(Iterable<String> nameServers);
-    
-    Builder search(String... search);
-    
-    Builder search(Iterable<String> search);
-    
-    Builder options(String... options);
-
-    Builder options(Iterable<String> options);
-
-    DnsConfig build();
-  }
+  List<String> options
+) {
 
   public static Builder builder() {
-    return ImmutableDnsConfig.builder();
+    return new Builder();
+  }
+
+  public static class Builder {
+    private List<String> nameServers;
+    private List<String> search;
+    private List<String> options;
+
+    public Builder nameServers(String... nameServers) {
+      return nameServers(Arrays.asList(nameServers));
+    }
+
+    public Builder nameServers(List<String> nameServers) {
+      this.nameServers = nameServers;
+      return this;
+    }
+
+    public Builder search(String... search) {
+      return search(Arrays.asList(search));
+    }
+
+    public Builder search(List<String> search) {
+      this.search = search;
+      return this;
+    }
+
+    public Builder options(String... options) {
+      return options(Arrays.asList(options));
+    }
+
+    public Builder options(List<String> options) {
+      this.options = options;
+      return this;
+    }
+
+    public DnsConfig build() {
+      return new DnsConfig(nameServers, search, options);
+    }
   }
 }

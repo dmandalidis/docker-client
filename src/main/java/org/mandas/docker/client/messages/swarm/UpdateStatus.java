@@ -23,29 +23,23 @@ package org.mandas.docker.client.messages.swarm;
 
 import java.util.Date;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableUpdateStatus.Builder.class)
-@Immutable
-public interface UpdateStatus {
-
+public record UpdateStatus(
   @Nullable
   @JsonProperty("State")
-  String state();
+  String state,
 
   @JsonProperty("StartedAt")
-  Date startedAt();
+  Date startedAt,
 
   @Nullable
   @JsonProperty("CompletedAt")
-  Date completedAt();
+  Date completedAt,
 
   @Nullable
   @JsonProperty("Message")
-  String message();
-
-}
+  String message
+) {}

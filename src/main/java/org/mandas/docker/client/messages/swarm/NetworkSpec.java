@@ -23,39 +23,34 @@ package org.mandas.docker.client.messages.swarm;
 
 import java.util.Map;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableNetworkSpec.Builder.class)
-@Immutable
-public interface NetworkSpec {
-
+public record NetworkSpec(
   @JsonProperty("Name")
-  String name();
+  String name,
 
   @Nullable
   @JsonProperty("Labels")
-  Map<String, String> labels();
+  Map<String, String> labels,
 
   @JsonProperty("DriverConfiguration")
-  Driver driverConfiguration();
+  Driver driverConfiguration,
 
   @Nullable
   @JsonProperty("IPv6Enabled")
-  Boolean ipv6Enabled();
+  Boolean ipv6Enabled,
 
   @Nullable
   @JsonProperty("Internal")
-  Boolean internal();
+  Boolean internal,
 
   @Nullable
   @JsonProperty("Attachable")
-  Boolean attachable();
+  Boolean attachable,
 
   @Nullable
   @JsonProperty("IPAMOptions")
-  IpamOptions ipamOptions();
-}
+  IpamOptions ipamOptions
+) {}

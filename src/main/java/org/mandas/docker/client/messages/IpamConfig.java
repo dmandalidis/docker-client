@@ -21,43 +21,54 @@
 
 package org.mandas.docker.client.messages;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableIpamConfig.Builder.class)
-@Immutable
-public interface IpamConfig {
-
+public record IpamConfig(
   @Nullable
   @JsonProperty("Subnet")
-  String subnet();
+  String subnet,
 
   @Nullable
   @JsonProperty("IPRange")
-  String ipRange();
+  String ipRange,
 
   @Nullable
   @JsonProperty("Gateway")
-  String gateway();
+  String gateway
+) {
   
-  interface Builder {
-	  Builder subnet(String subnet);
-	  
-	  Builder ipRange(String subnet);
-	  
-	  Builder gateway(String subnet);
-	  
-	  IpamConfig build();
+  public static IpamConfig create(final String subnet, final String ipRange, final String gateway) {
+    return new IpamConfig(subnet, ipRange, gateway);
   }
   
-  static IpamConfig create(final String subnet, final String ipRange, final String gateway) {
-	  return ImmutableIpamConfig.builder().subnet(subnet).ipRange(ipRange).gateway(gateway).build();
+  public static Builder builder() {
+    return new Builder();
   }
-  
-  static Builder builder() {
-	  return ImmutableIpamConfig.builder();
+
+  public static class Builder {
+    private String subnet;
+    private String ipRange;
+    private String gateway;
+
+    public Builder subnet(String subnet) {
+      this.subnet = subnet;
+      return this;
+    }
+
+    public Builder ipRange(String ipRange) {
+      this.ipRange = ipRange;
+      return this;
+    }
+
+    public Builder gateway(String gateway) {
+      this.gateway = gateway;
+      return this;
+    }
+
+    public IpamConfig build() {
+      return new IpamConfig(subnet, ipRange, gateway);
+    }
   }
 }

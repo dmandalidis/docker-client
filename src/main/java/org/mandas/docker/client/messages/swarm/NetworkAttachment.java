@@ -23,18 +23,12 @@ package org.mandas.docker.client.messages.swarm;
 
 import java.util.List;
 
-import org.immutables.value.Value.Immutable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableNetworkAttachment.Builder.class)
-@Immutable
-public interface NetworkAttachment {
-
+public record NetworkAttachment(
   @JsonProperty("Network")
-  Network network();
+  Network network,
 
   @JsonProperty("Addresses")
-  List<String> addresses();
-}
+  List<String> addresses
+) {}

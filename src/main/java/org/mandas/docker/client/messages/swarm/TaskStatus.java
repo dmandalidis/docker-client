@@ -23,16 +23,28 @@ package org.mandas.docker.client.messages.swarm;
 
 import java.util.Date;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableTaskStatus.Builder.class)
-@Immutable
-public interface TaskStatus {
+public record TaskStatus(
+  @JsonProperty("Timestamp")
+  Date timestamp,
 
+  @JsonProperty("State")
+  String state,
+
+  @JsonProperty("Message")
+  String message,
+
+  @Nullable
+  @JsonProperty("Err")
+  String err,
+
+  @Nullable
+  @JsonProperty("ContainerStatus")
+  ContainerStatus containerStatus
+) {
   public static final String TASK_STATE_NEW = "new";
   public static final String TASK_STATE_ALLOCATED = "allocated";
   public static final String TASK_STATE_PENDING = "pending";
@@ -46,21 +58,4 @@ public interface TaskStatus {
   public static final String TASK_STATE_SHUTDOWN = "shutdown";
   public static final String TASK_STATE_FAILED = "failed";
   public static final String TASK_STATE_REJECTED = "rejected";
-
-  @JsonProperty("Timestamp")
-  Date timestamp();
-
-  @JsonProperty("State")
-  String state();
-
-  @JsonProperty("Message")
-  String message();
-
-  @Nullable
-  @JsonProperty("Err")
-  String err();
-
-  @Nullable
-  @JsonProperty("ContainerStatus")
-  ContainerStatus containerStatus();
 }

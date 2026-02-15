@@ -23,33 +23,27 @@ package org.mandas.docker.client.messages.swarm;
 
 import java.util.Date;
 
-import org.immutables.value.Value.Immutable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableNetwork.Builder.class)
-@Immutable
-public interface Network {
-
+public record Network(
   @JsonProperty("ID")
-  String id();
+  String id,
 
   @JsonProperty("Version")
-  Version version();
+  Version version,
 
   @JsonProperty("CreatedAt")
-  Date createdAt();
+  Date createdAt,
 
   @JsonProperty("UpdatedAt")
-  Date updatedAt();
+  Date updatedAt,
 
   @JsonProperty("Spec")
-  NetworkSpec spec();
+  NetworkSpec spec,
 
   @JsonProperty("DriverState")
-  Driver driverState();
+  Driver driverState,
 
   @JsonProperty("IPAMOptions")
-  IpamOptions ipamOptions();
-}
+  IpamOptions ipamOptions
+) {}

@@ -23,34 +23,43 @@ package org.mandas.docker.client.messages.swarm;
 
 import java.util.List;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableCaConfig.Builder.class)
-@Immutable
-public interface CaConfig {
-
+public record CaConfig(
   @Nullable
   @JsonProperty("NodeCertExpiry")
-  Long nodeCertExpiry();
+  Long nodeCertExpiry,
 
   @Nullable
   @JsonProperty("ExternalCAs")
-  List<ExternalCa> externalCas();
+  List<ExternalCa> externalCas
+) {
 
-  interface Builder {
-
-    Builder nodeCertExpiry(Long nodeCertExpiry);
-
-    Builder externalCas(Iterable<? extends ExternalCa> externalCas);
-
-    CaConfig build();
-  }
+  
 
   public static Builder builder() {
-    return ImmutableCaConfig.builder();
+    return new Builder();
+  }
+
+  public static class Builder {
+    private Long nodeCertExpiry;
+    private List<ExternalCa> externalCas;
+
+    public Builder nodeCertExpiry(Long nodeCertExpiry) {
+      this.nodeCertExpiry = nodeCertExpiry;
+      return this;
+    }
+
+    public Builder externalCas(List<ExternalCa> externalCas) {
+      this.externalCas = externalCas;
+      return this;
+    }
+
+    public CaConfig build() {
+      return new CaConfig(nodeCertExpiry, 
+          externalCas == null ? null : List.copyOf(externalCas));
+    }
   }
 }

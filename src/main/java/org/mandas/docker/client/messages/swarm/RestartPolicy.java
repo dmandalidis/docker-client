@@ -21,51 +21,66 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableRestartPolicy.Builder.class)
-@Immutable
-public interface RestartPolicy {
+public record RestartPolicy(
+  @Nullable
+  @JsonProperty("Condition")
+  String condition,
+
+  @Nullable
+  @JsonProperty("Delay")
+  Long delay,
+
+  @Nullable
+  @JsonProperty("MaxAttempts")
+  Integer maxAttempts,
+
+  @Nullable
+  @JsonProperty("Window")
+  Long window
+) {
 
   public static final String RESTART_POLICY_NONE = "none";
   public static final String RESTART_POLICY_ON_FAILURE = "on-failure";
   public static final String RESTART_POLICY_ANY = "any";
 
-  @Nullable
-  @JsonProperty("Condition")
-  String condition();
-
-  @Nullable
-  @JsonProperty("Delay")
-  Long delay();
-
-  @Nullable
-  @JsonProperty("MaxAttempts")
-  Integer maxAttempts();
-
-  @Nullable
-  @JsonProperty("Window")
-  Long window();
-
-  interface Builder {
-
-    Builder condition(String condition);
-
-    Builder delay(Long delay);
-
-    Builder maxAttempts(Integer maxAttempts);
-
-    Builder window(Long window);
-
-    RestartPolicy build();
-  }
+  
 
   public static Builder builder() {
-    return ImmutableRestartPolicy.builder();
+    return new Builder();
   }
 
+  public static class Builder {
+    private String condition;
+    private Long delay;
+    private Integer maxAttempts;
+    private Long window;
+
+    public Builder condition(String condition) {
+      this.condition = condition;
+      return this;
+    }
+
+    public Builder delay(Long delay) {
+      this.delay = delay;
+      return this;
+    }
+
+    public Builder maxAttempts(Integer maxAttempts) {
+      this.maxAttempts = maxAttempts;
+      return this;
+    }
+
+    public Builder window(Long window) {
+      this.window = window;
+      return this;
+    }
+
+    public RestartPolicy build() {
+      return new RestartPolicy(condition, delay, maxAttempts, window);
+    }
+  }
 }

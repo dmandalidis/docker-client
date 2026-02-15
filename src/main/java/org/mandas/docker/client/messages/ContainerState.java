@@ -24,84 +24,74 @@ package org.mandas.docker.client.messages;
 import java.util.Date;
 import java.util.List;
 
-import org.immutables.value.Value.Enclosing;
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableContainerState.Builder.class)
-@Immutable
-@Enclosing
-public interface ContainerState {
-
+public record ContainerState(
   @Nullable
   @JsonProperty("Status")
-  String status();
+  String status,
 
   @JsonProperty("Running")
-  boolean running();
+  boolean running,
 
   @JsonProperty("Paused")
-  boolean paused();
+  boolean paused,
 
   @Nullable
   @JsonProperty("Restarting")
-  Boolean restarting();
+  Boolean restarting,
 
   @JsonProperty("Pid")
-  Integer pid();
+  Integer pid,
 
   @JsonProperty("ExitCode")
-  Long exitCode();
+  Long exitCode,
 
   @JsonProperty("StartedAt")
-  Date startedAt();
+  Date startedAt,
 
   @JsonProperty("FinishedAt")
-  Date finishedAt();
+  Date finishedAt,
 
   @Nullable
   @JsonProperty("Error")
-  String error();
+  String error,
 
   @Nullable
   @JsonProperty("OOMKilled")
-  Boolean oomKilled();
+  Boolean oomKilled,
 
   @Nullable
   @JsonProperty("Health")
-  Health health();
+  Health health
+) {
 
-  @JsonDeserialize(builder = ImmutableContainerState.HealthLog.Builder.class)
-  @Immutable
-  public interface HealthLog {
-
+  public record HealthLog(
     @JsonProperty("Start")
-    Date start();
+    Date start,
 
     @JsonProperty("End")
-    Date end();
+    Date end,
 
     @JsonProperty("ExitCode")
-    Long exitCode();
+    Long exitCode,
 
     @JsonProperty("Output")
-    String output();
+    String output
+  ) {
   }
 
-  @JsonDeserialize(builder = ImmutableContainerState.Health.Builder.class)
-  @Immutable
-  public interface Health {
-
+  public record Health(
     @JsonProperty("Status")
-    String status();
+    String status,
 
     @JsonProperty("FailingStreak")
-    Integer failingStreak();
+    Integer failingStreak,
 
     @JsonProperty("Log")
-    List<HealthLog> log();
+    List<HealthLog> log
+  ) {
   }
 }

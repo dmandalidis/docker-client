@@ -21,20 +21,15 @@
 
 package org.mandas.docker.client.messages;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableNetworkCreation.Builder.class)
-@Immutable
-public interface NetworkCreation {
-
+public record NetworkCreation(
   @JsonProperty("Id")
-  String id();
+  String id,
 
   @Nullable
   @JsonProperty("Warnings")
-  String warnings();
-}
+  String warnings
+) {}

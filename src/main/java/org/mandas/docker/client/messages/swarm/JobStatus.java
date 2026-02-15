@@ -21,28 +21,36 @@ package org.mandas.docker.client.messages.swarm;
 
 import java.util.Date;
 
-import org.immutables.value.Value.Immutable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableJobStatus.Builder.class)
-@Immutable
-public interface JobStatus {
-
+public record JobStatus(
   @JsonProperty("JobIteration")
-  Version jobIteration();
+  Version jobIteration,
   
   @JsonProperty("LastExecution")
-  Date lastExecution();
+  Date lastExecution
+) {
   
-  interface Builder {
-    Builder jobIteration(Version iteration);
-    Builder lastExecution(Date lastExecution);
-    JobStatus build();
+  public static Builder builder() {
+    return new Builder();
   }
-  
-  static Builder builder() {
-    return ImmutableJobStatus.builder();
+
+  public static class Builder {
+    private Version jobIteration;
+    private Date lastExecution;
+
+    public Builder jobIteration(Version iteration) {
+      this.jobIteration = iteration;
+      return this;
+    }
+
+    public Builder lastExecution(Date lastExecution) {
+      this.lastExecution = lastExecution;
+      return this;
+    }
+
+    public JobStatus build() {
+      return new JobStatus(jobIteration, lastExecution);
+    }
   }
 }

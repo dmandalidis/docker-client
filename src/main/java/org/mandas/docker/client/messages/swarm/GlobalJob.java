@@ -20,19 +20,17 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
-@JsonDeserialize(builder = ImmutableGlobalJob.Builder.class)
-@Immutable
-public interface GlobalJob {
+public record GlobalJob() {
 
   public static Builder builder() {
-    return ImmutableGlobalJob.builder();
+    return new Builder();
   }
 
-  interface Builder {
-    GlobalJob build();
+  
+
+  public static class Builder {
+    public GlobalJob build() {
+      return new GlobalJob();
+    }
   }
 }

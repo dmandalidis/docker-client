@@ -24,45 +24,42 @@ package org.mandas.docker.client.messages;
 import java.util.List;
 import java.util.Map;
 
-import org.immutables.value.Value.Default;
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableImage.Builder.class)
-@Immutable
-public interface Image {
-
+public record Image(
   @JsonProperty("Created")
-  String created();
+  String created,
 
   @JsonProperty("Id")
-  String id();
+  String id,
 
   @JsonProperty("ParentId")
-  String parentId();
+  String parentId,
 
   @Nullable
   @JsonProperty("RepoTags")
-  List<String> repoTags();
+  List<String> repoTags,
 
   @Nullable
   @JsonProperty("RepoDigests")
-  List<String> repoDigests();
+  List<String> repoDigests,
 
   @JsonProperty("Size")
-  Long size();
+  Long size,
 
-  @Deprecated // as of v1.44
-  @Default
+  @Deprecated
   @JsonProperty("VirtualSize")
-  default Long virtualSize() {
-    return size();
-  }
+  Long virtualSize,
 
   @Nullable
   @JsonProperty("Labels")
-  Map<String, String> labels();
+  Map<String, String> labels
+) {
+  public Image {
+    if (virtualSize == null) {
+      virtualSize = size;
+    }
+  }
 }

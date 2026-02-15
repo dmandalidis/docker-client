@@ -16,51 +16,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * -/-/-
-*/
+ */
 package org.mandas.docker.client.messages;
 
 import java.util.List;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableHealthcheck.Builder.class)
-@Immutable
-public interface Healthcheck {
+public record Healthcheck(
   @Nullable
   @JsonProperty("Test")
-  List<String> test();
+  List<String> test,
 
-  /**
-   * @return interval in nanoseconds.
-   */
   @Nullable
   @JsonProperty("Interval")
-  Long interval();
+  Long interval,
 
-  /**
-   * @return timeout in nanoseconds.
-   */
   @Nullable
   @JsonProperty("Timeout")
-  Long timeout();
+  Long timeout,
 
   @Nullable
   @JsonProperty("Retries")
-  Integer retries();
+  Integer retries,
 
-  /**
-   * @return start period in nanoseconds.
-   * @since API 1.29
-   */
   @Nullable
   @JsonProperty("StartPeriod")
-  Long startPeriod();
+  Long startPeriod
+) {
 
-  static Healthcheck create(
+  public static Healthcheck create(
           final List<String> test,
           final Long interval,
           final Long timeout,
@@ -68,36 +55,53 @@ public interface Healthcheck {
     return create(test, interval, timeout, retries, null);
   }
 
-  static Healthcheck create(
+  public static Healthcheck create(
           final List<String> test,
           final Long interval,
           final Long timeout,
           final Integer retries,
           final Long startPeriod) {
-    return builder()
-        .test(test)
-        .interval(interval)
-        .timeout(timeout)
-        .retries(retries)
-        .startPeriod(startPeriod)
-        .build();
+    return new Healthcheck(test, interval, timeout, retries, startPeriod);
   }
   
   public static Healthcheck.Builder builder() {
-    return ImmutableHealthcheck.builder();
+    return new Builder();
   }
 
-  interface Builder {
-    Healthcheck.Builder test(final Iterable<String> test);
+  public static class Builder {
+    private List<String> test;
+    private Long interval;
+    private Long timeout;
+    private Integer retries;
+    private Long startPeriod;
 
-    Healthcheck.Builder interval(final Long interval);
+    public Healthcheck.Builder test(final List<String> test) {
+      this.test = test;
+      return this;
+    }
 
-    Healthcheck.Builder timeout(final Long timeout);
+    public Healthcheck.Builder interval(final Long interval) {
+      this.interval = interval;
+      return this;
+    }
 
-    Healthcheck.Builder retries(final Integer retries);
+    public Healthcheck.Builder timeout(final Long timeout) {
+      this.timeout = timeout;
+      return this;
+    }
 
-    Healthcheck.Builder startPeriod(final Long startPeriod);
+    public Healthcheck.Builder retries(final Integer retries) {
+      this.retries = retries;
+      return this;
+    }
 
-    Healthcheck build();
+    public Healthcheck.Builder startPeriod(final Long startPeriod) {
+      this.startPeriod = startPeriod;
+      return this;
+    }
+
+    public Healthcheck build() {
+      return new Healthcheck(test, interval, timeout, retries, startPeriod);
+    }
   }
 }

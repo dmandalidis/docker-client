@@ -21,25 +21,20 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableContainerStatus.Builder.class)
-@Immutable
-public interface ContainerStatus {
-
+public record ContainerStatus(
   @Nullable
   @JsonProperty("ContainerID")
-  String containerId();
+  String containerId,
 
   @Nullable
   @JsonProperty("PID")
-  Integer pid();
+  Integer pid,
 
   @Nullable
   @JsonProperty("ExitCode")
-  Long exitCode();
-}
+  Long exitCode
+) {}

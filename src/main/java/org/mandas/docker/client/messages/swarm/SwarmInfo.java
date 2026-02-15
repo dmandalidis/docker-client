@@ -23,45 +23,39 @@ package org.mandas.docker.client.messages.swarm;
 
 import java.util.List;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableSwarmInfo.Builder.class)
-@Immutable
-public interface SwarmInfo {
-
+public record SwarmInfo(
   @Nullable
   @JsonProperty("Cluster")
-  SwarmCluster cluster();
+  SwarmCluster cluster,
   
   @JsonProperty("ControlAvailable")
-  boolean controlAvailable();
+  boolean controlAvailable,
 
   @JsonProperty("Error")
-  String error();
+  String error,
 
   @JsonProperty("LocalNodeState")
-  String localNodeState();
+  String localNodeState,
 
   @JsonProperty("NodeAddr")
-  String nodeAddr();
+  String nodeAddr,
 
   @JsonProperty("NodeID")
-  String nodeId();
+  String nodeId,
 
   @Nullable
   @JsonProperty("Nodes")
-  Integer nodes();
+  Integer nodes,
 
   @Nullable
   @JsonProperty("Managers")
-  Integer managers();
+  Integer managers,
   
   @Nullable
   @JsonProperty("RemoteManagers")
-  List<RemoteManager> remoteManagers();
-
-}
+  List<RemoteManager> remoteManagers
+) {}

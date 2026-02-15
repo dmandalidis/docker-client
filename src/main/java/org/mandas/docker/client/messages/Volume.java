@@ -21,72 +21,103 @@
 
 package org.mandas.docker.client.messages;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@Immutable
-@JsonDeserialize(builder = ImmutableVolume.Builder.class)
-public interface Volume {
-
+public record Volume(
   @Nullable
   @JsonProperty("Name")
-  String name();
+  String name,
 
   @Nullable
   @JsonProperty("Driver")
-  String driver();
+  String driver,
 
   @Nullable
   @JsonProperty("DriverOpts")
-  Map<String, String> driverOpts();
+  Map<String, String> driverOpts,
 
   @Nullable
   @JsonProperty("Options")
-  Map<String, String> options();
+  Map<String, String> options,
 
   @Nullable
   @JsonProperty("Labels")
-  Map<String, String> labels();
+  Map<String, String> labels,
 
   @Nullable
   @JsonProperty("Mountpoint")
-  String mountpoint();
+  String mountpoint,
 
   @Nullable
   @JsonProperty("Scope")
-  String scope();
+  String scope,
 
   @Nullable
   @JsonProperty("Status")
-  Map<String, String> status();
+  Map<String, String> status
+) {
 
   public static Builder builder() {
-    return ImmutableVolume.builder();
+    return new Builder();
   }
 
-  public interface Builder {
+  public static class Builder {
+    private String name;
+    private String driver;
+    private Map<String, String> driverOpts;
+    private Map<String, String> options;
+    private Map<String, String> labels;
+    private String mountpoint;
+    private String scope;
+    private Map<String, String> status;
 
-    Builder name(String name);
+    public Builder name(String name) {
+      this.name = name;
+      return this;
+    }
 
-    Builder driver(String driver);
+    public Builder driver(String driver) {
+      this.driver = driver;
+      return this;
+    }
 
-    Builder driverOpts(Map<String, ? extends String> driverOpts);
+    public Builder driverOpts(Map<String, String> driverOpts) {
+      this.driverOpts = new HashMap<>(driverOpts);
+      return this;
+    }
 
-    Builder options(Map<String, ? extends String> options);
+    public Builder options(Map<String, String> options) {
+      this.options = new HashMap<>(options);
+      return this;
+    }
 
-    Builder labels(Map<String, ? extends String> labels);
+    public Builder labels(Map<String, String> labels) {
+      this.labels = new HashMap<>(labels);
+      return this;
+    }
 
-    Builder mountpoint(String mountpoint);
+    public Builder mountpoint(String mountpoint) {
+      this.mountpoint = mountpoint;
+      return this;
+    }
 
-    Builder scope(String scope);
+    public Builder scope(String scope) {
+      this.scope = scope;
+      return this;
+    }
 
-    Builder status(Map<String, ? extends String> status);
+    public Builder status(Map<String, String> status) {
+      this.status = new HashMap<>(status);
+      return this;
+    }
 
-    Volume build();
+    public Volume build() {
+      return new Volume(name, driver, driverOpts, options, labels, mountpoint, scope, status);
+    }
   }
 }

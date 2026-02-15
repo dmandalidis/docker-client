@@ -21,51 +21,86 @@
 
 package org.mandas.docker.client.messages.swarm;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableNodeSpec.Builder.class)
-@Immutable
-public interface NodeSpec {
-
+public record NodeSpec(
   @Nullable
   @JsonProperty("Name")
-  String name();
+  String name,
 
   @Nullable
   @JsonProperty("Labels")
-  Map<String, String> labels();
+  Map<String, String> labels,
 
   @JsonProperty("Role")
-  String role();
+  String role,
 
   @JsonProperty("Availability")
-  String availability();
+  String availability
+) {
 
-  interface Builder {
-    Builder name(String name);
-
-    Builder addLabel(final String label, final String value);
-
-    Builder labels(Map<String, ? extends String> labels);
-
-    Builder role(String role);
-
-    Builder availability(String availability);
-
-    NodeSpec build();
-  }
+  
 
   public static Builder builder() {
-    return ImmutableNodeSpec.builder();
+    return new Builder();
   }
 
   public static Builder builder(final NodeSpec source) {
-    return ImmutableNodeSpec.builder().from(source);
+    return new Builder(source);
+  }
+
+  public static class Builder {
+    private String name;
+    private Map<String, String> labels;
+    private String role;
+    private String availability;
+
+    Builder() {}
+
+    Builder(NodeSpec source) {
+      this.name = source.name;
+      this.labels = source.labels;
+      this.role = source.role;
+      this.availability = source.availability;
+    }
+
+    public Builder name(String name) {
+      this.name = name;
+      return this;
+    }
+
+    public Builder addLabel(final String label, final String value) {
+      if (this.labels == null) {
+        this.labels = new HashMap<>();
+      } else {
+        this.labels = new HashMap<>(this.labels);
+      }
+      this.labels.put(label, value);
+      return this;
+    }
+
+    public Builder labels(Map<String, String> labels) {
+      this.labels = labels == null ? null : Map.copyOf(labels);
+      return this;
+    }
+
+    public Builder role(String role) {
+      this.role = role;
+      return this;
+    }
+
+    public Builder availability(String availability) {
+      this.availability = availability;
+      return this;
+    }
+
+    public NodeSpec build() {
+      return new NodeSpec(name, labels == null ? null : Map.copyOf(labels), role, availability);
+    }
   }
 }

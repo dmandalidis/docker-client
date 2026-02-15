@@ -23,39 +23,34 @@ package org.mandas.docker.client.messages.swarm;
 
 import java.util.Date;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 
-@JsonDeserialize(builder = ImmutableNodeInfo.Builder.class)
-@Immutable
-public interface NodeInfo {
-
+public record NodeInfo(
   @JsonProperty("ID")
-  String id();
+  String id,
 
   @JsonProperty("Version")
-  Version version();
+  Version version,
 
   @JsonProperty("CreatedAt")
-  Date createdAt();
+  Date createdAt,
 
   @JsonProperty("UpdatedAt")
-  Date updatedAt();
+  Date updatedAt,
 
   @JsonProperty("Spec")
-  NodeSpec spec();
+  NodeSpec spec,
 
   @JsonProperty("Description")
-  NodeDescription description();
+  NodeDescription description,
 
   @JsonProperty("Status")
-  NodeStatus status();
+  NodeStatus status,
 
   @Nullable
   @JsonProperty("ManagerStatus")
-  ManagerStatus managerStatus();
-}
+  ManagerStatus managerStatus
+) {}

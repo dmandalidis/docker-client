@@ -21,23 +21,18 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableIpamConfig.Builder.class)
-@Immutable
-public interface IpamConfig {
-
+public record IpamConfig(
   @JsonProperty("Subnet")
-  String subnet();
+  String subnet,
 
   @Nullable
   @JsonProperty("Range")
-  String range();
+  String range,
 
   @JsonProperty("Gateway")
-  String gateway();
-}
+  String gateway
+) {}

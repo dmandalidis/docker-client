@@ -21,25 +21,20 @@
 
 package org.mandas.docker.client.messages;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableProgressDetail.Builder.class)
-@Immutable
-public interface ProgressDetail {
-
+public record ProgressDetail(
   @Nullable
   @JsonProperty("current")
-  Long current();
+  Long current,
 
   @Nullable
   @JsonProperty("start")
-  Long start();
+  Long start,
 
   @Nullable
   @JsonProperty("total")
-  Long total();
-}
+  Long total
+) {}

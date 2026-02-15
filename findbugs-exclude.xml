@@ -1,9 +1,5 @@
 <FindBugsFilter>
 
-  <Match>
-    <Source name="~Immutable.*"/>
-  </Match>
-
   <!--We're not using Java serialization-->
   <Match>
     <Bug pattern="SE_BAD_FIELD"/>
@@ -35,6 +31,13 @@
 
   <Match>
   	<Bug pattern="CT_CONSTRUCTOR_THROW" />
+  </Match>
+
+  <!-- Null check needed for test mocks even though real implementation never returns null -->
+  <Match>
+    <Class name="org.mandas.docker.client.auth.ConfigFileRegistryAuthSupplier"/>
+    <Method name="authFor"/>
+    <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
   </Match>
   
 </FindBugsFilter>

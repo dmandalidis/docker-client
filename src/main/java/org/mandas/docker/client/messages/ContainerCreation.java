@@ -23,34 +23,17 @@ package org.mandas.docker.client.messages;
 
 import java.util.List;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableContainerCreation.Builder.class)
-@Immutable
-public interface ContainerCreation {
-
+public record ContainerCreation(
   @Nullable
   @JsonProperty("Id")
-  String id();
+  String id,
 
   @Nullable
   @JsonProperty("Warnings")
-  List<String> warnings();
-
-  static Builder builder() {
-    return ImmutableContainerCreation.builder();
-  }
-
-  interface Builder {
-
-    Builder id(String id);
-
-    Builder warnings(Iterable<String> warnings);
-
-    ContainerCreation build();
-  }
+  List<String> warnings
+) {
 }

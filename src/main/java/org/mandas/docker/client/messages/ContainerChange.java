@@ -21,28 +21,36 @@
 
 package org.mandas.docker.client.messages;
 
-import org.immutables.value.Value.Immutable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableContainerChange.Builder.class)
-@Immutable
-public interface ContainerChange {
-
+public record ContainerChange(
   @JsonProperty("Path")
-  String path();
+  String path,
 
   @JsonProperty("Kind")
-  Integer kind();
+  Integer kind
+) {
   
-  static Builder builder() {
-	  return ImmutableContainerChange.builder();
+  public static Builder builder() {
+    return new Builder();
   }
   
-  interface Builder {
-	  Builder path(String path);
-	  Builder kind(Integer kind);
-	  ContainerChange build();
+  public static class Builder {
+    private String path;
+    private Integer kind;
+
+    public Builder path(String path) {
+      this.path = path;
+      return this;
+    }
+
+    public Builder kind(Integer kind) {
+      this.kind = kind;
+      return this;
+    }
+
+    public ContainerChange build() {
+      return new ContainerChange(path, kind);
+    }
   }
 }

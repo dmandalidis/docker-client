@@ -23,68 +23,65 @@ package org.mandas.docker.client.messages.swarm;
 
 import java.util.Date;
 
-import org.immutables.value.Value.Enclosing;
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableConfig.Builder.class)
-@Immutable
-@Enclosing
-public interface Config {
-
+public record Config(
   @JsonProperty("ID")
-  String id();
+  String id,
 
   @JsonProperty("Version")
-  Version version();
+  Version version,
 
   @JsonProperty("CreatedAt")
-  Date createdAt();
+  Date createdAt,
 
   @JsonProperty("UpdatedAt")
-  Date updatedAt();
+  Date updatedAt,
 
   @JsonProperty("Spec")
-  ConfigSpec configSpec();
+  ConfigSpec configSpec
+) {
 
-  @Immutable
-  public interface Criteria {
-    /**
-     * Filter by config id.
-     * @return an optional config id
-     */
+  public record Criteria(
     @Nullable
-    String configId();
+    String configId,
 
-    /**
-     * Filter by label.
-     * @return an optional label
-     */
     @Nullable
-    String label();
+    String label,
 
-    /**
-     * Filter by config name.
-     * @return an optional name
-     */
     @Nullable
-    String name();
+    String name
+  ) {
 
-    public static Criteria.Builder builder() {
-      return ImmutableConfig.Criteria.builder();
+    public static Builder builder() {
+    return new Builder();
     }
 
-    interface Builder {
-      Builder configId(String nodeId);
+    public static class Builder {
+      private String configId;
+      private String label;
+      private String name;
 
-      Builder label(String label);
+      public Builder configId(String configId) {
+        this.configId = configId;
+        return this;
+      }
 
-      Builder name(String nodeName);
+      public Builder label(String label) {
+        this.label = label;
+        return this;
+      }
 
-      Criteria build();
+      public Builder name(String name) {
+        this.name = name;
+        return this;
+      }
+
+      public Criteria build() {
+        return new Criteria(configId, label, name);
+      }
     }
   }
 }

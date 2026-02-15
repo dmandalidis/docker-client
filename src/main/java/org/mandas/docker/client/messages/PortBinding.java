@@ -21,32 +21,28 @@
 
 package org.mandas.docker.client.messages;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutablePortBinding.Builder.class)
-@Immutable
-public interface PortBinding {
-
+public record PortBinding(
   @Nullable
   @JsonProperty("HostIp")
-  String hostIp();
+  String hostIp,
 
   @JsonProperty("HostPort")
-  String hostPort();
+  String hostPort
+) {
 
   public static PortBinding of(final String ip, final String port) {
-    return ImmutablePortBinding.builder().hostIp(ip).hostPort(port).build();
+    return new PortBinding(ip, port);
   }
 
   public static PortBinding of(final String ip, final int port) {
-    return ImmutablePortBinding.builder().hostIp(ip).hostPort(String.valueOf(port)).build();
+    return new PortBinding(ip, String.valueOf(port));
   }
 
   public static PortBinding randomPort(final String ip) {
-    return ImmutablePortBinding.builder().hostIp(ip).hostPort("").build();
+    return new PortBinding(ip, "");
   }
 }

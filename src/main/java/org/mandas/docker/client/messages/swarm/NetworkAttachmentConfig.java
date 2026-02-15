@@ -23,36 +23,48 @@ package org.mandas.docker.client.messages.swarm;
 
 import java.util.List;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableNetworkAttachmentConfig.Builder.class)
-@Immutable
-public interface NetworkAttachmentConfig {
-
+public record NetworkAttachmentConfig(
   @Nullable
   @JsonProperty("Target")
-  String target();
+  String target,
 
   @Nullable
   @JsonProperty("Aliases")
-  List<String> aliases();
+  List<String> aliases
+) {
 
   public static Builder builder() {
-    return ImmutableNetworkAttachmentConfig.builder();
+    return new Builder();
   }
 
-  interface Builder {
+  
 
-    Builder target(String target);
+  public static class Builder {
+    private String target;
+    private List<String> aliases;
 
-    Builder aliases(String... aliases);
+    public Builder target(String target) {
+      this.target = target;
+      return this;
+    }
 
-    Builder aliases(Iterable<String> aliases);
+    public Builder aliases(String... aliases) {
+      this.aliases = aliases == null ? null : List.of(aliases);
+      return this;
+    }
 
-    NetworkAttachmentConfig build();
+    public Builder aliases(List<String> aliases) {
+      this.aliases = aliases;
+      return this;
+    }
+
+    public NetworkAttachmentConfig build() {
+      return new NetworkAttachmentConfig(target, 
+          aliases == null ? null : List.copyOf(aliases));
+    }
   }
 }

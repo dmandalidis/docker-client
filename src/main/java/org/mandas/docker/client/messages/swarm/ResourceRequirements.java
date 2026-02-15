@@ -21,35 +21,42 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableResourceRequirements.Builder.class)
-@Immutable
-public interface ResourceRequirements {
-
+public record ResourceRequirements(
   @Nullable
   @JsonProperty("Limits")
-  Resources limits();
+  Resources limits,
 
   @Nullable
   @JsonProperty("Reservations")
-  Reservations reservations();
+  Reservations reservations
+) {
 
-  interface Builder {
-
-    Builder limits(Resources limits);
-
-    Builder reservations(Reservations reservations);
-
-    ResourceRequirements build();
-  }
+  
 
   public static Builder builder() {
-    return ImmutableResourceRequirements.builder();
+    return new Builder();
   }
 
+  public static class Builder {
+    private Resources limits;
+    private Reservations reservations;
+
+    public Builder limits(Resources limits) {
+      this.limits = limits;
+      return this;
+    }
+
+    public Builder reservations(Reservations reservations) {
+      this.reservations = reservations;
+      return this;
+    }
+
+    public ResourceRequirements build() {
+      return new ResourceRequirements(limits, reservations);
+    }
+  }
 }

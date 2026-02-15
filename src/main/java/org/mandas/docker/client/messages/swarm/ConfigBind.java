@@ -21,35 +21,45 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableConfigBind.Builder.class)
-@Immutable
-public interface ConfigBind {
+public record ConfigBind(
   @JsonProperty("File")
-  ConfigFile file();
+  ConfigFile file,
 
   @JsonProperty("ConfigID")
-  String configId();
+  String configId,
 
   @JsonProperty("ConfigName")
-  String configName();
+  String configName
+) {
 
   public static Builder builder() {
-    return ImmutableConfigBind.builder();
+    return new Builder();
   }
 
-  interface Builder {
+  public static class Builder {
+    private ConfigFile file;
+    private String configId;
+    private String configName;
 
-    Builder file(ConfigFile file);
+    public Builder file(ConfigFile file) {
+      this.file = file;
+      return this;
+    }
 
-    Builder configId(String configId);
+    public Builder configId(String configId) {
+      this.configId = configId;
+      return this;
+    }
 
-    Builder configName(String configName);
+    public Builder configName(String configName) {
+      this.configName = configName;
+      return this;
+    }
 
-    ConfigBind build();
+    public ConfigBind build() {
+      return new ConfigBind(file, configId, configName);
+    }
   }
 }

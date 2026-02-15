@@ -21,21 +21,15 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutablePlatform.Builder.class)
-@Immutable
-public interface Platform {
-
+public record Platform(
   @Nullable
   @JsonProperty("Architecture")
-  String architecture();
+  String architecture,
 
   @JsonProperty("OS")
-  String os();
-
-}
+  String os
+) {}

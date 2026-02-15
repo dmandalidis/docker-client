@@ -23,60 +23,88 @@ package org.mandas.docker.client.messages.swarm;
 
 import java.util.List;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableTaskSpec.Builder.class)
-@Immutable
-public interface TaskSpec {
-
+public record TaskSpec(
   @Nullable
   @JsonProperty("ContainerSpec")
-  ContainerSpec containerSpec();
+  ContainerSpec containerSpec,
 
   @Nullable
   @JsonProperty("Resources")
-  ResourceRequirements resources();
+  ResourceRequirements resources,
 
   @Nullable
   @JsonProperty("RestartPolicy")
-  RestartPolicy restartPolicy();
+  RestartPolicy restartPolicy,
 
   @Nullable
   @JsonProperty("Placement")
-  Placement placement();
+  Placement placement,
 
   @Nullable
   @JsonProperty("Networks")
-  List<NetworkAttachmentConfig> networks();
+  List<NetworkAttachmentConfig> networks,
 
   @Nullable
   @JsonProperty("LogDriver")
-  Driver logDriver();
+  Driver logDriver
+) {
 
-  interface Builder {
-
-    Builder containerSpec(ContainerSpec containerSpec);
-
-    Builder resources(ResourceRequirements resources);
-
-    Builder restartPolicy(RestartPolicy restartPolicy);
-
-    Builder placement(Placement placement);
-
-    Builder networks(NetworkAttachmentConfig... networks);
-
-    Builder networks(Iterable<? extends NetworkAttachmentConfig> networks);
-
-    Builder logDriver(Driver logDriver);
-
-    TaskSpec build();
-  }
+  
 
   public static Builder builder() {
-    return ImmutableTaskSpec.builder();
+    return new Builder();
+  }
+
+  public static class Builder {
+    private ContainerSpec containerSpec;
+    private ResourceRequirements resources;
+    private RestartPolicy restartPolicy;
+    private Placement placement;
+    private List<NetworkAttachmentConfig> networks;
+    private Driver logDriver;
+
+    public Builder containerSpec(ContainerSpec containerSpec) {
+      this.containerSpec = containerSpec;
+      return this;
+    }
+
+    public Builder resources(ResourceRequirements resources) {
+      this.resources = resources;
+      return this;
+    }
+
+    public Builder restartPolicy(RestartPolicy restartPolicy) {
+      this.restartPolicy = restartPolicy;
+      return this;
+    }
+
+    public Builder placement(Placement placement) {
+      this.placement = placement;
+      return this;
+    }
+
+    public Builder networks(NetworkAttachmentConfig... networks) {
+      this.networks = networks == null ? null : List.of(networks);
+      return this;
+    }
+
+    public Builder networks(List<NetworkAttachmentConfig> networks) {
+      this.networks = networks;
+      return this;
+    }
+
+    public Builder logDriver(Driver logDriver) {
+      this.logDriver = logDriver;
+      return this;
+    }
+
+    public TaskSpec build() {
+      return new TaskSpec(containerSpec, resources, restartPolicy, placement, 
+          networks == null ? null : List.copyOf(networks), logDriver);
+    }
   }
 }

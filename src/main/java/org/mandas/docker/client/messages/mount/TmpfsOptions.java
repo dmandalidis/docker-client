@@ -21,37 +21,42 @@
 
 package org.mandas.docker.client.messages.mount;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableTmpfsOptions.Builder.class)
-@Immutable
-public interface TmpfsOptions {
-
+public record TmpfsOptions(
   @Nullable
   @JsonProperty("SizeBytes")
-  Long sizeBytes();
+  Long sizeBytes,
 
-  /**
-   * @return The mode and permission bits.
-   */
   @Nullable
   @JsonProperty("Mode")
-  Integer mode();
+  Integer mode
+) {
 
-  interface Builder {
+  
 
-    Builder sizeBytes(Long sizeBytes);
-
-    Builder mode(Integer mode);
-
-    TmpfsOptions build();
+  public static Builder builder() {
+    return new Builder();
   }
 
-  public static TmpfsOptions.Builder builder() {
-    return ImmutableTmpfsOptions.builder();
+  public static class Builder {
+    private Long sizeBytes;
+    private Integer mode;
+
+    public Builder sizeBytes(Long sizeBytes) {
+      this.sizeBytes = sizeBytes;
+      return this;
+    }
+
+    public Builder mode(Integer mode) {
+      this.mode = mode;
+      return this;
+    }
+
+    public TmpfsOptions build() {
+      return new TmpfsOptions(sizeBytes, mode);
+    }
   }
 }

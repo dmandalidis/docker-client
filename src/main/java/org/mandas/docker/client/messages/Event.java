@@ -24,8 +24,6 @@ package org.mandas.docker.client.messages;
 import java.util.Date;
 import java.util.Map;
 
-import org.immutables.value.Value.Enclosing;
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 import org.mandas.docker.client.jackson.UnixTimestampDeserializer;
 import org.mandas.docker.client.jackson.UnixTimestampSerializer;
@@ -36,76 +34,85 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-@JsonDeserialize(builder = ImmutableEvent.Builder.class)
-@Immutable
-@Enclosing
-public interface Event {
-
+public record Event(
   @Nullable
   @JsonProperty("Type")
-  Type type();
+  Type type,
 
-  /**
-   * Event action.
-   * @return action
-   * @since API 1.22
-   */
   @Nullable
   @JsonProperty("Action")
-  String action();
+  String action,
 
-  /**
-   * Event actor.
-   * @return {@link Actor}
-   * @since API 1.22
-   */
   @Nullable
   @JsonProperty("Actor")
-  Actor actor();
+  Actor actor,
 
   @JsonProperty("time")
   @JsonDeserialize(using = UnixTimestampDeserializer.class)
   @JsonSerialize(using = UnixTimestampSerializer.class)
-  Date time();
+  Date time,
 
   @Nullable
   @JsonProperty("timeNano")
-  Long timeNano();
+  Long timeNano
+) {
 
-  interface Builder {
-	  Builder type(Type type);
+  
+  
+  public static Builder builder() {
+    return new Builder();
+  }
 
-	  Builder action(String action);
-	  
-	  Builder actor(Actor actor);
-	  
-	  Builder time(Date time);
-	  
-	  Builder timeNano(Long timeNano);
-	  
-	  Event build();
+  public static class Builder {
+    private Type type;
+    private String action;
+    private Actor actor;
+    private Date time;
+    private Long timeNano;
+
+    public Builder type(Type type) {
+      this.type = type;
+      return this;
+    }
+
+    public Builder action(String action) {
+      this.action = action;
+      return this;
+    }
+
+    public Builder actor(Actor actor) {
+      this.actor = actor;
+      return this;
+    }
+
+    public Builder time(Date time) {
+      this.time = time;
+      return this;
+    }
+
+    public Builder timeNano(Long timeNano) {
+      this.timeNano = timeNano;
+      return this;
+    }
+
+    public Event build() {
+      return new Event(type, action, actor, time, timeNano);
+    }
   }
   
-  static Builder builder() {
-	  return ImmutableEvent.builder();
-  }
-  
-  @JsonDeserialize(builder = ImmutableEvent.Actor.Builder.class)
-  @Immutable
-  public interface Actor {
-
+  public record Actor(
     @JsonProperty("ID")
-    String id();
+    String id,
 
     @Nullable
     @JsonProperty("Attributes")
-    Map<String, String> attributes();
+    Map<String, String> attributes
+  ) {
 
-    static Actor create(
+    public static Actor create(
         final String id,
         final Map<String, String> attributes) {
-
-    	return ImmutableEvent.Actor.builder().id(id).attributes(attributes).build();
+      return new Actor(id, attributes);
     }
   }
 

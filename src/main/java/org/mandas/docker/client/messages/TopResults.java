@@ -25,22 +25,18 @@ package org.mandas.docker.client.messages;
 
 import java.util.List;
 
-import org.immutables.value.Value.Immutable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * Raw results from the "top" (or "ps") command for a specific container.
+ * 
+ * @param titles the column titles
+ * @param processes the list of processes, where each process is represented as a list of strings
  */
-@JsonDeserialize(builder = ImmutableTopResults.Builder.class)
-@Immutable
-public interface TopResults {
-
+public record TopResults(
   @JsonProperty("Titles")
-  List<String> titles();
+  List<String> titles,
 
   @JsonProperty("Processes")
-  List<List<String>> processes();
-
-}
+  List<List<String>> processes
+) {}

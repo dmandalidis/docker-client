@@ -21,45 +21,60 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-
-@JsonDeserialize(builder = ImmutableSwarmInit.Builder.class)
-@Immutable
-public interface SwarmInit {
-
+public record SwarmInit(
   @JsonProperty("ListenAddr")
-  String listenAddr();
+  String listenAddr,
 
   @JsonProperty("AdvertiseAddr")
-  String advertiseAddr();
+  String advertiseAddr,
 
   @Nullable
   @JsonProperty("ForceNewCluster")
-  Boolean forceNewCluster();
+  Boolean forceNewCluster,
 
   @Nullable
   @JsonProperty("Spec")
-  SwarmSpec swarmSpec();
+  SwarmSpec swarmSpec
+) {
 
-  interface Builder {
-    Builder listenAddr(String listenAddr);
+  
 
-    Builder advertiseAddr(String advertiseAddr);
-
-    Builder forceNewCluster(Boolean forceNewCluster);
-
-    Builder swarmSpec(SwarmSpec swarmSpec);
-
-    SwarmInit build();
+  public static Builder builder() {
+    return new Builder();
   }
 
-  public static SwarmInit.Builder builder() {
-    return ImmutableSwarmInit.builder();
-  }
+  public static class Builder {
+    private String listenAddr;
+    private String advertiseAddr;
+    private Boolean forceNewCluster;
+    private SwarmSpec swarmSpec;
 
+    public Builder listenAddr(String listenAddr) {
+      this.listenAddr = listenAddr;
+      return this;
+    }
+
+    public Builder advertiseAddr(String advertiseAddr) {
+      this.advertiseAddr = advertiseAddr;
+      return this;
+    }
+
+    public Builder forceNewCluster(Boolean forceNewCluster) {
+      this.forceNewCluster = forceNewCluster;
+      return this;
+    }
+
+    public Builder swarmSpec(SwarmSpec swarmSpec) {
+      this.swarmSpec = swarmSpec;
+      return this;
+    }
+
+    public SwarmInit build() {
+      return new SwarmInit(listenAddr, advertiseAddr, forceNewCluster, swarmSpec);
+    }
+  }
 }

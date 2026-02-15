@@ -21,237 +21,406 @@
 
 package org.mandas.docker.client.messages;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.immutables.value.Value.Auxiliary;
-import org.immutables.value.Value.Derived;
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 import org.mandas.docker.client.ObjectMapperProvider;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-@JsonDeserialize(builder = ImmutableImageConfig.Builder.class)
-@Immutable
-public interface ImageConfig {
-
-  @Deprecated // as of v1.46
+public record ImageConfig(
+  @Deprecated
   @Nullable
   @JsonProperty("Hostname")
-  String hostname();
+  String hostname,
 
-  @Deprecated // as of v1.46
+  @Deprecated
   @Nullable
   @JsonProperty("Domainname")
-  String domainname();
+  String domainname,
 
   @Nullable
   @JsonProperty("User")
-  String user();
+  String user,
 
-  @Deprecated // as of v1.46
+  @Deprecated
   @Nullable
   @JsonProperty("AttachStdin")
-  Boolean attachStdin();
+  Boolean attachStdin,
 
-  @Deprecated // as of v1.46
+  @Deprecated
   @Nullable
   @JsonProperty("AttachStdout")
-  Boolean attachStdout();
+  Boolean attachStdout,
 
-  @Deprecated // as of v1.46
+  @Deprecated
   @Nullable
   @JsonProperty("AttachStderr")
-  Boolean attachStderr();
+  Boolean attachStderr,
 
   @Nullable
   @JsonProperty("PortSpecs")
-  List<String> portSpecs();
+  List<String> portSpecs,
 
   @Nullable
   @JsonProperty("ExposedPorts")
   @JsonSerialize(using=ObjectMapperProvider.SetSerializer.class)
   @JsonDeserialize(using=ObjectMapperProvider.SetDeserializer.class)
-  Set<String> exposedPorts();
+  Set<String> exposedPorts,
 
-  @Deprecated // as of v1.46
+  @Deprecated
   @Nullable
   @JsonProperty("Tty")
-  Boolean tty();
+  Boolean tty,
 
-  @Deprecated // as of v1.46
+  @Deprecated
   @Nullable
   @JsonProperty("OpenStdin")
-  Boolean openStdin();
+  Boolean openStdin,
 
-  @Deprecated // as of v1.46
+  @Deprecated
   @Nullable
   @JsonProperty("StdinOnce")
-  Boolean stdinOnce();
+  Boolean stdinOnce,
 
   @Nullable
   @JsonProperty("Env")
-  List<String> env();
+  List<String> env,
 
   @Nullable
   @JsonProperty("Cmd")
-  List<String> cmd();
+  List<String> cmd,
 
-  @Deprecated // as of v1.46
+  @Deprecated
   @Nullable
   @JsonProperty("Image")
-  String image();
+  String image,
 
   @Nullable
   @JsonProperty("Volumes")
   @JsonSerialize(using=ObjectMapperProvider.SetSerializer.class)
   @JsonDeserialize(using=ObjectMapperProvider.SetDeserializer.class)
-  Set<String> volumes();
+  Set<String> volumes,
 
   @Nullable
   @JsonProperty("WorkingDir")
-  String workingDir();
+  String workingDir,
 
   @Nullable
   @JsonProperty("Entrypoint")
-  List<String> entrypoint();
+  List<String> entrypoint,
 
-  @Deprecated // as of v1.46
   @Nullable
   @JsonProperty("NetworkDisabled")
-  Boolean networkDisabled();
+  Boolean networkDisabled,
 
   @Nullable
   @JsonProperty("OnBuild")
-  List<String> onBuild();
+  List<String> onBuild,
 
   @Nullable
   @JsonProperty("Labels")
-  Map<String, String> labels();
+  Map<String, String> labels,
 
-  @Deprecated // as of v1.44
+  @Deprecated
   @Nullable
   @JsonProperty("MacAddress")
-  String macAddress();
+  String macAddress,
 
   @Nullable
   @JsonProperty("HostConfig")
-  HostConfig hostConfig();
+  HostConfig hostConfig,
 
   @Nullable
   @JsonProperty("StopSignal")
-  String stopSignal();
+  String stopSignal,
 
   @Nullable
   @JsonProperty("Healthcheck")
-  Healthcheck healthcheck();
+  Healthcheck healthcheck,
 
   @Nullable
   @JsonProperty("NetworkingConfig")
-  NetworkingConfig networkingConfig();
+  NetworkingConfig networkingConfig
+) {
 
-  @JsonIgnore
-  @Derived
-  @Auxiliary
-  default Builder toBuilder() {
-	return ImmutableImageConfig.builder().from(this);
+  public Builder toBuilder() {
+    return new Builder(this);
   }
-  
+
   public static Builder builder() {
-    return ImmutableImageConfig.builder();
+    return new Builder();
   }
 
-  public interface Builder {
+  public static class Builder {
+    private String hostname;
+    private String domainname;
+    private String user;
+    private Boolean attachStdin;
+    private Boolean attachStdout;
+    private Boolean attachStderr;
+    private List<String> portSpecs;
+    private Set<String> exposedPorts;
+    private Boolean tty;
+    private Boolean openStdin;
+    private Boolean stdinOnce;
+    private List<String> env;
+    private List<String> cmd;
+    private String image;
+    private Set<String> volumes;
+    private String workingDir;
+    private List<String> entrypoint;
+    private Boolean networkDisabled;
+    private List<String> onBuild;
+    private Map<String, String> labels;
+    private String macAddress;
+    private HostConfig hostConfig;
+    private String stopSignal;
+    private Healthcheck healthcheck;
+    private NetworkingConfig networkingConfig;
 
-    @Deprecated // as of v1.46
-    Builder hostname(final String hostname);
-
-    @Deprecated // as of v1.46
-    Builder domainname(final String domainname);
-
-    Builder user(final String user);
-
-    @Deprecated // as of v1.46
-    Builder attachStdin(final Boolean attachStdin);
-
-    @Deprecated // as of v1.46
-    Builder attachStdout(final Boolean attachStdout);
-
-    @Deprecated // as of v1.46
-    Builder attachStderr(final Boolean attachStderr);
-
-    Builder portSpecs(final Iterable<String> portSpecs);
-
-    Builder portSpecs(final String... portSpecs);
-
-    Builder exposedPorts(final Iterable<String> exposedPorts);
-
-    Builder exposedPorts(final String... exposedPorts);
-
-    @Deprecated // as of v1.46
-    Builder tty(final Boolean tty);
-
-    @Deprecated // as of v1.46
-    Builder openStdin(final Boolean openStdin);
-
-    @Deprecated // as of v1.46
-    Builder stdinOnce(final Boolean stdinOnce);
-
-    Builder env(final Iterable<String> env);
-
-    Builder env(final String... env);
-
-    Builder cmd(final Iterable<String> cmd);
-
-    Builder cmd(final String... cmds);
-
-    @Deprecated // as of v1.46
-    Builder image(final String image);
-
-    default Builder addVolume(String volume) {
-    	volumes(volume);
-    	return this;
-    }
-    
-    default Builder addVolumes(String... volumes) {
-    	volumes(volumes);
-    	return this;
+    public Builder() {
     }
 
-    Builder volumes(final Iterable<String> volumes);
+    public Builder(ImageConfig config) {
+      this.hostname = config.hostname;
+      this.domainname = config.domainname;
+      this.user = config.user;
+      this.attachStdin = config.attachStdin;
+      this.attachStdout = config.attachStdout;
+      this.attachStderr = config.attachStderr;
+      this.portSpecs = config.portSpecs;
+      this.exposedPorts = config.exposedPorts;
+      this.tty = config.tty;
+      this.openStdin = config.openStdin;
+      this.stdinOnce = config.stdinOnce;
+      this.env = config.env;
+      this.cmd = config.cmd;
+      this.image = config.image;
+      this.volumes = config.volumes;
+      this.workingDir = config.workingDir;
+      this.entrypoint = config.entrypoint;
+      this.networkDisabled = config.networkDisabled;
+      this.onBuild = config.onBuild;
+      this.labels = config.labels;
+      this.macAddress = config.macAddress;
+      this.hostConfig = config.hostConfig;
+      this.stopSignal = config.stopSignal;
+      this.healthcheck = config.healthcheck;
+      this.networkingConfig = config.networkingConfig;
+    }
 
-    Builder volumes(final String... volumes);
+    @Deprecated
+    public Builder hostname(final String hostname) {
+      this.hostname = hostname;
+      return this;
+    }
 
-    Builder workingDir(final String workingDir);
+    @Deprecated
+    public Builder domainname(final String domainname) {
+      this.domainname = domainname;
+      return this;
+    }
 
-    Builder entrypoint(final Iterable<String> entrypoint);
+    public Builder user(final String user) {
+      this.user = user;
+      return this;
+    }
 
-    Builder entrypoint(final String... entrypoint);
+    @Deprecated
+    public Builder attachStdin(final Boolean attachStdin) {
+      this.attachStdin = attachStdin;
+      return this;
+    }
 
-    Builder networkDisabled(final Boolean networkDisabled);
+    @Deprecated
+    public Builder attachStdout(final Boolean attachStdout) {
+      this.attachStdout = attachStdout;
+      return this;
+    }
 
-    Builder onBuild(final Iterable<String> onBuild);
+    @Deprecated
+    public Builder attachStderr(final Boolean attachStderr) {
+      this.attachStderr = attachStderr;
+      return this;
+    }
 
-    Builder onBuild(final String... onBuild);
+    public Builder portSpecs(final List<String> portSpecs) {
+      this.portSpecs = portSpecs;
+      return this;
+    }
 
-    Builder labels(final Map<String, ? extends String> labels);
+    public Builder portSpecs(final String... portSpecs) {
+      return portSpecs(Arrays.asList(portSpecs));
+    }
 
-    @Deprecated // as of v1.46
-    Builder macAddress(final String macAddress);
+    public Builder exposedPorts(final Set<String> exposedPorts) {
+      this.exposedPorts = exposedPorts;
+      return this;
+    }
 
-    Builder hostConfig(final HostConfig hostConfig);
+    public Builder exposedPorts(final String... exposedPorts) {
+      return exposedPorts(Arrays.stream(exposedPorts).collect(Collectors.toSet()));
+    }
 
-    Builder stopSignal(final String stopSignal);
+    @Deprecated
+    public Builder tty(final Boolean tty) {
+      this.tty = tty;
+      return this;
+    }
 
-    Builder healthcheck(final Healthcheck healthcheck);
+    @Deprecated
+    public Builder openStdin(final Boolean openStdin) {
+      this.openStdin = openStdin;
+      return this;
+    }
 
-    Builder networkingConfig(final NetworkingConfig networkingConfig);
+    @Deprecated
+    public Builder stdinOnce(final Boolean stdinOnce) {
+      this.stdinOnce = stdinOnce;
+      return this;
+    }
 
-    ImageConfig build();
+    public Builder env(final List<String> env) {
+      this.env = env;
+      return this;
+    }
+
+    public Builder env(final String... env) {
+      return env(Arrays.asList(env));
+    }
+
+    public Builder cmd(final List<String> cmd) {
+      this.cmd = cmd;
+      return this;
+    }
+
+    public Builder cmd(final String... cmds) {
+      return cmd(Arrays.asList(cmds));
+    }
+
+    @Deprecated
+    public Builder image(final String image) {
+      this.image = image;
+      return this;
+    }
+
+    public Builder addVolume(String volume) {
+      if (this.volumes == null) {
+        this.volumes = new HashSet<>();
+      }
+      this.volumes.add(volume);
+      return this;
+    }
+
+    public Builder addVolumes(String... volumes) {
+      return volumes(volumes);
+    }
+
+    public Builder volumes(final Set<String> volumes) {
+      this.volumes = volumes;
+      return this;
+    }
+
+    public Builder volumes(final String... volumes) {
+      return volumes(Arrays.stream(volumes).collect(Collectors.toSet()));
+    }
+
+    public Builder workingDir(final String workingDir) {
+      this.workingDir = workingDir;
+      return this;
+    }
+
+    public Builder entrypoint(final List<String> entrypoint) {
+      this.entrypoint = entrypoint;
+      return this;
+    }
+
+    public Builder entrypoint(final String... entrypoint) {
+      return entrypoint(Arrays.asList(entrypoint));
+    }
+
+    public Builder networkDisabled(final Boolean networkDisabled) {
+      this.networkDisabled = networkDisabled;
+      return this;
+    }
+
+    public Builder onBuild(final List<String> onBuild) {
+      this.onBuild = onBuild;
+      return this;
+    }
+
+    public Builder onBuild(final String... onBuild) {
+      return onBuild(Arrays.asList(onBuild));
+    }
+
+    public Builder labels(final Map<String, String> labels) {
+      this.labels = new HashMap<>(labels);
+      return this;
+    }
+
+    @Deprecated
+    public Builder macAddress(final String macAddress) {
+      this.macAddress = macAddress;
+      return this;
+    }
+
+    public Builder hostConfig(final HostConfig hostConfig) {
+      this.hostConfig = hostConfig;
+      return this;
+    }
+
+    public Builder stopSignal(final String stopSignal) {
+      this.stopSignal = stopSignal;
+      return this;
+    }
+
+    public Builder healthcheck(final Healthcheck healthcheck) {
+      this.healthcheck = healthcheck;
+      return this;
+    }
+
+    public Builder networkingConfig(final NetworkingConfig networkingConfig) {
+      this.networkingConfig = networkingConfig;
+      return this;
+    }
+
+    public ImageConfig build() {
+      return new ImageConfig(
+        hostname,
+        domainname,
+        user,
+        attachStdin,
+        attachStdout,
+        attachStderr,
+        portSpecs,
+        exposedPorts,
+        tty,
+        openStdin,
+        stdinOnce,
+        env,
+        cmd,
+        image,
+        volumes,
+        workingDir,
+        entrypoint,
+        networkDisabled,
+        onBuild,
+        labels,
+        macAddress,
+        hostConfig,
+        stopSignal,
+        healthcheck,
+        networkingConfig
+      );
+    }
   }
 }

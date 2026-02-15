@@ -23,20 +23,15 @@ package org.mandas.docker.client.messages.swarm;
 
 import java.util.List;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableIpamOptions.Builder.class)
-@Immutable
-public interface IpamOptions {
-
+public record IpamOptions(
   @JsonProperty("Driver")
-  Driver driver();
+  Driver driver,
 
   @Nullable
   @JsonProperty("Configs")
-  List<IpamConfig> configs();
-}
+  List<IpamConfig> configs
+) {}

@@ -27,148 +27,156 @@ import static java.util.stream.Collectors.toMap;
 import java.util.List;
 import java.util.Map;
 
-import org.immutables.value.Value.Derived;
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.AllowNulls;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableNetworkSettings.Builder.class)
-@Immutable
-public interface NetworkSettings {
-
-  @Deprecated // as of v1.44
-  @Nullable
-  @JsonProperty("IPAddress")
-  String ipAddress();
-
-  @Deprecated // as of v1.44
-  @Nullable
-  @JsonProperty("IPPrefixLen")
-  Integer ipPrefixLen();
-
-  @Nullable
-  @JsonProperty("Gateway")
-  String gateway();
-
-  @Nullable
-  @JsonProperty("Bridge")
-  String bridge();
-
-  @Nullable
-  @JsonProperty("PortMapping")
-  Map<String, Map<String, String>> portMapping();
+public record NetworkSettings(
+  @Deprecated @Nullable @JsonProperty("IPAddress") String ipAddress,
+  @Deprecated @Nullable @JsonProperty("IPPrefixLen") Integer ipPrefixLen,
+  @Nullable @JsonProperty("Gateway") String gateway,
+  @Nullable @JsonProperty("Bridge") String bridge,
+  @Nullable @JsonProperty("PortMapping") Map<String, Map<String, String>> portMapping,
+  @Nullable @AllowNulls @JsonProperty("Ports") Map<String, List<PortBinding>> nullValuedPorts,
+  @Deprecated @Nullable @JsonProperty("MacAddress") String macAddress,
+  @Nullable @JsonProperty("Networks") Map<String, AttachedNetwork> networks,
+  @Nullable @JsonProperty("EndpointID") String endpointId,
+  @Nullable @JsonProperty("SandboxID") String sandboxId,
+  @Nullable @JsonProperty("SandboxKey") String sandboxKey,
+  @Deprecated @Nullable @JsonProperty("HairpinMode") Boolean hairpinMode,
+  @Deprecated @Nullable @JsonProperty("LinkLocalIPv6Address") String linkLocalIPv6Address,
+  @Deprecated @Nullable @JsonProperty("LinkLocalIPv6PrefixLen") Integer linkLocalIPv6PrefixLen,
+  @Nullable @JsonProperty("GlobalIPv6Address") String globalIPv6Address,
+  @Nullable @JsonProperty("GlobalIPv6PrefixLen") Integer globalIPv6PrefixLen,
+  @Nullable @JsonProperty("IPv6Gateway") String ipv6Gateway
+) {
 
   @JsonIgnore
-  @Nullable
-  @Derived
-  default Map<String, List<PortBinding>> ports() {
-	  if (nullValuedPorts() == null) {
-		  return null;
-	  }
-	  return nullValuedPorts().entrySet()
-			  .stream()
-			  .collect(toMap(k -> k.getKey(), k -> k.getValue() == null? emptyList(): k.getValue()));
-  }
-  
-  /**
-   * @return Only used for deserialization and clients should not call that method
-   */
-  @Nullable @AllowNulls
-  @JsonProperty("Ports")
-  Map<String, List<PortBinding>> nullValuedPorts();
-
-  @Deprecated // as of v1.44
-  @Nullable
-  @JsonProperty("MacAddress")
-  String macAddress();
-
-  @Nullable
-  @JsonProperty("Networks")
-  Map<String, AttachedNetwork> networks();
-
-  @Nullable
-  @JsonProperty("EndpointID")
-  String endpointId();
-
-  @Nullable
-  @JsonProperty("SandboxID")
-  String sandboxId();
-
-  @Nullable
-  @JsonProperty("SandboxKey")
-  String sandboxKey();
-
-  @Deprecated // as of v1.44
-  @Nullable
-  @JsonProperty("HairpinMode")
-  Boolean hairpinMode();
-
-  @Deprecated // as of v1.44
-  @Nullable
-  @JsonProperty("LinkLocalIPv6Address")
-  String linkLocalIPv6Address();
-
-  @Deprecated // as of v1.44
-  @Nullable
-  @JsonProperty("LinkLocalIPv6PrefixLen")
-  Integer linkLocalIPv6PrefixLen();
-
-  @Nullable
-  @JsonProperty("GlobalIPv6Address")
-  String globalIPv6Address();
-
-  @Nullable
-  @JsonProperty("GlobalIPv6PrefixLen")
-  Integer globalIPv6PrefixLen();
-
-  @Nullable
-  @JsonProperty("IPv6Gateway")
-  String ipv6Gateway();
-
-  static Builder builder() {
-    return ImmutableNetworkSettings.builder();
+  public Map<String, List<PortBinding>> ports() {
+    if (nullValuedPorts == null) {
+      return null;
+    }
+    return nullValuedPorts.entrySet()
+            .stream()
+            .collect(toMap(k -> k.getKey(), k -> k.getValue() == null? emptyList(): k.getValue()));
   }
 
-  interface Builder {
+  public static Builder builder() {
+    return new Builder();
+  }
 
-    Builder ipAddress(String ipAddress);
+  public static class Builder {
+    private String ipAddress;
+    private Integer ipPrefixLen;
+    private String gateway;
+    private String bridge;
+    private Map<String, Map<String, String>> portMapping;
+    private Map<String, List<PortBinding>> nullValuedPorts;
+    private String macAddress;
+    private Map<String, AttachedNetwork> networks;
+    private String endpointId;
+    private String sandboxId;
+    private String sandboxKey;
+    private Boolean hairpinMode;
+    private String linkLocalIPv6Address;
+    private Integer linkLocalIPv6PrefixLen;
+    private String globalIPv6Address;
+    private Integer globalIPv6PrefixLen;
+    private String ipv6Gateway;
 
-    Builder ipPrefixLen(Integer ipPrefixLen);
+    public Builder ipAddress(String ipAddress) {
+      this.ipAddress = ipAddress;
+      return this;
+    }
 
-    Builder gateway(String gateway);
+    public Builder ipPrefixLen(Integer ipPrefixLen) {
+      this.ipPrefixLen = ipPrefixLen;
+      return this;
+    }
 
-    Builder bridge(String bridge);
+    public Builder gateway(String gateway) {
+      this.gateway = gateway;
+      return this;
+    }
 
-    Builder portMapping(Map<String, ? extends Map<String, String>> portMapping);
+    public Builder bridge(String bridge) {
+      this.bridge = bridge;
+      return this;
+    }
 
-    Builder nullValuedPorts(Map<String, ? extends List<PortBinding>> ports);
+    public Builder portMapping(Map<String, ? extends Map<String, String>> portMapping) {
+      this.portMapping = portMapping != null ? Map.copyOf(portMapping) : null;
+      return this;
+    }
 
-    Builder macAddress(String macAddress);
+    public Builder nullValuedPorts(Map<String, ? extends List<PortBinding>> ports) {
+      this.nullValuedPorts = ports != null ? Map.copyOf(ports) : null;
+      return this;
+    }
 
-    Builder networks(Map<String, ? extends AttachedNetwork> networks);
+    public Builder macAddress(String macAddress) {
+      this.macAddress = macAddress;
+      return this;
+    }
 
-    Builder endpointId(final String endpointId);
+    public Builder networks(Map<String, ? extends AttachedNetwork> networks) {
+      this.networks = networks != null ? Map.copyOf(networks) : null;
+      return this;
+    }
 
-    Builder sandboxId(final String sandboxId);
+    public Builder endpointId(final String endpointId) {
+      this.endpointId = endpointId;
+      return this;
+    }
 
-    Builder sandboxKey(final String sandboxKey);
+    public Builder sandboxId(final String sandboxId) {
+      this.sandboxId = sandboxId;
+      return this;
+    }
 
-    Builder hairpinMode(final Boolean hairpinMode);
+    public Builder sandboxKey(final String sandboxKey) {
+      this.sandboxKey = sandboxKey;
+      return this;
+    }
 
-    Builder linkLocalIPv6Address(final String linkLocalIPv6Address);
+    public Builder hairpinMode(final Boolean hairpinMode) {
+      this.hairpinMode = hairpinMode;
+      return this;
+    }
 
-    Builder linkLocalIPv6PrefixLen(final Integer linkLocalIPv6PrefixLen);
+    public Builder linkLocalIPv6Address(final String linkLocalIPv6Address) {
+      this.linkLocalIPv6Address = linkLocalIPv6Address;
+      return this;
+    }
 
-    Builder globalIPv6Address(final String globalIPv6Address);
+    public Builder linkLocalIPv6PrefixLen(final Integer linkLocalIPv6PrefixLen) {
+      this.linkLocalIPv6PrefixLen = linkLocalIPv6PrefixLen;
+      return this;
+    }
 
-    Builder globalIPv6PrefixLen(final Integer globalIPv6PrefixLen);
+    public Builder globalIPv6Address(final String globalIPv6Address) {
+      this.globalIPv6Address = globalIPv6Address;
+      return this;
+    }
 
-    Builder ipv6Gateway(final String ipv6Gateway);
+    public Builder globalIPv6PrefixLen(final Integer globalIPv6PrefixLen) {
+      this.globalIPv6PrefixLen = globalIPv6PrefixLen;
+      return this;
+    }
 
-    NetworkSettings build();
+    public Builder ipv6Gateway(final String ipv6Gateway) {
+      this.ipv6Gateway = ipv6Gateway;
+      return this;
+    }
+
+    public NetworkSettings build() {
+      return new NetworkSettings(ipAddress, ipPrefixLen, gateway, bridge, portMapping, 
+                                nullValuedPorts, macAddress, networks, endpointId, sandboxId,
+                                sandboxKey, hairpinMode, linkLocalIPv6Address, 
+                                linkLocalIPv6PrefixLen, globalIPv6Address, 
+                                globalIPv6PrefixLen, ipv6Gateway);
+    }
   }
 }

@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.mandas.docker.Nullable;
 import org.mandas.docker.client.messages.DockerCredentialHelperAuth;
 import org.mandas.docker.client.messages.RegistryAuth;
 import org.mandas.docker.client.messages.RegistryConfigs;
@@ -211,6 +212,7 @@ public class DockerConfigReader {
         "registry \"" + registry + "\" does not appear in config file at " + configPath);
   }
 
+  @Nullable
   private RegistryAuth authForRegistry(final DockerConfig config, final String registry)
       throws IOException {
 

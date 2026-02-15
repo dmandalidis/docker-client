@@ -21,43 +21,33 @@
 
 package org.mandas.docker.client.messages.swarm;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-
-@JsonDeserialize(builder = ImmutableUpdateConfig.Builder.class)
-@Immutable
-public interface UpdateConfig {
-
+public record UpdateConfig(
   @Nullable
   @JsonProperty("Parallelism")
-  Long parallelism();
+  Long parallelism,
 
   @Nullable
   @JsonProperty("Delay")
-  Long delay();
+  Long delay,
 
   @Nullable
   @JsonProperty("FailureAction")
-  String failureAction();
+  String failureAction,
 
   @Nullable
   @JsonProperty("Order")
-  String order();
+  String order
+) {
 
   public static UpdateConfig create(
       final Long parallelism,
       final Long delay,
       final String failureAction,
       final String order) {
-	  
-    return ImmutableUpdateConfig.builder()
-    		.parallelism(parallelism)
-    		.delay(delay)
-    		.failureAction(failureAction)
-    		.order(order).build();
+    return new UpdateConfig(parallelism, delay, failureAction, order);
   }
 }

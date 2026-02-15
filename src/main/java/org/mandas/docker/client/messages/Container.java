@@ -24,71 +24,27 @@ package org.mandas.docker.client.messages;
 import java.util.List;
 import java.util.Map;
 
-import org.immutables.value.Value.Default;
-import org.immutables.value.Value.Derived;
-import org.immutables.value.Value.Enclosing;
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@Immutable
-@JsonDeserialize(builder = ImmutableContainer.Builder.class)
-@Enclosing
-public interface Container {
-
-  @JsonProperty("Id")
-  String id();
-
-  @Nullable
-  @JsonProperty("Names")
-  List<String> names();
-
-  @JsonProperty("Image")
-  String image();
-
-  @Nullable
-  @JsonProperty("ImageID")
-  String imageId();
-
-  @JsonProperty("Command")
-  String command();
-
-  @JsonProperty("Created")
-  Long created();
-
-  @Nullable
-  @JsonProperty("State")
-  String state();
-
-  @JsonProperty("Status")
-  String status();
-
-  @Nullable
-  @JsonProperty("Ports")
-  List<PortMapping> ports();
-
-  @Nullable
-  @JsonProperty("Labels")
-  Map<String, String> labels();
-
-  @Nullable
-  @JsonProperty("SizeRw")
-  Long sizeRw();
-
-  @Nullable
-  @JsonProperty("SizeRootFs")
-  Long sizeRootFs();
-
-  @Nullable
-  @JsonProperty("NetworkSettings")
-  NetworkSettings networkSettings();
-
-  @Nullable
-  @JsonProperty("Mounts")
-  List<ContainerMount> mounts();
+public record Container(
+  @JsonProperty("Id") String id,
+  @Nullable @JsonProperty("Names") List<String> names,
+  @JsonProperty("Image") String image,
+  @Nullable @JsonProperty("ImageID") String imageId,
+  @JsonProperty("Command") String command,
+  @JsonProperty("Created") Long created,
+  @Nullable @JsonProperty("State") String state,
+  @JsonProperty("Status") String status,
+  @Nullable @JsonProperty("Ports") List<PortMapping> ports,
+  @Nullable @JsonProperty("Labels") Map<String, String> labels,
+  @Nullable @JsonProperty("SizeRw") Long sizeRw,
+  @Nullable @JsonProperty("SizeRootFs") Long sizeRootFs,
+  @Nullable @JsonProperty("NetworkSettings") NetworkSettings networkSettings,
+  @Nullable @JsonProperty("Mounts") List<ContainerMount> mounts
+) {
 
   /**
    * Returns port information the way that <code>docker ps</code> does.
@@ -101,11 +57,10 @@ public interface Container {
    * @see org.mandas.docker.client.messages.PortBinding
    */
   @JsonIgnore
-  @Derived
-  public default String portsAsString() {
+  public String portsAsString() {
     final StringBuilder sb = new StringBuilder();
-    if (ports() != null) {
-      for (final PortMapping port : ports()) {
+    if (ports != null) {
+      for (final PortMapping port : ports) {
         if (sb.length() > 0) {
           sb.append(", ");
         }
@@ -124,27 +79,10 @@ public interface Container {
     return sb.toString();
   }
 
-  @JsonDeserialize(builder = ImmutableContainer.PortMapping.Builder.class)
-  @Immutable
-  public interface PortMapping {
-
-    @JsonProperty("PrivatePort")
-    @Default
-    default int privatePort() {
-    	return 0;
-    }
-
-    @JsonProperty("PublicPort")
-    @Default
-    default int publicPort() {
-    	return 0;
-    }
-
-    @JsonProperty("Type")
-    String type();
-
-    @Nullable
-    @JsonProperty("IP")
-    String ip();
-  }
+  public record PortMapping(
+    @JsonProperty("PrivatePort") int privatePort,
+    @JsonProperty("PublicPort") int publicPort,
+    @JsonProperty("Type") String type,
+    @Nullable @JsonProperty("IP") String ip
+  ) {}
 }

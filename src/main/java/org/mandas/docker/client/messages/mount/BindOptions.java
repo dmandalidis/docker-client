@@ -21,28 +21,32 @@
 
 package org.mandas.docker.client.messages.mount;
 
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableBindOptions.Builder.class)
-@Immutable
-public interface BindOptions {
-
+public record BindOptions(
   @Nullable
   @JsonProperty("Propagation")
-  String propagation();
+  String propagation
+) {
   
-  interface Builder {
-
-    Builder propagation(String propagation);
-
-    BindOptions build();
-  }
+  
 
   public static Builder builder() {
-    return ImmutableBindOptions.builder();
+    return new Builder();
+  }
+
+  public static class Builder {
+    private String propagation;
+
+    public Builder propagation(String propagation) {
+      this.propagation = propagation;
+      return this;
+    }
+
+    public BindOptions build() {
+      return new BindOptions(propagation);
+    }
   }
 }

@@ -24,531 +24,812 @@ package org.mandas.docker.client.messages;
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.immutables.value.Value;
-import org.immutables.value.Value.Auxiliary;
-import org.immutables.value.Value.Check;
-import org.immutables.value.Value.Derived;
-import org.immutables.value.Value.Enclosing;
-import org.immutables.value.Value.Immutable;
 import org.mandas.docker.Nullable;
 import org.mandas.docker.client.messages.mount.Mount;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableHostConfig.Builder.class)
-@Immutable
-@Enclosing
-public interface HostConfig {
-
+public record HostConfig(
   @Nullable
   @JsonProperty("Binds")
-  List<String> binds();
+  List<String> binds,
 
   @Nullable
   @JsonProperty("BlkioWeight")
-  Integer blkioWeight();
+  Integer blkioWeight,
 
   @Nullable
   @JsonProperty("BlkioWeightDevice")
-  List<BlkioWeightDevice> blkioWeightDevice();
+  List<BlkioWeightDevice> blkioWeightDevice,
 
   @Nullable
   @JsonProperty("BlkioDeviceReadBps")
-  List<BlkioDeviceRate> blkioDeviceReadBps();
+  List<BlkioDeviceRate> blkioDeviceReadBps,
 
   @Nullable
   @JsonProperty("BlkioDeviceWriteBps")
-  List<BlkioDeviceRate> blkioDeviceWriteBps();
+  List<BlkioDeviceRate> blkioDeviceWriteBps,
 
   @Nullable
   @JsonProperty("BlkioDeviceReadIOps")
-  List<BlkioDeviceRate> blkioDeviceReadIOps();
+  List<BlkioDeviceRate> blkioDeviceReadIOps,
 
   @Nullable
   @JsonProperty("BlkioDeviceWriteIOps")
-  List<BlkioDeviceRate> blkioDeviceWriteIOps();
+  List<BlkioDeviceRate> blkioDeviceWriteIOps,
 
   @Nullable
   @JsonProperty("ContainerIDFile")
-  String containerIdFile();
+  String containerIdFile,
 
   @Nullable
   @JsonProperty("LxcConf")
-  List<LxcConfParameter> lxcConf();
+  List<LxcConfParameter> lxcConf,
 
   @Nullable
   @JsonProperty("Privileged")
-  Boolean privileged();
+  Boolean privileged,
 
   @Nullable
   @JsonProperty("PortBindings")
-  Map<String, List<PortBinding>> portBindings();
+  Map<String, List<PortBinding>> portBindings,
 
   @Nullable
   @JsonProperty("Links")
-  List<String> links();
+  List<String> links,
 
   @Nullable
   @JsonProperty("PublishAllPorts")
-  Boolean publishAllPorts();
+  Boolean publishAllPorts,
 
   @Nullable
   @JsonProperty("Dns")
-  List<String> dns();
+  List<String> dns,
 
   @Nullable
   @JsonProperty("DnsOptions")
-  List<String> dnsOptions();
+  List<String> dnsOptions,
 
   @Nullable
   @JsonProperty("DnsSearch")
-  List<String> dnsSearch();
+  List<String> dnsSearch,
 
   @Nullable
   @JsonProperty("ExtraHosts")
-  List<String> extraHosts();
+  List<String> extraHosts,
   
   @Nullable
   @JsonProperty("GroupAdd")
-  List<String> groupAdd();
+  List<String> groupAdd,
   
   @Nullable
   @JsonProperty("VolumesFrom")
-  List<String> volumesFrom();
+  List<String> volumesFrom,
 
   @Nullable
   @JsonProperty("CapAdd")
-  List<String> capAdd();
+  List<String> capAdd,
 
   @Nullable
   @JsonProperty("CapDrop")
-  List<String> capDrop();
+  List<String> capDrop,
 
   @Nullable
   @JsonProperty("NetworkMode")
-  String networkMode();
+  String networkMode,
 
   @Nullable
   @JsonProperty("SecurityOpt")
-  List<String> securityOpt();
+  List<String> securityOpt,
 
   @Nullable
   @JsonProperty("Devices")
-  List<Device> devices();
+  List<Device> devices,
 
   @Nullable
   @JsonProperty("Memory")
-  Long memory();
+  Long memory,
 
   @Nullable
   @JsonProperty("MemorySwap")
-  Long memorySwap();
+  Long memorySwap,
 
   @Nullable
   @JsonProperty("MemorySwappiness")
-  Integer memorySwappiness();
+  Integer memorySwappiness,
 
   @Nullable
   @JsonProperty("MemoryReservation")
-  Long memoryReservation();
+  Long memoryReservation,
 
   @Nullable
   @JsonProperty("NanoCpus")
-  Long nanoCpus();
+  Long nanoCpus,
 
   @Nullable
   @JsonProperty("CpuPeriod")
-  Long cpuPeriod();
+  Long cpuPeriod,
 
   @Nullable
   @JsonProperty("CpuShares")
-  Long cpuShares();
+  Long cpuShares,
 
   @Nullable
   @JsonProperty("CpusetCpus")
-  String cpusetCpus();
+  String cpusetCpus,
 
   @Nullable
   @JsonProperty("CpusetMems")
-  String cpusetMems();
+  String cpusetMems,
 
   @Nullable
   @JsonProperty("CpuQuota")
-  Long cpuQuota();
+  Long cpuQuota,
 
   @Nullable
   @JsonProperty("CgroupParent")
-  String cgroupParent();
+  String cgroupParent,
 
   @Nullable
   @JsonProperty("RestartPolicy")
-  RestartPolicy restartPolicy();
+  RestartPolicy restartPolicy,
 
   @Nullable
   @JsonProperty("LogConfig")
-  LogConfig logConfig();
+  LogConfig logConfig,
 
   @Nullable
   @JsonProperty("IpcMode")
-  String ipcMode();
+  String ipcMode,
 
   @Nullable
   @JsonProperty("Ulimits")
-  List<Ulimit> ulimits();
+  List<Ulimit> ulimits,
 
   @Nullable
   @JsonProperty("PidMode")
-  String pidMode();
+  String pidMode,
 
   @Nullable
   @JsonProperty("UsernsMode")
-  String usernsMode();
+  String usernsMode,
 
   @Nullable
   @JsonProperty("ShmSize")
-  Long shmSize();
+  Long shmSize,
 
   @Nullable
   @JsonProperty("OomKillDisable")
-  Boolean oomKillDisable();
+  Boolean oomKillDisable,
 
   @Nullable
   @JsonProperty("OomScoreAdj")
-  Integer oomScoreAdj();
+  Integer oomScoreAdj,
 
   @Nullable
   @JsonProperty("AutoRemove")
-  Boolean autoRemove();
+  Boolean autoRemove,
 
-  /**
-   * Tune container pids limit (set -1 for unlimited).
-   * Only works for kernels &gt;= 4.3
-   * @return An integer indicating the pids limit.
-   */
   @Nullable
   @JsonProperty("PidsLimit")
-  Integer pidsLimit();
+  Integer pidsLimit,
 
   @Nullable
   @JsonProperty("Tmpfs")
-  Map<String, String> tmpfs();
+  Map<String, String> tmpfs,
 
   @Nullable
   @JsonProperty("ReadonlyRootfs")
-  Boolean readonlyRootfs();
+  Boolean readonlyRootfs,
   
   @Nullable
   @JsonProperty("StorageOpt")
-  Map<String, String> storageOpt();
+  Map<String, String> storageOpt,
 
   @Nullable
   @JsonProperty("Runtime")
-  String runtime();
+  String runtime,
   
   @Nullable
   @JsonProperty("Mounts")
-  List<Mount> mounts();
+  List<Mount> mounts,
 
   @Nullable
   @JsonProperty("Init")
-  Boolean init();
+  Boolean init,
   
   @JsonProperty("Sysctls")
-  Map<String, String> sysctls();
+  Map<String, String> sysctls,
   
   @Nullable
   @JsonProperty("DeviceRequests")
-  List<DeviceRequest> deviceRequests();
+  List<DeviceRequest> deviceRequests) {
   
-  @JsonDeserialize(builder = ImmutableHostConfig.LxcConfParameter.Builder.class)
-  @Immutable
-  public interface LxcConfParameter {
-
-    @JsonProperty("Key")
-    String key();
-
-    @JsonProperty("Value")
-    String value();
+  public HostConfig {
+    if (extraHosts != null) {
+      for (final String extraHost : extraHosts) {
+        if (!extraHost.contains(":")) {
+          throw new IllegalArgumentException(format("extra host arg '%s' must contain a ':'", extraHost));
+        }
+      }
+    }
   }
 
-  @JsonDeserialize(builder = ImmutableHostConfig.RestartPolicy.Builder.class)
-  @Immutable
-  public interface RestartPolicy {
+  public record LxcConfParameter(
+    @JsonProperty("Key")
+    String key,
 
+    @JsonProperty("Value")
+    String value) {
+  }
+
+  public record RestartPolicy(
     @JsonProperty("Name")
-    String name();
+    String name,
 
     @Nullable
     @JsonProperty("MaximumRetryCount")
-    Integer maxRetryCount();
+    Integer maxRetryCount) {
 
     public static RestartPolicy always() {
-      return ImmutableHostConfig.RestartPolicy.builder().name("always").build();
+      return new RestartPolicy("always", null);
     }
 
     public static RestartPolicy unlessStopped() {
-      return ImmutableHostConfig.RestartPolicy.builder().name("unless-stopped").build();
+      return new RestartPolicy("unless-stopped", null);
     }
 
     public static RestartPolicy onFailure(Integer maxRetryCount) {
-      return ImmutableHostConfig.RestartPolicy.builder().name("on-failure").maxRetryCount(maxRetryCount).build();
+      return new RestartPolicy("on-failure", maxRetryCount);
     }
   }
 
   @JsonIgnore
-  @Derived
-  @Auxiliary
-  default Builder toBuilder() {
-	return ImmutableHostConfig.builder().from(this);
+  public Builder toBuilder() {
+    return new Builder(this);
   }
 
   public static Builder builder() {
-    return ImmutableHostConfig.builder();
-  }
-  
-  @Check
-  default void check() {
-    if (extraHosts() != null) {
-	    for (final String extraHost : extraHosts()) {
-	      if (!extraHost.contains(":")) {
-	    	 throw new IllegalArgumentException(format("extra host arg '%s' must contain a ':'", extraHost));
-	      }
-	    }
-	  }
+    return new Builder();
   }
 
-  interface Builder {
+  public static class Builder {
+    private List<String> binds;
+    private Integer blkioWeight;
+    private List<BlkioWeightDevice> blkioWeightDevice;
+    private List<BlkioDeviceRate> blkioDeviceReadBps;
+    private List<BlkioDeviceRate> blkioDeviceWriteBps;
+    private List<BlkioDeviceRate> blkioDeviceReadIOps;
+    private List<BlkioDeviceRate> blkioDeviceWriteIOps;
+    private String containerIdFile;
+    private List<LxcConfParameter> lxcConf;
+    private Boolean privileged;
+    private Map<String, List<PortBinding>> portBindings;
+    private List<String> links;
+    private Boolean publishAllPorts;
+    private List<String> dns;
+    private List<String> dnsOptions;
+    private List<String> dnsSearch;
+    private List<String> extraHosts;
+    private List<String> groupAdd;
+    private List<String> volumesFrom;
+    private List<String> capAdd;
+    private List<String> capDrop;
+    private String networkMode;
+    private List<String> securityOpt;
+    private List<Device> devices;
+    private Long memory;
+    private Long memorySwap;
+    private Integer memorySwappiness;
+    private Long memoryReservation;
+    private Long nanoCpus;
+    private Long cpuPeriod;
+    private Long cpuShares;
+    private String cpusetCpus;
+    private String cpusetMems;
+    private Long cpuQuota;
+    private String cgroupParent;
+    private RestartPolicy restartPolicy;
+    private LogConfig logConfig;
+    private String ipcMode;
+    private List<Ulimit> ulimits;
+    private String pidMode;
+    private String usernsMode;
+    private Long shmSize;
+    private Boolean oomKillDisable;
+    private Integer oomScoreAdj;
+    private Boolean autoRemove;
+    private Integer pidsLimit;
+    private Map<String, String> tmpfs;
+    private Boolean readonlyRootfs;
+    private Map<String, String> storageOpt;
+    private String runtime;
+    private List<Mount> mounts;
+    private Boolean init;
+    private Map<String, String> sysctls;
+    private List<DeviceRequest> deviceRequests;
 
-    Builder binds(Iterable<String> binds);
-
-    Builder binds(String... binds);
-    
-    default Builder binds(Bind... binds) {
-    	List<String> bindsValue = stream(binds).map(Bind::representation).collect(toList());
-		return binds(bindsValue.toArray(new String[bindsValue.size()]));
+    public Builder() {
     }
 
-    Builder blkioWeight(Integer blkioWeight);
+    public Builder(HostConfig config) {
+      this.binds = config.binds;
+      this.blkioWeight = config.blkioWeight;
+      this.blkioWeightDevice = config.blkioWeightDevice;
+      this.blkioDeviceReadBps = config.blkioDeviceReadBps;
+      this.blkioDeviceWriteBps = config.blkioDeviceWriteBps;
+      this.blkioDeviceReadIOps = config.blkioDeviceReadIOps;
+      this.blkioDeviceWriteIOps = config.blkioDeviceWriteIOps;
+      this.containerIdFile = config.containerIdFile;
+      this.lxcConf = config.lxcConf;
+      this.privileged = config.privileged;
+      this.portBindings = config.portBindings;
+      this.links = config.links;
+      this.publishAllPorts = config.publishAllPorts;
+      this.dns = config.dns;
+      this.dnsOptions = config.dnsOptions;
+      this.dnsSearch = config.dnsSearch;
+      this.extraHosts = config.extraHosts;
+      this.groupAdd = config.groupAdd;
+      this.volumesFrom = config.volumesFrom;
+      this.capAdd = config.capAdd;
+      this.capDrop = config.capDrop;
+      this.networkMode = config.networkMode;
+      this.securityOpt = config.securityOpt;
+      this.devices = config.devices;
+      this.memory = config.memory;
+      this.memorySwap = config.memorySwap;
+      this.memorySwappiness = config.memorySwappiness;
+      this.memoryReservation = config.memoryReservation;
+      this.nanoCpus = config.nanoCpus;
+      this.cpuPeriod = config.cpuPeriod;
+      this.cpuShares = config.cpuShares;
+      this.cpusetCpus = config.cpusetCpus;
+      this.cpusetMems = config.cpusetMems;
+      this.cpuQuota = config.cpuQuota;
+      this.cgroupParent = config.cgroupParent;
+      this.restartPolicy = config.restartPolicy;
+      this.logConfig = config.logConfig;
+      this.ipcMode = config.ipcMode;
+      this.ulimits = config.ulimits;
+      this.pidMode = config.pidMode;
+      this.usernsMode = config.usernsMode;
+      this.shmSize = config.shmSize;
+      this.oomKillDisable = config.oomKillDisable;
+      this.oomScoreAdj = config.oomScoreAdj;
+      this.autoRemove = config.autoRemove;
+      this.pidsLimit = config.pidsLimit;
+      this.tmpfs = config.tmpfs;
+      this.readonlyRootfs = config.readonlyRootfs;
+      this.storageOpt = config.storageOpt;
+      this.runtime = config.runtime;
+      this.mounts = config.mounts;
+      this.init = config.init;
+      this.sysctls = config.sysctls;
+      this.deviceRequests = config.deviceRequests;
+    }
 
-    Builder blkioWeightDevice(Iterable<? extends BlkioWeightDevice> blkioWeightDevice);
+    public Builder binds(List<String> binds) {
+      this.binds = binds;
+      return this;
+    }
 
-    Builder blkioDeviceReadBps(Iterable<? extends BlkioDeviceRate> blkioDeviceReadBps);
-
-    Builder blkioDeviceWriteBps(Iterable<? extends BlkioDeviceRate> blkioDeviceWriteBps);
-
-    Builder blkioDeviceReadIOps(Iterable<? extends BlkioDeviceRate> blkioDeviceReadIOps);
-
-    Builder blkioDeviceWriteIOps(Iterable<? extends BlkioDeviceRate> blkioDeviceWriteIOps);
-
-    Builder containerIdFile(String containerIdFile);
-
-    Builder lxcConf(Iterable<? extends LxcConfParameter> lxcConf);
-
-    Builder lxcConf(LxcConfParameter... lxcConf);
-
-    Builder privileged(Boolean privileged);
-
-    Builder portBindings(Map<String, ? extends List<PortBinding>> portBindings);
-
-    Builder links(Iterable<String> links);
-
-    Builder links(String... links);
-
-    Builder publishAllPorts(Boolean publishAllPorts);
-
-    Builder dns(Iterable<String> dns);
-
-    Builder dns(String... dns);
-
-    Builder dnsOptions(Iterable<String> dnsOptions);
-
-    Builder dnsOptions(String... dnsOptions);
-
-    Builder dnsSearch(Iterable<String> dnsSearch);
-
-    Builder dnsSearch(String... dnsSearch);
-
-    Builder extraHosts(Iterable<String> extraHosts);
-
-    Builder extraHosts(String... extraHosts);
+    public Builder binds(String... binds) {
+      if (binds != null) {
+        return binds(List.of(binds));
+      }
+      return this;
+    }
     
-    Builder groupAdd(Iterable<String> groupAdd);
+    public Builder binds(Bind... binds) {
+      List<String> bindsValue = stream(binds).map(Bind::representation).toList();
+      return binds(bindsValue);
+    }
 
-    Builder groupAdd(String... groupAdd);
+    public Builder blkioWeight(Integer blkioWeight) {
+      this.blkioWeight = blkioWeight;
+      return this;
+    }
 
-    Builder volumesFrom(Iterable<String> volumesFrom);
+    public Builder blkioWeightDevice(List<BlkioWeightDevice> blkioWeightDevice) {
+      this.blkioWeightDevice = blkioWeightDevice;
+      return this;
+    }
 
-    Builder volumesFrom(String... volumesFrom);
+    public Builder blkioDeviceReadBps(List<BlkioDeviceRate> blkioDeviceReadBps) {
+      this.blkioDeviceReadBps = blkioDeviceReadBps;
+      return this;
+    }
 
-    Builder capAdd(Iterable<String> capAdd);
+    public Builder blkioDeviceWriteBps(List<BlkioDeviceRate> blkioDeviceWriteBps) {
+      this.blkioDeviceWriteBps = blkioDeviceWriteBps;
+      return this;
+    }
 
-    Builder capAdd(String... capAdd);
+    public Builder blkioDeviceReadIOps(List<BlkioDeviceRate> blkioDeviceReadIOps) {
+      this.blkioDeviceReadIOps = blkioDeviceReadIOps;
+      return this;
+    }
 
-    Builder capDrop(Iterable<String> capDrop);
+    public Builder blkioDeviceWriteIOps(List<BlkioDeviceRate> blkioDeviceWriteIOps) {
+      this.blkioDeviceWriteIOps = blkioDeviceWriteIOps;
+      return this;
+    }
 
-    Builder capDrop(String... capDrop);
+    public Builder containerIdFile(String containerIdFile) {
+      this.containerIdFile = containerIdFile;
+      return this;
+    }
 
-    Builder networkMode(String networkMode);
+    public Builder lxcConf(List<LxcConfParameter> lxcConf) {
+      this.lxcConf = lxcConf;
+      return this;
+    }
 
-    Builder securityOpt(Iterable<String> securityOpt);
+    public Builder lxcConf(LxcConfParameter... lxcConf) {
+      this.lxcConf = lxcConf != null ? List.of(lxcConf) : null;
+      return this;
+    }
 
-    Builder securityOpt(String... securityOpt);
+    public Builder privileged(Boolean privileged) {
+      this.privileged = privileged;
+      return this;
+    }
 
-    Builder devices(Iterable<? extends Device> devices);
+    public Builder portBindings(Map<String, ? extends List<PortBinding>> portBindings) {
+      this.portBindings = portBindings != null ? Map.copyOf(portBindings) : null;
+      return this;
+    }
 
-    Builder devices(Device... devices);
+    public Builder links(List<String> links) {
+      this.links = links;
+      return this;
+    }
 
-    Builder memory(Long memory);
+    public Builder links(String... links) {
+      this.links = links != null ? List.of(links) : null;
+      return this;
+    }
 
-    Builder memorySwap(Long memorySwap);
+    public Builder publishAllPorts(Boolean publishAllPorts) {
+      this.publishAllPorts = publishAllPorts;
+      return this;
+    }
 
-    Builder memorySwappiness(Integer memorySwappiness);
+    public Builder dns(List<String> dns) {
+      this.dns = dns;
+      return this;
+    }
+
+    public Builder dns(String... dns) {
+      this.dns = dns != null ? List.of(dns) : null;
+      return this;
+    }
+
+    public Builder dnsOptions(List<String> dnsOptions) {
+      this.dnsOptions = dnsOptions;
+      return this;
+    }
+
+    public Builder dnsOptions(String... dnsOptions) {
+      this.dnsOptions = dnsOptions != null ? List.of(dnsOptions) : null;
+      return this;
+    }
+
+    public Builder dnsSearch(List<String> dnsSearch) {
+      this.dnsSearch = dnsSearch;
+      return this;
+    }
+
+    public Builder dnsSearch(String... dnsSearch) {
+      this.dnsSearch = dnsSearch != null ? List.of(dnsSearch) : null;
+      return this;
+    }
+
+    public Builder extraHosts(List<String> extraHosts) {
+      this.extraHosts = extraHosts;
+      return this;
+    }
+
+    public Builder extraHosts(String... extraHosts) {
+      this.extraHosts = extraHosts != null ? List.of(extraHosts) : null;
+      return this;
+    }
     
-    Builder memoryReservation(Long memoryReservation);
+    public Builder groupAdd(List<String> groupAdd) {
+      this.groupAdd = groupAdd;
+      return this;
+    }
 
-    Builder nanoCpus(Long nanoCpus);
+    public Builder groupAdd(String... groupAdd) {
+      this.groupAdd = groupAdd != null ? List.of(groupAdd) : null;
+      return this;
+    }
 
-    Builder cpuPeriod(Long cpuPeriod);
+    public Builder volumesFrom(List<String> volumesFrom) {
+      this.volumesFrom = volumesFrom;
+      return this;
+    }
 
-    Builder cpuShares(Long cpuShares);
+    public Builder volumesFrom(String... volumesFrom) {
+      this.volumesFrom = volumesFrom != null ? List.of(volumesFrom) : null;
+      return this;
+    }
 
-    Builder cpusetCpus(String cpusetCpus);
+    public Builder capAdd(List<String> capAdd) {
+      this.capAdd = capAdd;
+      return this;
+    }
 
-    Builder cpusetMems(String cpusetMems);
+    public Builder capAdd(String... capAdd) {
+      this.capAdd = capAdd != null ? List.of(capAdd) : null;
+      return this;
+    }
 
-    Builder cpuQuota(Long cpuQuota);
+    public Builder capDrop(List<String> capDrop) {
+      this.capDrop = capDrop;
+      return this;
+    }
 
-    Builder cgroupParent(String cgroupParent);
+    public Builder capDrop(String... capDrop) {
+      this.capDrop = capDrop != null ? List.of(capDrop) : null;
+      return this;
+    }
 
-    Builder restartPolicy(RestartPolicy restartPolicy);
+    public Builder networkMode(String networkMode) {
+      this.networkMode = networkMode;
+      return this;
+    }
 
-    Builder logConfig(LogConfig logConfig);
+    public Builder securityOpt(List<String> securityOpt) {
+      this.securityOpt = securityOpt;
+      return this;
+    }
 
-    Builder ipcMode(String ipcMode);
+    public Builder securityOpt(String... securityOpt) {
+      this.securityOpt = securityOpt != null ? List.of(securityOpt) : null;
+      return this;
+    }
 
-    Builder ulimits(Iterable<? extends Ulimit> ulimits);
+    public Builder devices(List<Device> devices) {
+      this.devices = devices;
+      return this;
+    }
 
-    Builder pidMode(String pidMode);
+    public Builder devices(Device... devices) {
+      this.devices = devices != null ? List.of(devices) : null;
+      return this;
+    }
 
-    /**
-     * Set the PID (Process) Namespace mode for the container.
-     * Use this method to join another container's PID namespace. To use the host
-     * PID namespace, use {@link #hostPidMode()}.
-     *
-     * @param container Join the namespace of this container (Name or ID)
-     * @return Builder
-     */
-    default Builder containerPidMode(final String container) {
+    public Builder memory(Long memory) {
+      this.memory = memory;
+      return this;
+    }
+
+    public Builder memorySwap(Long memorySwap) {
+      this.memorySwap = memorySwap;
+      return this;
+    }
+
+    public Builder memorySwappiness(Integer memorySwappiness) {
+      this.memorySwappiness = memorySwappiness;
+      return this;
+    }
+    
+    public Builder memoryReservation(Long memoryReservation) {
+      this.memoryReservation = memoryReservation;
+      return this;
+    }
+
+    public Builder nanoCpus(Long nanoCpus) {
+      this.nanoCpus = nanoCpus;
+      return this;
+    }
+
+    public Builder cpuPeriod(Long cpuPeriod) {
+      this.cpuPeriod = cpuPeriod;
+      return this;
+    }
+
+    public Builder cpuShares(Long cpuShares) {
+      this.cpuShares = cpuShares;
+      return this;
+    }
+
+    public Builder cpusetCpus(String cpusetCpus) {
+      this.cpusetCpus = cpusetCpus;
+      return this;
+    }
+
+    public Builder cpusetMems(String cpusetMems) {
+      this.cpusetMems = cpusetMems;
+      return this;
+    }
+
+    public Builder cpuQuota(Long cpuQuota) {
+      this.cpuQuota = cpuQuota;
+      return this;
+    }
+
+    public Builder cgroupParent(String cgroupParent) {
+      this.cgroupParent = cgroupParent;
+      return this;
+    }
+
+    public Builder restartPolicy(RestartPolicy restartPolicy) {
+      this.restartPolicy = restartPolicy;
+      return this;
+    }
+
+    public Builder logConfig(LogConfig logConfig) {
+      this.logConfig = logConfig;
+      return this;
+    }
+
+    public Builder ipcMode(String ipcMode) {
+      this.ipcMode = ipcMode;
+      return this;
+    }
+
+    public Builder ulimits(List<Ulimit> ulimits) {
+      this.ulimits = ulimits;
+      return this;
+    }
+
+    public Builder pidMode(String pidMode) {
+      this.pidMode = pidMode;
+      return this;
+    }
+
+    public Builder containerPidMode(final String container) {
       pidMode("container:" + container);
       return this;
     }
 
-    /**
-     * Set the PID (Process) Namespace mode for the container.
-     * Use this method to use the host's PID namespace. To use another container's
-     * PID namespace, use {@link #containerPidMode(String)}.
-     *
-     * @return {@link Builder}
-     */
-    default Builder hostPidMode() {
+    public Builder hostPidMode() {
       pidMode("host");
       return this;
     }
 
-    Builder usernsMode(String usernsMode);
+    public Builder usernsMode(String usernsMode) {
+      this.usernsMode = usernsMode;
+      return this;
+    }
 
-    Builder shmSize(Long shmSize);
+    public Builder shmSize(Long shmSize) {
+      this.shmSize = shmSize;
+      return this;
+    }
 
-    Builder oomKillDisable(Boolean oomKillDisable);
+    public Builder oomKillDisable(Boolean oomKillDisable) {
+      this.oomKillDisable = oomKillDisable;
+      return this;
+    }
 
-    Builder oomScoreAdj(Integer oomScoreAdj);
+    public Builder oomScoreAdj(Integer oomScoreAdj) {
+      this.oomScoreAdj = oomScoreAdj;
+      return this;
+    }
 
-    /**
-     * Only works for Docker API version &gt;= 1.25.
-     * @param autoRemove Whether to automatically remove the container when it exits
-     * @return {@link Builder}
-     */
-    Builder autoRemove(Boolean autoRemove);
+    public Builder autoRemove(Boolean autoRemove) {
+      this.autoRemove = autoRemove;
+      return this;
+    }
 
-    Builder pidsLimit(Integer pidsLimit);
+    public Builder pidsLimit(Integer pidsLimit) {
+      this.pidsLimit = pidsLimit;
+      return this;
+    }
 
-    Builder tmpfs(Map<String, ? extends String> tmpfs);
+    public Builder tmpfs(Map<String, String> tmpfs) {
+      this.tmpfs = tmpfs != null ? Map.copyOf(tmpfs) : null;
+      return this;
+    }
 
-    Builder readonlyRootfs(Boolean readonlyRootfs);
+    public Builder readonlyRootfs(Boolean readonlyRootfs) {
+      this.readonlyRootfs = readonlyRootfs;
+      return this;
+    }
     
-    Builder storageOpt(Map<String, ? extends String> tmpfs);
+    public Builder storageOpt(Map<String, String> storageOpt) {
+      this.storageOpt = storageOpt != null ? Map.copyOf(storageOpt) : null;
+      return this;
+    }
 
-    Builder runtime(String runtime);
+    public Builder runtime(String runtime) {
+      this.runtime = runtime;
+      return this;
+    }
 
-    Builder mounts(final Iterable<? extends Mount> mounts);
+    public Builder mounts(final List<Mount> mounts) {
+      this.mounts = mounts;
+      return this;
+    }
 
-    Builder mounts(final Mount... mounts);
+    public Builder mounts(final Mount... mounts) {
+      this.mounts = mounts != null ? List.of(mounts) : null;
+      return this;
+    }
     
-    Builder init(Boolean init);
+    public Builder init(Boolean init) {
+      this.init = init;
+      return this;
+    }
     
-    Builder sysctls(Map<String, ? extends String> sysctls);
+    public Builder sysctls(Map<String, String> sysctls) {
+      this.sysctls = sysctls != null ? Map.copyOf(sysctls) : null;
+      return this;
+    }
     
-    Builder addSysctl(String key, String value);
+    public Builder addSysctl(String key, String value) {
+      if (this.sysctls == null) {
+        this.sysctls = Map.of(key, value);
+      } else {
+        Map<String, String> updated = new java.util.HashMap<>(this.sysctls);
+        updated.put(key, value);
+        this.sysctls = Map.copyOf(updated);
+      }
+      return this;
+    }
     
-    Builder deviceRequests(Iterable<? extends DeviceRequest> deviceRequests);
+    public Builder deviceRequests(List<DeviceRequest> deviceRequests) {
+      this.deviceRequests = deviceRequests;
+      return this;
+    }
     
-    HostConfig build();
+    public HostConfig build() {
+      return new HostConfig(binds, blkioWeight, blkioWeightDevice, blkioDeviceReadBps, 
+          blkioDeviceWriteBps, blkioDeviceReadIOps, blkioDeviceWriteIOps, containerIdFile,
+          lxcConf, privileged, portBindings, links, publishAllPorts, dns, dnsOptions, 
+          dnsSearch, extraHosts, groupAdd, volumesFrom, capAdd, capDrop, networkMode, 
+          securityOpt, devices, memory, memorySwap, memorySwappiness, memoryReservation, 
+          nanoCpus, cpuPeriod, cpuShares, cpusetCpus, cpusetMems, cpuQuota, cgroupParent, 
+          restartPolicy, logConfig, ipcMode, ulimits, pidMode, usernsMode, shmSize, 
+          oomKillDisable, oomScoreAdj, autoRemove, pidsLimit, tmpfs, readonlyRootfs, 
+          storageOpt, runtime, mounts, init, sysctls, deviceRequests);
+    }
   }
 
-  @JsonDeserialize(builder = ImmutableHostConfig.Bind.Builder.class)
-  @Immutable
-  public interface Bind {
+  public record Bind(
+    String to,
+    String from,
+    boolean readOnly,
+    @Nullable Boolean noCopy,
+    @Nullable Boolean selinuxLabeling) {
 
-    String to();
-
-    String from();
-
-    @Value.Default
-    default boolean readOnly() {
-    	return false;
+    public Bind {
+      // Compact constructor with default value handling already done by builder
     }
 
-    @Nullable
-    Boolean noCopy();
-
-    @Nullable
-    Boolean selinuxLabeling();
-
-    static Builder builder() {
-      return ImmutableHostConfig.Bind.builder();
+    public static Builder builder() {
+      return new Builder();
     }
 
-    @Derived
     @JsonIgnore
-	default String representation() {
-      if (to() == null || "".equals(to().trim())) {
+    public String representation() {
+      if (to == null || "".equals(to.trim())) {
         return "";
-      } else if (from() == null || "".equals(from().trim())) {
-        return to();
+      } else if (from == null || "".equals(from.trim())) {
+        return to;
       }
 
-      final String bind = from() + ":" + to();
+      final String bind = from + ":" + to;
 
       final List<String> options = new ArrayList<>();
-      if (readOnly()) {
+      if (readOnly) {
         options.add("ro");
       }
-      //noinspection ConstantConditions
-      if (noCopy() != null && noCopy()) {
+      if (noCopy != null && noCopy) {
         options.add("nocopy");
       }
 
-      if (selinuxLabeling() != null) {
-        // shared
-        if (Boolean.TRUE.equals(selinuxLabeling())) {
+      if (selinuxLabeling != null) {
+        if (Boolean.TRUE.equals(selinuxLabeling)) {
           options.add("z");
         } else {
           options.add("Z");
@@ -560,142 +841,203 @@ public interface HostConfig {
       return (optionsValue.isEmpty()) ? bind : bind + ":" + optionsValue;
     }
 
-    interface Builder {
+    public static class Builder {
+      private String to;
+      private String from;
+      private boolean readOnly = false;
+      private Boolean noCopy;
+      private Boolean selinuxLabeling;
 
-      Builder to(String to);
+      public Builder to(String to) {
+        this.to = to;
+        return this;
+      }
 
-      Builder from(String from);
+      public Builder from(String from) {
+        this.from = from;
+        return this;
+      }
 
-      Builder readOnly(boolean readOnly);
+      public Builder readOnly(boolean readOnly) {
+        this.readOnly = readOnly;
+        return this;
+      }
 
-      Builder noCopy(Boolean noCopy);
+      public Builder noCopy(Boolean noCopy) {
+        this.noCopy = noCopy;
+        return this;
+      }
 
-      /**
-       * Turn on automatic SELinux labeling of the host file or directory being
-       * mounted into the container.
-       * @param sharedContent True if this bind mount content is shared among multiple 
-       *     containers (mount option "z"); false if private and unshared (mount option "Z")
-       * @return {@link Builder}
-       */
-      Builder selinuxLabeling(Boolean sharedContent);
+      public Builder selinuxLabeling(Boolean sharedContent) {
+        this.selinuxLabeling = sharedContent;
+        return this;
+      }
 
-      Bind build();
+      public Bind build() {
+        return new Bind(to, from, readOnly, noCopy, selinuxLabeling);
+      }
     }
   }
 
-  @JsonDeserialize(builder = ImmutableHostConfig.Ulimit.Builder.class)
-  @Immutable
-  public interface Ulimit {
-
+  public record Ulimit(
     @JsonProperty("Name")
-    String name();
+    String name,
 
     @JsonProperty("Soft")
-    Long soft();
+    Long soft,
 
     @JsonProperty("Hard")
-    Long hard();
+    Long hard) {
 
     public static Builder builder() {
-      return ImmutableHostConfig.Ulimit.builder();
+      return new Builder();
     }
 
-    interface Builder {
-      Builder name(String name);
+    public static class Builder {
+      private String name;
+      private Long soft;
+      private Long hard;
 
-      Builder soft(Long soft);
+      public Builder name(String name) {
+        this.name = name;
+        return this;
+      }
 
-      Builder hard(Long hard);
+      public Builder soft(Long soft) {
+        this.soft = soft;
+        return this;
+      }
 
-      Ulimit build();
+      public Builder hard(Long hard) {
+        this.hard = hard;
+        return this;
+      }
+
+      public Ulimit build() {
+        return new Ulimit(name, soft, hard);
+      }
     }
   }
 
-  @JsonDeserialize(builder = ImmutableHostConfig.BlkioWeightDevice.Builder.class)
-  @Immutable
-  public interface BlkioWeightDevice {
-
+  public record BlkioWeightDevice(
     @JsonProperty("Path")
-    String path();
+    String path,
 
     @JsonProperty("Weight")
-    Integer weight();
+    Integer weight) {
 
     public static Builder builder() {
-      return ImmutableHostConfig.BlkioWeightDevice.builder();
+      return new Builder();
     }
 
-    interface Builder {
+    public static class Builder {
+      private String path;
+      private Integer weight;
 
-      Builder path(final String path);
+      public Builder path(final String path) {
+        this.path = path;
+        return this;
+      }
 
-      Builder weight(final Integer weight);
+      public Builder weight(final Integer weight) {
+        this.weight = weight;
+        return this;
+      }
 
-      BlkioWeightDevice build();
+      public BlkioWeightDevice build() {
+        return new BlkioWeightDevice(path, weight);
+      }
     }
   }
 
-  @JsonDeserialize(builder = ImmutableHostConfig.BlkioDeviceRate.Builder.class)
-  @Immutable
-  public interface  BlkioDeviceRate {
-
+  public record BlkioDeviceRate(
     @JsonProperty("Path")
-    String path();
+    String path,
 
     @JsonProperty("Rate")
-    Integer rate();
+    Integer rate) {
 
     public static Builder builder() {
-      return ImmutableHostConfig.BlkioDeviceRate.builder();
+      return new Builder();
     }
 
-    interface Builder {
+    public static class Builder {
+      private String path;
+      private Integer rate;
 
-      Builder path(final String path);
+      public Builder path(final String path) {
+        this.path = path;
+        return this;
+      }
 
-      Builder rate(final Integer rate);
+      public Builder rate(final Integer rate) {
+        this.rate = rate;
+        return this;
+      }
 
-      BlkioDeviceRate build();
+      public BlkioDeviceRate build() {
+        return new BlkioDeviceRate(path, rate);
+      }
     }
   }
   
-  @JsonDeserialize(builder = ImmutableHostConfig.DeviceRequest.Builder.class)
-  @Immutable
-  public interface DeviceRequest {
-	  
-	  @Nullable
-	  @JsonProperty("Driver")
-	  String driver();
-	  
-	  @Nullable
-	  @JsonProperty("Count")
-	  Integer count();
-	  
-	  @JsonProperty("DeviceIDs")
-	  List<String> deviceIds();
-	  
-	  @JsonProperty("Capabilities")
-	  List<List<String>> capabilities();
-	  
-	  @JsonProperty("Options")
-	  Map<String, String> options();
-	  
-	  public static Builder builder() {
-	    return ImmutableHostConfig.DeviceRequest.builder();
+  public record DeviceRequest(
+    @Nullable
+    @JsonProperty("Driver")
+    String driver,
+    
+    @Nullable
+    @JsonProperty("Count")
+    Integer count,
+    
+    @JsonProperty("DeviceIDs")
+    List<String> deviceIds,
+    
+    @JsonProperty("Capabilities")
+    List<List<String>> capabilities,
+    
+    @JsonProperty("Options")
+    Map<String, String> options) {
+    
+    public static Builder builder() {
+      return new Builder();
+    }
+
+    public static class Builder {
+      private String driver;
+      private Integer count;
+      private List<String> deviceIds;
+      private List<List<String>> capabilities;
+      private Map<String, String> options;
+
+      public Builder driver(final String driver) {
+        this.driver = driver;
+        return this;
       }
 
-      interface Builder {
-        Builder driver(final String driver);
+      public Builder count(final Integer count) {
+        this.count = count;
+        return this;
+      }
 
-        Builder count(final Integer count);
-
-        Builder deviceIds(final Iterable<String> deviceIds);
-        
-        Builder capabilities(final Iterable<? extends List<String>> capabilities);
-        
-        Builder options(final Map<String, ? extends String> options);
-        
-        DeviceRequest build();
+      public Builder deviceIds(final List<String> deviceIds) {
+        this.deviceIds = deviceIds;
+        return this;
+      }
+      
+      public Builder capabilities(final List<List<String>> capabilities) {
+        this.capabilities = capabilities;
+        return this;
+      }
+      
+      public Builder options(final Map<String, String> options) {
+        this.options = options != null ? Map.copyOf(options) : null;
+        return this;
+      }
+      
+      public DeviceRequest build() {
+        return new DeviceRequest(driver, count, deviceIds, capabilities, options);
+      }
     }
   }
 }

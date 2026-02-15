@@ -23,31 +23,24 @@ package org.mandas.docker.client.messages.swarm;
 
 import java.util.Date;
 
-import org.immutables.value.Value.Immutable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(builder = ImmutableSwarm.Builder.class)
-@Immutable
-public interface Swarm {
-
+public record Swarm(
   @JsonProperty("ID")
-  String id();
+  String id,
 
   @JsonProperty("Version")
-  Version version();
+  Version version,
 
   @JsonProperty("CreatedAt")
-  Date createdAt();
+  Date createdAt,
 
   @JsonProperty("UpdatedAt")
-  Date updatedAt();
+  Date updatedAt,
 
   @JsonProperty("Spec")
-  SwarmSpec swarmSpec();
+  SwarmSpec swarmSpec,
 
   @JsonProperty("JoinTokens")
-  JoinTokens joinTokens();
-
-}
+  JoinTokens joinTokens
+) {}
