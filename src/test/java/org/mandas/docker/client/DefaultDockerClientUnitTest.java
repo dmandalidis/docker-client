@@ -21,9 +21,6 @@
 
 package org.mandas.docker.client;
 
-import static com.spotify.hamcrest.jackson.JsonMatchers.jsonArray;
-import static com.spotify.hamcrest.jackson.JsonMatchers.jsonObject;
-import static com.spotify.hamcrest.jackson.JsonMatchers.jsonText;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableList;
@@ -39,6 +36,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mandas.docker.FixtureUtil.fixture;
 
 import java.io.IOException;
@@ -246,10 +245,12 @@ public class DefaultDockerClientUnitTest {
     assertThat(recordedRequest.getHeader("Content-Type"), is("application/json"));
 
     final JsonNode requestJson = toJson(recordedRequest.getBody());
-    assertThat(requestJson, is(jsonObject()
-        .where("HostConfig", is(jsonObject()
-            .where("CapAdd", is(jsonArray(
-                containsInAnyOrder(jsonText("baz"), jsonText("qux")))))))));
+    final JsonNode capAdd = requestJson.get("HostConfig").get("CapAdd");
+    assertTrue(capAdd.isArray());
+    Set<String> capAddValues = childrenTextNodes((ArrayNode) capAdd);
+    assertTrue(capAddValues.contains("baz"));
+    assertTrue(capAddValues.contains("qux"));
+    assertEquals(2, capAddValues.size());
   }
 
   private static Set<String> childrenTextNodes(ArrayNode arrayNode) {
