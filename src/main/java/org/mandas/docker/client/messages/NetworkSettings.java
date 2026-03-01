@@ -27,7 +27,6 @@ import static java.util.stream.Collectors.toMap;
 import java.util.List;
 import java.util.Map;
 
-import org.mandas.docker.AllowNulls;
 import org.mandas.docker.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -39,7 +38,7 @@ public record NetworkSettings(
   @Nullable @JsonProperty("Gateway") String gateway,
   @Nullable @JsonProperty("Bridge") String bridge,
   @Nullable @JsonProperty("PortMapping") Map<String, Map<String, String>> portMapping,
-  @Nullable @AllowNulls @JsonProperty("Ports") Map<String, List<PortBinding>> nullValuedPorts,
+  @Nullable @JsonProperty("Ports") Map<String, List<PortBinding>> nullValuedPorts,
   @Deprecated @Nullable @JsonProperty("MacAddress") String macAddress,
   @Nullable @JsonProperty("Networks") Map<String, AttachedNetwork> networks,
   @Nullable @JsonProperty("EndpointID") String endpointId,
