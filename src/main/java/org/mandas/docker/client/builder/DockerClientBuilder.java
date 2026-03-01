@@ -37,17 +37,18 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.HttpClientConnectionManager;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.glassfish.jersey.apache.connector.ApacheClientProperties;
-import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.config.RequestConfig.Builder;
+import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.io.HttpClientConnectionManager;
+import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy;
+import org.apache.hc.client5.http.ssl.HostnameVerificationPolicy;
+import org.apache.hc.core5.util.TimeValue;
+import org.apache.hc.core5.util.Timeout;
+import org.glassfish.jersey.apache5.connector.Apache5ClientProperties;
+import org.glassfish.jersey.apache5.connector.Apache5ConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.RequestEntityProcessing;
@@ -57,11 +58,9 @@ import org.mandas.docker.client.DockerCertificates;
 import org.mandas.docker.client.DockerCertificatesStore;
 import org.mandas.docker.client.DockerHost;
 import org.mandas.docker.client.ObjectMapperProvider;
-import org.mandas.docker.client.UnixConnectionSocketFactory;
 import org.mandas.docker.client.auth.ConfigFileRegistryAuthSupplier;
 import org.mandas.docker.client.auth.RegistryAuthSupplier;
 import org.mandas.docker.client.exceptions.DockerCertificateException;
-import org.mandas.docker.client.npipe.NpipeConnectionSocketFactory;
 
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -77,8 +76,7 @@ public class DockerClientBuilder {
     BUFFERED;
   }
   
-  private static String UNIX_SCHEME = "unix";
-  private static String NPIPE_SCHEME = "npipe";
+  private static final String UNIX_SCHEME = "unix";
   private long DEFAULT_CONNECT_TIMEOUT_MILLIS = SECONDS.toMillis(5);
   private long DEFAULT_READ_TIMEOUT_MILLIS = SECONDS.toMillis(30);
   private int DEFAULT_CONNECTION_POOL_SIZE = 100;
@@ -119,15 +117,16 @@ public class DockerClientBuilder {
   }
   
   private Client createClient() {
-    Registry<ConnectionSocketFactory> schemeRegistry = getSchemeRegistry(uri, dockerCertificatesStore);
-    
-    final HttpClientConnectionManager cm = getConnectionManager(uri, schemeRegistry, connectionPoolSize);
+    final HttpClientConnectionManager cm = getConnectionManager(uri, connectionPoolSize);
 
-    final RequestConfig requestConfig = RequestConfig.custom()
-        .setConnectionRequestTimeout((int) connectTimeoutMillis)
-        .setConnectTimeout((int) connectTimeoutMillis)
-        .setSocketTimeout((int) readTimeoutMillis)
-        .build();
+    Builder builder = RequestConfig.custom()
+        .setConnectionRequestTimeout(Timeout.ofMilliseconds(connectTimeoutMillis));
+
+    if (uri.getScheme().equals("unix")) {
+    	builder = builder.setUnixDomainSocket(Paths.get(uri.getPath()));
+    }
+    
+    final RequestConfig requestConfig = builder.build();
 
     ClientConfig config = new ClientConfig(JacksonFeature.class);
     
@@ -136,10 +135,12 @@ public class DockerClientBuilder {
     }
     
     config
-      .connectorProvider(new ApacheConnectorProvider())
-      .property(ApacheClientProperties.CONNECTION_MANAGER, cm)
-      .property(ApacheClientProperties.CONNECTION_MANAGER_SHARED, "true")
-      .property(ApacheClientProperties.REQUEST_CONFIG, requestConfig);
+      .connectorProvider(new Apache5ConnectorProvider())
+      .property(Apache5ClientProperties.CONNECTION_MANAGER, cm)
+      .property(Apache5ClientProperties.CONNECTION_MANAGER_SHARED, "true")
+      .property(Apache5ClientProperties.REQUEST_CONFIG, requestConfig)
+      .property(Apache5ClientProperties.RETRY_STRATEGY, new DefaultHttpRequestRetryStrategy(0, TimeValue.ZERO_MILLISECONDS));
+    
 
     if (entityProcessing != null) {
       switch (entityProcessing) {
@@ -178,8 +179,6 @@ public class DockerClientBuilder {
   
     URI uri = null;
     if (endpoint.startsWith(UNIX_SCHEME + "://")) {
-      uri = URI.create(endpoint);
-    } else if (endpoint.startsWith(NPIPE_SCHEME + "://")) {
       uri = URI.create(endpoint);
     } else {
       final String stripped = endpoint.replaceAll(".*://", "");
@@ -250,7 +249,7 @@ public class DockerClientBuilder {
   }
 
   /**
-   * Set the SO_TIMEOUT in milliseconds. This is the maximum period of inactivity between
+   * Set the socket timeout in milliseconds. This is the maximum period of inactivity between
    * receiving two consecutive data packets from Docker.
    *
    * @param readTimeoutMillis read timeout to Docker daemon in milliseconds
@@ -273,10 +272,7 @@ public class DockerClientBuilder {
   }
 
   /**
-   * Set the size of the connection pool for connections to Docker. Note that due to a known
-   * issue, DefaultDockerClient maintains two separate connection pools, each of which is capped
-   * at this size. Therefore, the maximum number of concurrent connections to Docker may be up to
-   * 2 * connectionPoolSize.
+   * Set the size of the connection pool for connections to Docker.
    *
    * @param connectionPoolSize connection pool size
    * @return Builder
@@ -371,7 +367,7 @@ public class DockerClientBuilder {
           "An HTTPS URI for DOCKER_HOST must be provided to use Docker client certificates");
     }
     
-    if (uri.getScheme().startsWith(UNIX_SCHEME) || uri.getScheme().startsWith(NPIPE_SCHEME)) {
+    if (uri.getScheme().startsWith(UNIX_SCHEME)) {
       this.useProxy = false;
     }
     
@@ -379,9 +375,7 @@ public class DockerClientBuilder {
         .register(ObjectMapperProvider.class);
     
     if (uri.getScheme().equals(UNIX_SCHEME)) {
-      this.sanitizedUri = UnixConnectionSocketFactory.sanitizeUri(uri);
-    } else if (uri.getScheme().equals(NPIPE_SCHEME)) {
-      this.sanitizedUri = NpipeConnectionSocketFactory.sanitizeUri(uri);
+      this.sanitizedUri = URI.create("unix://localhost:80"); // Jersey requires a host which the Apache connector won't use
     } else {
       this.sanitizedUri = this.uri;
     }
@@ -394,39 +388,26 @@ public class DockerClientBuilder {
     return new DefaultDockerClient(apiVersion, registryAuthSupplier, sanitizedUri, client, headers);
   }
 
-  private HttpClientConnectionManager getConnectionManager(URI uri, Registry<ConnectionSocketFactory> schemeRegistry, int connectionPoolSize) {
-    if (uri.getScheme().equals(NPIPE_SCHEME)) {
-      return new BasicHttpClientConnectionManager(schemeRegistry);
-    }
-    final PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(schemeRegistry);
-    // Use all available connections instead of artificially limiting ourselves to 2 per server.
-    cm.setMaxTotal(connectionPoolSize);
-    cm.setDefaultMaxPerRoute(cm.getMaxTotal());
-    return cm;
-  }
-
-  private Registry<ConnectionSocketFactory> getSchemeRegistry(URI uri, DockerCertificatesStore certificateStore) {
-    final SSLConnectionSocketFactory https;
+  private HttpClientConnectionManager getConnectionManager(URI uri, int connectionPoolSize) {
+    PoolingHttpClientConnectionManagerBuilder builder = PoolingHttpClientConnectionManagerBuilder.create()
+      .setMaxConnTotal(connectionPoolSize)
+      .setMaxConnPerRoute(connectionPoolSize)
+      .setDefaultConnectionConfig(ConnectionConfig.custom()
+          .setConnectTimeout(Timeout.ofMilliseconds(connectTimeoutMillis))
+          .setSocketTimeout(Timeout.ofMilliseconds(readTimeoutMillis))
+          .build()
+      );
+    
     if (dockerCertificatesStore == null) {
-      https = SSLConnectionSocketFactory.getSocketFactory();
+      builder = builder.setTlsSocketStrategy(DefaultClientTlsStrategy.createDefault());
     } else {
-      https = new SSLConnectionSocketFactory(dockerCertificatesStore.sslContext(),
-                                             dockerCertificatesStore.hostnameVerifier());
-    }
-  
-    final RegistryBuilder<ConnectionSocketFactory> registryBuilder = RegistryBuilder
-        .<ConnectionSocketFactory>create()
-        .register("https", https)
-        .register("http", PlainConnectionSocketFactory.getSocketFactory());
-  
-    if (uri.getScheme().equals(UNIX_SCHEME)) {
-      registryBuilder.register(UNIX_SCHEME, new UnixConnectionSocketFactory(uri));
+      DefaultClientTlsStrategy strategy = new DefaultClientTlsStrategy(
+          dockerCertificatesStore.sslContext(),
+          HostnameVerificationPolicy.BOTH,
+          dockerCertificatesStore.hostnameVerifier());
+      builder = builder.setTlsSocketStrategy(strategy);
     }
     
-    if (uri.getScheme().equals(NPIPE_SCHEME)) {
-      registryBuilder.register(NPIPE_SCHEME, new NpipeConnectionSocketFactory(uri));
-    }
-  
-    return registryBuilder.build();
+    return builder.build();
   }
 }

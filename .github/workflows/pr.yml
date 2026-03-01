@@ -33,4 +33,4 @@ jobs:
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       run: ./.github/scripts/docker.sh install_docker
     - name: Build
-      run: mvn -B clean verify -Dsurefire.rerunFailingTestsCount=1
+      run: mvn -B clean verify

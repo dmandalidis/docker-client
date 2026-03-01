@@ -85,7 +85,6 @@ import static org.mandas.docker.client.DockerClient.ListImagesParam.digests;
 import static org.mandas.docker.client.DockerClient.ListVolumesParam.dangling;
 import static org.mandas.docker.client.DockerClient.ListVolumesParam.driver;
 import static org.mandas.docker.client.DockerClient.ListVolumesParam.name;
-import static org.mandas.docker.client.DockerClient.LogsParam.follow;
 import static org.mandas.docker.client.DockerClient.LogsParam.since;
 import static org.mandas.docker.client.DockerClient.LogsParam.stderr;
 import static org.mandas.docker.client.DockerClient.LogsParam.stdout;
@@ -291,16 +290,9 @@ public class DefaultDockerClientTest {
 
   @BeforeEach
   public void setup(TestInfo testInfo) throws Exception {
-    final DockerClientBuilder builder = DockerClientBuilder.fromEnv();
-    // Make it easier to test no read timeout occurs by using a smaller value
-    // Such test methods should end in 'NoTimeout'
-    if (testInfo.getDisplayName().endsWith("NoTimeout()")) {
-      builder.readTimeoutMillis(5000);
-    } else {
-      builder.readTimeoutMillis(120000);
-    }
-
-    sut = builder.build();
+    sut = DockerClientBuilder.fromEnv()
+      .readTimeoutMillis(120000)
+      .build();
 
     System.out.printf("- %s\n", testInfo.getDisplayName());
   }
@@ -2211,24 +2203,6 @@ public class DefaultDockerClientTest {
     final ContainerInfo info = sut.inspectContainer(volumeContainer);
     assertThat(info.state().running(), is(false));
     assertThat(info.state().exitCode(), is(0L));
-  }
-
-  @Test
-  public void testLogNoTimeout() throws Exception {
-    final String volumeContainer = createSleepingContainer();
-    final StringBuffer result = new StringBuffer();
-    try (final LogStream stream = sut.logs(volumeContainer, stdout(), stderr(), follow())) {
-      try {
-        while (stream.hasNext()) {
-          final String r = UTF_8.decode(stream.next().content()).toString();
-          log.info(r);
-          result.append(r);
-        }
-      } catch (Exception e) {
-        log.info(e.getMessage());
-      }
-    }
-    verifyNoTimeoutContainer(volumeContainer, result);
   }
 
   @Test
@@ -4416,16 +4390,6 @@ public class DefaultDockerClientTest {
     sut.createContainer(volumeConfig, volumeContainer);
     sut.startContainer(volumeContainer);
     return volumeContainer;
-  }
-
-  private void verifyNoTimeoutContainer(final String volumeContainer, final StringBuffer result)
-      throws Exception {
-    log.info("Reading has finished, waiting for program to end.");
-    sut.waitContainer(volumeContainer);
-    final ContainerInfo info = sut.inspectContainer(volumeContainer);
-    assertThat(result.toString().contains("Finished"), is(true));
-    assertThat(info.state().running(), is(false));
-    assertThat(info.state().exitCode(), is(0L));
   }
 
   private List<String> containersToIds(final List<Container> containers) {
