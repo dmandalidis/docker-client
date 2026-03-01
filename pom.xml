@@ -69,7 +69,7 @@
 		<version.plugin.publishing>0.10.0</version.plugin.publishing>
 		<version.plugin.gpg>3.2.8</version.plugin.gpg>
 		<version.plugin.surefire>3.5.5</version.plugin.surefire>
-		<version.plugin.bundle>6.0.0</version.plugin.bundle>
+		<version.plugin.bundle>6.0.2</version.plugin.bundle>
 		<version.plugin.pmd>3.28.0</version.plugin.pmd>
 	</properties>
 
