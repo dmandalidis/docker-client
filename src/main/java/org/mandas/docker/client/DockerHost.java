@@ -54,7 +54,6 @@ public class DockerHost {
   private static SystemDelegate systemDelegate = defaultSystemDelegate;
 
   private static final String DEFAULT_UNIX_ENDPOINT = "unix:///var/run/docker.sock";
-  private static final String DEFAULT_WINDOWS_ENDPOINT = "npipe:////./pipe/docker_engine";
   private static final String DEFAULT_ADDRESS = "localhost";
   private static final int DEFAULT_PORT = 2375;
   private final String host;
@@ -183,12 +182,8 @@ public class DockerHost {
     final String os = osName.toLowerCase(Locale.ENGLISH);
     if (os.equalsIgnoreCase("linux") || os.contains("mac")) {
       return DEFAULT_UNIX_ENDPOINT;
-    } else if (System.getProperty("os.name").equalsIgnoreCase("Windows 10")) {
-      //from Docker doc: Windows 10 64bit: Pro, Enterprise or Education
-      return DEFAULT_WINDOWS_ENDPOINT;
-    } else {
-      return DEFAULT_ADDRESS + ":" + defaultPort();
     }
+    return DEFAULT_ADDRESS + ":" + defaultPort();
   }
 
   public static String endpointFromEnv() {
@@ -202,10 +197,6 @@ public class DockerHost {
 
   public static String defaultUnixEndpoint() {
     return DEFAULT_UNIX_ENDPOINT;
-  }
-
-  public static String defaultWindowsEndpoint() {
-    return DEFAULT_WINDOWS_ENDPOINT;
   }
 
   public static String defaultAddress() {

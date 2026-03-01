@@ -1,5 +1,18 @@
 # Change Log
 
+## 11.0.0 - notables changes
+
+* Support for Windows named pipes is dropped for two reasons:
+    - Apache HTTP client 5.x has deprecated connection factories,
+    providing only native Unix socket support as an alternative.
+    The effort of supporting named pipes and keep using a deprecated
+    feature doesn't worth the trouble (IMO; see next reason).
+    - With WSL, Docker for Windows is using a Linux distribution
+    as a backend by default. Therefore, Windows supports Unix 
+    sockets for long time, making the usage of named pipes very 
+    rare nowadays for this use case.
+* Upgrade to Jersey 4.x (fixes #917, #671)
+
 ## 10.0.1 - notable changes
 
 * Bump org.apache.felix:maven-bundle-plugin from 6.0.0 to 6.0.2
