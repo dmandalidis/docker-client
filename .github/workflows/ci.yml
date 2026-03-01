@@ -43,7 +43,7 @@ jobs:
       env:
         SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
         SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-      run: mvn -B --settings .github/files/custom-settings.xml -Pdeploy-artifacts clean deploy -Dsurefire.rerunFailingTestsCount=1 -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
+      run: mvn -B --settings .github/files/custom-settings.xml -Pdeploy-artifacts clean deploy -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
     - name: Upload coverage reports to Codecov with GitHub Action
       uses: codecov/codecov-action@v3
 
