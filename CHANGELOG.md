@@ -1,5 +1,13 @@
 # Change Log
 
+## 10.0.1 - notable changes
+
+* Bump org.apache.felix:maven-bundle-plugin from 6.0.0 to 6.0.2
+* Drop jakarta-jaxrs-json-provider
+* Convert immutables to records
+* Bump com.fasterxml.jackson:jackson-bom from 2.20.1 to 2.21.1
+* Bump org.bouncycastle:bcpkix-jdk18on from 1.82 to 1.83
+
 ## 10.0.0 - notable changes
 
 * Support for Docker v1.52 and removal of pre-v1.44 support
