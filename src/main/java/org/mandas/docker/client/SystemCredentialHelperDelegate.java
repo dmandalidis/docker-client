@@ -134,9 +134,8 @@ class SystemCredentialHelperDelegate implements CredentialHelperDelegate {
   }
 
   private Process exec(final String subcommand, final String credsStore) throws IOException {
-    final String cmd = "docker-credential-" + credsStore + " " + subcommand;
-    log.debug("Executing \"{}\"", cmd);
-    return Runtime.getRuntime().exec(new String[] {cmd});
+    log.debug("Executing \"docker-credential-{} {}\"", credsStore, subcommand);
+    return new ProcessBuilder("docker-credential-" + credsStore, subcommand).start();
   }
   
   private static class MapTypeReference extends TypeReference<Map<String, String>> {

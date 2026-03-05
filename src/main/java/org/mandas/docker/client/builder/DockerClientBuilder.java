@@ -76,7 +76,7 @@ public class DockerClientBuilder {
     BUFFERED;
   }
   
-  private static String UNIX_SCHEME = "unix";
+  private static final String UNIX_SCHEME = "unix";
   private long DEFAULT_CONNECT_TIMEOUT_MILLIS = SECONDS.toMillis(5);
   private long DEFAULT_READ_TIMEOUT_MILLIS = SECONDS.toMillis(30);
   private int DEFAULT_CONNECTION_POOL_SIZE = 100;
