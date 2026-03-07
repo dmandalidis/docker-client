@@ -180,7 +180,7 @@ public class DockerHost {
   static String defaultDockerEndpoint() {
     final String osName = systemDelegate.getProperty("os.name");
     final String os = osName.toLowerCase(Locale.ENGLISH);
-    if (os.equalsIgnoreCase("linux") || os.contains("mac")) {
+    if (os.equals("linux") || os.contains("mac")) {
       return DEFAULT_UNIX_ENDPOINT;
     }
     return DEFAULT_ADDRESS + ":" + defaultPort();

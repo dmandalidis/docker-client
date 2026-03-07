@@ -45,7 +45,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 class SystemCredentialHelperDelegate implements CredentialHelperDelegate {
 
-  private static final Logger log = LoggerFactory.getLogger(DockerConfigReader.class);
+  private static final Logger log = LoggerFactory.getLogger(SystemCredentialHelperDelegate.class);
   private static final ObjectMapper mapper = ObjectMapperProvider.objectMapper();
 
   @Override

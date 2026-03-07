@@ -77,9 +77,9 @@ public class DockerClientBuilder {
   }
   
   private static final String UNIX_SCHEME = "unix";
-  private long DEFAULT_CONNECT_TIMEOUT_MILLIS = SECONDS.toMillis(5);
-  private long DEFAULT_READ_TIMEOUT_MILLIS = SECONDS.toMillis(30);
-  private int DEFAULT_CONNECTION_POOL_SIZE = 100;
+  private static long DEFAULT_CONNECT_TIMEOUT_MILLIS = SECONDS.toMillis(5);
+  private static long DEFAULT_READ_TIMEOUT_MILLIS = SECONDS.toMillis(30);
+  private static int DEFAULT_CONNECTION_POOL_SIZE = 100;
   private URI uri;
   private URI sanitizedUri;
   private String apiVersion;
@@ -117,7 +117,7 @@ public class DockerClientBuilder {
   }
   
   private Client createClient() {
-    final HttpClientConnectionManager cm = getConnectionManager(uri, connectionPoolSize);
+    final HttpClientConnectionManager cm = getConnectionManager(connectionPoolSize);
 
     Builder builder = RequestConfig.custom()
         .setConnectionRequestTimeout(Timeout.ofMilliseconds(connectTimeoutMillis));
@@ -388,7 +388,7 @@ public class DockerClientBuilder {
     return new DefaultDockerClient(apiVersion, registryAuthSupplier, sanitizedUri, client, headers);
   }
 
-  private HttpClientConnectionManager getConnectionManager(URI uri, int connectionPoolSize) {
+  private HttpClientConnectionManager getConnectionManager(int connectionPoolSize) {
     PoolingHttpClientConnectionManagerBuilder builder = PoolingHttpClientConnectionManagerBuilder.create()
       .setMaxConnTotal(connectionPoolSize)
       .setMaxConnPerRoute(connectionPoolSize)
