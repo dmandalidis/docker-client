@@ -77,20 +77,15 @@ public class DockerClientBuilder {
   }
   
   private static final String UNIX_SCHEME = "unix";
-  private long DEFAULT_CONNECT_TIMEOUT_MILLIS = SECONDS.toMillis(5);
-  private long DEFAULT_READ_TIMEOUT_MILLIS = SECONDS.toMillis(30);
-  private int DEFAULT_CONNECTION_POOL_SIZE = 100;
   private URI uri;
-  private URI sanitizedUri;
   private String apiVersion;
-  private long connectTimeoutMillis = DEFAULT_CONNECT_TIMEOUT_MILLIS;
-  private long readTimeoutMillis = DEFAULT_READ_TIMEOUT_MILLIS;
-  private int connectionPoolSize = DEFAULT_CONNECTION_POOL_SIZE;
+  private long connectTimeoutMillis = SECONDS.toMillis(5);
+  private long readTimeoutMillis = SECONDS.toMillis(30);
+  private int connectionPoolSize = 100;
   private DockerCertificatesStore dockerCertificatesStore;
   private boolean useProxy = true;
   private RegistryAuthSupplier registryAuthSupplier;
   private Map<String, Object> headers = new HashMap<>();
-  private Client client;
   private EntityProcessing entityProcessing;
 
   private ClientConfig updateProxy(ClientConfig config) {
@@ -371,13 +366,14 @@ public class DockerClientBuilder {
       this.useProxy = false;
     }
     
-    this.client = createClient()
+    final Client client = createClient()
         .register(ObjectMapperProvider.class);
     
+    final URI sanitizedUri;
     if (uri.getScheme().equals(UNIX_SCHEME)) {
-      this.sanitizedUri = URI.create("unix://localhost:80"); // Jersey requires a host which the Apache connector won't use
+      sanitizedUri = URI.create("unix://localhost:80"); // Jersey requires a host which the Apache connector won't use
     } else {
-      this.sanitizedUri = this.uri;
+      sanitizedUri = this.uri;
     }
     
     // read the docker config file for auth info if nothing else was specified

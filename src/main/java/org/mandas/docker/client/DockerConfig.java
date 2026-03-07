@@ -33,12 +33,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * 
  * @param credHelpers credential helpers configuration
  * @param auths authentication configurations
- * @param httpHeaders HTTP headers to include in requests
  * @param credsStore the credentials store to use
- * @param detachKeys the detach keys configuration
- * @param stackOrchestrator the stack orchestrator configuration
- * @param psFormat the format string for ps command output
- * @param imagesFormat the format string for images command output
  */
 public record DockerConfig(
   @JsonProperty("credHelpers")
@@ -47,26 +42,7 @@ public record DockerConfig(
   @JsonProperty("auths")
   Map<String, RegistryAuth> auths,
 
-  @JsonProperty("HttpHeaders")
-  Map<String, String> httpHeaders,
-
   @Nullable
   @JsonProperty("credsStore")
-  String credsStore,
-
-  @Nullable
-  @JsonProperty("detachKeys")
-  String detachKeys,
-
-  @Nullable
-  @JsonProperty("stackOrchestrator")
-  String stackOrchestrator,
-
-  @Nullable
-  @JsonProperty("psFormat")
-  String psFormat,
-
-  @Nullable
-  @JsonProperty("imagesFormat")
-  String imagesFormat
+  String credsStore
 ) {}
