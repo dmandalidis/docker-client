@@ -29,6 +29,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.mandas.docker.client.DockerCredentialHelper.CredentialHelperDelegate;
@@ -47,6 +48,7 @@ class SystemCredentialHelperDelegate implements CredentialHelperDelegate {
 
   private static final Logger log = LoggerFactory.getLogger(SystemCredentialHelperDelegate.class);
   private static final ObjectMapper mapper = ObjectMapperProvider.objectMapper();
+  private static final Pattern VALID_CREDS_STORE_PATTERN = Pattern.compile("[a-zA-Z0-9_-]+");
 
   @Override
   public int store(final String credsStore, final DockerCredentialHelperAuth auth)
@@ -134,6 +136,9 @@ class SystemCredentialHelperDelegate implements CredentialHelperDelegate {
   }
 
   private Process exec(final String subcommand, final String credsStore) throws IOException {
+    if (!VALID_CREDS_STORE_PATTERN.matcher(credsStore).matches()) {
+      throw new IOException("Invalid credential store name: " + credsStore);
+    }
     final String cmd = "docker-credential-" + credsStore + " " + subcommand;
     log.debug("Executing \"{}\"", cmd);
     return new ProcessBuilder("docker-credential-" + credsStore, subcommand).start();
