@@ -121,7 +121,7 @@ class SystemCredentialHelperDelegateTest {
   }
 
   @Test
-  void testRejectsCredsStoreWithSpaces() {
+  void testRejectsCredsStoreWithShellMetacharacters() {
     assertThatThrownBy(() -> delegate.get("valid-name; malicious-command", "registry.example.com"))
         .isInstanceOf(IOException.class)
         .hasMessageContaining("Invalid credential store name");
