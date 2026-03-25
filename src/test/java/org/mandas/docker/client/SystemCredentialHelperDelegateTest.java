@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.mandas.docker.client.messages.DockerCredentialHelperAuth;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.StringReader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,10 +36,12 @@ import org.junit.jupiter.api.Test;
 class SystemCredentialHelperDelegateTest {
 
   private ObjectMapper objectMapper;
+  private SystemCredentialHelperDelegate delegate;
 
   @BeforeEach
   void setup() {
     objectMapper = ObjectMapperProvider.objectMapper();
+    delegate = new SystemCredentialHelperDelegate();
   }
 
   @Test
@@ -82,6 +85,46 @@ class SystemCredentialHelperDelegateTest {
     assertThat(auth.username()).isEqualTo("foo");
     assertThat(auth.secret()).isEqualTo("bar");
     assertThat(auth.serverUrl()).isNull();
+  }
+
+  @Test
+  void testGetRejectsPathTraversalInCredsStore() {
+    assertThatThrownBy(() -> delegate.get("../../usr/bin/evil", "registry.example.com"))
+        .isInstanceOf(IOException.class)
+        .hasMessageContaining("Invalid credential store name");
+  }
+
+  @Test
+  void testStoreRejectsPathTraversalInCredsStore() {
+    final DockerCredentialHelperAuth auth = DockerCredentialHelperAuth.builder()
+        .username("user")
+        .secret("pass")
+        .serverUrl("registry.example.com")
+        .build();
+    assertThatThrownBy(() -> delegate.store("../../usr/bin/evil", auth))
+        .isInstanceOf(IOException.class)
+        .hasMessageContaining("Invalid credential store name");
+  }
+
+  @Test
+  void testEraseRejectsPathTraversalInCredsStore() {
+    assertThatThrownBy(() -> delegate.erase("../../usr/bin/evil", "registry.example.com"))
+        .isInstanceOf(IOException.class)
+        .hasMessageContaining("Invalid credential store name");
+  }
+
+  @Test
+  void testListRejectsPathTraversalInCredsStore() {
+    assertThatThrownBy(() -> delegate.list("../../usr/bin/evil"))
+        .isInstanceOf(IOException.class)
+        .hasMessageContaining("Invalid credential store name");
+  }
+
+  @Test
+  void testRejectsCredsStoreWithSpaces() {
+    assertThatThrownBy(() -> delegate.get("valid-name; malicious-command", "registry.example.com"))
+        .isInstanceOf(IOException.class)
+        .hasMessageContaining("Invalid credential store name");
   }
 
 }
