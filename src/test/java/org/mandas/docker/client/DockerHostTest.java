@@ -51,11 +51,22 @@ public class DockerHostTest {
   @Test
   public void testDefaultDockerEndpoint() throws Exception {
     when(systemDelegate.getProperty("os.name")).thenReturn("linux", "mac", "other");
+    when(systemDelegate.fileExists("unix:///var/run/docker.sock")).thenReturn(true);
     DockerHost.setSystemDelegate(systemDelegate);
 
     assertThat(DockerHost.defaultDockerEndpoint(), equalTo("unix:///var/run/docker.sock"));
     assertThat(DockerHost.defaultDockerEndpoint(), equalTo("unix:///var/run/docker.sock"));
     assertThat(DockerHost.defaultDockerEndpoint(), equalTo("localhost:2375"));
+  }
+
+  @Test
+  public void testDefaultDockerEndpointForDockerDesktopOnMac() throws Exception {
+    when(systemDelegate.getProperty("os.name")).thenReturn("mac");
+    when(systemDelegate.getProperty("user.home")).thenReturn("/Users/test-user");
+    when(systemDelegate.fileExists("unix:///var/run/docker.sock")).thenReturn(false);
+    DockerHost.setSystemDelegate(systemDelegate);
+
+    assertThat(DockerHost.defaultDockerEndpoint(), equalTo("unix:///Users/test-user/.docker/run/docker.sock"));
   }
 
   @Test

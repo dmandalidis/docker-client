@@ -22,6 +22,8 @@
 package org.mandas.docker.client;
 
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
 
@@ -38,6 +40,8 @@ public class DockerHost {
     String getProperty(String key);
 
     String getenv(String name);
+
+    boolean fileExists(String path);
   }
 
   private static final SystemDelegate defaultSystemDelegate = new SystemDelegate() {
@@ -49,6 +53,12 @@ public class DockerHost {
     @Override
     public String getenv(final String name) {
       return System.getenv(name);
+    }
+
+    @Override
+    public boolean fileExists(String path) {
+      final Path p = Path.of(path);
+      return Files.exists(p);
     }
   };
   private static SystemDelegate systemDelegate = defaultSystemDelegate;
@@ -180,8 +190,14 @@ public class DockerHost {
   static String defaultDockerEndpoint() {
     final String osName = systemDelegate.getProperty("os.name");
     final String os = osName.toLowerCase(Locale.ENGLISH);
-    if (os.equals("linux") || os.contains("mac")) {
+    if (os.equals("linux")) {
       return DEFAULT_UNIX_ENDPOINT;
+    } else if (os.contains("mac")) {
+      if (systemDelegate.fileExists(DEFAULT_UNIX_ENDPOINT)) {
+        return DEFAULT_UNIX_ENDPOINT;
+      }
+      final String userHome = systemDelegate.getProperty("user.home");
+      return "unix://" + userHome + "/.docker/run/docker.sock";
     }
     return DEFAULT_ADDRESS + ":" + defaultPort();
   }
