@@ -46,7 +46,7 @@
 		<!-- -->
 		<version.apache.compress>1.28.0</version.apache.compress>
 		<version.apache.lang>2.6</version.apache.lang>
-		<version.bcpkix>1.83</version.bcpkix>
+		<version.bcpkix>1.84</version.bcpkix>
 
 		<version.junit>6.0.3</version.junit>
 		<version.mockito>5.23.0</version.mockito>
