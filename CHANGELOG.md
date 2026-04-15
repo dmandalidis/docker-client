@@ -12,6 +12,10 @@
     sockets for long time, making the usage of named pipes very 
     rare nowadays for this use case.
 * Upgrade to Jersey 4.x (fixes #917, #671)
+* Bump org.bouncycastle:bcpkix-jdk18on from 1.83 to 1.84
+* Fall back to Docker Desktop user socket on macOS (thanks @vkuptcov)
+* Fix process injection vulnerability in SystemCredentialHelperDelegate
+* Bump com.fasterxml.jackson:jackson-bom from 2.21.1 to 2.21.2
 
 ## 10.0.1 - notable changes
 
