@@ -45,7 +45,7 @@
 		<version.apache.http>5.6.1</version.apache.http>
 		<!-- -->
 		<version.apache.compress>1.28.0</version.apache.compress>
-		<version.apache.lang>2.6</version.apache.lang>
+		<version.apache.lang>3.20.0</version.apache.lang>
 		<version.bcpkix>1.84</version.bcpkix>
 
 		<version.junit>6.0.3</version.junit>
@@ -134,8 +134,8 @@
 		</dependency>
 		<!--test deps -->
 		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
+			<groupId>org.apache.commons</groupId>
+    		<artifactId>commons-lang3</artifactId>
 			<version>${version.apache.lang}</version>
 			<scope>test</scope>
 		</dependency>
