@@ -1,5 +1,10 @@
 # Change Log
 
+## 11.0.1 - notable changes
+
+* Bump com.fasterxml.jackson:jackson-bom from 2.21.2 to 2.21.3
+* Bump org.apache.httpcomponents.client5:httpclient5 from 5.6 to 5.6.1
+
 ## 11.0.0 - notables changes
 
 * Support for Windows named pipes is dropped for two reasons:
