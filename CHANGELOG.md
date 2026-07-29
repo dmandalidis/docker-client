@@ -1,5 +1,14 @@
 # Change Log
 
+## 11.0.2 - notable changes
+
+* Bump ch.qos.logback:logback-classic from 1.5.32 to 1.6.1
+* Bump org.bouncycastle:bcpkix-jdk18on from 1.84 to 1.85
+* Bump com.fasterxml.jackson:jackson-bom from 2.21.3 to 2.22.1
+* Bump org.apache.httpcomponents.client5:httpclient5 from 5.6.1 to 5.6.2
+* Bump org.slf4j:slf4j-api from 2.0.17 to 2.0.18
+
+
 ## 11.0.1 - notable changes
 
 * Bump com.fasterxml.jackson:jackson-bom from 2.21.2 to 2.21.3
