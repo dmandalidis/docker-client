@@ -57,7 +57,7 @@
 		<version.assertj>3.27.7</version.assertj>
 
 		<version.plugin.spotbugs>4.10.4.0</version.plugin.spotbugs>
-		<version.plugin.compiler>3.15.0</version.plugin.compiler>
+		<version.plugin.compiler>3.16.0</version.plugin.compiler>
 		<version.spotbugs>4.10.4</version.spotbugs>
 		<version.plugin.checkstyle>3.6.0</version.plugin.checkstyle>
 		<version.plugin.enforcer>3.6.3</version.plugin.enforcer>
