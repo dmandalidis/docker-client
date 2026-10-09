@@ -1,5 +1,16 @@
 # Change Log
 
+## 11.0.3 - notable changes
+
+* Bump version.jersey from 4.0.2 to 4.0.3
+* Bump ch.qos.logback:logback-classic from 1.6.1 to 1.6.5
+* Bump org.apache.commons:commons-lang3 from 3.20.0 to 3.21.0
+* Bump org.slf4j:slf4j-api from 2.0.18 to 2.0.20
+* Bump com.fasterxml.jackson:jackson-bom from 2.22.1 to 2.22.3
+* Bump org.bouncycastle:bcpkix-jdk18on from 1.85 to 1.86
+* Bump com.google.jimfs:jimfs from 1.3.1 to 1.3.2
+* Bump org.apache.httpcomponents.client5:httpclient5 from 5.6.2 to 5.6.4
+
 ## 11.0.2 - notable changes
 
 * Bump ch.qos.logback:logback-classic from 1.5.32 to 1.6.1
