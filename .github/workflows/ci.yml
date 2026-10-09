@@ -45,7 +45,7 @@ jobs:
         SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
       run: mvn -B --settings .github/files/custom-settings.xml -Pdeploy-artifacts clean deploy -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
     - name: Upload coverage reports to Codecov with GitHub Action
-      uses: codecov/codecov-action@v6
+      uses: codecov/codecov-action@v7
 
     - name: Update dependency graph
       uses: advanced-security/maven-dependency-submission-action@v6
