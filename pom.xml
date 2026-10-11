@@ -369,7 +369,7 @@
 						<version>${version.plugin.publishing}</version>
 						<extensions>true</extensions>
 						<configuration>
-							<publishingServerId>central</publishingServerId>
+							<publishingServerId>sonatype-central</publishingServerId>
 							<autoPublish>true</autoPublish>
 						</configuration>
 					</plugin>

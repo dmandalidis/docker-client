@@ -14,7 +14,7 @@
   
   <servers>
     <server>
-      <id>central</id>
+      <id>sonatype-central</id>
       <username>${env.SONATYPE_USERNAME}</username>
       <password>${env.SONATYPE_PASSWORD}</password>
     </server>
