@@ -144,7 +144,7 @@ public class DockerConfigReaderTest {
 
   @Test
   public void testFromDockerConfig_MissingConfigFile() throws Exception {
-    final Path randomPath = Paths.get(RandomStringUtils.randomAlphanumeric(16) + ".json");
+    final Path randomPath = Paths.get(RandomStringUtils.secure().nextAlphanumeric(16) + ".json");
     assertThrows(FileNotFoundException.class, () -> reader.anyRegistryAuth(randomPath));
   }
 
